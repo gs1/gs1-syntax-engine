@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>gs1encoders_dotnet_app</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <StartupObject>GS1.EncodersApp.App</StartupObject>
+    <Authors>GS1 AISBL</Authors>
+    <Company>GS1 AISBL</Company>
+    <Copyright>GS1 AISBL</Copyright>
+    <Product>C# .NET WPF demo application</Product>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\dotnet-lib\GS1Encoder.cs" Link="GS1Encoder.cs" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y /d &quot;..\c-lib\build\library\Win32\$(Configuration)\gs1encoders.dll&quot; &quot;bin\$(Configuration)\$(TargetFramework)\&quot;" />
+  </Target>
+
+</Project>

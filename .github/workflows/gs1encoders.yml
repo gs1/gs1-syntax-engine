@@ -1,0 +1,393 @@
+name: GS1 Encoders CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  #
+  #  CI jobs
+  #
+
+  ci-clang:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: clang CI (with sanitizers)
+      run: |
+        # Load AI table from external Syntax Dictionary
+        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
+
+        # Re-run using the embedded AI table
+        rm src/c-lib/gs1-syntax-dictionary.txt
+        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
+
+        make -C src/c-lib -j `nproc` lib CC=clang SANITIZE=yes
+
+        make -C src/c-lib -j `nproc` app CC=clang SANITIZE=yes
+        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+
+        make -C src/c-lib -j `nproc` app-static CC=clang SANITIZE=yes
+        src/c-lib/build/gs1encoders-linux.bin --version
+
+  ci-gcc:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: gcc CI
+      run: |
+        # Load AI table from external Syntax Dictionary
+        make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
+
+        # Re-run using the embedded AI table
+        rm src/c-lib/gs1-syntax-dictionary.txt
+        make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
+
+        make -C src/c-lib -j `nproc` lib CC=gcc
+
+        make -C src/c-lib -j `nproc` app CC=gcc
+        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+
+        make -C src/c-lib -j `nproc` app-static CC=gcc
+        src/c-lib/build/gs1encoders-linux.bin --version
+
+  ci-msvc:
+
+    runs-on: windows-2019
+
+    steps:
+
+    - uses: actions/checkout@v2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1
+
+    - name: MSVC CI
+      run: |
+        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" src\gs1encoders.sln
+
+        # Load AI table from external Syntax Dictionary
+        copy src\c-lib\gs1-syntax-dictionary.txt .
+        src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+
+        # Re-run using the embedded AI table
+        del gs1-syntax-dictionary.txt
+        src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+
+        src\c-lib\build\console-app\Win32\Release\gs1encoders-app.exe --version
+        src\dotnet-app\bin\Release\netcoreapp3.1\gs1encoders-dotnet-app.exe --version
+
+  ci-macos:
+
+    runs-on: macos-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: clang CI
+      run: |
+        # Load AI table from external Syntax Dictionary
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=yes SLOW_TESTS=yes
+
+        # Re-run using the embedded AI table
+        rm src/c-lib/gs1-syntax-dictionary.txt
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=yes SLOW_TESTS=yes
+
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib SANITIZE=yes
+
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app SANITIZE=yes
+        DYLD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static SANITIZE=yes
+        src/c-lib/build/gs1encoders-linux.bin --version
+
+  ci-scan-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: clang static analyser CI
+      run: |
+        sudo apt-get update
+        sudo apt-get -y --no-install-recommends install clang-tools
+        scan-build -o plist make -C src/c-lib -j `nproc` all CC=clang
+        scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang SLOW_TESTS=yes
+        [ "$(find plist/ -name *.html)" = '' ];
+
+    - name: "clang static analyzer: Store assets on failure"
+      uses: actions/upload-artifact@v2
+      with:
+        name: clang-scan.tgz
+        path: plist/**/*.html
+        retention-days: 30
+      if: ${{ failure() }}
+
+    - name: check includes with IWYU
+      working-directory: src/c-lib
+      run: |
+        sudo apt-get -y --no-install-recommends install iwyu clang-9
+        find -name '*.c' -print0 | xargs -0 -n1 -i bash -c 'iwyu -DPRNT -DSYMBOLOGY=gs1_encoder_sNONE -DUNIT_TESTS -DGS1_LINTER_ERR_STR_EN {}; [[ $? = 2 ]] || false'
+
+  ci-wasm:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: mymindstorm/setup-emsdk@v11
+
+    - uses: actions/checkout@v2
+
+    - name: WASM CI
+      run: |
+        make -C src/c-lib -j `nproc` wasm
+
+
+  #
+  #  Production builds
+  #
+
+  build-release-windows:
+
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs:
+      - ci-gcc
+      - ci-clang
+      - ci-msvc
+      - ci-macos
+      - ci-scan-build
+      - ci-wasm
+
+    runs-on: windows-2019
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Windows release build
+      run: |
+        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 src\gs1encoders.sln
+        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\netcoreapp3.1\win-x86\publish\ src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
+
+    - name: ZIP development libs
+      working-directory: src/c-lib/build/library/Win32/Release
+      run: |
+        7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
+
+    - name: Store Windows development libs
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-libs
+        path: src/c-lib/build/library/Win32/Release/gs1encoders-windows-libs.zip
+
+    - name: ZIP console application
+      working-directory: src/c-lib/build/console-app/Win32/Release
+      run: |
+        7z a gs1encoders-windows-console-app.zip gs1encoders-app.exe gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
+
+    - name: Store Windows console app
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-console-app
+        path: src/c-lib/build/console-app/Win32/Release/gs1encoders-windows-console-app.zip
+
+    - name: ZIP GUI application
+      working-directory: src/dotnet-app/bin/Release\netcoreapp3.1\win-x86\publish
+      run: |
+        7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet-app.exe ../../gs1encoders.dll ../../../../../../c-lib/gs1-syntax-dictionary.txt
+
+    - name: Store Windows GUI app
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-gui-app
+        path: src/dotnet-app/bin/Release/netcoreapp3.1/win-x86/publish/gs1encoders-windows-gui-app.zip
+
+
+  build-release-linux:
+
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs:
+      - ci-gcc
+      - ci-clang
+      - ci-msvc
+      - ci-macos
+      - ci-scan-build
+      - ci-wasm
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Linux release build
+      run: |
+        make -C src/c-lib -j `nproc` CC=clang
+        src/c-lib/build/gs1encoders-linux.bin --version
+        cp src/c-lib/gs1-syntax-dictionary.txt src/c-lib/build/
+        cd src/c-lib/build
+        tar cvzf gs1encoders-linux-app.tgz gs1encoders-linux.bin gs1-syntax-dictionary.txt
+
+    - name: Store Linux build
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-app
+        path: src/c-lib/build/gs1encoders-linux-app.tgz
+
+  build-release-wasm:
+
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs:
+      - ci-gcc
+      - ci-clang
+      - ci-msvc
+      - ci-macos
+      - ci-scan-build
+      - ci-wasm
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: mymindstorm/setup-emsdk@v11
+
+    - uses: actions/checkout@v2
+
+    - name: WASM release build
+      run: |
+        make -C src/c-lib -j `nproc` wasm
+        cp src/js-wasm/gs1encoder.js src/js-wasm/example.html src/js-wasm/example.js src/c-lib/build-wasm/
+        cd src/c-lib/build-wasm
+        tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.js gs1encoder.js example.html example.js
+
+    - name: Store WASM build
+      uses: actions/upload-artifact@v2
+      with:
+        name: wasm-app
+        path: src/c-lib/build-wasm/gs1encoders-wasm-app.tgz
+
+
+  #
+  #  Create release and upload artifacts
+  #
+
+  create-release:
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - build-release-linux
+      - build-release-windows
+      - build-release-wasm
+
+    steps:
+
+    - name: Load Windows libs
+      uses: actions/download-artifact@v2
+      with:
+        name: windows-libs
+
+    - name: Load Windows console app
+      uses: actions/download-artifact@v2
+      with:
+        name: windows-console-app
+
+    - name: Load Windows GUI app
+      uses: actions/download-artifact@v2
+      with:
+        name: windows-gui-app
+
+    - name: Load Linux app
+      uses: actions/download-artifact@v2
+      with:
+        name: linux-app
+
+    - name: Load WASM app
+      uses: actions/download-artifact@v2
+      with:
+        name: wasm-app
+
+    - name: Get version
+      id: get_version
+      run: |
+        VERSION=${GITHUB_REF/refs\/tags\//}
+        echo ::set-output name=VERSION::$VERSION
+
+    - name: Create GitHub release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        release_name: ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: "Upload asset: Windows development libs"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-windows-libs.zip
+        asset_name: gs1encoders-windows-libs.zip
+        asset_content_type: application/zip
+
+    - name: "Upload asset: Windows console application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-windows-console-app.zip
+        asset_name: gs1encoders-windows-console-app.zip
+        asset_content_type: application/zip
+
+    - name: "Upload asset: Windows GUI application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-windows-gui-app.zip
+        asset_name: gs1encoders-windows-gui-app.zip
+        asset_content_type: application/zip
+
+    - name: "Upload asset: Linux application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-linux-app.tgz
+        asset_name: gs1encoders-linux-app.tgz
+        asset_content_type: application/octet-stream
+
+    - name: "Upload asset: WASM application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-wasm-app.tgz
+        asset_name: gs1encoders-wasm-app.tgz
+        asset_content_type: application/octet-stream
