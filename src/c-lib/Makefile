@@ -39,7 +39,7 @@ CC = emcc
 CFLAGS_G =
 CFLAGS_O = -O3
 BUILD_DIR = build-wasm
-LDFLAGS_WASM = -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1
+LDFLAGS_WASM = -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1
 SYN_DICT = gs1-syntax-dictionary.txt
 else
 CFLAGS_G = -g
