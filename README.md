@@ -54,13 +54,13 @@ library to be redistributed with an application.
 
 This repository contains:
 
-| Directory      | Purpose                                                                                           |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application |
-| docs           | Documentation for the public API of the native C library                                          |
-| src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke       |
-| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                |
-| src/js-wasm    | A JavaScript wrapper providing an OO interface to the WASM build, and a demo web application      |
+| Directory      | Purpose                                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application                   |
+| docs           | Documentation for the public API of the native C library                                                            |
+| src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                         |
+| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                  |
+| src/js-wasm    | A JavaScript wrapper providing an OO interface to the WASM build, a demo web application and an example for Node.js |
 
 
 ### Building on Windows
