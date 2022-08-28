@@ -102,7 +102,7 @@ APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
 
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test
 
-WASM_JS = $(BUILD_DIR)/gs1encoder-wasm.js
+WASM_JS = $(BUILD_DIR)/gs1encoder-wasm.mjs
 WASM_WASM = $(BUILD_DIR)/gs1encoder-wasm.wasm
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a

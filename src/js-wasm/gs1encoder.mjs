@@ -31,7 +31,7 @@
  *  "application/wasm".
  *
  */
-import createGS1encoderModule from './gs1encoder-wasm.js';
+import createGS1encoderModule from './gs1encoder-wasm.mjs';
 
 
 /**

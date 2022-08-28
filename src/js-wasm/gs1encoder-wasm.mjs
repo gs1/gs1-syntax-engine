@@ -1,0 +1,1 @@
+../c-lib/build-wasm/gs1encoder-wasm.mjs

@@ -25,7 +25,7 @@
 
 'use strict';
 
-import { GS1encoder } from './gs1encoder.js';
+import { GS1encoder } from './gs1encoder.mjs';
 
 
 var gs1encoder = {};
