@@ -21,7 +21,8 @@ This project includes:
   * Several example applications:
     * A demonstration console application whose code shows how to use the native library.
     * A demonstration desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper to access the native library.
-    * A demonstration web application whose code shows how to use the WebAssembly build.
+    * A demonstration web application whose code shows how to use the WebAssembly build from browser-based JavaScript.
+    * A demonstration console application whose code shows how to use the WebAssembly build from JavaScript executed by Node.js.
 
 
 Documentation
