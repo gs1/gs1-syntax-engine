@@ -150,9 +150,15 @@ jobs:
 
     - uses: actions/checkout@v2
 
-    - name: WASM CI
+    - name: WASM build
       run: |
         make -C src/c-lib -j `nproc` wasm
+
+    - name: Node.js run
+      working-directory: src/js-wasm
+      run: |
+        npm install readline-sync
+        node example.node.mjs --version
 
 
   #
