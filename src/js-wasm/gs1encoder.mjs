@@ -122,7 +122,7 @@ export class GS1encoder {
             gs1_encoder_getDataStr:
                 this.module.cwrap('gs1_encoder_getDataStr', 'string', ['number']),
             gs1_encoder_getDLuri:
-                this.module.cwrap('gs1_encoder_getDLuri', 'string', ['number']),
+                this.module.cwrap('gs1_encoder_getDLuri', 'string', ['number', 'string']),
             gs1_encoder_setScanData:
                 this.module.cwrap('gs1_encoder_setScanData', 'number', ['number', 'string']),
             gs1_encoder_getScanData:
@@ -333,8 +333,8 @@ export class GS1encoder {
      *   - gs1_encoder_getDLuri()
      *
      */
-    get dlURI() {
-        var uri = this.api.gs1_encoder_getDLuri(this.ctx);
+    getDLuri(stem) {
+        var uri = this.api.gs1_encoder_getDLuri(this.ctx, stem);
         if (!uri)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
         return uri;

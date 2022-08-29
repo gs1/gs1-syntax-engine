@@ -72,7 +72,7 @@ function load_data_values() {
 	document.getElementById("elementstring").value = gs1encoder.aiDataStr || "⧚ Not AI-based data ⧛";
 
 	try {
-		document.getElementById("dl").value = gs1encoder.dlURI;
+		document.getElementById("dl").value = gs1encoder.getDLuri(null);
 	}
 	catch (err) {
 		document.getElementById("dl").value = "⧚ " + err.message + " ⧛";
