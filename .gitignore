@@ -22,3 +22,6 @@ src/dotnet-lib/bin/
 src/dotnet-lib/obj/
 src/dotnet-app/bin/
 src/dotnet-app/obj/
+src/js-wasm/node_modules/
+src/js-wasm/package.json
+src/js-wasm/package-lock.json

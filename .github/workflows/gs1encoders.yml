@@ -280,9 +280,9 @@ jobs:
     - name: WASM release build
       run: |
         make -C src/c-lib -j `nproc` wasm
-        cp src/js-wasm/gs1encoder.js src/js-wasm/example.html src/js-wasm/example.js src/c-lib/build-wasm/
+        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs example.node.mjs src/c-lib/build-wasm/
         cd src/c-lib/build-wasm
-        tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.js gs1encoder.js example.html example.js
+        tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store WASM build
       uses: actions/upload-artifact@v2
@@ -388,7 +388,7 @@ jobs:
         asset_name: gs1encoders-linux-app.tgz
         asset_content_type: application/octet-stream
 
-    - name: "Upload asset: WASM application"
+    - name: "Upload asset: WASM applications (browser and Node.js)"
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
