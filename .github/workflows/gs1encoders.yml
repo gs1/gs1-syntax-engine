@@ -280,7 +280,7 @@ jobs:
     - name: WASM release build
       run: |
         make -C src/c-lib -j `nproc` wasm
-        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs example.node.mjs src/c-lib/build-wasm/
+        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs src/js-wasm/example.node.mjs src/c-lib/build-wasm/
         cd src/c-lib/build-wasm
         tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
