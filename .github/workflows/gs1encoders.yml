@@ -154,10 +154,13 @@ jobs:
       run: |
         make -C src/c-lib -j `nproc` wasm
 
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
     - name: Node.js run
       working-directory: src/js-wasm
       run: |
-        npm install readline-sync
         node example.node.mjs --version
 
 

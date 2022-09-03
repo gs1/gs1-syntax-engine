@@ -4,8 +4,12 @@
  *
  *  Requirements:
  *
- *    - Node.js >= v13.2.0 for stable ES6 module support
- *    - readline-sync package
+ *    - Node.js >= v17.0.0 for stable ES6 module support and readline/promises
+ *
+ *  The API reference for the native C library is available here:
+ *
+ *      https://gs1.github.io/gs1-syntax-engine/
+ *
  *
  *  Copyright (c) 2022 GS1 AISBL.
  *
@@ -22,20 +26,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- *  The API reference for the native C library is available here:
- *
- *  https://gs1.github.io/gs1-syntax-engine/
- *
  */
 
 "use strict";
 
-import readline from "readline-sync";
+
+/*
+ *  Setup for synchronous console interaction
+ *
+ */
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
+const rl = readline.createInterface({ input, output });
 
 
 /*
- * Temporary boilerplate required due to deficiencies in Emscripten's modulular
- * JS wrapper. May be able to drop this in due course.
+ *  Temporary boilerplate required due to deficiencies in Emscripten's
+ *  modulular JS wrapper. May be able to drop this in due course.
  *
  */
 globalThis.__dirname = '.';
@@ -47,16 +54,17 @@ import { GS1encoder } from "./gs1encoder.mjs";
 var gs1encoder = new GS1encoder();
 await gs1encoder.init();
 
+var exit = 0;
+
 
 /*
- *  If --version is provided, then report the library version and exit
+ *  If --version is provided, then just report the library version
  *
  */
 var argv = process.argv.slice(2);
 if (argv.length == 1 && argv == "--version") {
     console.log("Library version: %s", gs1encoder.version);
-    gs1encoder.free();
-    process.exit(0);
+    exit = 1;
 }
 
 
@@ -64,7 +72,6 @@ if (argv.length == 1 && argv == "--version") {
  *  Interactive loop
  *
  */
-var exit = 0;
 while (!exit) {
 
     console.log("\n\n\nCurrent state:");
@@ -95,13 +102,13 @@ while (!exit) {
 
     console.log("\n 0) Exit program");
 
-    var menuVal = await readline.question("\nMenu selection: ");
+    var menuVal = await rl.question("\nMenu selection: ");
 
     switch (menuVal) {
         case "1":
         case "2":
         case "3":
-            var inpStr = await readline.question("\nEnter data: ");
+            var inpStr = await rl.question("\nEnter data: ");
             if (!inpStr)
                 continue;
             try {
@@ -122,7 +129,7 @@ while (!exit) {
         case "4":
         case "5":
         case "6":
-            var inpStr = await readline.question("\nEnter 0 for OFF or 1 for ON: ");
+            var inpStr = await rl.question("\nEnter 0 for OFF or 1 for ON: ");
             if (!inpStr)
                 continue;
             if (inpStr !== "0" && inpStr !== "1") {
@@ -151,3 +158,5 @@ while (!exit) {
 }
 
 gs1encoder.free();
+
+rl.close();
