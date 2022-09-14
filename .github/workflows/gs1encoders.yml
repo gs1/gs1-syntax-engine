@@ -26,14 +26,15 @@ jobs:
         # Re-run using the embedded AI table
         rm src/c-lib/gs1-syntax-dictionary.txt
         make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
+        git checkout src/c-lib/gs1-syntax-dictionary.txt
 
         make -C src/c-lib -j `nproc` lib CC=clang SANITIZE=yes
 
         make -C src/c-lib -j `nproc` app CC=clang SANITIZE=yes
-        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `nproc` app-static CC=clang SANITIZE=yes
-        src/c-lib/build/gs1encoders-linux.bin --version
+        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
 
   ci-gcc:
 
@@ -51,14 +52,15 @@ jobs:
         # Re-run using the embedded AI table
         rm src/c-lib/gs1-syntax-dictionary.txt
         make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
+        git checkout src/c-lib/gs1-syntax-dictionary.txt
 
         make -C src/c-lib -j `nproc` lib CC=gcc
 
         make -C src/c-lib -j `nproc` app CC=gcc
-        LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `nproc` app-static CC=gcc
-        src/c-lib/build/gs1encoders-linux.bin --version
+        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
 
   ci-msvc:
 
@@ -81,6 +83,7 @@ jobs:
         # Re-run using the embedded AI table
         del gs1-syntax-dictionary.txt
         src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+        copy src\c-lib\gs1-syntax-dictionary.txt .
 
         src\c-lib\build\console-app\Win32\Release\gs1encoders-app.exe --version
         src\dotnet-app\bin\Release\netcoreapp3.1\gs1encoders-dotnet-app.exe --version
@@ -101,14 +104,15 @@ jobs:
         # Re-run using the embedded AI table
         rm src/c-lib/gs1-syntax-dictionary.txt
         make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=yes SLOW_TESTS=yes
+        git checkout src/c-lib/gs1-syntax-dictionary.txt
 
         make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib SANITIZE=yes
 
         make -C src/c-lib -j `sysctl -n hw.logicalcpu` app SANITIZE=yes
-        DYLD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin --version
+        ( cd src/c-lib && DYLD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static SANITIZE=yes
-        src/c-lib/build/gs1encoders-linux.bin --version
+        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
 
   ci-scan-build:
 
