@@ -329,7 +329,8 @@ static size_t URIescape(char *out, size_t maxlen, const char *in, const size_t i
  * path information, and convert it to a regular AI data string with ^ = FNC1,
  * extracting AI data for HRI purposes.
  *
- * Note: Convenience strings are not supported.
+ * Note: "Convenience alphas" (e.g. "/gtin/0123...", which have been
+ * deprecated) are not supported.
  *
  */
 bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
@@ -687,13 +688,9 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 		assert(ai->aiEntry);
 		strcpy(seq[0], ai->aiEntry->ai);
 		if ((ke = getDLpathAIseqEntry(ctx, seq, 1)) != -1) {
-			if (keyEntry != -1) {
-				sprintf(ctx->errMsg, "Cannot create a DL URI with multiple primary key AIs (%s) and (%s)", ctx->dlKeyQualifiers[keyEntry], ai->aiEntry->ai);
-				ctx->errFlag = true;
-				return NULL;
-			}
-			keyEntry = ke;		// Continue, to ensure only one DL primary key
+			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
+			break;
 		}
 	}
 
@@ -704,8 +701,8 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 	}
 
 	/*
-	 *  Pick a qualifier-key sequence starting with the primary key and
-	 *  having a maximum number of matching qualifier AIs
+	 *  Pick a qualifier-key sequence starting with the chosen primary key
+	 *  and having a maximum number of matching qualifier AIs
 	 *
 	 */
 	DEBUG_PRINT("Considering DL key-qualifier sequences\n");
@@ -1353,6 +1350,16 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI?95=INT");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(21)XYZ(01)12312312312333(10)ABC123(99)XYZ", "https://example.com/01/12312312312333/10/ABC123/21/XYZ?99=XYZ");
+
+	/*
+	 * Multiple candidate primary keys; first should be chosen and
+	 * subsequent ones relegated to attributes.
+	 *
+	 */
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(8017)795260646688514634(99)000001(253)9526064000028000001", "https://example.com/8017/795260646688514634?99=000001&253=9526064000028000001");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?99=000001&8017=795260646688514634");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(98)ABC(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?98=ABC&99=000001&8017=795260646688514634");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&22=ABC&10=DEF&21=GHI&95=INT");
 
 	gs1_encoder_free(ctx);
 
