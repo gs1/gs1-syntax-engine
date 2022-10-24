@@ -16,7 +16,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: clang CI (with sanitizers)
       run: |
@@ -42,7 +42,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: gcc CI
       run: |
@@ -68,7 +68,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1
 
@@ -94,7 +94,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: clang CI
       run: |
@@ -120,7 +120,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: clang static analyser CI
       run: |
@@ -152,7 +152,7 @@ jobs:
 
     - uses: mymindstorm/setup-emsdk@v11
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: WASM build
       run: |
@@ -188,7 +188,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1
@@ -248,7 +248,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Linux release build
       run: |
@@ -282,7 +282,7 @@ jobs:
 
     - uses: mymindstorm/setup-emsdk@v11
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: WASM release build
       run: |
