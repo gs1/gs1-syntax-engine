@@ -35,11 +35,15 @@ UNIT_TEST_CFLAGS = -DUNIT_TESTS
 endif
 
 ifeq ($(MAKECMDGOALS),wasm)
+DO_WASM = 1
+ifeq ($(JSONLY),yes)
+DO_WASM = 0
+endif
 CC = emcc
 CFLAGS_G =
 CFLAGS_O = -O3
 BUILD_DIR = build-wasm
-LDFLAGS_WASM = -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1
+LDFLAGS_WASM = -s WASM=$(DO_WASM) -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1
 SYN_DICT = gs1-syntax-dictionary.txt
 else
 CFLAGS_G = -g
@@ -103,7 +107,8 @@ APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test
 
 WASM_JS = $(BUILD_DIR)/gs1encoder-wasm.mjs
-WASM_WASM = $(BUILD_DIR)/gs1encoder-wasm.wasm
+WASM_WASM = $(WASM_JS:.mjs=.wasm)
+WASM_MEM = $(WASM_JS).mem
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(BUILD_DIR)/lib$(NAME).so $(BUILD_DIR)/lib$(NAME).so.$(MAJOR)
@@ -260,7 +265,7 @@ clean-test:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 clean-wasm:
-	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(DEPS)
+	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(WASM_MEM) $(DEPS)
 
 install: install-static install-shared
 
