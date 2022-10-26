@@ -498,7 +498,7 @@ fail:
 bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 
 	size_t i;
-	bool aiMode;
+	bool aiMode = false;
 	enum gs1_encoder_symbologies sym = gs1_encoder_sNONE;
 	const struct symIdEntry *entry;
 	const size_t symIdTable_len = SIZEOF_ARRAY(symIdTable);

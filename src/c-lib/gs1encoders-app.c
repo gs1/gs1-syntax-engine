@@ -45,7 +45,7 @@ static char* _gets(char* in) {
 
 static bool userInt(gs1_encoder *ctx) {
 
-	bool ret;
+	bool ret = false;
 	int menuVal, i, numHRI;
 	char **hri;
 
