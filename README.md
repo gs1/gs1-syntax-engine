@@ -18,6 +18,9 @@ This project includes:
     * Compiled to native code for use as a shared library (Linux / MacOS / BSD) or dynamic-link library (Windows).
     * Compiled to WebAssembly (or JavaScript) for use in a browser-based web application or Node.js application.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
+  * A Java wrapper class that provides an object interface to the native library from managed code, using Java Native Interface.
+  * Preliminary Kotlin code demonstrating how to use the Java wrapper around the native library in an Android Studio project to create an Android app.
+  * Preliminary Swift code demonstrating how to use the native library in an Xcode project ot create an iOS app.
   * Several example applications:
     * A demonstration console application whose code shows how to use the native library.
     * A demonstration desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper to access the native library.
@@ -62,6 +65,9 @@ This repository contains:
 | src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                                                |
 | src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                         |
 | src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or JavaScript build, with demo web and console applications |
+| src/java       |  A Java wrapper that provides a managed code interface to the native library using Java Native interface                                   |
+| src/android    |  A preliminary Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                   |
+| src/ios        |  A preliminary Xcode project that demonstrates how to use the native library from Swift to create an iOS app                               |
 
 
 ### Building on Windows
