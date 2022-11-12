@@ -1,0 +1,535 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */; };
+		F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AD2909D225008E17F4 /* ContentView.swift */; };
+		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
+		F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */; };
+		F79827612909D35500F00DDA /* ai.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827202909D35400F00DDA /* ai.c */; };
+		F79827662909D35500F00DDA /* scandata.c in Sources */ = {isa = PBXBuildFile; fileRef = F798272A2909D35400F00DDA /* scandata.c */; };
+		F798276D2909D35500F00DDA /* dl.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827342909D35400F00DDA /* dl.c */; };
+		F79827702909D35500F00DDA /* gs1encoders.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827372909D35400F00DDA /* gs1encoders.c */; };
+		F79827722909D35500F00DDA /* lint_latlong.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273A2909D35400F00DDA /* lint_latlong.c */; };
+		F79827732909D35500F00DDA /* lint_iso3166list.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273B2909D35400F00DDA /* lint_iso3166list.c */; };
+		F79827742909D35500F00DDA /* lint_winding.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273C2909D35400F00DDA /* lint_winding.c */; };
+		F79827752909D35500F00DDA /* lint_couponcode.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273D2909D35400F00DDA /* lint_couponcode.c */; };
+		F79827762909D35500F00DDA /* lint_csum.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273E2909D35400F00DDA /* lint_csum.c */; };
+		F79827772909D35500F00DDA /* lint_iso4217.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273F2909D35400F00DDA /* lint_iso4217.c */; };
+		F79827782909D35500F00DDA /* lint_cset39.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827402909D35400F00DDA /* lint_cset39.c */; };
+		F79827792909D35500F00DDA /* lint_yymmddhh.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827412909D35400F00DDA /* lint_yymmddhh.c */; };
+		F798277A2909D35500F00DDA /* lint_zero.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827422909D35400F00DDA /* lint_zero.c */; };
+		F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827442909D35400F00DDA /* lint_csetnumeric.c */; };
+		F798277C2909D35500F00DDA /* lint_iso3166.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827462909D35400F00DDA /* lint_iso3166.c */; };
+		F798277D2909D35500F00DDA /* lint_importeridx.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827482909D35400F00DDA /* lint_importeridx.c */; };
+		F798277E2909D35500F00DDA /* lint_pcenc.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827492909D35400F00DDA /* lint_pcenc.c */; };
+		F798277F2909D35500F00DDA /* lint_cset82.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274A2909D35400F00DDA /* lint_cset82.c */; };
+		F79827802909D35500F00DDA /* lint_iban.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274B2909D35400F00DDA /* lint_iban.c */; };
+		F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */; };
+		F79827822909D35500F00DDA /* lint_couponposoffer.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274D2909D35400F00DDA /* lint_couponposoffer.c */; };
+		F79827832909D35500F00DDA /* lint_hhmm.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274E2909D35400F00DDA /* lint_hhmm.c */; };
+		F79827842909D35500F00DDA /* lint_nonzero.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274F2909D35400F00DDA /* lint_nonzero.c */; };
+		F79827852909D35500F00DDA /* lint_key.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827502909D35400F00DDA /* lint_key.c */; };
+		F79827862909D35500F00DDA /* lint_csumalpha.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827512909D35400F00DDA /* lint_csumalpha.c */; };
+		F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827522909D35400F00DDA /* lint_nozeroprefix.c */; };
+		F79827882909D35500F00DDA /* lint_yymmdd.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827532909D35400F00DDA /* lint_yymmdd.c */; };
+		F79827892909D35500F00DDA /* lint_yesno.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827542909D35400F00DDA /* lint_yesno.c */; };
+		F798278A2909D35500F00DDA /* lint_pieceoftotal.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827552909D35400F00DDA /* lint_pieceoftotal.c */; };
+		F798278B2909D35500F00DDA /* lint_mmoptss.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827562909D35400F00DDA /* lint_mmoptss.c */; };
+		F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827572909D35400F00DDA /* lint_iso3166999.c */; };
+		F798278D2909D35500F00DDA /* gs1syntaxdictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827582909D35400F00DDA /* gs1syntaxdictionary.c */; };
+		F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827592909D35400F00DDA /* lint_yymmd0.c */; };
+		F79827902909D35500F00DDA /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = F798275B2909D35400F00DDA /* syn.c */; };
+		F79827912909D35500F00DDA /* gs1-syntax-dictionary.txt in Resources */ = {isa = PBXBuildFile; fileRef = F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */; };
+		F79827DD2909E3AE00F00DDA /* GS1Encoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS1 Encoders App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1_Encoders_AppApp.swift; sourceTree = "<group>"; };
+		F73EC9AD2909D225008E17F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F73EC9AF2909D226008E17F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F798271D2909D35400F00DDA /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
+		F79827202909D35400F00DDA /* ai.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ai.c; sourceTree = "<group>"; };
+		F79827212909D35400F00DDA /* enc-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "enc-private.h"; sourceTree = "<group>"; };
+		F79827222909D35400F00DDA /* syn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syn.h; sourceTree = "<group>"; };
+		F79827242909D35400F00DDA /* acutest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acutest.h; sourceTree = "<group>"; };
+		F79827252909D35400F00DDA /* gs1encoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gs1encoders.h; sourceTree = "<group>"; };
+		F79827272909D35400F00DDA /* aitable.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = aitable.inc; sourceTree = "<group>"; };
+		F798272A2909D35400F00DDA /* scandata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scandata.c; sourceTree = "<group>"; };
+		F798272B2909D35400F00DDA /* dl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dl.h; sourceTree = "<group>"; };
+		F798272F2909D35400F00DDA /* ai.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ai.h; sourceTree = "<group>"; };
+		F79827322909D35400F00DDA /* scandata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scandata.h; sourceTree = "<group>"; };
+		F79827342909D35400F00DDA /* dl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dl.c; sourceTree = "<group>"; };
+		F79827372909D35400F00DDA /* gs1encoders.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gs1encoders.c; sourceTree = "<group>"; };
+		F798273A2909D35400F00DDA /* lint_latlong.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_latlong.c; sourceTree = "<group>"; };
+		F798273B2909D35400F00DDA /* lint_iso3166list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166list.c; sourceTree = "<group>"; };
+		F798273C2909D35400F00DDA /* lint_winding.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_winding.c; sourceTree = "<group>"; };
+		F798273D2909D35400F00DDA /* lint_couponcode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_couponcode.c; sourceTree = "<group>"; };
+		F798273E2909D35400F00DDA /* lint_csum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csum.c; sourceTree = "<group>"; };
+		F798273F2909D35400F00DDA /* lint_iso4217.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso4217.c; sourceTree = "<group>"; };
+		F79827402909D35400F00DDA /* lint_cset39.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset39.c; sourceTree = "<group>"; };
+		F79827412909D35400F00DDA /* lint_yymmddhh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmddhh.c; sourceTree = "<group>"; };
+		F79827422909D35400F00DDA /* lint_zero.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_zero.c; sourceTree = "<group>"; };
+		F79827432909D35400F00DDA /* acutest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acutest.h; sourceTree = "<group>"; };
+		F79827442909D35400F00DDA /* lint_csetnumeric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csetnumeric.c; sourceTree = "<group>"; };
+		F79827462909D35400F00DDA /* lint_iso3166.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166.c; sourceTree = "<group>"; };
+		F79827472909D35400F00DDA /* gs1syntaxdictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gs1syntaxdictionary.h; sourceTree = "<group>"; };
+		F79827482909D35400F00DDA /* lint_importeridx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_importeridx.c; sourceTree = "<group>"; };
+		F79827492909D35400F00DDA /* lint_pcenc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_pcenc.c; sourceTree = "<group>"; };
+		F798274A2909D35400F00DDA /* lint_cset82.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset82.c; sourceTree = "<group>"; };
+		F798274B2909D35400F00DDA /* lint_iban.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iban.c; sourceTree = "<group>"; };
+		F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166alpha2.c; sourceTree = "<group>"; };
+		F798274D2909D35400F00DDA /* lint_couponposoffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_couponposoffer.c; sourceTree = "<group>"; };
+		F798274E2909D35400F00DDA /* lint_hhmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hhmm.c; sourceTree = "<group>"; };
+		F798274F2909D35400F00DDA /* lint_nonzero.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_nonzero.c; sourceTree = "<group>"; };
+		F79827502909D35400F00DDA /* lint_key.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_key.c; sourceTree = "<group>"; };
+		F79827512909D35400F00DDA /* lint_csumalpha.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csumalpha.c; sourceTree = "<group>"; };
+		F79827522909D35400F00DDA /* lint_nozeroprefix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_nozeroprefix.c; sourceTree = "<group>"; };
+		F79827532909D35400F00DDA /* lint_yymmdd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmdd.c; sourceTree = "<group>"; };
+		F79827542909D35400F00DDA /* lint_yesno.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yesno.c; sourceTree = "<group>"; };
+		F79827552909D35400F00DDA /* lint_pieceoftotal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_pieceoftotal.c; sourceTree = "<group>"; };
+		F79827562909D35400F00DDA /* lint_mmoptss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_mmoptss.c; sourceTree = "<group>"; };
+		F79827572909D35400F00DDA /* lint_iso3166999.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166999.c; sourceTree = "<group>"; };
+		F79827582909D35400F00DDA /* gs1syntaxdictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gs1syntaxdictionary.c; sourceTree = "<group>"; };
+		F79827592909D35400F00DDA /* lint_yymmd0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmd0.c; sourceTree = "<group>"; };
+		F798275B2909D35400F00DDA /* syn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = syn.c; sourceTree = "<group>"; };
+		F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "gs1-syntax-dictionary.txt"; sourceTree = "<group>"; };
+		F79827DB2909DC2600F00DDA /* GS1 Encoders App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GS1 Encoders App-Bridging-Header.h"; sourceTree = "<group>"; };
+		F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1Encoder.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F73EC9A52909D225008E17F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F73EC99F2909D225008E17F4 = {
+			isa = PBXGroup;
+			children = (
+				F73EC9AA2909D225008E17F4 /* GS1 Encoders App */,
+				F73EC9A92909D225008E17F4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F73EC9A92909D225008E17F4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F73EC9AA2909D225008E17F4 /* GS1 Encoders App */ = {
+			isa = PBXGroup;
+			children = (
+				F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */,
+				F798271B2909D35400F00DDA /* c-lib */,
+				F73EC9AD2909D225008E17F4 /* ContentView.swift */,
+				F73EC9AF2909D226008E17F4 /* Assets.xcassets */,
+				F73EC9B12909D226008E17F4 /* Preview Content */,
+				F79827DB2909DC2600F00DDA /* GS1 Encoders App-Bridging-Header.h */,
+				F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */,
+			);
+			path = "GS1 Encoders App";
+			sourceTree = "<group>";
+		};
+		F73EC9B12909D226008E17F4 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F798271B2909D35400F00DDA /* c-lib */ = {
+			isa = PBXGroup;
+			children = (
+				F798271D2909D35400F00DDA /* debug.h */,
+				F79827202909D35400F00DDA /* ai.c */,
+				F79827212909D35400F00DDA /* enc-private.h */,
+				F79827222909D35400F00DDA /* syn.h */,
+				F79827242909D35400F00DDA /* acutest.h */,
+				F79827252909D35400F00DDA /* gs1encoders.h */,
+				F79827272909D35400F00DDA /* aitable.inc */,
+				F798272A2909D35400F00DDA /* scandata.c */,
+				F798272B2909D35400F00DDA /* dl.h */,
+				F798272F2909D35400F00DDA /* ai.h */,
+				F79827322909D35400F00DDA /* scandata.h */,
+				F79827342909D35400F00DDA /* dl.c */,
+				F79827372909D35400F00DDA /* gs1encoders.c */,
+				F79827392909D35400F00DDA /* syntax */,
+				F798275B2909D35400F00DDA /* syn.c */,
+				F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */,
+			);
+			name = "c-lib";
+			path = "../../c-lib";
+			sourceTree = "<group>";
+		};
+		F79827392909D35400F00DDA /* syntax */ = {
+			isa = PBXGroup;
+			children = (
+				F798273A2909D35400F00DDA /* lint_latlong.c */,
+				F798273B2909D35400F00DDA /* lint_iso3166list.c */,
+				F798273C2909D35400F00DDA /* lint_winding.c */,
+				F798273D2909D35400F00DDA /* lint_couponcode.c */,
+				F798273E2909D35400F00DDA /* lint_csum.c */,
+				F798273F2909D35400F00DDA /* lint_iso4217.c */,
+				F79827402909D35400F00DDA /* lint_cset39.c */,
+				F79827412909D35400F00DDA /* lint_yymmddhh.c */,
+				F79827422909D35400F00DDA /* lint_zero.c */,
+				F79827432909D35400F00DDA /* acutest.h */,
+				F79827442909D35400F00DDA /* lint_csetnumeric.c */,
+				F79827462909D35400F00DDA /* lint_iso3166.c */,
+				F79827472909D35400F00DDA /* gs1syntaxdictionary.h */,
+				F79827482909D35400F00DDA /* lint_importeridx.c */,
+				F79827492909D35400F00DDA /* lint_pcenc.c */,
+				F798274A2909D35400F00DDA /* lint_cset82.c */,
+				F798274B2909D35400F00DDA /* lint_iban.c */,
+				F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */,
+				F798274D2909D35400F00DDA /* lint_couponposoffer.c */,
+				F798274E2909D35400F00DDA /* lint_hhmm.c */,
+				F798274F2909D35400F00DDA /* lint_nonzero.c */,
+				F79827502909D35400F00DDA /* lint_key.c */,
+				F79827512909D35400F00DDA /* lint_csumalpha.c */,
+				F79827522909D35400F00DDA /* lint_nozeroprefix.c */,
+				F79827532909D35400F00DDA /* lint_yymmdd.c */,
+				F79827542909D35400F00DDA /* lint_yesno.c */,
+				F79827552909D35400F00DDA /* lint_pieceoftotal.c */,
+				F79827562909D35400F00DDA /* lint_mmoptss.c */,
+				F79827572909D35400F00DDA /* lint_iso3166999.c */,
+				F79827582909D35400F00DDA /* gs1syntaxdictionary.c */,
+				F79827592909D35400F00DDA /* lint_yymmd0.c */,
+			);
+			path = syntax;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F73EC9A72909D225008E17F4 /* GS1 Encoders App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F73EC9B62909D226008E17F4 /* Build configuration list for PBXNativeTarget "GS1 Encoders App" */;
+			buildPhases = (
+				F73EC9A42909D225008E17F4 /* Sources */,
+				F73EC9A52909D225008E17F4 /* Frameworks */,
+				F73EC9A62909D225008E17F4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GS1 Encoders App";
+			productName = "GS1 Encoders App";
+			productReference = F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F73EC9A02909D225008E17F4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1400;
+				LastUpgradeCheck = 1400;
+				TargetAttributes = {
+					F73EC9A72909D225008E17F4 = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
+				};
+			};
+			buildConfigurationList = F73EC9A32909D225008E17F4 /* Build configuration list for PBXProject "GS1 Encoders App" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F73EC99F2909D225008E17F4;
+			productRefGroup = F73EC9A92909D225008E17F4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F73EC9A72909D225008E17F4 /* GS1 Encoders App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F73EC9A62909D225008E17F4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F79827912909D35500F00DDA /* gs1-syntax-dictionary.txt in Resources */,
+				F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */,
+				F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F73EC9A42909D225008E17F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F79827902909D35500F00DDA /* syn.c in Sources */,
+				F79827DD2909E3AE00F00DDA /* GS1Encoder.swift in Sources */,
+				F798277D2909D35500F00DDA /* lint_importeridx.c in Sources */,
+				F79827762909D35500F00DDA /* lint_csum.c in Sources */,
+				F79827742909D35500F00DDA /* lint_winding.c in Sources */,
+				F79827882909D35500F00DDA /* lint_yymmdd.c in Sources */,
+				F798278A2909D35500F00DDA /* lint_pieceoftotal.c in Sources */,
+				F79827792909D35500F00DDA /* lint_yymmddhh.c in Sources */,
+				F79827842909D35500F00DDA /* lint_nonzero.c in Sources */,
+				F79827732909D35500F00DDA /* lint_iso3166list.c in Sources */,
+				F798277A2909D35500F00DDA /* lint_zero.c in Sources */,
+				F79827862909D35500F00DDA /* lint_csumalpha.c in Sources */,
+				F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */,
+				F79827822909D35500F00DDA /* lint_couponposoffer.c in Sources */,
+				F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */,
+				F798277E2909D35500F00DDA /* lint_pcenc.c in Sources */,
+				F79827852909D35500F00DDA /* lint_key.c in Sources */,
+				F798278B2909D35500F00DDA /* lint_mmoptss.c in Sources */,
+				F79827772909D35500F00DDA /* lint_iso4217.c in Sources */,
+				F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */,
+				F798276D2909D35500F00DDA /* dl.c in Sources */,
+				F79827702909D35500F00DDA /* gs1encoders.c in Sources */,
+				F79827892909D35500F00DDA /* lint_yesno.c in Sources */,
+				F79827662909D35500F00DDA /* scandata.c in Sources */,
+				F798277C2909D35500F00DDA /* lint_iso3166.c in Sources */,
+				F79827752909D35500F00DDA /* lint_couponcode.c in Sources */,
+				F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */,
+				F79827802909D35500F00DDA /* lint_iban.c in Sources */,
+				F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */,
+				F79827612909D35500F00DDA /* ai.c in Sources */,
+				F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */,
+				F798278D2909D35500F00DDA /* gs1syntaxdictionary.c in Sources */,
+				F79827832909D35500F00DDA /* lint_hhmm.c in Sources */,
+				F798277F2909D35500F00DDA /* lint_cset82.c in Sources */,
+				F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */,
+				F79827782909D35500F00DDA /* lint_cset39.c in Sources */,
+				F79827722909D35500F00DDA /* lint_latlong.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F73EC9B42909D226008E17F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F73EC9B52909D226008E17F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F73EC9B72909D226008E17F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					GS1_LINTER_ERR_STR_EN,
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GS1 Encoders App/GS1 Encoders App-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F73EC9B82909D226008E17F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = GS1_LINTER_ERR_STR_EN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "GS1 Encoders App/GS1 Encoders App-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F73EC9A32909D225008E17F4 /* Build configuration list for PBXProject "GS1 Encoders App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F73EC9B42909D226008E17F4 /* Debug */,
+				F73EC9B52909D226008E17F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F73EC9B62909D226008E17F4 /* Build configuration list for PBXNativeTarget "GS1 Encoders App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F73EC9B72909D226008E17F4 /* Debug */,
+				F73EC9B82909D226008E17F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F73EC9A02909D225008E17F4 /* Project object */;
+}
