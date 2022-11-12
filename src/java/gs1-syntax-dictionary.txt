@@ -1,0 +1,1 @@
+../c-lib/gs1-syntax-dictionary.txt

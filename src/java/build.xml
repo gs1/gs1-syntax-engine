@@ -1,0 +1,82 @@
+<!--
+
+Copyright (c) 2022 GS1 AISBL.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-->
+
+<project name="gs1encoders" default="all" basedir=".">
+
+  <description>
+    Java binding for GS1 Syntax Engine.
+  </description>
+
+  <property name="src" location="."/>
+  <property name="build" location="build"/>
+  <property name="classes" location="${build}/classes"/>
+  <property name="jar" location="libgs1encoders.jar"/>
+
+  <property name="wrapfile" location="gs1encoders_wrap.c"/>
+  <property name="sofile" location="libgs1encoders.so"/>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${classes}"/>
+  </target>
+
+  <target name="jni">
+    <exec executable="gcc" failonerror="true">
+      <arg line="-fPIC -shared -O2 -g
+                 -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed
+                 -L../c-lib/build -lgs1encoders
+                 -I../c-lib
+                 -I${java.home}/../include
+                 -I${java.home}/../include/linux
+                 -I${java.home}/include
+                 -I${java.home}/include/linux
+                 -o ${sofile}
+                 ${wrapfile}
+                "/>
+    </exec>
+  </target>
+
+  <target name="compile" depends="jni,init" description="compile the source">
+    <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
+      <exclude name="Example.java"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile,jni">
+    <jar destfile="${jar}" basedir="${classes}" />
+  </target>
+
+  <target name="test" depends="jar,jni">
+    <javac includes="Example.java" srcdir="." destdir="." includeantruntime="false" classpath=".:${jar}" />
+    <java classname="Example" failonerror="true" classpath=".:${jar}" fork="true">
+      <env key="LD_LIBRARY_PATH" value="../c-lib/build:$LD_LIBRARY_PATH"/>
+      <sysproperty key="java.library.path" path="."/>
+    </java>
+  </target>
+
+  <target name="clean" description="clean up">
+    <delete dir="${build}"/>
+    <delete file="${jar}"/>
+    <delete file="${sofile}"/>
+    <delete file="Example.class"/>
+  </target>
+
+  <target name="all" depends="jar,jni"/>
+
+</project>
