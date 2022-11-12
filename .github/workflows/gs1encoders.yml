@@ -213,7 +213,7 @@ jobs:
 
   ci-ios-app:
 
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
 
