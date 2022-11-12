@@ -144,6 +144,25 @@ jobs:
         sudo apt-get -y --no-install-recommends install iwyu clang-9
         find -name '*.c' -print0 | xargs -0 -n1 -i bash -c 'iwyu -DPRNT -DSYMBOLOGY=gs1_encoder_sNONE -DUNIT_TESTS -DGS1_LINTER_ERR_STR_EN {}; [[ $? = 2 ]] || false'
 
+  ci-java:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Java CI
+      run: |
+        make -C src/c-lib -j `nproc`
+        ant -f src/java/build.xml test
+
   ci-wasm:
 
     runs-on: ubuntu-latest
@@ -157,6 +176,7 @@ jobs:
     - name: WASM build
       run: |
         make -C src/c-lib -j `nproc` wasm
+        ls -l src/c-lib/build-wasm
 
     - uses: actions/setup-node@v3
       with:
@@ -167,6 +187,61 @@ jobs:
       run: |
         node example.node.mjs --version
 
+  ci-wasm-jsonly:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: mymindstorm/setup-emsdk@v11
+
+    - uses: actions/checkout@v3
+
+    - name: WASM build
+      run: |
+        make -C src/c-lib -j `nproc` wasm JSONLY=yes
+        ls -l src/c-lib/build-wasm
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Node.js run
+      working-directory: src/js-wasm
+      run: |
+        node example.node.mjs --version
+
+  ci-ios-app:
+
+    runs-on: macos-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: iOS app CI
+      working-directory: src/ios
+      run: |
+        xcodebuild build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+  ci-android-app:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Android app CI
+      working-directory: src/android
+      run: |
+        ./gradlew build --no-daemon
 
   #
   #  Production builds
@@ -182,7 +257,11 @@ jobs:
       - ci-msvc
       - ci-macos
       - ci-scan-build
+      - ci-java
       - ci-wasm
+      - ci-wasm-jsonly
+      - ci-ios-app
+      - ci-android-app
 
     runs-on: windows-2019
 
@@ -242,7 +321,11 @@ jobs:
       - ci-msvc
       - ci-macos
       - ci-scan-build
+      - ci-java
       - ci-wasm
+      - ci-wasm-jsonly
+      - ci-ios-app
+      - ci-android-app
 
     runs-on: ubuntu-latest
 
@@ -274,7 +357,11 @@ jobs:
       - ci-msvc
       - ci-macos
       - ci-scan-build
+      - ci-java
       - ci-wasm
+      - ci-wasm-jsonly
+      - ci-ios-app
+      - ci-android-app
 
     runs-on: ubuntu-latest
 
