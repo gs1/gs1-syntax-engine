@@ -22,7 +22,7 @@ This project includes:
   * Several example applications:
     * A console application whose C code shows how to use the native library.
     * A console application whose Java code shows how to use the Java Native Interface wrapper.
-    * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper to access the native library.
+    * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper.
     * A browser-based web application that shows how to use the WebAssembly (or JavaScript) build of the library.
     * A Node.js console application that shows how to use the WebAssembly (or JavaScript) build of the library.
     * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app.
