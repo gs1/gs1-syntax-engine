@@ -220,9 +220,9 @@ JNIEXPORT jstring JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetDLuri
 
     const char* out;
     const char* str;
-    jboolean isCopy;
+    jboolean isCopy = JNI_FALSE;
 
-    str = (*env)->GetStringUTFChars(env, stem, &isCopy);
+    str = stem ? (*env)->GetStringUTFChars(env, stem, &isCopy) : NULL;
     out = gs1_encoder_getDLuri((gs1_encoder*)ctx, (char*)str);
     if (isCopy == JNI_TRUE)
         (*env)->ReleaseStringUTFChars(env, stem, str);

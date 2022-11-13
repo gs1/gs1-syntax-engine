@@ -449,7 +449,7 @@ public class GS1Encoder {
      */
     public String getDLuri(String stem) throws GS1EncoderDigitalLinkException {
         String uri = gs1encoderGetDLuriJNI(ctx, stem);
-        if (uri.isEmpty())
+        if (uri == null)
             throw new GS1EncoderDigitalLinkException(this.getErrMsg());
         return uri;
     }
