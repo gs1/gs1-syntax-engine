@@ -18,7 +18,10 @@
  *
  */
 
-import org.gs1.gs1encoders.GS1Encoder;
+import org.gs1.gs1encoders.*;
+
+import java.util.Scanner;
+
 
 public class Example {
 
@@ -28,34 +31,120 @@ public class Example {
 
     public static void main(final String args[]) {
 
+        GS1Encoder gs1encoder = null;
+
         try {
-
-            String intext = "^011231231231232699ABC";
-
-            GS1Encoder gs1encoder = new GS1Encoder();
-
-            System.out.println("Library version: " + gs1encoder.getVersion() + "\n");
-
-            System.out.println("IN: " + intext + "\n");
-
-            gs1encoder.setDataStr(intext);
-            System.out.println("AI: " + gs1encoder.getDataStr() + "\n");
-            System.out.println("DL: " + gs1encoder.getDLuri("https://example.org/") + "\n");
-
-            gs1encoder.setIncludeDataTitlesInHRI(true);
-
-            System.out.println("HRI (with data titles):\n");
-            for (String hri: gs1encoder.getHRI())
-                System.out.println(hri);
-
-            gs1encoder.free();
-
-        } catch (Exception e) {
-
+            gs1encoder = new GS1Encoder();
+        } catch (GS1EncoderGeneralException e) {
             System.err.println(e.getMessage());
             System.exit(1);
+        }
+
+        boolean exit = false;
+
+        if (args.length == 1 && args[0].equals("--version")) {
+            System.out.format("Library version: %s\n", gs1encoder.getVersion());
+            exit = true;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (!exit) {
+
+            System.out.println("\n\n\nCurrent state:");
+
+            System.out.format("\n    Barcode message:    %s", gs1encoder.getDataStr());
+            System.out.format("\n\n    AI element string:  %s", gs1encoder.getAIdataStr());
+
+            String dlURI = null; try { dlURI = gs1encoder.getDLuri(null); } catch (GS1EncoderDigitalLinkException e) {}
+            System.out.format("\n    Digital Link URI:   %s", dlURI);
+
+            System.out.println("\n    HRI:\n");
+            for (String hri : gs1encoder.getHRI()) {
+                System.out.format("       %s\n", hri);
+            }
+
+            System.out.println("\n\nMENU:");
+            System.out.println("\n 1) Process raw barcode message data, either:");
+            System.out.println("      * Plain data");
+            System.out.println("      * Unbracketed AI element string with FNC1 in first position");
+            System.out.println("      * Digital Link URI");
+            System.out.println(" 2) Process a bracketed AI element string");
+            System.out.println(" 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
+
+            System.out.format("\n 4) Toggle 'include data titles in HRI' flag.  Current value = %s\n",
+                                                gs1encoder.getIncludeDataTitlesInHRI() ? "ON" : "OFF");
+            System.out.format(" 5) Toggle 'permit unknown AIs' flag.          Current value = %s\n",
+                                                gs1encoder.getPermitUnknownAIs() ? "ON" : "OFF");
+            System.out.format(" 6) Toggle 'validate AI associations' flag.    Current value = %s\n",
+                                                gs1encoder.getValidateAIassociations() ? "ON" : "OFF");
+
+            System.out.println("\n 0) Exit program");
+
+            System.out.print("\nMenu selection: ");
+            String menuVal = scanner.nextLine();
+
+            String inpStr;
+
+            switch (menuVal) {
+                case "1":
+                case "2":
+                case "3":
+                    System.out.print("\nEnter data: ");
+                    inpStr = scanner.nextLine();
+                    if (inpStr.isEmpty())
+                        continue;
+
+                    try {
+                        if (menuVal.equals("1"))
+                            gs1encoder.setDataStr(inpStr);
+                        else if (menuVal.equals("2"))
+                            gs1encoder.setAIdataStr(inpStr);
+                        else            // "3"
+                            gs1encoder.setScanData(inpStr);
+                    } catch (GS1EncoderParameterException | GS1EncoderScanDataException e) {
+                        System.out.format("\n\nERROR message: %s\n\n", e.getMessage());
+                        String markup = gs1encoder.getErrMarkup();
+                        if (!markup.isEmpty())
+                            System.out.format("ERROR markup:  %s\n", markup.replace("|", "⧚"));
+                        continue;
+                    }
+                    break;
+                case "4":
+                case "5":
+                case "6":
+                    System.out.print("\nEnter 0 for OFF or 1 for ON: ");
+                    inpStr = scanner.nextLine();
+                    if (inpStr.isEmpty())
+                        continue;
+
+                    if (!inpStr.equals("0") && !inpStr.equals("1")) {
+                        System.out.println("\n\nOUT OF RANGE. PLEASE ENTER 0 or 1");
+                        continue;
+                    }
+                    try {
+                        if (menuVal.equals("4"))
+                            gs1encoder.setIncludeDataTitlesInHRI(inpStr.equals("1"));
+                        else if (menuVal.equals("5"))
+                            gs1encoder.setPermitUnknownAIs(inpStr.equals("1"));
+                        else           // "6"
+                            gs1encoder.setValidateAIassociations(inpStr.equals("1"));
+                    } catch (GS1EncoderParameterException e) {
+                        System.out.format("\n\nERROR: %s\n", e.getMessage());
+                        continue;
+                    }
+                    break;
+                case "0":
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("\n\nOUT OF RANGE. PLEASE ENTER 1-6, 9 or 0.");
+            }
+
 
         }
+
+        gs1encoder.free();
 
     }
 
