@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Must add this listener ourselves because there is no corresponding binding
         binding.inputData.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -79,21 +80,21 @@ class MainActivity : AppCompatActivity() {
             return
 
         binding.datastrTextBox.setText(gs1encoder.dataStr)
-        var ai = gs1encoder.aIdataStr
+        val ai = gs1encoder.aIdataStr
         if (ai != "")
             binding.elementstringTextBox.setText(gs1encoder.aIdataStr)
         else
             binding.elementstringTextBox.setText("⧚ Not AI-based data ⧛")
 
         try {
-            binding.dlTextBox.setText(gs1encoder.getDLuri("https://example.org/"))
+            binding.dlTextBox.setText(gs1encoder.getDLuri(null))
         } catch (e: GS1EncoderDigitalLinkException) {
             binding.dlTextBox.setText(e.message)
         }
 
         binding.hriTextBox.setText(gs1encoder.hri.joinToString("\n"))
 
-        var qps = gs1encoder.dLignoredQueryParams
+        val qps = gs1encoder.dLignoredQueryParams
         if (qps.isNotEmpty())
                 binding.infoTextBox.setText("Warning: Non-numeric query parameters ignored: ⧚" +
                         qps.joinToString("&") + "⧚")
@@ -104,7 +105,7 @@ class MainActivity : AppCompatActivity() {
 
         clearRender()
 
-        var data = binding.inputData.text.toString().trim()
+        val data = binding.inputData.text.toString().trim()
         if (data == "")
             return
 
@@ -123,30 +124,30 @@ class MainActivity : AppCompatActivity() {
                 binding.syntaxTextBox.setText("Digital Link URI")
                 gs1encoder.dataStr = data
             } else if (data.matches("^\\d+$".toRegex())) {
-                    binding.syntaxTextBox.setText("Plain data")
+                binding.syntaxTextBox.setText("Plain data")
 
-                    if (data.length != 8 && data.length != 12 && data.length != 13 && data.length != 14) {
-                            binding.errmsgTextBox.setText("Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14")
-                            return
-                    }
+                if (data.length != 8 && data.length != 12 && data.length != 13 && data.length != 14) {
+                        binding.errmsgTextBox.setText("Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14")
+                        return
+                }
 
-                    // Perform a checksum validation here, since the Syntax Engine validates only AI-based data
-                    var parity: Int = 0
-                    var weight: Int = if (data.length % 2 == 0) 3 else 1
-                    for (d in data) {
-                            parity += weight * (d - '0')
-                            weight = 4 - weight
-                    }
-                    parity = (10 - parity % 10) % 10
+                // Perform a checksum validation here, since the Syntax Engine validates only AI-based data
+                var parity = 0
+                var weight: Int = if (data.length % 2 == 0) 3 else 1
+                for (d in data.dropLast(1)) {
+                        parity += weight * d.digitToInt()
+                        weight = 4 - weight
+                }
+                parity = (10 - parity % 10) % 10
 
-                    if (parity.digitToChar() != data.last()) {
-                            binding.errmsgTextBox.setText("Incorrect numeric check digit")
-                            binding.infoTextBox.setText("Plain data validation failed: " + data.dropLast(1) + "⧚" + data.last() + "⧛")
-                            return
-                    }
+                if (parity != data.last().digitToInt()) {
+                        binding.errmsgTextBox.setText("Incorrect numeric check digit")
+                        binding.infoTextBox.setText("Plain data validation failed: " + data.dropLast(1) + "⧚" + data.last() + "⧛")
+                        return
+                }
 
-                    binding.syntaxTextBox.setText("Plain GTIN-" + data.length + " - converted to AI (01)...")
-                    gs1encoder.dataStr = "^01" + data.padStart(14, '0')
+                binding.syntaxTextBox.setText("Plain GTIN-" + data.length + " - converted to AI (01)...")
+                gs1encoder.dataStr = "^01" + data.padStart(14, '0')
             } else {
                 binding.syntaxTextBox.setText("Non-numeric plain data is not a valid GS1 syntax")
                 return
@@ -158,7 +159,7 @@ class MainActivity : AppCompatActivity() {
                 is GS1EncoderScanDataException,
                 is GS1EncoderDigitalLinkException -> {
                     binding.errmsgTextBox.setText("Error: " + e.message)
-                    var markup = gs1encoder.errMarkup
+                    val markup = gs1encoder.errMarkup
                     if (markup != "")
                         binding.infoTextBox.setText(
                             "AI content validation failed: " + markup.replace("|","⧚")
@@ -171,10 +172,6 @@ class MainActivity : AppCompatActivity() {
 
         loadDataValues()
 
-    }
-
-    fun dataChanged(view: View) {
-        clearRender()
     }
 
     fun unknownAIsCheckBoxClicked(view: View) {
