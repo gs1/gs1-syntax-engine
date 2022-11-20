@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import org.gs1.gs1encoders.GS1Encoder
 import org.gs1.gs1encoders.GS1EncoderDigitalLinkException
@@ -66,8 +67,14 @@ class MainActivity : AppCompatActivity() {
         binding.elementstringTextBox.setText("")
         binding.dlTextBox.setText("")
         binding.hriTextBox.setText("")
+
         binding.infoTextBox.setText("")
+        binding.infoTextBox.visibility = View.GONE
+        binding.infoTextInputLayout.visibility = View.GONE
+
         binding.errmsgTextBox.setText("")
+        binding.errmsgTextBox.visibility = View.GONE
+        binding.errmsgTextInputLayout.visibility = View.GONE
     }
 
     private fun loadDataValues() {
@@ -95,9 +102,14 @@ class MainActivity : AppCompatActivity() {
         binding.hriTextBox.setText(gs1encoder.hri.joinToString("\n"))
 
         val qps = gs1encoder.dLignoredQueryParams
-        if (qps.isNotEmpty())
-                binding.infoTextBox.setText("Warning: Non-numeric query parameters ignored: ⧚" +
-                        qps.joinToString("&") + "⧚")
+        if (qps.isNotEmpty()) {
+            binding.infoTextBox.setText(
+                "Warning: Non-numeric query parameters ignored: ⧚" +
+                        qps.joinToString("&") + "⧚"
+            )
+            binding.infoTextBox.visibility = View.VISIBLE
+            binding.infoTextInputLayout.visibility = View.VISIBLE
+        }
 
     }
 
@@ -128,6 +140,8 @@ class MainActivity : AppCompatActivity() {
 
                 if (data.length != 8 && data.length != 12 && data.length != 13 && data.length != 14) {
                         binding.errmsgTextBox.setText("Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14")
+                        binding.errmsgTextBox.visibility = View.VISIBLE
+                        binding.errmsgTextInputLayout.visibility = View.VISIBLE
                         return
                 }
 
@@ -142,7 +156,12 @@ class MainActivity : AppCompatActivity() {
 
                 if (parity != data.last().digitToInt()) {
                         binding.errmsgTextBox.setText("Incorrect numeric check digit")
+                        binding.errmsgTextBox.visibility = View.VISIBLE
+                        binding.errmsgTextInputLayout.visibility = View.VISIBLE
+
                         binding.infoTextBox.setText("Plain data validation failed: " + data.dropLast(1) + "⧚" + data.last() + "⧛")
+                        binding.infoTextBox.visibility = View.VISIBLE
+                        binding.infoTextInputLayout.visibility = View.VISIBLE
                         return
                 }
 
@@ -159,16 +178,26 @@ class MainActivity : AppCompatActivity() {
                 is GS1EncoderScanDataException,
                 is GS1EncoderDigitalLinkException -> {
                     binding.errmsgTextBox.setText("Error: " + e.message)
+                    binding.errmsgTextBox.visibility = View.VISIBLE
+                    binding.errmsgTextInputLayout.visibility = View.VISIBLE
+
                     val markup = gs1encoder.errMarkup
                     if (markup != "")
                         binding.infoTextBox.setText(
                             "AI content validation failed: " + markup.replace("|","⧚")
                         )
+                        binding.infoTextBox.visibility = View.VISIBLE
+                        binding.infoTextInputLayout.visibility = View.VISIBLE
                     return
                 }
                 else -> throw e
             }
         }
+
+        // Release the input field and hide the keyboard
+        binding.inputData.clearFocus()
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
 
         loadDataValues()
 
