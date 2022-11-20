@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun processInputButtonClicked(view: View) {
+    fun processInputButtonClicked(@Suppress("UNUSED_PARAMETER") view: View) {
 
         clearRender()
 
@@ -174,17 +174,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun unknownAIsCheckBoxClicked(view: View) {
+    fun unknownAIsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         clearRender()
         gs1encoder.permitUnknownAIs = binding.unknownAIsCheckBox.isChecked
     }
 
-    fun associationsCheckBoxClicked(view: View) {
+    fun associationsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         clearRender()
         gs1encoder.validateAIassociations = binding.associationsCheckBox.isChecked
     }
 
-    fun dataTitlesCheckBoxClicked(view: View) {
+    fun dataTitlesCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         clearRender()
         gs1encoder.includeDataTitlesInHRI = binding.dataTitlesCheckBox.isChecked
     }
