@@ -170,7 +170,7 @@ public class GS1Encoder {
      *   - typedef struct gs1_encoder
      *
      */
-    private long ctx = 0;
+    private long ctx;
 
     /*
      *  Methods to provide a wrapper around the functional interface imported from the native library
@@ -197,7 +197,7 @@ public class GS1Encoder {
     public GS1Encoder() throws GS1EncoderGeneralException {
         ctx = gs1encoderInitJNI();
         if (ctx == 0)
-            throw new GS1EncoderGeneralException("Failed to initalise the native library");
+            throw new GS1EncoderGeneralException("Failed to initialise the native library");
     }
 
     /**
