@@ -385,13 +385,17 @@ class GS1Encoder {
      *   - gs1_encoder_getDLuri()
      *
      */
-    func getDLuri(_ stem: String) throws -> String {
-        var ret :String
-        ret = String(cString: gs1_encoder_getDLuri(ctx, UnsafeMutablePointer<CChar>(mutating: (stem as NSString).utf8String)))
-        if (ret == "") {
+    func getDLuri(_ stem: String? = nil) throws -> String {
+        var cstr: UnsafeMutablePointer<CChar>?;
+        if let ustem = stem {
+            cstr = gs1_encoder_getDLuri(ctx, UnsafeMutablePointer<CChar>(mutating: (ustem as NSString).utf8String))
+        } else {
+            cstr = gs1_encoder_getDLuri(ctx, nil)
+        }
+        if (cstr == nil) {
             throw GS1EncoderError.digitalLinkError(msg: self.getErrMsg())
         }
-        return ret;
+        return String(cString: cstr!)
     }
 
     /**
