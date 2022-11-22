@@ -43,8 +43,12 @@ struct ContentView: View {
     let gs1encoder = try! GS1Encoder()
     
     init() {
+        
+        UIScrollView.appearance().bounces = false
+        
         inputData = "https://example.com/01/12312312312333/10/ABC123?99=TESTING"
         libver = "GS1 Encoders library: " + gs1encoder.getVersion()
+  
     }
     
     func clearRender() {
@@ -170,38 +174,40 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack {
-            TextField("", text: $libver).frame(maxWidth: .infinity).padding().background(Color.blue).font(.title2).foregroundColor(.white)
-            HStack {
-                Toggle("Permit unknown AIs", isOn: $unknownAIs).toggleStyle(CheckboxToggleStyle()).onChange(of: unknownAIs) { value in
-                    clearRender()
-                    try! gs1encoder.setPermitUnknownAIs(value)
+        ScrollView() {
+            VStack {
+                TextField("", text: $libver).frame(maxWidth: .infinity).padding().background(Color.blue).font(.title2).foregroundColor(.white)
+                HStack {
+                    Toggle("Permit unknown AIs", isOn: $unknownAIs).toggleStyle(CheckboxToggleStyle()).onChange(of: unknownAIs) { value in
+                        clearRender()
+                        try! gs1encoder.setPermitUnknownAIs(value)
+                    }
+                    Toggle("Validate AI associations", isOn: $associations).toggleStyle(CheckboxToggleStyle()).onChange(of: associations) { value in
+                        clearRender()
+                        try! gs1encoder.setValidateAIassociations(value)
+                    }
+                    Toggle("Include data titles in HRI", isOn: $datatitles).toggleStyle(CheckboxToggleStyle()).onChange(of: datatitles) { value in
+                        clearRender()
+                        try! gs1encoder.setIncludeDataTitlesInHRI(value)
+                    }
                 }
-                Toggle("Validate AI associations", isOn: $associations).toggleStyle(CheckboxToggleStyle()).onChange(of: associations) { value in
+                
+                TextFieldWithBorder(label: "Input data", message: $inputData).focused($inputIsFocused).onChange(of: inputData) { value in
                     clearRender()
-                    try! gs1encoder.setValidateAIassociations(value)
                 }
-                Toggle("Include data titles in HRI", isOn: $datatitles).toggleStyle(CheckboxToggleStyle()).onChange(of: datatitles) { value in
-                    clearRender()
-                    try! gs1encoder.setIncludeDataTitlesInHRI(value)
+                
+                Button {
+                    processInput()
+                } label: {
+                    Text("PROCESS INPUT").frame(maxWidth: .infinity)
                 }
-            }
-
-            TextFieldWithBorder(label: "Input data", message: $inputData).focused($inputIsFocused).onChange(of: inputData) { value in
-                clearRender()
-            }
-
-            Button {
-                processInput()
-            } label: {
-                Text("PROCESS INPUT").frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            
-            OutputView(errorMsg: $errorMsg, errorIsHidden: $errorIsHidden, infoMsg: $infoMsg, infoIsHidden: $infoIsHidden, syntax: $syntax, dataStr: $dataStr, aiDataStr: $aiDataStr, dlURI: $dlURI, hri: $hri)
-
-            Spacer()
-        }.onAppear(perform: loadDataValues)
+                .buttonStyle(.borderedProminent)
+                
+                OutputView(errorMsg: $errorMsg, errorIsHidden: $errorIsHidden, infoMsg: $infoMsg, infoIsHidden: $infoIsHidden, syntax: $syntax, dataStr: $dataStr, aiDataStr: $aiDataStr, dlURI: $dlURI, hri: $hri)
+                
+                Spacer()
+            }.onAppear(perform: loadDataValues)
+        }
     }
 }
 
