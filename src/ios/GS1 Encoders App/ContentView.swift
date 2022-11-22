@@ -238,7 +238,7 @@ struct TextFieldWithBorder: View {
             TextField("", text: $message, axis: .vertical)
                 .autocorrectionDisabled(true)
                 .textInputAutocapitalization(.never)
-                .offset(x:0, y:6).lineLimit(2...6)
+                .offset(x:0, y:6).lineLimit(2...)
                 .font(.body).textFieldStyle(.roundedBorder).padding(.bottom, 8)
             HStack {
                 Text(label).font(.caption).foregroundColor(Color.blue).background(.white).offset(x: -10, y: -20)
