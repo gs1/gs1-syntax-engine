@@ -67,8 +67,8 @@ This repository contains:
 | src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                         |
 | src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or JavaScript build, with demo web and console applications |
 | src/java       | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                    |
-| src/android    | A preliminary Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                    |
-| src/ios        | A preliminary Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                |
+| src/android    | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                               |
+| src/ios        | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                           |
 
 
 ### Building on Windows
