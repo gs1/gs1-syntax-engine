@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 binding.syntaxTextBox.setText("Unbracketed AI element string")
                 gs1encoder.dataStr = data
             } else if (data.startsWith("http://") || data.startsWith("https://")) {
-                binding.syntaxTextBox.setText("Digital Link URI")
+                binding.syntaxTextBox.setText("GS1 Digital Link URI")
                 gs1encoder.dataStr = data
             } else if (data.matches("^\\d+$".toRegex())) {
                 binding.syntaxTextBox.setText("Plain data")
@@ -182,12 +182,13 @@ class MainActivity : AppCompatActivity() {
                     binding.errmsgTextInputLayout.visibility = View.VISIBLE
 
                     val markup = gs1encoder.errMarkup
-                    if (markup != "")
+                    if (markup != "") {
                         binding.infoTextBox.setText(
                             "AI content validation failed: " + markup.replace("|","⧚")
                         )
                         binding.infoTextBox.visibility = View.VISIBLE
                         binding.infoTextInputLayout.visibility = View.VISIBLE
+                    }
                     return
                 }
                 else -> throw e

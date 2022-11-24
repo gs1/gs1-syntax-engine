@@ -204,7 +204,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
-	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// Digital Link URI
+	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// GS1 Digital Link URI
 	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
@@ -819,7 +819,7 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) COMPOSITE") == 0);
 
-	// HRI from Digital Link URI
+	// HRI from GS1 Digital Link URI
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
@@ -828,7 +828,7 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
 	TEST_CHECK(strcmp(hri[3], "(98) XYZ") == 0);
 
-	// HRI from Digital Link URI with extra ignored query params
+	// HRI from GS1 Digital Link URI with extra ignored query params
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?singleton&99=ABC%2d123&compound1=QWERTY&98=XYZ&compound2=12345"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);

@@ -33,24 +33,24 @@ struct ContentView: View {
     @State var aiDataStr :String = ""
     @State var dlURI :String = ""
     @State var hri :String = ""
-    
+
     @State var unknownAIs = false
     @State var associations = false
     @State var datatitles = false
-    
+
     @FocusState var inputIsFocused: Bool
-    
+
     let gs1encoder = try! GS1Encoder()
-    
+
     init() {
-        
+
         UIScrollView.appearance().bounces = false
-        
+
         inputData = "https://example.com/01/12312312312333/10/ABC123?99=TESTING"
         libver = "GS1 Encoders library: " + gs1encoder.getVersion()
-  
+
     }
-    
+
     func clearRender() {
         syntax = ""
         dataStr = ""
@@ -62,7 +62,7 @@ struct ContentView: View {
         errorMsg = ""
         errorIsHidden = true
     }
-    
+
     func loadDataValues() {
         unknownAIs = gs1encoder.getPermitUnknownAIs()
         associations = gs1encoder.getValidateAIassociations()
@@ -71,20 +71,20 @@ struct ContentView: View {
         if (gs1encoder.getDataStr() == "") {
             return
         }
-        
+
         dataStr = gs1encoder.getDataStr()
- 
+
         let ai = gs1encoder.getAIdataStr()
         aiDataStr = ai != "" ? ai : "⧚ Not AI-based data ⧛"
-        
+
         do {
             dlURI = try gs1encoder.getDLuri()
         } catch GS1EncoderError.digitalLinkError(let msg) {
             dlURI = msg
         } catch {}
-         
+
         hri = gs1encoder.getHRI().joined(separator: "\n")
-        
+
         let qps = gs1encoder.getDLignoredQueryParams()
         if (qps.count > 0) {
             infoMsg = "Warning: Non-numeric query parameters ignored: ⧚" +
@@ -92,18 +92,18 @@ struct ContentView: View {
             infoIsHidden = false
        }
     }
-    
+
     func processInput() {
-        
+
         clearRender()
-        
+
         let data = inputData.trimmingCharacters(in: .whitespacesAndNewlines)
         if (data == "") {
             return
         }
-        
+
         do {
-            
+
             if (data.starts(with: "(")) {
                 syntax = "Bracketed AI element string"
                 try gs1encoder.setAIdataStr(data)
@@ -114,17 +114,17 @@ struct ContentView: View {
                 syntax = "Unbracketed AI element string"
                 try gs1encoder.setDataStr(data)
             } else if (data.starts(with: "http://") || data.starts(with: "https://")) {
-                syntax = "Digital Link URI"
+                syntax = "GS1 Digital Link URI"
                 try gs1encoder.setDataStr(data)
             } else if (CharacterSet(charactersIn: data).isSubset(of: CharacterSet(charactersIn: "0123456789"))) {
                 syntax =  "Plain data"
-                
+
                 if (data.count != 8 && data.count != 12 && data.count != 13 && data.count != 14) {
                     errorMsg = "Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14"
                     errorIsHidden = false
                     return
                 }
-                
+
                 // Perform a checksum validation here, since the Syntax Engine validates only AI-based data
                 var parity = 0
                 var weight = data.count % 2 == 0 ? 3 : 1
@@ -133,7 +133,7 @@ struct ContentView: View {
                     weight = 4 - weight
                 }
                 parity = (10 - parity % 10) % 10
-                
+
                 if (parity != data.last!.wholeNumberValue!) {
                     errorMsg = "Incorrect numeric check digit"
                     errorIsHidden = false
@@ -141,15 +141,15 @@ struct ContentView: View {
                     infoIsHidden = false
                     return
                 }
-                
+
                 syntax = "Plain GTIN-" + String(data.count) + " - converted to AI (01)..."
                 try gs1encoder.setDataStr("^01" + String(repeating: "0", count: 14 - data.count) + data)
-                
+
             } else {
                 syntax =  "Non-numeric plain data is not a valid GS1 syntax"
                 return
             }
-            
+
         } catch GS1EncoderError.parameterError(let msg),
                 GS1EncoderError.scanDataError(let msg),
                 GS1EncoderError.digitalLinkError(let msg) {
@@ -168,11 +168,11 @@ struct ContentView: View {
         }
 
         inputIsFocused = false
-        
+
         loadDataValues()
-        
+
     }
-    
+
     var body: some View {
         ScrollView() {
             VStack {
@@ -191,20 +191,20 @@ struct ContentView: View {
                         try! gs1encoder.setIncludeDataTitlesInHRI(value)
                     }
                 }
-                
+
                 TextFieldWithBorder(label: "Input data", message: $inputData).focused($inputIsFocused).onChange(of: inputData) { value in
                     clearRender()
                 }
-                
+
                 Button {
                     processInput()
                 } label: {
                     Text("PROCESS INPUT").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                
+
                 OutputView(errorMsg: $errorMsg, errorIsHidden: $errorIsHidden, infoMsg: $infoMsg, infoIsHidden: $infoIsHidden, syntax: $syntax, dataStr: $dataStr, aiDataStr: $aiDataStr, dlURI: $dlURI, hri: $hri)
-                
+
                 Spacer()
             }.onAppear(perform: loadDataValues)
         }
@@ -232,7 +232,7 @@ struct CheckboxToggleStyle: ToggleStyle {
 struct TextFieldWithBorder: View {
     var label :String
     @Binding var message :String
-    
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             TextField("", text: $message, axis: .vertical)
@@ -249,7 +249,7 @@ struct TextFieldWithBorder: View {
 }
 
 struct OutputView: View {
-    
+
     @Binding var errorMsg :String
     @Binding var errorIsHidden :Bool
     @Binding var infoMsg :String
@@ -259,7 +259,7 @@ struct OutputView: View {
     @Binding var aiDataStr :String
     @Binding var dlURI :String
     @Binding var hri :String
-    
+
     var body: some View {
         if (!errorIsHidden) {
             TextFieldWithBorder(label: "Error", message: $errorMsg).disabled(true)
@@ -271,6 +271,6 @@ struct OutputView: View {
         TextFieldWithBorder(label: "Barcode message (^ = FNC1)", message: $dataStr).disabled(true)
         TextFieldWithBorder(label: "GS1 AI element string", message: $aiDataStr).disabled(true)
         TextFieldWithBorder(label: "GS1 Digital Link URI (canonical form)", message: $dlURI).disabled(true)
-        TextFieldWithBorder(label: "HRI", message: $hri).disabled(true)
+        TextFieldWithBorder(label: "HRI text", message: $hri).disabled(true)
     }
 }

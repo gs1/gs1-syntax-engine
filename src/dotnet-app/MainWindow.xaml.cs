@@ -99,7 +99,7 @@ namespace GS1.EncodersApp
                 }
                 else if (inputTextBox.Text.StartsWith("http://") || inputTextBox.Text.StartsWith("https://"))
                 {  // GS1 Digital Link URI
-                    syntaxTextBox.Text = "Digital Link URI";
+                    syntaxTextBox.Text = "GS1 Digital Link URI";
                     App.gs1Encoder.DataStr = inputTextBox.Text;
                 }
                 else if (Regex.IsMatch(inputTextBox.Text, @"^\d+$"))

@@ -31,7 +31,7 @@ import Foundation
 
 /// A Swift wrapper around the GS1 Syntax Engine native library
 class GS1Encoder {
-    
+
     /**
      * List of symbology types, mirroring the corresponding list in the
      * C library.
@@ -42,56 +42,56 @@ class GS1Encoder {
      *
      */
     enum Symbology: Int {
-        
+
         /// None defined
         case NONE = -1,
-        
+
         /// GS1 DataBar Omnidirectional
         DataBarOmni,
-        
+
         /// GS1 DataBar Truncated
         DataBarTruncated,
-        
+
         /// GS1 DataBar Stacked
         DataBarStacked,
-        
+
         /// GS1 DataBar Stacked Omnidirectional
         DataBarStackedOmni,
-        
+
         /// GS1 DataBar Liimited
         DataBarLimited,
-        
+
         /// GS1 DataBar Expanded (Stacked)
         DataBarExpanded,
-        
+
         /// UPC-A
         UPCA,
-        
+
         /// UPC-E
         UPCE,
-        
+
         /// EAN-13
         EAN13,
-        
+
         /// EAN-8
         EAN8,
-        
+
         /// GS1-128 with CC-A or CC-B
         GS1_128_CCA,
-        
+
         /// GS1-128 with CC-C
         GS1_128_CCC,
-        
+
         /// (GS1) QR Code
         QR,
-        
+
         /// (GS1) Data Matrix
         DM,
-        
+
         /// Value is the number of symbologies
         NUMSYMS
     };
-    
+
     /**
      * An opaque pointer used by the native code to represent an
      * "instance" of the library. It is hidden behind the object
@@ -103,7 +103,7 @@ class GS1Encoder {
      *
      */
     private(set) var ctx :OpaquePointer? = nil
-    
+
     /*
      * This Swift wrapper library throws an exeception containing the error message whenever
      * an error is returned by the native library. Therefore direct access to the native
@@ -113,7 +113,7 @@ class GS1Encoder {
     private func getErrMsg() -> String {
         return String(cString: gs1_encoder_getErrMsg(ctx))
     }
-    
+
     /**
      * Constructor that creates an object wrapping an "instance" of the library
      * managed by the native code.
@@ -129,7 +129,7 @@ class GS1Encoder {
             throw GS1EncoderError.generalError(msg: "Failed to initalise the native library")
         }
     }
- 
+
     /**
      * Destructor that will release the resources allocated by the native library.
      *
@@ -143,7 +143,7 @@ class GS1Encoder {
             gs1_encoder_free(ctx)
         }
     }
-    
+
     /**
      * Returns the version of the native library.
      *
@@ -155,7 +155,7 @@ class GS1Encoder {
     func getVersion() -> String {
         return String(cString: gs1_encoder_getVersion())
     }
-    
+
     /**
      * Get the symbology type.
      *
@@ -167,7 +167,7 @@ class GS1Encoder {
     func getSym() -> Int {
         return Int(gs1_encoder_getSym(ctx))
     }
-    
+
     /**
      * Set the symbology type.
      *
@@ -181,7 +181,7 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Get the "add check digit" mode for EAN/UPC and GS1 DataBar symbols.
      *
@@ -193,7 +193,7 @@ class GS1Encoder {
     func getAddCheckDigit() -> Bool {
         return gs1_encoder_getAddCheckDigit(ctx)
     }
-    
+
     /**
      * Set the "add check digit" mode for EAN/UPC and GS1 DataBar symbols.
      *
@@ -207,7 +207,7 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Get the "include data titles in HRI" flag.
      *
@@ -219,7 +219,7 @@ class GS1Encoder {
     func getIncludeDataTitlesInHRI() -> Bool {
         return gs1_encoder_getIncludeDataTitlesInHRI(ctx)
     }
-    
+
     /**
      * Set the "include data titles in HRI" flag.
      *
@@ -233,7 +233,7 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Get the "permit unknown AIs" mode.
      *
@@ -245,7 +245,7 @@ class GS1Encoder {
     func getPermitUnknownAIs() -> Bool {
         return gs1_encoder_getPermitUnknownAIs(ctx)
     }
-    
+
     /**
      * Set the "permit unknown AIs" mode.
      *
@@ -259,7 +259,7 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Get the "validate AI associations" flag.
      *
@@ -271,7 +271,7 @@ class GS1Encoder {
     func getValidateAIassociations() -> Bool {
         return gs1_encoder_getValidateAIassociations(ctx)
     }
-    
+
     /**
      * Set the "validate AI associations" flag.
      *
@@ -285,7 +285,7 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Get the raw barcode data input buffer.
      *
@@ -297,7 +297,7 @@ class GS1Encoder {
     func getDataStr() -> String {
         return String(cString: gs1_encoder_getDataStr(ctx))
     }
-    
+
     /**
      * Set the raw barcode data input buffer.
      *
@@ -323,7 +323,7 @@ class GS1Encoder {
     func getAIdataStr() -> String {
         return String(cString: gs1_encoder_getAIdataStr(ctx))
     }
-    
+
     /**
      * Set the barcode data input buffer using GS1 AI syntax.
      *
@@ -349,7 +349,7 @@ class GS1Encoder {
     func getScanData() -> String {
         return String(cString: gs1_encoder_getScanData(ctx))
     }
-    
+
     /**
      * Set the barcode data input buffer using barcode scan data format.
      *
@@ -363,7 +363,7 @@ class GS1Encoder {
             throw GS1EncoderError.scanDataError(msg: self.getErrMsg())
         }
     }
-    
+
     /**
      * Read the error markup generated when parsing AI data fails due to a
      * linting failure.
@@ -376,9 +376,9 @@ class GS1Encoder {
     func getErrMarkup() -> String {
         return String(cString: gs1_encoder_getErrMarkup(ctx))
     }
-    
+
     /**
-     * Get a Digital Link URI that represents the AI-based input data.
+     * Get a GS1 Digital Link URI that represents the AI-based input data.
      *
      * See the native library documentation for details:
      *

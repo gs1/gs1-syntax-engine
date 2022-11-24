@@ -53,11 +53,11 @@ public class Example {
 
             System.out.println("\n\n\nCurrent state:");
 
-            System.out.format("\n    Barcode message:    %s", gs1encoder.getDataStr());
-            System.out.format("\n\n    AI element string:  %s", gs1encoder.getAIdataStr());
+            System.out.format("\n    Barcode message:        %s", gs1encoder.getDataStr());
+            System.out.format("\n\n    AI element string:      %s", gs1encoder.getAIdataStr());
 
             String dlURI = null; try { dlURI = gs1encoder.getDLuri(null); } catch (GS1EncoderDigitalLinkException e) {}
-            System.out.format("\n    Digital Link URI:   %s", dlURI);
+            System.out.format("\n    GS1 Digital Link URI:   %s", dlURI);
 
             System.out.println("\n    HRI:\n");
             for (String hri : gs1encoder.getHRI()) {
@@ -68,7 +68,7 @@ public class Example {
             System.out.println("\n 1) Process raw barcode message data, either:");
             System.out.println("      * Plain data");
             System.out.println("      * Unbracketed AI element string with FNC1 in first position");
-            System.out.println("      * Digital Link URI");
+            System.out.println("      * GS1 Digital Link URI");
             System.out.println(" 2) Process a bracketed AI element string");
             System.out.println(" 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
 

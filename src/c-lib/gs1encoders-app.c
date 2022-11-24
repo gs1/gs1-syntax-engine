@@ -53,9 +53,9 @@ static bool userInt(gs1_encoder *ctx) {
 
 		printf("\n\n\nCurrent state:\n");
 
-		printf("\n    Barcode message:    %s\n", gs1_encoder_getDataStr(ctx));
-		printf("\n    AI element string:  %s", gs1_encoder_getAIdataStr(ctx));
-		printf("\n    Digital Link URI:   %s", gs1_encoder_getDLuri(ctx, NULL));
+		printf("\n    Barcode message:        %s\n", gs1_encoder_getDataStr(ctx));
+		printf("\n    AI element string:      %s", gs1_encoder_getAIdataStr(ctx));
+		printf("\n    GS1 Digital Link URI:   %s", gs1_encoder_getDLuri(ctx, NULL));
 		printf("\n    HRI:\n");
 		numHRI = gs1_encoder_getHRI(ctx, &hri);
 		for (i = 0; i < numHRI; i++) {
@@ -66,7 +66,7 @@ static bool userInt(gs1_encoder *ctx) {
 		printf("\n\n 1) Process raw barcode message data, either:");
 		printf("\n      * Plain data");
 		printf("\n      * Unbracketed AI element string with FNC1 in first position");
-		printf("\n      * Digital Link URI");
+		printf("\n      * GS1 Digital Link URI");
 		printf("\n 2) Process a bracketed AI element string");
 		printf("\n 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
 

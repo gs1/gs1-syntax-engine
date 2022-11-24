@@ -47,7 +47,7 @@
  *  This library stores a compact representation of AI data (FNC1 in first) in
  *  unbracketed format where "^" represents FNC1, i.e. "^..."
  *
- *  Ingested AI element strings and Digital Link URI data is parsed then
+ *  Ingested AI element strings and GS1 Digital Link URI data is parsed then
  *  processed (validated) into the aforementioned form. Either during parsing
  *  or processing a table of extracted AIs is populated consisting of a pointer
  *  to an AI table entry, as well as pointers to the start of the AI and its
@@ -65,13 +65,13 @@
  *  been provided by the provided by the user, whether they have provided
  *  bracketed AI data or scan data.
  *
- *  Digital Link inputs are an exception since they must be stored as given,
- *  ready to be encoded directly into a barcode symbol. Unlike conversion
- *  between bracketed/unbracketed AI data and scan data, by specification the
- *  conversion between Digital Link URIs and AI syntax is not bijective: the
- *  URI stem is lost, element order may not be preserved and AI values may be
- *  normalised into canonical form.
-
+ *  GS1 Digital Link inputs are an exception since they must be stored as
+ *  given, ready to be encoded directly into a barcode symbol. Unlike
+ *  conversion between bracketed/unbracketed AI data and scan data, by
+ *  specification the conversion between GS1 Digital Link URIs and AI syntax is
+ *  not bijective: the URI stem is lost, element order may not be preserved and
+ *  AI values may be normalised into canonical form.
+ *
  *  The extracted AI element string is stored in dlAIbuffer which is used as
  *  the storage for HRI text and construction bracketed AI strings.
  *

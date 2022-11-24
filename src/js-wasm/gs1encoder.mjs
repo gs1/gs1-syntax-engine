@@ -324,7 +324,7 @@ export class GS1encoder {
 
 
     /**
-     * Get a Digital Link URI that represents the AI-based input data.
+     * Get a GS1 Digital Link URI that represents the AI-based input data.
      *
      * @throws {GS1encoderDigitalLinkException}
      *

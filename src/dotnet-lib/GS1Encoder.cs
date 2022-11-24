@@ -444,7 +444,7 @@ namespace GS1.Encoders
 
 
         /// <summary>
-        /// Get a Digital Link URI that represents the AI-based input data.
+        /// Get a GS1 Digital Link URI that represents the AI-based input data.
         ///
         /// See the native library documentation for details:
         ///

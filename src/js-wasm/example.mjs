@@ -108,7 +108,7 @@ function process_clicked() {
 			document.getElementById("syntax").value = "Unbracketed AI element string";
 			gs1encoder.dataStr = data;
 		} else if (data.startsWith("http://") || data.startsWith("https://")) {
-			document.getElementById("syntax").value = "Digital Link URI";
+			document.getElementById("syntax").value = "GS1 Digital Link URI";
 			gs1encoder.dataStr = data;
 		} else if (/^\d+$/.test(data)) {
 			document.getElementById("syntax").value = "Plain data";

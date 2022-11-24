@@ -616,8 +616,8 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
 		*p++ = '\\';
 	strcpy(p, scanData);
 
-	// If a Digital Link URI is given then process it immediately
-	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) || // Digital Link URI
+	// If a GS1 Digital Link URI is given then process it immediately
+	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
 	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
@@ -794,7 +794,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]Q3011231231231233310ABC123" "\x1D" "99TESTING",
 		QR, "^011231231231233310ABC123^99TESTING");
 
-	// Digital Link URI
+	// GS1 Digital Link URI
 	test_testProcessScanData(true, "]Q1https://example.com/01/12312312312333?99=TEST",
 		QR, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
@@ -808,7 +808,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]d2011231231231233310ABC123" "\x1D" "99TESTING",
 		DM, "^011231231231233310ABC123^99TESTING");
 
-	// Digital Link URI
+	// GS1 Digital Link URI
 	test_testProcessScanData(true, "]d1https://example.com/01/12312312312333?99=TEST",
 		DM, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction

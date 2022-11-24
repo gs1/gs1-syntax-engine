@@ -76,11 +76,11 @@ while (!exit) {
 
     console.log("\n\n\nCurrent state:");
 
-    console.log("\n    Barcode message:    %s", gs1encoder.dataStr);
-    console.log("\n    AI element string:  %s", gs1encoder.aiDataStr);
+    console.log("\n    Barcode message:        %s", gs1encoder.dataStr);
+    console.log("\n    AI element string:      %s", gs1encoder.aiDataStr);
 
     var dlURI = ''; try { dlURI = gs1encoder.getDLuri(null); } catch {}
-    console.log("\n    Digital Link URI:   %s", dlURI);
+    console.log("\n    GS1 Digital Link URI:   %s", dlURI);
 
     console.log("\n    HRI:\n");
     gs1encoder.hri.forEach(ai => console.log("       %s", ai));
@@ -89,7 +89,7 @@ while (!exit) {
     console.log("\n 1) Process raw barcode message data, either:");
     console.log("      * Plain data");
     console.log("      * Unbracketed AI element string with FNC1 in first position");
-    console.log("      * Digital Link URI");
+    console.log("      * GS1 Digital Link URI");
     console.log(" 2) Process a bracketed AI element string");
     console.log(" 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
 
