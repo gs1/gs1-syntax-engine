@@ -20,17 +20,21 @@
 
 package org.gs1.gs1encodersapp
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import org.gs1.gs1encoders.GS1Encoder
 import org.gs1.gs1encoders.GS1EncoderDigitalLinkException
 import org.gs1.gs1encoders.GS1EncoderParameterException
 import org.gs1.gs1encoders.GS1EncoderScanDataException
 import org.gs1.gs1encodersapp.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,6 +63,11 @@ class MainActivity : AppCompatActivity() {
         binding.inputData.setText("https://example.com/01/12312312312333/10/ABC123?99=TESTING")
 
         loadDataValues()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gs1encoder.free()
     }
 
     private fun clearRender() {
@@ -202,6 +211,24 @@ class MainActivity : AppCompatActivity() {
 
         loadDataValues()
 
+    }
+
+    private val scanInputDataLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.resultCode != Activity.RESULT_OK) {
+                binding.inputData.setText("Scan failed")
+                return@registerForActivityResult
+            }
+            val value = it.data?.getStringExtra("INPUT_DATA") ?: ""
+            binding.inputData.setText(value.replace("\u001D", "{GS}"))
+        }
+
+    fun scanBarcodeButtonClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+        clearRender()
+        val intent = Intent(this, GS1BarcodeScannerActivity::class.java)
+        scanInputDataLauncher.launch(intent)
     }
 
     fun unknownAIsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {

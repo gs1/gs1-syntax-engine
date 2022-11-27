@@ -72,6 +72,19 @@
                     android:onClick="processInputButtonClicked"
                     android:text="Process input" />
 
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/scanBarcodeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="scanBarcodeButtonClicked"
+                    android:text="Scan Barcode" />
+
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
