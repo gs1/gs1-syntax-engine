@@ -170,6 +170,8 @@ jobs:
     steps:
 
     - uses: mymindstorm/setup-emsdk@v11
+      with:
+        version: 3.1.26
 
     - uses: actions/checkout@v3
 
@@ -194,6 +196,8 @@ jobs:
     steps:
 
     - uses: mymindstorm/setup-emsdk@v11
+      with:
+        version: 3.1.26
 
     - uses: actions/checkout@v3
 
@@ -376,6 +380,8 @@ jobs:
     steps:
 
     - uses: mymindstorm/setup-emsdk@v11
+      with:
+        version: 3.1.26
 
     - uses: actions/checkout@v3
 
