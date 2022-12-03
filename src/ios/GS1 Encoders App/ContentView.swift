@@ -38,6 +38,8 @@ struct ContentView: View {
     @State var associations = false
     @State var datatitles = false
 
+    @State private var showCamera = false
+
     @FocusState var inputIsFocused: Bool
 
     let gs1encoder = try! GS1Encoder()
@@ -173,6 +175,16 @@ struct ContentView: View {
 
     }
 
+    func scanBarcode() {
+        clearRender()
+        showCamera = true
+    }
+
+    func updateInputData(data: String) {
+        inputData = data.replacingOccurrences(of: "\u{001d}", with: "{GS}")
+        showCamera = false
+    }
+
     var body: some View {
         ScrollView() {
             VStack {
@@ -196,17 +208,30 @@ struct ContentView: View {
                     clearRender()
                 }
 
-                Button {
-                    processInput()
-                } label: {
-                    Text("PROCESS INPUT").frame(maxWidth: .infinity)
+                HStack {
+                    Button {
+                        processInput()
+                    } label: {
+                        Text("PROCESS INPUT").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    Button {
+                        scanBarcode()
+                    } label: {
+                        Text("SCAN BARCODE").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
 
                 OutputView(errorMsg: $errorMsg, errorIsHidden: $errorIsHidden, infoMsg: $infoMsg, infoIsHidden: $infoIsHidden, syntax: $syntax, dataStr: $dataStr, aiDataStr: $aiDataStr, dlURI: $dlURI, hri: $hri)
 
                 Spacer()
             }.onAppear(perform: loadDataValues)
+        }.sheet(isPresented: $showCamera, onDismiss: {self.showCamera = false}) {
+            VStack {
+                BarcodeScannerView(updatefn: updateInputData)
+            }.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
         }
     }
 }

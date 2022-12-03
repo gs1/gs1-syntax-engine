@@ -1,0 +1,8 @@
+platform :ios, '11.0'
+
+target 'GS1 Encoders App' do
+  use_frameworks!
+
+  pod 'GoogleMLKit/BarcodeScanning', '3.2.0'
+
+end

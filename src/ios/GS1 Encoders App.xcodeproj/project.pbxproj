@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C61FD91F516A6C861323F7AE /* Pods_GS1_Encoders_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8E9779FA2B3E64A62BA5D1F /* Pods_GS1_Encoders_App.framework */; };
+		F72D9196293AB3F300809E9B /* BarcodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */; };
 		F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */; };
 		F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AD2909D225008E17F4 /* ContentView.swift */; };
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
@@ -50,6 +52,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		236FDA1DC8D99856F812E304 /* Pods-GS1 Encoders App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GS1 Encoders App.debug.xcconfig"; path = "Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App.debug.xcconfig"; sourceTree = "<group>"; };
+		6E6A486084227C4CC5414BBB /* Pods-GS1 Encoders App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GS1 Encoders App.release.xcconfig"; path = "Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App.release.xcconfig"; sourceTree = "<group>"; };
+		E8E9779FA2B3E64A62BA5D1F /* Pods_GS1_Encoders_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GS1_Encoders_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodeScannerView.swift; sourceTree = "<group>"; };
 		F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS1 Encoders App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1_Encoders_AppApp.swift; sourceTree = "<group>"; };
 		F73EC9AD2909D225008E17F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -110,17 +116,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C61FD91F516A6C861323F7AE /* Pods_GS1_Encoders_App.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BEA5995848794A0F2315D65A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				236FDA1DC8D99856F812E304 /* Pods-GS1 Encoders App.debug.xcconfig */,
+				6E6A486084227C4CC5414BBB /* Pods-GS1 Encoders App.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		D7C1224EEF009EA543345ABB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E8E9779FA2B3E64A62BA5D1F /* Pods_GS1_Encoders_App.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F73EC99F2909D225008E17F4 = {
 			isa = PBXGroup;
 			children = (
 				F73EC9AA2909D225008E17F4 /* GS1 Encoders App */,
 				F73EC9A92909D225008E17F4 /* Products */,
+				BEA5995848794A0F2315D65A /* Pods */,
+				D7C1224EEF009EA543345ABB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,6 +164,7 @@
 				F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */,
 				F798271B2909D35400F00DDA /* c-lib */,
 				F73EC9AD2909D225008E17F4 /* ContentView.swift */,
+				F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */,
 				F73EC9AF2909D226008E17F4 /* Assets.xcassets */,
 				F73EC9B12909D226008E17F4 /* Preview Content */,
 				F79827DB2909DC2600F00DDA /* GS1 Encoders App-Bridging-Header.h */,
@@ -223,9 +250,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F73EC9B62909D226008E17F4 /* Build configuration list for PBXNativeTarget "GS1 Encoders App" */;
 			buildPhases = (
+				13F493CF1EA314ADA94DEFD8 /* [CP] Check Pods Manifest.lock */,
 				F73EC9A42909D225008E17F4 /* Sources */,
 				F73EC9A52909D225008E17F4 /* Frameworks */,
 				F73EC9A62909D225008E17F4 /* Resources */,
+				7FF09ED7D26C416AF73ED353 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -282,6 +311,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		13F493CF1EA314ADA94DEFD8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-GS1 Encoders App-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7FF09ED7D26C416AF73ED353 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		F73EC9A42909D225008E17F4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -311,6 +382,7 @@
 				F79827702909D35500F00DDA /* gs1encoders.c in Sources */,
 				F79827892909D35500F00DDA /* lint_yesno.c in Sources */,
 				F79827662909D35500F00DDA /* scandata.c in Sources */,
+				F72D9196293AB3F300809E9B /* BarcodeScannerView.swift in Sources */,
 				F798277C2909D35500F00DDA /* lint_iso3166.c in Sources */,
 				F79827752909D35500F00DDA /* lint_couponcode.c in Sources */,
 				F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */,
@@ -446,12 +518,15 @@
 		};
 		F73EC9B72909D226008E17F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 236FDA1DC8D99856F812E304 /* Pods-GS1 Encoders App.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
+				DEVELOPMENT_TEAM = AAYQF35QVM;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -459,6 +534,8 @@
 					GS1_LINTER_ERR_STR_EN,
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Read input data from barcode";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -469,7 +546,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "GS1 Encoders App/GS1 Encoders App-Bridging-Header.h";
@@ -480,15 +557,20 @@
 		};
 		F73EC9B82909D226008E17F4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E6A486084227C4CC5414BBB /* Pods-GS1 Encoders App.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
+				DEVELOPMENT_TEAM = AAYQF35QVM;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = GS1_LINTER_ERR_STR_EN;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Read input data from barcode";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -499,7 +581,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.gs1.GS1-Encoders-App1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "GS1 Encoders App/GS1 Encoders App-Bridging-Header.h";
