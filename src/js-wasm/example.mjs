@@ -78,8 +78,13 @@ function load_data_values() {
 		document.getElementById("dl").value = "⧚ " + err.message + " ⧛";
 	}
 
-	for (const ai of gs1encoder.hri)
-		document.getElementById("hri").value += ai + "\n";
+	var hri = gs1encoder.hri;
+	if (hri.length > 0) {
+		for (const ai of hri)
+			document.getElementById("hri").value += ai + "\n";
+	} else {
+		document.getElementById("hri").value = "⧚ Not AI-based data ⧛";
+	}
 
 	var qps = gs1encoder.dlIgnoredQueryParams;
 	if (qps.length > 0)
