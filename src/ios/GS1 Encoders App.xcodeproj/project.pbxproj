@@ -109,6 +109,7 @@
 		F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "gs1-syntax-dictionary.txt"; sourceTree = "<group>"; };
 		F79827DB2909DC2600F00DDA /* GS1 Encoders App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GS1 Encoders App-Bridging-Header.h"; sourceTree = "<group>"; };
 		F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1Encoder.swift; sourceTree = "<group>"; };
+		F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GS1-Encoders-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +162,7 @@
 		F73EC9AA2909D225008E17F4 /* GS1 Encoders App */ = {
 			isa = PBXGroup;
 			children = (
+				F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */,
 				F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */,
 				F798271B2909D35400F00DDA /* c-lib */,
 				F73EC9AD2909D225008E17F4 /* ContentView.swift */,
@@ -526,7 +528,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
-				DEVELOPMENT_TEAM = AAYQF35QVM;
+				DEVELOPMENT_TEAM = W5TY4M55Q5;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -534,6 +536,7 @@
 					GS1_LINTER_ERR_STR_EN,
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GS1-Encoders-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Read input data from barcode";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -565,10 +568,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GS1 Encoders App/Preview Content\"";
-				DEVELOPMENT_TEAM = AAYQF35QVM;
+				DEVELOPMENT_TEAM = W5TY4M55Q5;
 				ENABLE_PREVIEWS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = GS1_LINTER_ERR_STR_EN;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GS1-Encoders-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Read input data from barcode";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
