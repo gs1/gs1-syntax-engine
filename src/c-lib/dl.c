@@ -30,7 +30,6 @@
 #include "gs1encoders.h"
 #include "enc-private.h"
 #include "debug.h"
-#include "ai.h"
 #include "dl.h"
 
 

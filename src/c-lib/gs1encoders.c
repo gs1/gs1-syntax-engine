@@ -28,7 +28,6 @@
 #include "syntax/gs1syntaxdictionary.h"
 #include "enc-private.h"
 #include "gs1encoders.h"
-#include "ai.h"
 #include "dl.h"
 #include "scandata.h"
 #include "syn.h"

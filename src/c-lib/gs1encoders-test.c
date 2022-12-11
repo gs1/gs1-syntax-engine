@@ -46,7 +46,6 @@
 #include <stddef.h>
 
 #include "enc-private.h"
-#include "ai.h"
 #include "dl.h"
 #include "scandata.h"
 #include "syn.h"

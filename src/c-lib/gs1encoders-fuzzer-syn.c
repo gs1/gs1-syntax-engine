@@ -24,7 +24,6 @@
 
 #include "gs1encoders.h"
 #include "enc-private.h"
-#include "ai.h"
 #include "syn.h"
 
 static gs1_encoder *ctx = NULL;
