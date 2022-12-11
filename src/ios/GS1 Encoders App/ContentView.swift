@@ -76,8 +76,7 @@ struct ContentView: View {
 
         dataStr = gs1encoder.getDataStr()
 
-        let ai = gs1encoder.getAIdataStr()
-        aiDataStr = ai != "" ? ai : "⧚ Not AI-based data ⧛"
+        aiDataStr = gs1encoder.getAIdataStr() ?? "⧚ Not AI-based data ⧛"
 
         do {
             dlURI = try gs1encoder.getDLuri()
@@ -85,7 +84,8 @@ struct ContentView: View {
             dlURI = msg
         } catch {}
 
-        hri = gs1encoder.getHRI().joined(separator: "\n")
+        let hritext = gs1encoder.getHRI()
+        hri = hritext.count > 0 ? hritext.joined(separator: "\n") : "⧚ Not AI-based data ⧛"
 
         let qps = gs1encoder.getDLignoredQueryParams()
         if (qps.count > 0) {

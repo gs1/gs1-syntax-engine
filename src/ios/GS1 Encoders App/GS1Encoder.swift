@@ -320,10 +320,10 @@ class GS1Encoder {
      *   - gs1_encoder_getAIdataStr()
      *
      */
-    func getAIdataStr() -> String {
+    func getAIdataStr() -> String? {
         let cstr = gs1_encoder_getAIdataStr(ctx)
         if (cstr == nil) {
-            return ""
+            return nil
         }
         return String(cString: cstr!)
     }
