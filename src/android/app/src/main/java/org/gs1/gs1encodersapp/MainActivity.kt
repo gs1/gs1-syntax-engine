@@ -96,11 +96,9 @@ class MainActivity : AppCompatActivity() {
             return
 
         binding.datastrTextBox.setText(gs1encoder.dataStr)
-        val ai = gs1encoder.aIdataStr
-        if (ai != "")
-            binding.elementstringTextBox.setText(gs1encoder.aIdataStr)
-        else
-            binding.elementstringTextBox.setText("⧚ Not AI-based data ⧛")
+
+        val ai = gs1encoder.aIdataStr ?: "⧚ Not AI-based data ⧛"
+        binding.elementstringTextBox.setText(ai)
 
         try {
             binding.dlTextBox.setText(gs1encoder.getDLuri(null))
@@ -108,7 +106,12 @@ class MainActivity : AppCompatActivity() {
             binding.dlTextBox.setText(e.message)
         }
 
-        binding.hriTextBox.setText(gs1encoder.hri.joinToString("\n"))
+        val hri = gs1encoder.hri
+        if (hri.isNotEmpty()) {
+            binding.hriTextBox.setText(hri.joinToString("\n"))
+        } else {
+            binding.hriTextBox.setText("⧚ Not AI-based data ⧛")
+        }
 
         val qps = gs1encoder.dLignoredQueryParams
         if (qps.isNotEmpty()) {
