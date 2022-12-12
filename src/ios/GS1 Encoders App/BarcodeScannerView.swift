@@ -107,7 +107,8 @@ class BarcodeScannerUIView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate
         super.didMoveToSuperview()
         if nil != self.superview {
             self.videoPreviewLayer.session = self.captureSession
-            self.videoPreviewLayer.videoGravity = .resize
+            self.videoPreviewLayer.videoGravity = .resizeAspectFill
+            self.videoPreviewLayer.connection?.videoOrientation = .portrait
             DispatchQueue.global(qos: .userInitiated).async { //[weak self] in
                 self.captureSession?.startRunning()
             }
