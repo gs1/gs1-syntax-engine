@@ -224,7 +224,19 @@ struct ContentView: View {
                     .buttonStyle(.borderedProminent)
                 }
 
-                OutputView(errorMsg: $errorMsg, errorIsHidden: $errorIsHidden, infoMsg: $infoMsg, infoIsHidden: $infoIsHidden, syntax: $syntax, dataStr: $dataStr, aiDataStr: $aiDataStr, dlURI: $dlURI, hri: $hri)
+                Group {
+                    if !self.errorIsHidden {
+                        TextFieldWithBorder(label: "Error", message: $errorMsg).disabled(true)
+                    }
+                    if !self.infoIsHidden {
+                        TextFieldWithBorder(label: "Info", message: $infoMsg).disabled(true)
+                    }
+                    TextFieldWithBorder(label: "Detected syntax", message: $syntax).disabled(true)
+                    TextFieldWithBorder(label: "Barcode message (^ = FNC1)", message: $dataStr).disabled(true)
+                    TextFieldWithBorder(label: "GS1 AI element string", message: $aiDataStr).disabled(true)
+                    TextFieldWithBorder(label: "GS1 Digital Link URI (canonical form)", message: $dlURI).disabled(true)
+                    TextFieldWithBorder(label: "HRI text", message: $hri).disabled(true)
+                }
 
                 Spacer()
             }.onAppear(perform: loadDataValues)
@@ -270,32 +282,5 @@ struct TextFieldWithBorder: View {
                 Spacer()
             }.padding()
         }
-    }
-}
-
-struct OutputView: View {
-
-    @Binding var errorMsg :String
-    @Binding var errorIsHidden :Bool
-    @Binding var infoMsg :String
-    @Binding var infoIsHidden :Bool
-    @Binding var syntax :String
-    @Binding var dataStr :String
-    @Binding var aiDataStr :String
-    @Binding var dlURI :String
-    @Binding var hri :String
-
-    var body: some View {
-        if (!errorIsHidden) {
-            TextFieldWithBorder(label: "Error", message: $errorMsg).disabled(true)
-        }
-        if (!infoIsHidden) {
-            TextFieldWithBorder(label: "Info", message: $infoMsg).disabled(true)
-        }
-        TextFieldWithBorder(label: "Detected syntax", message: $syntax).disabled(true)
-        TextFieldWithBorder(label: "Barcode message (^ = FNC1)", message: $dataStr).disabled(true)
-        TextFieldWithBorder(label: "GS1 AI element string", message: $aiDataStr).disabled(true)
-        TextFieldWithBorder(label: "GS1 Digital Link URI (canonical form)", message: $dlURI).disabled(true)
-        TextFieldWithBorder(label: "HRI text", message: $hri).disabled(true)
     }
 }
