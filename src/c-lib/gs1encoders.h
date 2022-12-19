@@ -995,6 +995,8 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char ***hri);
 /**
  * @brief Get the require HRI buffer size.
  *
+ * @deprecated Use gs1_encoder_getHRI() instead.
+ *
  * @see gs1_encoder_copyHRI()
  *
  * \note
@@ -1009,6 +1011,8 @@ GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
 
 /**
  * @brief Copy the HRI to a user-provided buffer in the form of a "|"-separated string.
+ *
+ * @deprecated Use gs1_encoder_getHRI() instead.
  *
  * The buffer into which the output buffer is copied must be preallocated with
  * at least the size returned by gs1_encoder_getHRIsize().
@@ -1066,6 +1070,8 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder* ctx, char 
  * @brief Get the require buffer size for ignored GS1 Digital Link query
  * parameters.
  *
+ * @deprecated Use gs1_encoder_getDLignoredQueryParams() instead.
+ *
  * @see gs1_encoder_copyDLignoredQueryParams()
  *
  * \note
@@ -1082,6 +1088,8 @@ GS1_ENCODERS_API size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx
 /**
  * @brief Copy the non-numeric (ignored) GS1 Digital Link query parameters to a
  * user-provided buffer in the form of a "&"-separated string.
+ *
+ * @deprecated Use gs1_encoder_getDLignoredQueryParams() instead.
  *
  * The buffer into which the output buffer is copied must be preallocated with
  * at least the size returned by gs1_encoder_getDLignoredQueryParamsSize().

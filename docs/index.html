@@ -425,6 +425,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the form of a "&amp;"-separated string. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
 <p>The buffer into which the output buffer is copied must be preallocated with at least the size returned by <a class="el" href="gs1encoders_8h.html#a5f2e7121014df0028a47e49a1da4a05b" title="Get the require buffer size for ignored GS1 Digital Link query parameters.">gs1_encoder_getDLignoredQueryParamsSize()</a>.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a5f2e7121014df0028a47e49a1da4a05b" title="Get the require buffer size for ignored GS1 Digital Link query parameters.">gs1_encoder_getDLignoredQueryParamsSize()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function exists mainly for environments where it is difficult to access library-allocated buffers via a pointer modified in function parameters.</dd></dl>
@@ -472,6 +473,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Copy the HRI to a user-provided buffer in the form of a "|"-separated string. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
 <p>The buffer into which the output buffer is copied must be preallocated with at least the size returned by <a class="el" href="gs1encoders_8h.html#a816123420e38dcd67d32b3553001931e" title="Get the require HRI buffer size.">gs1_encoder_getHRIsize()</a>.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a816123420e38dcd67d32b3553001931e" title="Get the require HRI buffer size.">gs1_encoder_getHRIsize()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function exists mainly for environments where it is difficult to access library-allocated buffers via a pointer modified in function parameters.</dd></dl>
@@ -666,6 +668,7 @@ The return data does not need to be free()ed and the content should be copied if
 </div><div class="memdoc">
 
 <p>Get the require buffer size for ignored GS1 Digital Link query parameters. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae3c401b4222d7a93251bf28888ee8950" title="Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the for...">gs1_encoder_copyDLignoredQueryParams()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is useful when used in tandem with <a class="el" href="gs1encoders_8h.html#ae3c401b4222d7a93251bf28888ee8950" title="Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the for...">gs1_encoder_copyDLignoredQueryParams()</a> to determine the size of the user-provided buffer to pre-allocate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -895,6 +898,7 @@ Data validation checks</h3>
 </div><div class="memdoc">
 
 <p>Get the require HRI buffer size. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a43b1c1f4a2122d053277311be3444d8e" title="Copy the HRI to a user-provided buffer in the form of a &quot;|&quot;-separated string.">gs1_encoder_copyHRI()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is useful when used in tandem with <a class="el" href="gs1encoders_8h.html#a43b1c1f4a2122d053277311be3444d8e" title="Copy the HRI to a user-provided buffer in the form of a &quot;|&quot;-separated string.">gs1_encoder_copyHRI()</a> to determine the size of the user-provided buffer to pre-allocate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
