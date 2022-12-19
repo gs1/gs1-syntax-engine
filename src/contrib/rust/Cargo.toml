@@ -1,0 +1,7 @@
+[package]
+name = "gs1encoders"
+version = "0.1.0"
+
+[[bin]]
+name="example"
+path = "example.rs"
