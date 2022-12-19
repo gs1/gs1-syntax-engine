@@ -1,7 +1,11 @@
 [package]
 name = "gs1encoders"
 version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
 
 [[bin]]
-name="example"
+name = "example"
 path = "example.rs"
