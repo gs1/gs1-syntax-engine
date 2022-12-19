@@ -127,14 +127,10 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_setScanData', 'number', ['number', 'string']),
             gs1_encoder_getScanData:
                 this.module.cwrap('gs1_encoder_getScanData', 'string', ['number']),
-            gs1_encoder_getHRIsize:
-                this.module.cwrap('gs1_encoder_getHRIsize', 'number', ['number']),
-            gs1_encoder_copyHRI:
-                this.module.cwrap('gs1_encoder_copyHRI', null, ['number', 'number', 'number']),
-            gs1_encoder_getDLignoredQueryParamsSize:
-                this.module.cwrap('gs1_encoder_getDLignoredQueryParamsSize', 'number', ['number']),
-            gs1_encoder_copyDLignoredQueryParams:
-                this.module.cwrap('gs1_encoder_copyDLignoredQueryParams', null, ['number', 'number', 'number']),
+            gs1_encoder_getHRI:
+                this.module.cwrap('gs1_encoder_getHRI', 'number', ['number', 'number']),
+            gs1_encoder_getDLignoredQueryParams:
+                this.module.cwrap('gs1_encoder_getDLignoredQueryParams', null, ['number', 'number']),
         };
 
         this.ctx = this.api.gs1_encoder_init(null);
@@ -370,14 +366,15 @@ export class GS1encoder {
      *
      */
     get hri() {
-        var needed = this.api.gs1_encoder_getHRIsize(this.ctx);
-        if (needed == 0) return [];
-        var ptr = this.module._malloc(needed);
-        var buf = this.module.HEAPU8.subarray(ptr, ptr + needed);
-        this.api.gs1_encoder_copyHRI(this.ctx, ptr, needed);
-        var ret = buf.slice(0, needed - 1);
-        this.module._free(ptr);
-        return String.fromCharCode.apply(null, ret).split('|');
+        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        var size = this.api.gs1_encoder_getHRI(this.ctx, ptr);
+        var hri = Array(size);
+        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+             i < size;
+             i++, p += Uint32Array.BYTES_PER_ELEMENT) {
+            hri[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
+        }
+        return hri;
     }
 
 
@@ -390,14 +387,15 @@ export class GS1encoder {
      *
      */
     get dlIgnoredQueryParams() {
-        var needed = this.api.gs1_encoder_getDLignoredQueryParamsSize(this.ctx);
-        if (needed == 0) return [];
-        var ptr = this.module._malloc(needed);
-        var buf = this.module.HEAPU8.subarray(ptr, ptr + needed);
-        this.api.gs1_encoder_copyDLignoredQueryParams(this.ctx, ptr, needed);
-        var ret = buf.slice(0, needed - 1);
-        this.module._free(ptr);
-        return String.fromCharCode.apply(null, ret).split('&');
+        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        var size = this.api.gs1_encoder_getDLignoredQueryParams(this.ctx, ptr);
+        var qp = Array(size);
+        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+             i < size;
+             i++, p += Uint32Array.BYTES_PER_ELEMENT) {
+            qp[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
+        }
+        return qp;
     }
 
 }
