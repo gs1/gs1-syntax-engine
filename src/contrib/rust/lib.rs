@@ -48,7 +48,7 @@ impl GS1Encoder {
 
     fn get_err_msg(&self) -> String {
         let c_str: &CStr = unsafe { CStr::from_ptr( gs1_encoder_getErrMsg(self.ctx) ) };
-        return c_str.to_str().unwrap().to_owned();
+        c_str.to_str().unwrap().to_owned()
     }
 
     pub fn new() -> Result<Self, GS1EncoderError> {
@@ -57,7 +57,7 @@ impl GS1Encoder {
         if gs1encoder.ctx.is_null() {
             return Err(GS1EncoderError::GS1GeneralError("Failed to initalise the native library".to_string()));
         }
-        return Ok(gs1encoder);
+        Ok(gs1encoder)
     }
 
     pub fn free(&self) {
@@ -66,7 +66,7 @@ impl GS1Encoder {
 
     pub fn get_version(&self) -> String {
         let c_str: &CStr = unsafe { CStr::from_ptr(gs1_encoder_getVersion()) };
-        return c_str.to_str().unwrap().to_owned();
+        c_str.to_str().unwrap().to_owned()
     }
 
     pub fn set_include_data_titles_in_hri(&self, value: bool) -> Result<(), GS1EncoderError> {
@@ -78,12 +78,12 @@ impl GS1Encoder {
     }
 
     pub fn get_include_data_titles_in_hri(&self) -> bool {
-        return unsafe { gs1_encoder_getIncludeDataTitlesInHRI(self.ctx) };
+        unsafe { gs1_encoder_getIncludeDataTitlesInHRI(self.ctx) }
     }
 
     pub fn get_data_str(&self) -> String {
         let c_str: &CStr = unsafe { CStr::from_ptr( gs1_encoder_getDataStr(self.ctx) ) };
-        return c_str.to_str().unwrap().to_owned();
+        c_str.to_str().unwrap().to_owned()
     }
 
     pub fn set_data_str(&self, value: &str) -> Result<(), GS1EncoderError> {
@@ -99,7 +99,7 @@ impl GS1Encoder {
         let ptr = unsafe { gs1_encoder_getAIdataStr(self.ctx) };
         if ptr.is_null() { return None; }
         let c_str: &CStr = unsafe { CStr::from_ptr(ptr) };
-        return Some(c_str.to_str().unwrap().to_owned());
+        Some(c_str.to_str().unwrap().to_owned())
     }
 
     pub fn get_hri(&self) -> Vec<String> {
@@ -109,10 +109,9 @@ impl GS1Encoder {
         for i in 0..size {
             let c_buf = unsafe { ptr::read(ptr.offset(i as isize)) };
             let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
-            let str_buf: String = c_str.to_str().unwrap().to_owned();
-            hri.push(str_buf);
+            hri.push(c_str.to_str().unwrap().to_owned());
         }
-        return hri;
+        hri
     }
 
 }
