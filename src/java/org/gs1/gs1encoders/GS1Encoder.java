@@ -39,30 +39,30 @@ public class GS1Encoder {
      *  Functions imported from the JNI interface
      *
      */
-    private final static native String gs1encoderGetErrMsgJNI(long ctx);
-    private final static native long gs1encoderInitJNI();
-    private final static native void gs1encoderFreeJNI(long ctx);
-    private final static native String gs1encoderGetVersionJNI();
-    private final static native int gs1encoderGetSymJNI(long ctx);
-    private final static native boolean gs1encoderSetSymJNI(long ctx, int value);
-    private final static native boolean gs1encoderGetAddCheckDigitJNI(long ctx);
-    private final static native boolean gs1encoderSetAddCheckDigitJNI(long ctx, boolean value);
-    private final static native boolean gs1encoderGetIncludeDataTitlesInHRIJNI(long ctx);
-    private final static native boolean gs1encoderSetIncludeDataTitlesInHRIJNI(long ctx, boolean value);
-    private final static native boolean gs1encoderGetPermitUnknownAIsJNI(long ctx);
-    private final static native boolean gs1encoderSetPermitUnknownAIsJNI(long ctx, boolean value);
-    private final static native boolean gs1encoderGetValidateAIassociationsJNI(long ctx);
-    private final static native boolean gs1encoderSetValidateAIassociationsJNI(long ctx, boolean value);
-    private final static native String gs1encoderGetDataStrJNI(long ctx);
-    private final static native boolean gs1encoderSetDataStrJNI(long ctx, String value);
-    private final static native String gs1encoderGetAIdataStrJNI(long ctx);
-    private final static native boolean gs1encoderSetAIdataStrJNI(long ctx, String value);
-    private final static native String gs1encoderGetScanDataJNI(long ctx);
-    private final static native boolean gs1encoderSetScanDataJNI(long ctx, String value);
-    private final static native String gs1encoderGetErrMarkupJNI(long ctx);
-    private final static native String gs1encoderGetDLuriJNI(long ctx, String stem);
-    private final static native String[] gs1encoderGetHRIJNI(long ctx);
-    private final static native String[] gs1encoderGetDLignoredQueryParamsJNI(long ctx);
+    private static native String gs1encoderGetErrMsgJNI(long ctx);
+    private static native long gs1encoderInitJNI();
+    private static native void gs1encoderFreeJNI(long ctx);
+    private static native String gs1encoderGetVersionJNI();
+    private static native int gs1encoderGetSymJNI(long ctx);
+    private static native boolean gs1encoderSetSymJNI(long ctx, int value);
+    private static native boolean gs1encoderGetAddCheckDigitJNI(long ctx);
+    private static native boolean gs1encoderSetAddCheckDigitJNI(long ctx, boolean value);
+    private static native boolean gs1encoderGetIncludeDataTitlesInHRIJNI(long ctx);
+    private static native boolean gs1encoderSetIncludeDataTitlesInHRIJNI(long ctx, boolean value);
+    private static native boolean gs1encoderGetPermitUnknownAIsJNI(long ctx);
+    private static native boolean gs1encoderSetPermitUnknownAIsJNI(long ctx, boolean value);
+    private static native boolean gs1encoderGetValidateAIassociationsJNI(long ctx);
+    private static native boolean gs1encoderSetValidateAIassociationsJNI(long ctx, boolean value);
+    private static native String gs1encoderGetDataStrJNI(long ctx);
+    private static native boolean gs1encoderSetDataStrJNI(long ctx, String value);
+    private static native String gs1encoderGetAIdataStrJNI(long ctx);
+    private static native boolean gs1encoderSetAIdataStrJNI(long ctx, String value);
+    private static native String gs1encoderGetScanDataJNI(long ctx);
+    private static native boolean gs1encoderSetScanDataJNI(long ctx, String value);
+    private static native String gs1encoderGetErrMarkupJNI(long ctx);
+    private static native String gs1encoderGetDLuriJNI(long ctx, String stem);
+    private static native String[] gs1encoderGetHRIJNI(long ctx);
+    private static native String[] gs1encoderGetDLignoredQueryParamsJNI(long ctx);
 
     // Initialisation loads the gs1encoders JNI library interface
     static {
