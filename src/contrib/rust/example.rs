@@ -45,8 +45,7 @@ fn main() {
     gs1encoder.set_include_data_titles_in_hri(data_titles).unwrap();
     println!("\nHRI{}:", if gs1encoder.get_include_data_titles_in_hri() { " (including data titles)" } else { "" });
 
-    let hri = gs1encoder.get_hri();
-    for h in &hri {
+    for h in gs1encoder.get_hri() {
         println!("    {}", h);
     }
 
