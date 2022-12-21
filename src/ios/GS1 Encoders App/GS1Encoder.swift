@@ -139,9 +139,8 @@ class GS1Encoder {
      *
      */
     func free() {
-        if (ctx != nil) {
-            gs1_encoder_free(ctx)
-        }
+        gs1_encoder_free(ctx)
+        ctx = nil
     }
 
     /**
