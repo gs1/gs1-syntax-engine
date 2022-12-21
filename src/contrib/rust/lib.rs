@@ -60,8 +60,9 @@ impl GS1Encoder {
         Ok(gs1encoder)
     }
 
-    pub fn free(&self) {
+    pub fn free(&mut self) {
         unsafe { gs1_encoder_free(self.ctx) };
+        self.ctx = ptr::null_mut();
     }
 
     pub fn get_version(&self) -> String {
