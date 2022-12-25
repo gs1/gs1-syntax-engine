@@ -4,7 +4,8 @@
  *
  *  Requirements:
  *
- *    - Node.js >= v17.0.0 for stable ES6 module support and readline/promises
+ *    - Compile with emsdk >= 3.1.28 for correct ES6 module support
+ *    - Run with Node.js >= v17.0.0 for stable ES6 module support and readline/promises
  *
  *  The API reference for the native C library is available here:
  *
@@ -38,16 +39,6 @@
 import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 const rl = readline.createInterface({ input, output });
-
-
-/*
- *  Temporary boilerplate required due to deficiencies in Emscripten's
- *  modulular JS wrapper. May be able to drop this in due course.
- *
- */
-globalThis.__dirname = '.';
-await import('module').then(module => globalThis.require = module.createRequire(import.meta.url));
-
 
 import { GS1encoder } from "./gs1encoder.mjs";
 
