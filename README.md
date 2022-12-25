@@ -114,6 +114,10 @@ the Emscripten SDK and then running:
 
     make wasm [JSONLY=yes]    # Set JSONLY=yes to create a JS-only build that does not use WebAssembly.
 
+Alternatively, on a Docker-enabled system a WASM / JS-only build can be lauched with:
+
+    docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk  make wasm [JSONLY=yes]
+
 
 Installing the Pre-built Demo Console Application
 -------------------------------------------------
