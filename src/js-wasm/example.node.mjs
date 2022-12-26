@@ -65,16 +65,23 @@ if (argv.length == 1 && argv == "--version") {
  */
 while (!exit) {
 
+    var dataStr = gs1encoder.dataStr;
+    var aiDataStr = "";
+    var dlURI = "";
+    var hri = [];
+    if (dataStr !== "") {
+        aiDataStr = gs1encoder.aiDataStr ?? "⧚ Not AI-based data ⧚";
+        try { dlURI = gs1encoder.getDLuri(null); } catch (err) { dlURI = "⧚ " + err.message + " ⧚"; }
+        hri = gs1encoder.hri;
+    }
+
     console.log("\n\n\nCurrent state:");
 
-    console.log("\n    Barcode message:        %s", gs1encoder.dataStr);
-    console.log("\n    AI element string:      %s", gs1encoder.aiDataStr);
-
-    var dlURI = ''; try { dlURI = gs1encoder.getDLuri(null); } catch {}
+    console.log("\n    Barcode message:        %s", dataStr);
+    console.log("\n    AI element string:      %s", aiDataStr);
     console.log("\n    GS1 Digital Link URI:   %s", dlURI);
-
-    console.log("\n    HRI:\n");
-    gs1encoder.hri.forEach(ai => console.log("       %s", ai));
+    console.log("\n    HRI:                    %s\n", dataStr !== "" && hri.length == 0 ? "⧚ Not AI-based data ⧚": "");
+    hri.forEach(ai => console.log("       %s", ai));
 
     console.log("\n\nMENU:");
     console.log("\n 1) Process raw barcode message data, either:");

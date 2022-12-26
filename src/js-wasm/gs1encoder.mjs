@@ -116,7 +116,7 @@ export class GS1encoder {
             gs1_encoder_setAIdataStr:
                 this.module.cwrap('gs1_encoder_setAIdataStr', 'number', ['number', 'string']),
             gs1_encoder_getAIdataStr:
-                this.module.cwrap('gs1_encoder_getAIdataStr', 'string', ['number']),
+                this.module.cwrap('gs1_encoder_getAIdataStr', 'number', ['number']),
             gs1_encoder_setDataStr:
                 this.module.cwrap('gs1_encoder_setDataStr', 'number', ['number', 'string']),
             gs1_encoder_getDataStr:
@@ -292,7 +292,10 @@ export class GS1encoder {
      *
      */
     get aiDataStr() {
-        return this.api.gs1_encoder_getAIdataStr(this.ctx);
+        var c_str = this.api.gs1_encoder_getAIdataStr(this.ctx);
+        if (!c_str)
+            return null;
+        return this.module.UTF8ToString(c_str);
     }
     set aiDataStr(value) {
         if (!this.api.gs1_encoder_setAIdataStr(this.ctx, value))
