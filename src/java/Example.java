@@ -51,17 +51,25 @@ public class Example {
 
         while (!exit) {
 
+            String dataStr = gs1encoder.getDataStr();
+            String aiDataStr = "";
+            String dlURI = "";
+            String[] hri = {};
+            if (!dataStr.isEmpty()) {
+                aiDataStr = gs1encoder.getAIdataStr();
+                if (aiDataStr == null) aiDataStr = "⧚ Not AI-based data ⧚";
+                try { dlURI = gs1encoder.getDLuri(null); } catch (GS1EncoderDigitalLinkException e) { dlURI = "⧚ " + e.getMessage() + " ⧚"; }
+                hri = gs1encoder.getHRI();
+            }
+
             System.out.println("\n\n\nCurrent state:");
 
-            System.out.format("\n    Barcode message:        %s", gs1encoder.getDataStr());
-            System.out.format("\n\n    AI element string:      %s", gs1encoder.getAIdataStr());
-
-            String dlURI = null; try { dlURI = gs1encoder.getDLuri(null); } catch (GS1EncoderDigitalLinkException e) {}
+            System.out.format("\n    Barcode message:        %s", dataStr);
+            System.out.format("\n    AI element string:      %s", aiDataStr);
             System.out.format("\n    GS1 Digital Link URI:   %s", dlURI);
-
-            System.out.println("\n    HRI:\n");
-            for (String hri : gs1encoder.getHRI()) {
-                System.out.format("       %s\n", hri);
+            System.out.format("\n    HRI:                    %s\n", !dataStr.isEmpty() && hri.length == 0 ? "⧚ Not AI-based data ⧚": "");
+            for (String h : hri) {
+                System.out.format("       %s\n", h);
             }
 
             System.out.println("\n\nMENU:");
