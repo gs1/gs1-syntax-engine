@@ -47,17 +47,30 @@ static bool userInt(gs1_encoder *ctx) {
 
 	bool ret = false;
 	int menuVal, i, numHRI;
-	char **hri;
+	char *dataStr, *aiDataStr, *dlURI, **hri = NULL;
 
 	while (true) {
 
 		printf("\n\n\nCurrent state:\n");
 
-		printf("\n    Barcode message:        %s\n", gs1_encoder_getDataStr(ctx));
-		printf("\n    AI element string:      %s", gs1_encoder_getAIdataStr(ctx));
-		printf("\n    GS1 Digital Link URI:   %s", gs1_encoder_getDLuri(ctx, NULL));
-		printf("\n    HRI:\n");
-		numHRI = gs1_encoder_getHRI(ctx, &hri);
+		dataStr = gs1_encoder_getDataStr(ctx);
+		printf("\n    Barcode message:        %s", dataStr);
+
+		aiDataStr = "";
+		if (*dataStr != '\0') aiDataStr = gs1_encoder_getAIdataStr(ctx);
+		printf("\n    AI element string:      %s", aiDataStr ? aiDataStr : "⧚ Not AI-based data ⧚");
+
+		dlURI = "";
+		if (*dataStr != '\0') dlURI = gs1_encoder_getDLuri(ctx, NULL);
+		if (dlURI) {
+			printf("\n    GS1 Digital Link URI:   %s", dlURI);
+		} else {
+			printf("\n    GS1 Digital Link URI:   ⧚ %s ⧚", gs1_encoder_getErrMsg(ctx));
+		}
+
+		numHRI = 0;
+		if (*dataStr != '\0') numHRI = gs1_encoder_getHRI(ctx, &hri);
+		printf("\n    HRI:                    %s\n", *dataStr != '\0' && numHRI == 0 ? "⧚ Not AI-based data ⧚": "");
 		for (i = 0; i < numHRI; i++) {
 			printf("        %s\n", hri[i]);
 		}
