@@ -31,6 +31,8 @@ limitations under the License.
   <property name="wrapfile" location="gs1encoders_wrap.c"/>
   <property name="sofile" location="libgs1encoders.so"/>
 
+  <property name="clib" location="../c-lib"/>
+
   <target name="init">
     <tstamp/>
     <mkdir dir="${classes}"/>
@@ -40,8 +42,8 @@ limitations under the License.
     <exec executable="gcc" failonerror="true">
       <arg line="-fPIC -shared -O2 -g
                  -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed
-                 -L../c-lib/build -lgs1encoders
-                 -I../c-lib
+                 -L${clib}/build -lgs1encoders
+                 -I${clib}
                  -I${java.home}/../include
                  -I${java.home}/../include/linux
                  -I${java.home}/include
@@ -54,19 +56,31 @@ limitations under the License.
 
   <target name="compile" depends="jni,init" description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
-      <exclude name="Example.java"/>
+      <exclude name="*"/>
     </javac>
   </target>
 
   <target name="jar" depends="compile,jni">
-    <jar destfile="${jar}" basedir="${classes}" />
+    <jar destfile="${jar}" basedir="${classes}">
+    <manifest>
+        <attribute name="Implementation-Vendor" value="GS1 AISBL"/>
+        <attribute name="Implementation-Title" value="GS1 Encoders Library"/>
+        <attribute name="Implementation-Version" value="1.0.0"/>
+      </manifest>
+    </jar>
   </target>
 
-  <target name="test" depends="jar,jni">
-    <javac includes="Example.java" srcdir="." destdir="." includeantruntime="false" classpath=".:${jar}" />
-    <java classname="Example" failonerror="true" classpath=".:${jar}" fork="true">
-      <env key="LD_LIBRARY_PATH" value="../c-lib/build:$LD_LIBRARY_PATH"/>
-      <sysproperty key="java.library.path" path="."/>
+  <target name="example" depends="jar,jni">
+    <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}" />
+    <echo>To run:
+LD_LIBRARY_PATH=${clib}/build java -Djava.library.path=${src} -classpath ${src}:${jar} Example
+    </echo>
+  </target>
+
+  <target name="test" depends="example">
+    <java classname="Example" failonerror="true" classpath="${src}:${jar}" fork="true">
+      <env key="LD_LIBRARY_PATH" value="${clib}/build:$LD_LIBRARY_PATH"/>
+      <sysproperty key="java.library.path" path="${src}"/>
       <arg value="--version"/>
     </java>
   </target>
@@ -75,7 +89,7 @@ limitations under the License.
     <delete dir="${build}"/>
     <delete file="${jar}"/>
     <delete file="${sofile}"/>
-    <delete file="Example.class"/>
+    <delete file="${src}/Example.class"/>
   </target>
 
   <target name="all" depends="jar,jni"/>
