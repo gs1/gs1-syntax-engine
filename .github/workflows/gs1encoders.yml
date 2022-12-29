@@ -141,7 +141,7 @@ jobs:
     - name: check includes with IWYU
       working-directory: src/c-lib
       run: |
-        sudo apt-get -y --no-install-recommends install iwyu clang-14
+        sudo apt-get -y --no-install-recommends install iwyu
         find -name '*.c' -print0 | xargs -0 -n1 -i bash -c 'iwyu -DPRNT -DSYMBOLOGY=gs1_encoder_sNONE -DUNIT_TESTS -DGS1_LINTER_ERR_STR_EN {}; [[ $? = 2 ]] || false'
 
   ci-java:
