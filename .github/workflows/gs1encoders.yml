@@ -169,7 +169,7 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v11
+    - uses: mymindstorm/setup-emsdk@v12
 
     - uses: actions/checkout@v3
 
@@ -193,7 +193,7 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v11
+    - uses: mymindstorm/setup-emsdk@v12
 
     - uses: actions/checkout@v3
 
@@ -375,7 +375,7 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v11
+    - uses: mymindstorm/setup-emsdk@v12
 
     - uses: actions/checkout@v3
 
