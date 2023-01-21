@@ -93,7 +93,7 @@ static bool populateAIlengthByPrefix(gs1_encoder *ctx) {
 		prefix = (uint8_t)((e->ai[0] - '0') * 10 + (e->ai[1] - '0'));
 		length = (uint8_t)strlen(e->ai);
 		if (ctx->aiLengthByPrefix[prefix] != 0 && ctx->aiLengthByPrefix[prefix] != length) {
-			sprintf(ctx->errMsg, "AI table is broken: AIs beginning '%c%c' have different lengths", e->ai[0], e->ai[1]);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI table is broken: AIs beginning '%c%c' have different lengths", e->ai[0], e->ai[1]);
 			ctx->errFlag = true;
 			return false;
 		}
@@ -343,7 +343,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 	p = start;
 	r = end;
 	if (p == r) {
-		sprintf(ctx->errMsg, "AI (%.*s) data is empty", (int)strlen(entry->ai), ai);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is empty", (int)strlen(entry->ai), ai);
 		ctx->errFlag = true;
 		return 0;
 	}
@@ -362,7 +362,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 			continue;
 
 		if (complen < part->min) {
-			sprintf(ctx->errMsg, "AI (%.*s) data is too short", (int)strlen(entry->ai), ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too short", (int)strlen(entry->ai), ai);
 			ctx->errFlag = true;
 			return 0;
 		}
@@ -383,7 +383,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 		do {
 			err = (*l)(compval, &errpos, &errlen);
 			if (err) {
-				sprintf(ctx->errMsg, "AI (%.*s): %s", (int)strlen(entry->ai), ai, gs1_lint_err_str[err]);
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s): %s", (int)strlen(entry->ai), ai, gs1_lint_err_str[err]);
 				ctx->linterErr = err;
 				errpos += (size_t)(p-start);
 				snprintf(ctx->linterErrMarkup, sizeof(ctx->linterErrMarkup), "(%.*s)%.*s|%.*s|%.*s",
@@ -426,17 +426,17 @@ bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct 
 		maxlen += part->max;
 	}
 	if (vallen < minlen) {
-		sprintf(ctx->errMsg, "AI (%.*s) value is too short", (int)strlen(entry->ai), ai);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too short", (int)strlen(entry->ai), ai);
 		return false;
 	}
 	if (vallen > maxlen) {
-		sprintf(ctx->errMsg, "AI (%.*s) value is too long", (int)strlen(entry->ai), ai);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too long", (int)strlen(entry->ai), ai);
 		return false;
 	}
 
 	// Also forbid data "^" characters at this stage so we don't conflate with FNC1
 	if (memchr(aiVal, '^', vallen) != NULL) {
-		sprintf(ctx->errMsg, "AI (%.*s) contains illegal ^ character", (int)strlen(entry->ai), ai);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) contains illegal ^ character", (int)strlen(entry->ai), ai);
 		return false;
 	}
 
@@ -476,7 +476,7 @@ bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
 		ailen = (size_t)(r-p);
 		entry = gs1_lookupAIentry(ctx, p, ailen);
 		if (entry == NULL) {
-			sprintf(ctx->errMsg, "Unrecognised AI: %.*s", (int)ailen, p);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Unrecognised AI: %.*s", (int)ailen, p);
 			goto fail;
 		}
 		ai = p;
@@ -593,7 +593,7 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 		 */
 		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL ||
 		    (extractAIs && entry == &unknownAI)) {
-			sprintf(ctx->errMsg, "No known AI is a prefix of: %.4s...", p);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "No known AI is a prefix of: %.4s...", p);
 			ctx->errFlag = true;
 			return false;
 		}
@@ -630,7 +630,7 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
 		p += vallen;
 		if (entry->fnc1 && *p != '^' && *p != '\0') {
-			sprintf(ctx->errMsg, "AI (%.*s) data is too long", (int)strlen(entry->ai), ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too long", (int)strlen(entry->ai), ai);
 			ctx->errFlag = true;
 			return false;
 		}
@@ -702,7 +702,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 				continue;
 			if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
 			   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
-				sprintf(ctx->errMsg, "Multiple instances of AI (%.*s) have different values", ai->ailen, ai->ai);
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Multiple instances of AI (%.*s) have different values", ai->ailen, ai->ai);
 				ctx->errFlag = true;
 				return false;
 			}
@@ -721,7 +721,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 
 				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
 					if (aiExists(ctx, token, ai->ai, matchedAI)) {
-						sprintf(ctx->errMsg, "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
+						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
 						ctx->errFlag = true;
 						return false;
 					}
@@ -736,7 +736,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 						break;
 
 				if (!token) {		/* Loop finished without a matching "req" */
-					sprintf(ctx->errMsg, "Required AIs for AI (%.*s) are not satisfied: %.*s", ai->ailen, ai->ai, reqLen, reqErr);
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %.*s", ai->ailen, ai->ai, reqLen, reqErr);
 					ctx->errFlag = true;
 					return false;
 				}
@@ -938,7 +938,7 @@ static void test_parseAIdata(gs1_encoder *ctx, const bool should_succeed, const 
 	char out[256];
 	char casename[256];
 
-	sprintf(casename, "%s => %s", aiData, expect);
+	snprintf(casename, sizeof(casename), "%s => %s", aiData, expect);
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;

@@ -36,10 +36,10 @@
 #define MAX_SD_ENTRY_LEN 150
 
 
-#define error(...) do {				\
-	sprintf(ctx->errMsg, __VA_ARGS__);	\
-	ctx->errFlag = true;			\
-	goto fail;				\
+#define error(...) do {							\
+	snprintf(ctx->errMsg, sizeof(ctx->errMsg), __VA_ARGS__);	\
+	ctx->errFlag = true;						\
+	goto fail;							\
 } while(0)
 
 
@@ -257,7 +257,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct 
 
 		if ((size_t)(p - buf) + strlen(token) > MAX_AI_ATTR_LEN)
 			error("Attributes too long");
-		p += sprintf(p, "%s ", token);
+		p += snprintf(p, sizeof(buf) - (size_t)(p-buf), "%s ", token);
 
 		token = strtok_r(NULL, " \t", &saveptr);
 
@@ -351,7 +351,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder *ctx, const char *f
 
 	fp = fopen(fname, "r");
 	if (fp == NULL) {
-		sprintf(ctx->errMsg, "Cannot read file %s", fname);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot read file %s", fname);
 		ctx->errFlag = true;
 		goto fail;
 	}

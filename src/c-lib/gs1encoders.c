@@ -194,7 +194,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char* dataS
 	reset_error(ctx);
 
 	if (strlen(dataStr) > MAX_DATA) {
-		sprintf(ctx->errMsg, "Maximum data length is %d characters", MAX_DATA);
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Maximum data length is %d characters", MAX_DATA);
 		ctx->errFlag = true;
 		return false;
 	}
@@ -322,7 +322,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		ai = &ctx->aiData[i];
 		if (ai->kind == aiValue_aival) {
-			p += sprintf(p, "(%.*s)", ai->ailen, ai->ai);
+			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s)", ai->ailen, ai->ai);
 			for (j = 0; j < ai->vallen; j++) {
 				if (ai->value[j] == '(')	// Escape data "("
 					*p++ = '\\';
@@ -388,9 +388,9 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 		assert(ai->aiEntry);
 		ctx->outHRI[j] = p;
 		if (!ctx->includeDataTitlesInHRI || *ai->aiEntry->title == '\0')
-			p += sprintf(p, "(%.*s) %.*s", ai->ailen, ai->ai, ai->vallen, ai->value);
+			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s) %.*s", ai->ailen, ai->ai, ai->vallen, ai->value);
 		else
-			p += sprintf(p, "%s (%.*s) %.*s", ai->aiEntry->title, ai->ailen, ai->ai, ai->vallen, ai->value);
+			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%s (%.*s) %.*s", ai->aiEntry->title, ai->ailen, ai->ai, ai->vallen, ai->value);
 		*p++ = '\0';
 		j++;
 	}
@@ -463,7 +463,7 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder *ctx, char*
 		if (ai->kind != alValue_dlign)
 			continue;
 		ctx->outHRI[j] = p;
-		p += sprintf(p, "%.*s", ai->vallen, ai->value);
+		p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s", ai->vallen, ai->value);
 		*p++ = '\0';
 		j++;
 	}

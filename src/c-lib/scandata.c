@@ -109,7 +109,7 @@ static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *prim
 
 	if (!ctx->addCheckDigit) {
 		if (strlen(dataStr) != digits) {
-			sprintf(ctx->errMsg, "Primary data must be %d digits", digits);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", digits);
 			ctx->errFlag = true;
 			*primaryStr = '\0';
 			return false;
@@ -117,7 +117,7 @@ static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *prim
 	}
 	else {
 		if (strlen(dataStr) != (size_t)digits-1) {
-			sprintf(ctx->errMsg, "Primary data must be %d digits without check digit", digits-1);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", digits-1);
 			ctx->errFlag = true;
 			*primaryStr = '\0';
 			return false;
@@ -652,7 +652,7 @@ static void do_test_testGenerateScanData(gs1_encoder* ctx, const char* name, con
 	char *out;
 	char casename[256];
 
-	sprintf(casename, "%s: %s", name, dataStr);
+	snprintf(casename, sizeof(casename), "%s: %s", name, dataStr);
 	TEST_CASE(casename);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, sym));
@@ -756,7 +756,7 @@ static void do_test_testProcessScanData(gs1_encoder *ctx, const bool should_succ
 
 	char casename[256];
 
-	sprintf(casename, "%s", scanData);
+	snprintf(casename, sizeof(casename), "%s", scanData);
 	TEST_CASE(casename);
 
 	TEST_CHECK(gs1_processScanData(ctx, scanData) ^ !should_succeed);

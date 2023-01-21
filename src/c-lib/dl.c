@@ -239,7 +239,7 @@ static int getDLpathAIseqEntry(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) 
 	 *
 	 */
 	for (i = 0 ; i < len; i++)
-		p += sprintf(p, "%s ", seq[i]);
+		p += snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
 	*--p = '\0';		// Chop stray space
 
 	/*
@@ -312,7 +312,7 @@ static size_t URIescape(char *out, size_t maxlen, const char *in, const size_t i
 		else if (in[i] == ' ')
 			out[j++] = '+';
 		else if (j+2 < maxlen)
-			j += (size_t)sprintf(&out[j], "%%%02X", in[i]);
+			j += (size_t)snprintf(&out[j], 4, "%%%02X", in[i]);
 		else
 			break;		/* Out of space */
 	}
@@ -455,7 +455,7 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 
 ;		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, r, (size_t)(p-r))) == 0) {
-			sprintf(ctx->errMsg, "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
 			goto fail;
 		}
 
@@ -534,7 +534,7 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 		ai = p;
 		ailen = (size_t)(e-p);
 		if (gs1_allDigits((uint8_t*)p, ailen) && (entry = gs1_lookupAIentry(ctx, p, ailen)) == NULL) {
-			sprintf(ctx->errMsg, "Unknown AI (%.*s) in query parameters", (int)ailen, p);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Unknown AI (%.*s) in query parameters", (int)ailen, p);
 			goto fail;
 		}
 
@@ -549,7 +549,7 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 		// Reverse percent encoding
 		e++;
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, e, (size_t)(r-e))) == 0) {
-			sprintf(ctx->errMsg, "Decoded AI (%.*s) value from DL query params too long", (int)strlen(entry->ai), ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params too long", (int)strlen(entry->ai), ai);
 			goto fail;
 		}
 
@@ -694,7 +694,7 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 	}
 
 	if (keyEntry == -1) {
-		sprintf(ctx->errMsg, "Cannot create a DL URI without a primary key AI");
+		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot create a DL URI without a primary key AI");
 		ctx->errFlag = true;
 		return NULL;
 	}
@@ -755,7 +755,7 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 	 *
 	 */
 	p = ctx->outStr;
-	p += sprintf(p, "%s", stem ? stem : CANONICAL_DL_STEM);
+	p += snprintf(p, sizeof(ctx->outStr), "%s", stem ? stem : CANONICAL_DL_STEM);
 
 	// Trim trailing slash
 	if (*(p-1) == '/')
@@ -771,12 +771,12 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 			ai = &ctx->aiData[j];
 			if (ai->kind == aiValue_aival && ai->dlPathOrder == i) {
 				URIescape(encval, sizeof(encval), ai->value, ai->vallen);
-				p += sprintf(p, "/%.*s/%s", ai->ailen, ai->ai, encval);
+				p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
 				break;
 			}
 		}
 	}
-	p += sprintf(p, "?");
+	p += snprintf(p, 2, "?");
 
 	/*
 	 *  Output the query parameter components (i.e. attribute AIs) in received order (i.e. attribute AIs), fixed-length first
@@ -791,7 +791,7 @@ again:
 				assert(ai->aiEntry);
 				if (ai->aiEntry->fnc1 != emitFixed) {
 					URIescape(encval, sizeof(encval), ai->value, ai->vallen);
-					p += sprintf(p, "%.*s=%s&", ai->ailen, ai->ai, encval);
+					p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
 				}
 			}
 		}
@@ -821,7 +821,7 @@ static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *d
 	char out[256];
 	char casename[256];
 
-	sprintf(casename, "%s => %s", dlData, expect);
+	snprintf(casename, sizeof(casename), "%s => %s", dlData, expect);
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
