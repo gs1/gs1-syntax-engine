@@ -38,7 +38,7 @@ static void DO_UNIT_TEST(int should_succeed, gs1_lint_err_t (*fn)(const char *, 
 	char casestr[512] = {0};
 
 	strcat(casestr, *data != '\0' ? data : "(empty string)");
-	sprintf(&casestr[strlen(casestr)], " %s:%d", file, line);
+	snprintf(&casestr[strlen(casestr)], sizeof(casestr) - strlen(casestr), " %s:%d", file, line);
 	TEST_CASE(casestr);
 
 	err = (fn)(data, err_pos, err_len);
