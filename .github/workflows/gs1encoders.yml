@@ -187,7 +187,7 @@ jobs:
       run: |
         node example.node.mjs --version
 
-  ci-wasm-jsonly:
+  ci-jsonly:
 
     runs-on: ubuntu-latest
 
@@ -267,7 +267,7 @@ jobs:
       - ci-scan-build
       - ci-java
       - ci-wasm
-      - ci-wasm-jsonly
+      - ci-jsonly
       - ci-ios-app
       - ci-android-app
 
@@ -331,7 +331,7 @@ jobs:
       - ci-scan-build
       - ci-java
       - ci-wasm
-      - ci-wasm-jsonly
+      - ci-jsonly
       - ci-ios-app
       - ci-android-app
 
@@ -367,7 +367,7 @@ jobs:
       - ci-scan-build
       - ci-java
       - ci-wasm
-      - ci-wasm-jsonly
+      - ci-jsonly
       - ci-ios-app
       - ci-android-app
 
@@ -393,6 +393,44 @@ jobs:
         path: src/c-lib/build-wasm/gs1encoders-wasm-app.tgz
 
 
+  build-release-jsonly:
+
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs:
+      - ci-gcc
+      - ci-clang
+      - ci-msvc
+      - ci-macos
+      - ci-scan-build
+      - ci-java
+      - ci-wasm
+      - ci-jsonly
+      - ci-ios-app
+      - ci-android-app
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: mymindstorm/setup-emsdk@v12
+
+    - uses: actions/checkout@v3
+
+    - name: JSONLY release build
+      run: |
+        make -C src/c-lib -j `nproc` wasm JSONLY=yes
+        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs src/js-wasm/example.node.mjs src/c-lib/build-wasm/
+        cd src/c-lib/build-wasm
+        tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs.mem gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
+
+    - name: Store JSONLY build
+      uses: actions/upload-artifact@v2
+      with:
+        name: jsonly-app
+        path: src/c-lib/build-wasm/gs1encoders-jsonly-app.tgz
+
+
   #
   #  Create release and upload artifacts
   #
@@ -405,6 +443,7 @@ jobs:
       - build-release-linux
       - build-release-windows
       - build-release-wasm
+      - build-release-jsonly
 
     steps:
 
@@ -432,6 +471,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: wasm-app
+
+    - name: Load JSONLY app
+      uses: actions/download-artifact@v2
+      with:
+        name: jsonly-app
 
     - name: Get version
       id: get_version
@@ -498,4 +542,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: gs1encoders-wasm-app.tgz
         asset_name: gs1encoders-wasm-app.tgz
+        asset_content_type: application/octet-stream
+
+    - name: "Upload asset: JSONLY applications (browser and Node.js)"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: gs1encoders-jsonly-app.tgz
+        asset_name: gs1encoders-jsonly-app.tgz
         asset_content_type: application/octet-stream
