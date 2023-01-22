@@ -759,7 +759,7 @@ static void do_test_testProcessScanData(gs1_encoder *ctx, const bool should_succ
 	snprintf(casename, sizeof(casename), "%s", scanData);
 	TEST_CASE(casename);
 
-	TEST_CHECK(gs1_processScanData(ctx, scanData) ^ !should_succeed);
+	TEST_CHECK(gs1_processScanData(ctx, scanData) ^ (!should_succeed));
 	TEST_MSG("Error message: %s", ctx->errMsg);
 	TEST_CHECK(ctx->sym == expectSym);
 	TEST_MSG("Got: %d; Expected: %d (%s)", ctx->sym, expectSym, expectSymName);

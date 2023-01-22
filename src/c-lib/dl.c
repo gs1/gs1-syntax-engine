@@ -824,7 +824,7 @@ static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *d
 
 	ctx->numAIs = 0;
 	strcpy(in, dlData);
-	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ !should_succeed);
+	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ (!should_succeed));
 	TEST_MSG("Err: %s", ctx->errMsg);
 	if (should_succeed)
 		TEST_CHECK(strcmp(out, expect) == 0);

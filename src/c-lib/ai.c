@@ -941,7 +941,7 @@ static void test_parseAIdata(gs1_encoder *ctx, const bool should_succeed, const 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
-	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ !should_succeed);
+	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ (!should_succeed));
 	if (should_succeed)
 		TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, out, expect, ctx->errMsg);
@@ -1151,7 +1151,7 @@ static void test_processAIdata(gs1_encoder *ctx, const bool should_succeed, cons
 	TEST_CASE(casename);
 
 	// Process and extract AIs
-	TEST_CHECK(gs1_processAIdata(ctx, dataStr, true) ^ !should_succeed);
+	TEST_CHECK(gs1_processAIdata(ctx, dataStr, true) ^ (!should_succeed));
 	TEST_MSG(ctx->errMsg);
 
 }

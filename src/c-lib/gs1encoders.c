@@ -520,7 +520,7 @@ GS1_ENCODERS_API void gs1_encoder_copyDLignoredQueryParams(gs1_encoder *ctx, voi
 
 GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx) {
 	assert(ctx);
-	assert(!ctx->errFlag ^ *ctx->errMsg);
+	assert((!ctx->errFlag) ^ *ctx->errMsg);
 	return ctx->errMsg;
 }
 
