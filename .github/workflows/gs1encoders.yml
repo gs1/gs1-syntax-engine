@@ -148,6 +148,27 @@ jobs:
         sudo apt-get -y --no-install-recommends install iwyu
         find -name '*.c' -print0 | xargs -0 -n1 -i bash -c 'iwyu -DPRNT -DSYMBOLOGY=gs1_encoder_sNONE -DUNIT_TESTS -DGS1_LINTER_ERR_STR_EN {}; [[ $? = 2 ]] || false'
 
+    - name: cppcheck
+      working-directory: src/c-lib
+      run: |
+        sudo apt-get -y --no-install-recommends install cppcheck
+        cppcheck --enable=all --force \
+            -U GS1_LINTER_CUSTOM_GCP_LOOKUP \
+            -U GS1_LINTER_CUSTOM_GCP_LOOKUP_H \
+            -U GS1_LINTER_CUSTOM_ISO4217_LOOKUP \
+            -U GS1_LINTER_CUSTOM_ISO4217_LOOKUP_H \
+            -U GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP \
+            -U GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP_H \
+            -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP \
+            -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP_H \
+            -U CLOCK_MONOTONIC -U RUNNING_ON_VALGRIND -U TEST_FINI -U TEST_INIT \
+            -i gs1encoders-fuzzer-ais.c \
+            -i gs1encoders-fuzzer-dl.c \
+            -i gs1encoders-fuzzer-scandata.c \
+            -i gs1encoders-fuzzer-syn.c \
+            -i gs1syntaxdictionary-fuzzer-linters.c \
+            --suppress=missingIncludeSystem .
+
   ci-java:
 
     runs-on: ubuntu-latest
