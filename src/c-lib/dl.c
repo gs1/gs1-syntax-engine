@@ -231,8 +231,6 @@ static int getDLpathAIseqEntry(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) 
 	int i;
 	size_t s = 0;
 	size_t e = (size_t)ctx->numDLkeyQualifiers;
-	size_t m;
-	int cmp;
 
 	/*
 	 *  Build a space separated AI sequence string
@@ -248,8 +246,8 @@ static int getDLpathAIseqEntry(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) 
 	 *
 	 */
 	while (s < e) {
-		m = s + (e - s) / 2;
-		cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
+		size_t m = s + (e - s) / 2;
+		int cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
 		if (cmp == 0)
 			return (int)m;
 		if (cmp < 0)

@@ -373,7 +373,6 @@ fail:
 GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 
 	int i, j;
-	struct aiValue *ai;
 	char *p = ctx->outStr;
 
 	assert(ctx);
@@ -382,7 +381,7 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char*** out) {
 
 	*p = '\0';
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
-		ai = &ctx->aiData[i];
+		struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind != aiValue_aival)
 			continue;
 		assert(ai->aiEntry);
@@ -450,7 +449,6 @@ GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t ma
 GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder *ctx, char*** out) {
 
 	int i, j;
-	struct aiValue *ai;
 	char *p = ctx->outStr;
 
 	assert(ctx);
@@ -459,7 +457,7 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder *ctx, char*
 
 	*p = '\0';
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
-		ai = &ctx->aiData[i];
+		struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind != alValue_dlign)
 			continue;
 		ctx->outHRI[j] = p;

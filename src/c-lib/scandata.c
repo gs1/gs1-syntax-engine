@@ -62,7 +62,7 @@ static const struct symIdEntry symIdTable[] = {
 
 static void scancat(char* out, const char* in) {
 
-	const char *p, *r;
+	const char *p;
 	char *q;
 
 	p = in;
@@ -86,7 +86,7 @@ static void scancat(char* out, const char* in) {
 	else {
 
 		// Unescape leading sequence "\\...^" -> "\...^"
-		r = p;
+		const char *r = p;
 		while (*r == '\\')
 			r++;
 		if (*r == '^')

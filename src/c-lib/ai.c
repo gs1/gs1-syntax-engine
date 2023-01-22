@@ -84,14 +84,13 @@
  *
  */
 static bool populateAIlengthByPrefix(gs1_encoder *ctx) {
-	uint8_t prefix, length;
 	const struct aiEntry *e;
 
 	memset(ctx->aiLengthByPrefix, 0, sizeof(ctx->aiLengthByPrefix));
 
 	for (e = ctx->aiTable; *e->ai; e++) {
-		prefix = (uint8_t)((e->ai[0] - '0') * 10 + (e->ai[1] - '0'));
-		length = (uint8_t)strlen(e->ai);
+		uint8_t prefix = (uint8_t)((e->ai[0] - '0') * 10 + (e->ai[1] - '0'));
+		uint8_t length = (uint8_t)strlen(e->ai);
 		if (ctx->aiLengthByPrefix[prefix] != 0 && ctx->aiLengthByPrefix[prefix] != length) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI table is broken: AIs beginning '%c%c' have different lengths", e->ai[0], e->ai[1]);
 			ctx->errFlag = true;
@@ -244,11 +243,9 @@ static const struct aiEntry unknownAI4fixed6 =
  */
 const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t ailen) {
 
-	const struct aiEntry *entry;
-	size_t entrylen, aiLenByPrefix;
+	size_t aiLenByPrefix;
 	uint8_t valLenByPrefix;
-	size_t s = 0, e = ctx->aiTableEntries, m;
-	int cmp;
+	size_t s = 0, e = ctx->aiTableEntries;
 
 	assert(ailen <= strlen(p));
 
@@ -265,10 +262,10 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t 
 	 *
 	 */
 	while (s < e) {
-		m = s + (e - s) / 2;
-		entry = &ctx->aiTable[m];
-		entrylen = strlen(entry->ai);
-		cmp = strncmp(entry->ai, p, entrylen);
+		size_t m = s + (e - s) / 2;
+		const struct aiEntry *entry = &ctx->aiTable[m];
+		size_t entrylen = strlen(entry->ai);
+		int cmp = strncmp(entry->ai, p, entrylen);
 		if (cmp == 0) {
 			if (ailen != 0 && entrylen != ailen)
 				return NULL;	// Prefix match, but incorrect length
@@ -327,7 +324,6 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 
 	const struct aiComponent *part;
 	char compval[MAX_AI_LEN+1];
-	size_t complen;
 	gs1_linter_t linter;
 	gs1_lint_err_t err;
 	size_t errpos, errlen;
@@ -352,7 +348,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 
 	for (part = entry->parts; part->cset; part++) {
 
-		complen = (size_t)(r-p);	// Until given FNC1 or end...
+		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
 		if (part->max < r-p)
 			complen = part->max;	// ... reduced to max length of component
 		strncpy(compval, p, complen);
@@ -555,8 +551,7 @@ fail:
  */
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extractAIs) {
 
-	const char *p, *r, *ai;
-	size_t vallen;
+	const char *p, *ai;
 	const struct aiEntry *entry;
 
 	assert(ctx);
@@ -584,6 +579,9 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 	}
 
 	while (*p) {
+
+		const char *r;
+		size_t vallen;
 
 		/* Find AI that matches a prefix of our data
 		 *
@@ -659,10 +657,9 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
 static bool aiExists(gs1_encoder *ctx, const char *ai, const char *ignoreAI, char *matchedAI) {
 	int i;
 	size_t prefixlen = strspn(ai, "0123456789");
-	struct aiValue *ai2;
 
 	for (i = 0; i < ctx->numAIs; i++) {
-		ai2 = &ctx->aiData[i];
+		struct aiValue *ai2 = &ctx->aiData[i];
 		if (ai2->kind != aiValue_aival)
 			continue;
 		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
@@ -680,7 +677,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 	char *token;
 	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 	int i, j;
-	struct aiValue *ai, *ai2;
+	struct aiValue *ai2;
 	char matchedAI[5] = { 0 };
 	char *reqErr;
 	int reqLen;
@@ -690,7 +687,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		ai = &ctx->aiData[i];
+		struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind != aiValue_aival)
 			continue;
 

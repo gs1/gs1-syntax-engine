@@ -45,11 +45,11 @@ static char* _gets(char* in) {
 
 static bool userInt(gs1_encoder *ctx) {
 
-	bool ret = false;
-	int menuVal, i, numHRI;
-	char *dataStr, *aiDataStr, *dlURI, **hri = NULL;
-
 	while (true) {
+
+		bool ret = false;
+		char *dataStr, *aiDataStr, *dlURI, **hri = NULL;
+		int menuVal, numHRI, i;
 
 		printf("\n\n\nCurrent state:\n");
 
