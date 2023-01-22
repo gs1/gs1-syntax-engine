@@ -113,7 +113,9 @@ void gs1_setAItable(gs1_encoder *ctx, struct aiEntry *aiTable) {
 
 	struct aiEntry *e;
 
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
 redo:
+#endif
 
 	/*
 	 *  Clear the current AI table
