@@ -122,6 +122,8 @@ APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
+LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
+
 FUZZER_PREFIX = $(NAME)-fuzzer-
 FUZZER_SRCS = gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-dl.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-syn.c
 FUZZER_OBJS = $(addprefix $(BUILD_DIR)/, $(FUZZER_SRCS:.c=.o))
@@ -131,7 +133,7 @@ FUZZER_CORPUS_PREFIX = corpus-
 FUZZER_CORPUSES = $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)dl/ $(FUZZER_CORPUS_PREFIX)scandata/ $(FUZZER_CORPUS_PREFIX)syn/
 
 ALL_SRCS = $(wildcard *.c) $(wildcard syntax/*.c)
-SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
+SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(LINTER_TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
 OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
