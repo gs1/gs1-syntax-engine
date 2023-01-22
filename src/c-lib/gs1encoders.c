@@ -569,11 +569,15 @@ void test_api_init(void) {
 	gs1_encoder_free(ctx);
 
 	// We malloc the storage on the heap at run-time and pass it in
+#ifndef __clang_analyzer__
+// Analyzer fails to derive that ctx->localAlloc will be set and incorrectly reports a double free
 	TEST_ASSERT((mem = gs1_encoder_instanceSize()) > 0);
 	TEST_ASSERT((heap = malloc(mem)) != NULL);
 	TEST_ASSERT((ctx = gs1_encoder_init(heap)) == heap);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	gs1_encoder_free(ctx);
+	free(heap);
+#endif
 
 	// We allocate at compile-time and pass it in
 	TEST_ASSERT((ctx = gs1_encoder_init(&static_buf)) != NULL);
