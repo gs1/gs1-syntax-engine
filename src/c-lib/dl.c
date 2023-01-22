@@ -844,6 +844,7 @@ void test_dl_parseDLuri(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	test_parseDLuri(ctx, false,  "", "");
 	test_parseDLuri(ctx, false,  "ftp://", "");
@@ -1294,6 +1295,7 @@ void test_dl_testValidateDLpathAIseq(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(seq); i++) {
 		for (num = 0; *seq[i][num]; num++);
@@ -1341,6 +1343,7 @@ void test_dl_generateDLuri(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	test_testGenerateDLuri(ctx, true, NULL, "(01)12312312312326(21)abc123", "https://id.gs1.org/01/12312312312326/21/abc123");	// Canonical
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(21)abc123", "https://example.com/01/12312312312326/21/abc123");

@@ -442,6 +442,8 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder *ctx, char *sdEntry, str
 	TEST_CASE(sdEntry);
 
 	TEST_ASSERT((out = calloc(cap, sizeof(struct aiEntry))) != NULL);
+	assert(out);
+
 	*out->ai = '\0';
 	tmp = out;
 	strcpy(buf, sdEntry);
@@ -558,6 +560,7 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(tests_parse_sd_entry); i++)
 		test_parseSyntaxDictionaryEntry(ctx, tests_parse_sd_entry[i].sdEntry, tests_parse_sd_entry[i].aiEntries, tests_parse_sd_entry[i].expectSuccess);

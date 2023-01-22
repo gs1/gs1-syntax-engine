@@ -658,6 +658,7 @@ static void do_test_testGenerateScanData(gs1_encoder* ctx, const char* name, con
 	TEST_ASSERT(gs1_encoder_setSym(ctx, sym));
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, dataStr));
 	TEST_ASSERT((out = gs1_generateScanData(ctx)) != NULL);
+	assert(out);
 	TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s", dataStr, out, expect);
 

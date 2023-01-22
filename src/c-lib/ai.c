@@ -802,6 +802,7 @@ void test_ai_lookupAIentry(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "01",     2)->ai, "01") == 0);		// Exact lookup, data following
 	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "011234", 2)->ai, "01") == 0);		// Exact lookup, data following
@@ -848,6 +849,7 @@ void test_ai_checkAIlengthByPrefix(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(aiLengthByPrefix(ctx, "00") == 2);
 	TEST_CHECK(aiLengthByPrefix(ctx, "01") == 2);
@@ -905,6 +907,7 @@ void test_ai_AItableVsPrefixLength(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
 		TEST_CASE(entry->ai);
@@ -921,6 +924,7 @@ void test_ai_AItableVsIsFNC1required(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
 		TEST_CASE(entry->ai);
@@ -957,6 +961,7 @@ void test_ai_parseAIdata(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	test_parseAIdata(ctx, true,  "(01)12345678901231", "^0112345678901231");
 	test_parseAIdata(ctx, true,  "(10)12345", "^1012345");
@@ -1134,6 +1139,7 @@ void test_ai_linters(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(tests); i++)
 		test_linters(ctx, tests[i].aiData, tests[i].linterErr);
@@ -1161,6 +1167,7 @@ void test_ai_processAIdata(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	test_processAIdata(ctx, false, "");						// No FNC1 in first position
 	test_processAIdata(ctx, false, "991234");					// No FNC1 in first position
@@ -1269,9 +1276,10 @@ void test_ai_validateAIassociations(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-
+	assert(ctx);
 
 	/*
 	 * Test for repeated attributes

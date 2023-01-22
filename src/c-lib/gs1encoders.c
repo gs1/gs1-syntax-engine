@@ -563,6 +563,7 @@ void test_api_init(void) {
 
 	// Mallocs its own memory
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	gs1_encoder_free(ctx);
 
@@ -579,6 +580,7 @@ void test_api_init(void) {
 
 	// We allocate at compile-time and pass it in
 	TEST_ASSERT((ctx = gs1_encoder_init(&static_buf)) != NULL);
+	assert(ctx);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 
 }
@@ -589,6 +591,7 @@ void test_api_defaults(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "") == 0);
@@ -603,6 +606,7 @@ void test_api_sym(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarTruncated));
@@ -638,6 +642,7 @@ void test_api_addCheckDigit(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getAddCheckDigit(ctx));		// Default
 
@@ -657,6 +662,7 @@ void test_api_permitUnknownAIs(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));		// Default
 
@@ -676,6 +682,7 @@ void test_api_validateAIassociations(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_getValidateAIassociations(ctx));		// Default
 
@@ -696,6 +703,7 @@ void test_api_dataStr(void) {
 	int i;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "barcode"));
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "barcode") == 0);
@@ -724,9 +732,11 @@ void test_api_getAIdataStr(void) {
 	char *out;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
+	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
 
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "TESTING"));
@@ -735,11 +745,13 @@ void test_api_getAIdataStr(void) {
 	// Escape data "(" characters
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC(123"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
+	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC\\(123") == 0);
 
 	// Composite strings
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99XYZ(TM)_CORP"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
+	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123|(99)XYZ\\(TM)_CORP") == 0);
 
 	gs1_encoder_free(ctx);
@@ -753,10 +765,12 @@ void test_api_getScanData(void) {
 	char *out;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123^11991225|^98COMPOSITE^97XYZ"));
 	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
+	assert(out);
 	TEST_CHECK(strcmp(out, "]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ") == 0);
 
 	gs1_encoder_free(ctx);
@@ -769,6 +783,7 @@ void test_api_setScanData(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
@@ -787,11 +802,13 @@ void test_api_getHRI(void) {
 	char buf[256];
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	// HRI from linear-only, raw AI data
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 
@@ -799,6 +816,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99COMPOSITE"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) COMPOSITE") == 0);
@@ -808,6 +826,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 2);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 
@@ -816,6 +835,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) COMPOSITE") == 0);
@@ -824,6 +844,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&98=XYZ"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(22) TESTING") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
@@ -833,6 +854,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?singleton&99=ABC%2d123&compound1=QWERTY&98=XYZ&compound2=12345"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(22) TESTING") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
@@ -845,6 +867,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(89) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "(88) COMPOSITE") == 0);
@@ -852,6 +875,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333?89=TESTING&99=ABC%2d123&88=XYZ"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(89) TESTING") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
@@ -861,12 +885,14 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^236ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(236) ABC123") == 0);
 
 	// HRI from linear-only, raw AI data, with unknown AI with known length 4
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^8299ABC123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 1);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(8299) ABC123") == 0);
 
 	gs1_encoder_setIncludeDataTitlesInHRI(ctx, true);
@@ -876,6 +902,7 @@ void test_api_getHRI(void) {
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
 	TEST_ASSERT(hri != NULL);
+	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "GTIN (01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "BATCH/LOT (10) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "INTERNAL (99) COMPOSITE") == 0);
@@ -892,6 +919,7 @@ void test_api_copyHRI(void) {
 	size_t needed;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	// No HRI should return empty string
 	gs1_encoder_copyHRI(ctx, (void*)buf, sizeof(buf));
@@ -926,6 +954,7 @@ void test_api_getDLignoredQueryParams(void) {
 	char buf[256];
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	// No ignored query params from non-DL URI data
 	strcpy(buf, "(01)12312312312333(10)ABC123|(99)COMPOSITE");
@@ -942,30 +971,35 @@ void test_api_getDLignoredQueryParams(void) {
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?singleton&99=ABC%2d123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 1);
 	TEST_ASSERT(qp != NULL);
+	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "singleton") == 0);
 
 	// Non-numeric singleton after
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&singleton"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 1);
 	TEST_ASSERT(qp != NULL);
+	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "singleton") == 0);
 
 	// Non-numeric compound before
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?compound1=QWERTY&99=ABC%2d123"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 1);
 	TEST_ASSERT(qp != NULL);
+	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "compound1=QWERTY") == 0);
 
 	// Non-numeric compound after
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?99=ABC%2d123&compound1=QWERTY"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 1);
 	TEST_ASSERT(qp != NULL);
+	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "compound1=QWERTY") == 0);
 
 	// Singleton and compond non-numeric query parameters before and after
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?singleton1&compound1=QWERTY&99=ABC%2d123&singleton2&98=XYZ&compound2=12345"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 4);
 	TEST_ASSERT(qp != NULL);
+	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "singleton1") == 0);
 	TEST_CHECK(strcmp(qp[1], "compound1=QWERTY") == 0);
 	TEST_CHECK(strcmp(qp[2], "singleton2") == 0);
@@ -983,6 +1017,7 @@ void test_api_copyDLignoredQueryParams(void) {
 	size_t needed;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
 
 	// No data should return empty string
 	gs1_encoder_copyDLignoredQueryParams(ctx, (void*)buf, sizeof(buf));
