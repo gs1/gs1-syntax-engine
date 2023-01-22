@@ -188,7 +188,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char *data, s
 	int vli;
 	const char *p, *q;
 	char expiry_date[7] = {0};
-	char start_date[7] = {0};
 	int expiry_set = 0;
 	char gcp[14] = {0};
 
@@ -693,6 +692,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char *data, s
 	 *
 	 */
 	if (p < q && *p == '4') {
+
+		char start_date[7] = {0};
 
 		p++;
 
