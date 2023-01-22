@@ -109,7 +109,7 @@ static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *prim
 
 	if (!ctx->addCheckDigit) {
 		if (strlen(dataStr) != digits) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", digits);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %u digits", digits);
 			ctx->errFlag = true;
 			*primaryStr = '\0';
 			return false;
@@ -117,7 +117,7 @@ static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *prim
 	}
 	else {
 		if (strlen(dataStr) != (size_t)digits-1) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", digits-1);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %u digits without check digit", digits-1);
 			ctx->errFlag = true;
 			*primaryStr = '\0';
 			return false;
