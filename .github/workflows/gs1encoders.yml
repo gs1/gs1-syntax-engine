@@ -20,6 +20,10 @@ jobs:
 
     - name: clang CI (with sanitizers)
       run: |
+
+        # For llvm-symbolizer
+        sudo apt-get -y --no-install-recommends install llvm
+
         # Load AI table from external Syntax Dictionary
         make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
 
