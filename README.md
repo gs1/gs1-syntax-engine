@@ -16,7 +16,7 @@ This project includes:
   * A C library that can be:
     * Vendored into third-party code.
     * Compiled to native code for use as a shared library (Linux / MacOS / BSD) or dynamic-link library (Windows).
-    * Compiled to WebAssembly (or JavaScript) for use in a browser-based web application or Node.js application.
+    * Compiled to WebAssembly (or pure JavaScript) for use in a browser-based web application or Node.js application.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
   * A Java wrapper class that provides an object interface to the native library from managed code, using Java Native Interface.
   * Several example applications:
@@ -59,16 +59,16 @@ library to be redistributed with an application.
 
 This repository contains:
 
-| Directory      | Purpose                                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application                                          |
-| docs           | Documentation for the public API of the native C library                                                                                   |
-| src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                                                |
-| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                         |
-| src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or JavaScript build, with demo web and console applications |
-| src/java       | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                    |
-| src/android    | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                               |
-| src/ios        | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                           |
+| Directory      | Purpose                                                                                                                                         |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application                                               |
+| docs           | Documentation for the public API of the native C library                                                                                        |
+| src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                                                     |
+| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                              |
+| src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or pure JavaScript build, with demo web and console applications |
+| src/java       | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                         |
+| src/android    | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                                     |
+| src/ios        | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                                |
 
 
 ### Building on Windows
@@ -158,25 +158,36 @@ The pre-built application requires that the .NET Core 3.1 Desktop Runtime -
 Windows x86 is installed: <https://dotnet.microsoft.com/download/dotnet/3.1/runtime>
 
 
-Installing the Pre-built Demo Web Browser Application
------------------------------------------------------
+Installing the Pre-built Demo Web Browser Application and Node.js Application
+-----------------------------------------------------------------------------
 
-A demonstration web browser application is provided in the form of a
-WebAssembly executable (with supporting JavaScript loader), a JavaScript
-wrapper (providing the user API) and HTML + JS implementation files. Compatible
-with all modern web browsers.
+A demonstration build, that can be run as either a web browser application or a
+Node.js console application, is provided in two forms:
 
-The most recent version of the web application can be
+1. A compilation to a WebAssembly executable with supporting JavaScript loader
+2. A transpilation to pure JavaScript ("asm.js")
+
+Each of these includes a JavaScript wrapper (providing the user API) and HTML / JS
+/ Node.js implementation files. They are compatible with all modern web browsers
+and Node.js 17 or later.
+
+The most recent version can be
 [downloaded from here](https://github.com/gs1/gs1-syntax-engine/releases/latest).
 
-Download the asset named `gs1encoders-wasm-app.zip`, extract it and place the
-resulting files in a single directory to served by a web server.
+Download the asset named `gs1encoders-wasm-app.zip` or `gs1encoders-jsonly-app.zip`
 
-Ensure that the `.wasm` file is served with the MIME type `application/wasm`.
+To use the demo web application, extract the ZIP file and place the resulting files
+in a single directory to served by a web server as static content. For the WASM
+build, ensure that the `.wasm` file is served with the MIME type `application/wasm`.
 
 Simply point a WebAssembly-enabled browser at the HTTP location of the `.html`
 file and the web application will load.
 
+To use the demo Node.js console application, extract the ZIP file into a single
+directory and start it by running:
+
+    node example.node.mjs
+    
 
 License
 -------
