@@ -178,11 +178,11 @@ Download the asset named `gs1encoders-wasm-app.zip` or `gs1encoders-jsonly-app.z
 based on the required flavour (WASM or pure JavaScript, respectively).
 
 To use the demo web application, extract the ZIP file and place the resulting files
-in a single directory to served by a web server as static content. Simply point a
+in a single directory to be served by a web server as static content. Simply point a
 WebAssembly-enabled browser at the HTTP location of the `.html` file and the web
 application will load.
 
-Note: For the WASM build, ensure that the web server is configured to service the
+Note: For the WASM build, ensure that the web server is configured to serve the
 `.wasm` file with the MIME type `application/wasm`.
 
 To use the demo Node.js console application, extract the ZIP file into a single
