@@ -162,19 +162,20 @@ Installing the Pre-built Demo Web Browser Application and Node.js Application
 -----------------------------------------------------------------------------
 
 A demonstration build, that can be run as either a web browser application or a
-Node.js console application, is provided in two forms:
+Node.js console application, is provided in two flavours:
 
 1. A compilation to a WebAssembly executable with supporting JavaScript loader
-2. A transpilation to pure JavaScript ("asm.js")
+2. A transpilation to pure JavaScript ("asm.js") with associated mem file
 
-Each of these includes a JavaScript wrapper (providing the user API) and HTML / JS
-/ Node.js implementation files. They are compatible with all modern web browsers
-and Node.js 17 or later.
+Each of these flavours includes the JavaScript wrapper (providing the user API)
+and HTML / JS / Node.js implementation files. They are compatible with all modern
+web browsers and Node.js 17 or later.
 
 The most recent version can be
 [downloaded from here](https://github.com/gs1/gs1-syntax-engine/releases/latest).
 
 Download the asset named `gs1encoders-wasm-app.zip` or `gs1encoders-jsonly-app.zip`
+based on the required flavour (WASM or pure JavaScript, respectively).
 
 To use the demo web application, extract the ZIP file and place the resulting files
 in a single directory to served by a web server as static content. For the WASM
