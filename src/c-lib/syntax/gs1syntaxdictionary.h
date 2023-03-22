@@ -167,6 +167,7 @@ typedef enum
 	GS1_LINTER_LATLONG_INVALID_LENGTH,				///< The concatenated latitude and longitude value must be 20 digits.
 	GS1_LINTER_INVALID_LATITUDE,					///< The latitude is outside of the range "0000000000" to "1800000000".
 	GS1_LINTER_INVALID_LONGITUDE,					///< The longitude is outside of the range "0000000000" to "3600000000".
+	GS1_LINTER_INVALID_MEDIA_TYPE,					///< A valid AIDC media type is required.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -215,6 +216,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char *data, size_t
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latlong(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
 
 GS1_SYNTAX_DICTIONARY_API gs1_linter_t gs1_linter_from_name(const char *name);
 

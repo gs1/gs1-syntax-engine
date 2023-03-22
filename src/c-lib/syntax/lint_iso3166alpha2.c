@@ -49,7 +49,7 @@
  * Used to validate that an AI component is an ISO 3166 "alpha-2" country
  * code.
  *
- * @note The default lookup function provided by this linter is a linear search
+ * @note The default lookup function provided by this linter is a binary search
  *       over a static list this is maintained in this file.
  * @note To enable this linter to hook into an alternative ISO 3166 "alpha-2"
  *       lookup function (provided by the user) the

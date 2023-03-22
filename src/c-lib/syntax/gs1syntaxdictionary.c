@@ -44,6 +44,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
 	{ .name = "key",		.fn = gs1_lint_key },
 	{ .name = "latlong",		.fn = gs1_lint_latlong },
+	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
 	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
 	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
 	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
@@ -200,6 +201,7 @@ const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"The concatenated latitude and longitude value must be 20 digits.",
 	"The latitude is outside of the range \"0000000000\" to \"1800000000\".",
 	"The longitude is outside of the range \"0000000000\" to \"3600000000\".",
+	"A valid AIDC media type is required.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

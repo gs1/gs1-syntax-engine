@@ -27,6 +27,7 @@ gs1encoders/syntax/lint_iso3166list.c
 gs1encoders/syntax/lint_iso4217.c
 gs1encoders/syntax/lint_key.c
 gs1encoders/syntax/lint_latlong.c
+gs1encoders/syntax/lint_mediatype.c
 gs1encoders/syntax/lint_mmoptss.c
 gs1encoders/syntax/lint_nonzero.c
 gs1encoders/syntax/lint_nozeroprefix.c

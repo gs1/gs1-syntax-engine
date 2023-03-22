@@ -75,6 +75,7 @@ void test_lint_pcenc(void);
 void test_lint_couponcode(void);
 void test_lint_couponposoffer(void);
 void test_lint_latlong(void);
+void test_lint_mediatype(void);
 
 void test_name_function_map_is_sorted(void);
 void test_gs1_linter_from_name(void);
@@ -110,6 +111,7 @@ TEST_LIST = {
 	{ "lint_couponcode", test_lint_couponcode },
 	{ "lint_couponposoffer", test_lint_couponposoffer },
 	{ "lint_latlong", test_lint_latlong },
+	{ "lint_mediatype", test_lint_mediatype },
 
 	{ "name_function_map_is_sorted", test_name_function_map_is_sorted },
 	{ "gs1_linter_from_name", test_gs1_linter_from_name },

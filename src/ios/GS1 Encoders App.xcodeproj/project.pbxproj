@@ -13,6 +13,7 @@
 		F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AD2909D225008E17F4 /* ContentView.swift */; };
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
 		F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */; };
+		F7478BFC29CB222E00080607 /* lint_mediatype.c in Sources */ = {isa = PBXBuildFile; fileRef = F7478BFB29CB222E00080607 /* lint_mediatype.c */; };
 		F79827612909D35500F00DDA /* ai.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827202909D35400F00DDA /* ai.c */; };
 		F79827662909D35500F00DDA /* scandata.c in Sources */ = {isa = PBXBuildFile; fileRef = F798272A2909D35400F00DDA /* scandata.c */; };
 		F798276D2909D35500F00DDA /* dl.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827342909D35400F00DDA /* dl.c */; };
@@ -61,6 +62,7 @@
 		F73EC9AD2909D225008E17F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F73EC9AF2909D226008E17F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F7478BFB29CB222E00080607 /* lint_mediatype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_mediatype.c; sourceTree = "<group>"; };
 		F798271D2909D35400F00DDA /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		F79827202909D35400F00DDA /* ai.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ai.c; sourceTree = "<group>"; };
 		F79827212909D35400F00DDA /* enc-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "enc-private.h"; sourceTree = "<group>"; };
@@ -210,37 +212,38 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
-				F798273A2909D35400F00DDA /* lint_latlong.c */,
-				F798273B2909D35400F00DDA /* lint_iso3166list.c */,
-				F798273C2909D35400F00DDA /* lint_winding.c */,
+				F7478BFB29CB222E00080607 /* lint_mediatype.c */,
+				F79827432909D35400F00DDA /* acutest.h */,
+				F79827582909D35400F00DDA /* gs1syntaxdictionary.c */,
+				F79827472909D35400F00DDA /* gs1syntaxdictionary.h */,
 				F798273D2909D35400F00DDA /* lint_couponcode.c */,
-				F798273E2909D35400F00DDA /* lint_csum.c */,
-				F798273F2909D35400F00DDA /* lint_iso4217.c */,
+				F798274D2909D35400F00DDA /* lint_couponposoffer.c */,
 				F79827402909D35400F00DDA /* lint_cset39.c */,
+				F798274A2909D35400F00DDA /* lint_cset82.c */,
+				F79827442909D35400F00DDA /* lint_csetnumeric.c */,
+				F798273E2909D35400F00DDA /* lint_csum.c */,
+				F79827512909D35400F00DDA /* lint_csumalpha.c */,
+				F798274E2909D35400F00DDA /* lint_hhmm.c */,
+				F798274B2909D35400F00DDA /* lint_iban.c */,
+				F79827482909D35400F00DDA /* lint_importeridx.c */,
+				F79827462909D35400F00DDA /* lint_iso3166.c */,
+				F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */,
+				F798273B2909D35400F00DDA /* lint_iso3166list.c */,
+				F798273F2909D35400F00DDA /* lint_iso4217.c */,
+				F79827572909D35400F00DDA /* lint_iso3166999.c */,
+				F79827502909D35400F00DDA /* lint_key.c */,
+				F798273A2909D35400F00DDA /* lint_latlong.c */,
+				F79827562909D35400F00DDA /* lint_mmoptss.c */,
+				F798274F2909D35400F00DDA /* lint_nonzero.c */,
+				F79827522909D35400F00DDA /* lint_nozeroprefix.c */,
+				F79827492909D35400F00DDA /* lint_pcenc.c */,
+				F79827552909D35400F00DDA /* lint_pieceoftotal.c */,
+				F798273C2909D35400F00DDA /* lint_winding.c */,
+				F79827542909D35400F00DDA /* lint_yesno.c */,
+				F79827592909D35400F00DDA /* lint_yymmd0.c */,
+				F79827532909D35400F00DDA /* lint_yymmdd.c */,
 				F79827412909D35400F00DDA /* lint_yymmddhh.c */,
 				F79827422909D35400F00DDA /* lint_zero.c */,
-				F79827432909D35400F00DDA /* acutest.h */,
-				F79827442909D35400F00DDA /* lint_csetnumeric.c */,
-				F79827462909D35400F00DDA /* lint_iso3166.c */,
-				F79827472909D35400F00DDA /* gs1syntaxdictionary.h */,
-				F79827482909D35400F00DDA /* lint_importeridx.c */,
-				F79827492909D35400F00DDA /* lint_pcenc.c */,
-				F798274A2909D35400F00DDA /* lint_cset82.c */,
-				F798274B2909D35400F00DDA /* lint_iban.c */,
-				F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */,
-				F798274D2909D35400F00DDA /* lint_couponposoffer.c */,
-				F798274E2909D35400F00DDA /* lint_hhmm.c */,
-				F798274F2909D35400F00DDA /* lint_nonzero.c */,
-				F79827502909D35400F00DDA /* lint_key.c */,
-				F79827512909D35400F00DDA /* lint_csumalpha.c */,
-				F79827522909D35400F00DDA /* lint_nozeroprefix.c */,
-				F79827532909D35400F00DDA /* lint_yymmdd.c */,
-				F79827542909D35400F00DDA /* lint_yesno.c */,
-				F79827552909D35400F00DDA /* lint_pieceoftotal.c */,
-				F79827562909D35400F00DDA /* lint_mmoptss.c */,
-				F79827572909D35400F00DDA /* lint_iso3166999.c */,
-				F79827582909D35400F00DDA /* gs1syntaxdictionary.c */,
-				F79827592909D35400F00DDA /* lint_yymmd0.c */,
 			);
 			path = syntax;
 			sourceTree = "<group>";
@@ -398,6 +401,7 @@
 				F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */,
 				F79827782909D35500F00DDA /* lint_cset39.c in Sources */,
 				F79827722909D35500F00DDA /* lint_latlong.c in Sources */,
+				F7478BFC29CB222E00080607 /* lint_mediatype.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

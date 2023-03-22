@@ -122,6 +122,9 @@
     <ClCompile Include="syntax\lint_latlong.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_mediatype.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_mmoptss.c">
       <Filter>Source Files</Filter>
     </ClCompile>
