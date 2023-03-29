@@ -8,8 +8,8 @@ for C# .NET, and is intended to be integrated into the widest variety of
 settings.
 
 The project also serves as a reference implementation of a framework for
-processing the [GS1 Syntax Dictionary and
-Linters](https://github.com/gs1/gs1-syntax-dictionary).
+processing the [GS1 Syntax Dictionary](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-dictionary/)
+and [Linters](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-tests/).
 
 This project includes:
 
