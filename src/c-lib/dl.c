@@ -451,7 +451,12 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 		if ((p = strchr(++r, '/')) == NULL)
 			p = r + strlen(r);
 
-;		// Reverse percent encoding
+		if (p == r) {
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value path element is empty", (int)strlen(entry->ai), ai);
+			goto fail;
+		}
+
+		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, r, (size_t)(p-r))) == 0) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
 			goto fail;
@@ -544,8 +549,13 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
-		// Reverse percent encoding
 		e++;
+		if (r == e) {
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value query element is empty", (int)strlen(entry->ai), ai);
+			goto fail;
+		}
+
+		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_LEN, e, (size_t)(r-e))) == 0) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params too long", (int)strlen(entry->ai), ai);
 			goto fail;
@@ -846,12 +856,14 @@ void test_dl_parseDLuri(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
-	test_parseDLuri(ctx, false,  "", "");
-	test_parseDLuri(ctx, false,  "ftp://", "");
-	test_parseDLuri(ctx, false,  "http://", "");
-	test_parseDLuri(ctx, false,  "http:///", "");			// No domain
-	test_parseDLuri(ctx, false,  "http://a", "");			// No path info
-	test_parseDLuri(ctx, false,  "http://a/", "");			// Pathelogical minimal domain but no AI info
+	test_parseDLuri(ctx, false, "", "");
+	test_parseDLuri(ctx, false, "ftp://", "");
+	test_parseDLuri(ctx, false, "http://", "");
+	test_parseDLuri(ctx, false, "http:///", "");				// No domain
+	test_parseDLuri(ctx, false, "http://a", "");				// No path info
+	test_parseDLuri(ctx, false, "http://a/", "");				// Pathelogical minimal domain but no AI info
+	test_parseDLuri(ctx, false, "http://a/b", "");				// No path info
+	test_parseDLuri(ctx, false, "http://a/b/", "");				// Pathelogical minimal domain but no AI info
 
 	test_parseDLuri(ctx, true,					// http
 		"http://a/00/006141411234567890",
@@ -934,6 +946,9 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
+
+	test_parseDLuri(ctx, false,
+		"https://a/01/12312312312333?99=", ""); 		// Empty AI value in query parameter
 
 	test_parseDLuri(ctx, false,
 		"https://a/01/12312312312333?99=ABC&999=faux", "");	// Non-AI, numeric-only query param
