@@ -309,8 +309,8 @@ static size_t URIescape(char *out, size_t maxlen, const char *in, const size_t i
 			out[j++] = in[i];
 		else if (in[i] == ' ' && is_query_component)
 			out[j++] = '+';
-		else if (in[i] == '+' && !is_query_component)
-			out[j++] = '+';
+//		else if (in[i] == '+' && !is_query_component)		// Encoding '+' as '%2d' in path info is preferred
+//			out[j++] = '+';
 		else if (j+2 < maxlen)
 			j += (size_t)snprintf(&out[j], 4, "%%%02X", in[i]);
 		else
@@ -1207,7 +1207,7 @@ void test_dl_URIescape(void) {
 	test_URIescape("0123456789-._~", "0123456789-._~", "0123456789-._~");
 
 	// Other characters that may appear in AIs that must be escaped
-	test_URIescape("!\"#%&'()*+,/:;<=>?", "%21%22%23%25%26%27%28%29%2A+%2C%2F%3A%3B%3C%3D%3E%3F", "%21%22%23%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3C%3D%3E%3F");
+	test_URIescape("!\"#%&'()*+,/:;<=>?", "%21%22%23%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3C%3D%3E%3F", "%21%22%23%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3C%3D%3E%3F");
 
 	test_URIescape("test", "test", "test");
 	test_URIescape(" ", "%20", "+");
@@ -1389,7 +1389,7 @@ void test_dl_generateDLuri(void) {
 	 * "+" represents space in query info but not path components
 	 *
 	 */
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312333(10)ABC+123(99)XYZ+QWERTY", "https://example.com/01/12312312312333/10/ABC+123?99=XYZ%2BQWERTY");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312333(10)ABC+123(99)XYZ+QWERTY", "https://example.com/01/12312312312333/10/ABC%2B123?99=XYZ%2BQWERTY");
 
 	/*
 	 * Multiple candidate primary keys; first should be chosen and
