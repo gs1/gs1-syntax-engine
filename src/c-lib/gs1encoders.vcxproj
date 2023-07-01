@@ -146,6 +146,7 @@
     <ClCompile Include="syntax\lint_couponcode.c" />
     <ClCompile Include="syntax\lint_couponposoffer.c" />
     <ClCompile Include="syntax\lint_cset39.c" />
+    <ClCompile Include="syntax\lint_cset64.c" />
     <ClCompile Include="syntax\lint_cset82.c" />
     <ClCompile Include="syntax\lint_csetnumeric.c" />
     <ClCompile Include="syntax\lint_csum.c" />
@@ -159,7 +160,8 @@
     <ClCompile Include="syntax\lint_iso3166list.c" />
     <ClCompile Include="syntax\lint_iso4217.c" />
     <ClCompile Include="syntax\lint_key.c" />
-    <ClCompile Include="syntax\lint_latlong.c" />
+    <ClCompile Include="syntax\lint_latitude.c" />
+    <ClCompile Include="syntax\lint_longitude.c" />
     <ClCompile Include="syntax\lint_mediatype.c" />
     <ClCompile Include="syntax\lint_mmoptss.c" />
     <ClCompile Include="syntax\lint_nonzero.c" />

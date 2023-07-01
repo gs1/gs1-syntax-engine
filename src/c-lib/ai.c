@@ -374,6 +374,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
 			case cset_N: linter = gs1_lint_csetnumeric; break;
 			case cset_X: linter = gs1_lint_cset82; break;
 			case cset_Y: linter = gs1_lint_cset39; break;
+			case cset_Z: linter = gs1_lint_cset64; break;
 			default: linter = NULL; break;
 		}
 		assert(linter);
@@ -1030,6 +1031,8 @@ void test_ai_linters(void) {
 		{ "(10) ",						GS1_LINTER_INVALID_CSET82_CHARACTER },
 		{ "(8010)123456_",					GS1_LINTER_INVALID_CSET39_CHARACTER },
 		{ "(8013)123456ABOO",					GS1_LINTER_INVALID_CSET32_CHARACTER },
+		{ "(8030)ABC:123",					GS1_LINTER_INVALID_CSET64_CHARACTER },
+		{ "(8030)123=",						GS1_LINTER_INVALID_CSET64_PADDING },
 		{ "(00)123456789012345670",				GS1_LINTER_INCORRECT_CHECK_DIGIT },
 		{ "(00)123456789012345675",				GS1_LINTER_OK },
 //		GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT			No variable-length csum components at present

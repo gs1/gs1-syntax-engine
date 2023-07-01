@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022 GS1 AISBL.
+ * GS1 Syntax Dictionary. Copyright (c) 2022-2023 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
  *
  * @brief This header contains the declarations for the reference linter
  * functions of type ::gs1_linter_t referred to in the [GS1 Syntax
- * Dictionary](https://github.com/gs1/gs1-syntax-dictionary/), as well as the
- * list of all possible return codes with a description of the indicated error
- * conditions.
+ * Dictionary](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-dictionary/),
+ * as well as the list of all possible return codes with a description of the
+ * indicated error conditions.
  *
  * The reference linter return codes of type ::gs1_lint_err_t are described
  * below.
@@ -164,10 +164,14 @@ typedef enum
 	GS1_LINTER_COUPON_MISSING_DONT_MULTIPLY_FLAG,			///< The coupon's Don't Multiply Flag is missing.
 	GS1_LINTER_COUPON_INVALID_DONT_MULTIPLY_FLAG,			///< The coupon's Don't Multiply Flag must be "0" or "1".
 	GS1_LINTER_COUPON_EXCESS_DATA,					///< The coupon contains excess data after the recognised optional fields.
-	GS1_LINTER_LATLONG_INVALID_LENGTH,				///< The concatenated latitude and longitude value must be 20 digits.
+	GS1_LINTER_UNUSED_1,
 	GS1_LINTER_INVALID_LATITUDE,					///< The latitude is outside of the range "0000000000" to "1800000000".
 	GS1_LINTER_INVALID_LONGITUDE,					///< The longitude is outside of the range "0000000000" to "3600000000".
 	GS1_LINTER_INVALID_MEDIA_TYPE,					///< A valid AIDC media type is required.
+	GS1_LINTER_LATITUDE_INVALID_LENGTH,				///< The latitude value must be 10 digits.
+	GS1_LINTER_LONGITUDE_INVALID_LENGTH,				///< The longitude value must be 10 digits.
+	GS1_LINTER_INVALID_CSET64_CHARACTER,				///< A non-CSET 64 character was found where a CSET 64 character is expected.
+	GS1_LINTER_INVALID_CSET64_PADDING,				///< Incorrect number of CSET 64 pad characters.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -191,6 +195,7 @@ extern "C" {
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csetnumeric(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset82(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset39(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char *data, size_t *err_pos, size_t *err_len);
@@ -215,7 +220,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char *data,
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latlong(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
 
 GS1_SYNTAX_DICTIONARY_API gs1_linter_t gs1_linter_from_name(const char *name);

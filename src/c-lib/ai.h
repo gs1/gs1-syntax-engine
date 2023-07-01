@@ -48,6 +48,7 @@ typedef enum {
 	cset_X,
 	cset_N,
 	cset_Y,
+	cset_Z,
 } cset_t;
 
 

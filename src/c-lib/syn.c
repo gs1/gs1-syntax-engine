@@ -65,6 +65,7 @@ static int processComponent(gs1_encoder *ctx, char* component, struct aiComponen
 		case 'X': part->cset = cset_X;    break;
 		case 'N': part->cset = cset_N;    break;
 		case 'Y': part->cset = cset_Y;    break;
+		case 'Z': part->cset = cset_Z;    break;
 		case '_': part->cset = cset_none; break;	// Filler
 		default:  error("Unknown character set %c", *p);
 	}

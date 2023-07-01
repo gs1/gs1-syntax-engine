@@ -46,7 +46,7 @@
 
 
 #ifndef GCP_MIN_LENGTH
-#define GCP_MIN_LENGTH 6  ///< Currently the shortest GS1 Company Prefix is six digits.
+#define GCP_MIN_LENGTH 4  ///< Currently the shortest GS1 Company Prefix is four digits.
 #endif
 
 

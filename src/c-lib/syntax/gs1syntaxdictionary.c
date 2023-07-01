@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022 GS1 AISBL.
+ * GS1 Syntax Dictionary. Copyright (c) 2022-2023 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "couponcode",		.fn = gs1_lint_couponcode },
 	{ .name = "couponposoffer",	.fn = gs1_lint_couponposoffer },
 	{ .name = "cset39",		.fn = gs1_lint_cset39 },
+	{ .name = "cset64",		.fn = gs1_lint_cset64 },
 	{ .name = "cset82",		.fn = gs1_lint_cset82 },
 	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
 	{ .name = "csum",		.fn = gs1_lint_csum },
@@ -43,7 +44,8 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },
 	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
 	{ .name = "key",		.fn = gs1_lint_key },
-	{ .name = "latlong",		.fn = gs1_lint_latlong },
+	{ .name = "latitude",		.fn = gs1_lint_latitude },
+	{ .name = "longitude",		.fn = gs1_lint_longitude },
 	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
 	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
 	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
@@ -198,10 +200,14 @@ const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"The coupon's Don't Multiply Flag is missing.",
 	"The coupon's Don't Multiply Flag must be \"0\" or \"1\".",
 	"The coupon contains excess data after the recognised optional fields.",
-	"The concatenated latitude and longitude value must be 20 digits.",
+	"",	// Unused
 	"The latitude is outside of the range \"0000000000\" to \"1800000000\".",
 	"The longitude is outside of the range \"0000000000\" to \"3600000000\".",
 	"A valid AIDC media type is required.",
+	"The latitude must be 10 digits.",
+	"The longitude must be 10 digits.",
+	"A non-CSET 64 character was found where a CSET 64 character is expected.",
+	"Incorrect number of CSET 64 pad characters.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

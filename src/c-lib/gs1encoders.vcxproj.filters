@@ -45,6 +45,9 @@
     <ClCompile Include="syntax\lint_cset82.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_cset64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_csetnumeric.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,7 +84,10 @@
     <ClCompile Include="syntax\lint_key.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_latlong.c">
+    <ClCompile Include="syntax\lint_latitude.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint_longitude.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_mediatype.c">

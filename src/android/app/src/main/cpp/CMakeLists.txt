@@ -13,6 +13,7 @@ gs1encoders/syntax/gs1syntaxdictionary.c
 gs1encoders/syntax/lint_couponcode.c
 gs1encoders/syntax/lint_couponposoffer.c
 gs1encoders/syntax/lint_cset39.c
+gs1encoders/syntax/lint_cset64.c
 gs1encoders/syntax/lint_cset82.c
 gs1encoders/syntax/lint_csetnumeric.c
 gs1encoders/syntax/lint_csumalpha.c
@@ -26,7 +27,8 @@ gs1encoders/syntax/lint_iso3166.c
 gs1encoders/syntax/lint_iso3166list.c
 gs1encoders/syntax/lint_iso4217.c
 gs1encoders/syntax/lint_key.c
-gs1encoders/syntax/lint_latlong.c
+gs1encoders/syntax/lint_latitude.c
+gs1encoders/syntax/lint_longitude.c
 gs1encoders/syntax/lint_mediatype.c
 gs1encoders/syntax/lint_mmoptss.c
 gs1encoders/syntax/lint_nonzero.c
