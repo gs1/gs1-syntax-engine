@@ -83,12 +83,14 @@ static bool userInt(gs1_encoder *ctx) {
 		printf("\n 2) Process a bracketed AI element string");
 		printf("\n 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
 
-		printf("\n\n 4) Toggle 'include data titles in HRI' flag.  Current value = %s",
+		printf("\n\n 4) Set 'include data titles in HRI' flag.                  Current value = %s",
 					gs1_encoder_getIncludeDataTitlesInHRI(ctx) ? "ON" : "OFF");
-		printf("\n 5) Toggle 'permit unknown AIs' flag.          Current value = %s",
+		printf("\n 5) Set 'permit unknown AIs' flag.                          Current value = %s",
 					gs1_encoder_getPermitUnknownAIs(ctx) ? "ON" : "OFF");
-		printf("\n 6) Toggle 'validate AI associations' flag.    Current value = %s",
+		printf("\n 6) Set 'validate AI associations' flag.                    Current value = %s",
 					gs1_encoder_getValidateAIassociations(ctx) ? "ON" : "OFF");
+		printf("\n 7) Set 'permit zero-suppressed GTIN in GS1 DL URIs' flag.  Current value = %s",
+					gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx) ? "ON" : "OFF");
 
 		printf("\n\n 0) Exit program");
 
@@ -120,6 +122,7 @@ static bool userInt(gs1_encoder *ctx) {
 			case 4:
 			case 5:
 			case 6:
+			case 7:
 				printf("\nEnter 0 for OFF or 1 for ON: ");
 				if (gets(inpStr) == NULL)
 					return false;
@@ -130,10 +133,12 @@ static bool userInt(gs1_encoder *ctx) {
 				}
 				if (menuVal == 4)
 					ret = gs1_encoder_setIncludeDataTitlesInHRI(ctx, i);
-				if (menuVal == 5)
+				else if (menuVal == 5)
 					ret = gs1_encoder_setPermitUnknownAIs(ctx, i);
-				if (menuVal == 6)
+				else if (menuVal == 6)
 					ret = gs1_encoder_setValidateAIassociations(ctx, i);
+				else if (menuVal == 7)
+					ret = gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, i);
 				if (!ret) {
 					printf("\n\nERROR: %s\n", gs1_encoder_getErrMsg(ctx));
 					continue;
