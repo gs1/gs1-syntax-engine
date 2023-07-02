@@ -75,8 +75,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char *data, size_
 	 * Count the number of padding characters, which are optional.
 	 *
 	 */
-	for (pads = 0; len > 0; pads++, len--)
-		if (data[len-1] != '=') break;
+	for (pads = 0; len > 0 && data[len-1] == '='; pads++, len--);
 
 	if (pads > 2 || (pads > 0 && (len + pads) % 3 != 0)) {
 		if (err_pos) *err_pos = len;
