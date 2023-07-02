@@ -464,8 +464,8 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 			goto fail;
 		}
 
-		// Special handling of AI (01) to pad up to a GTIN-14
-		if (strcmp(entry->ai, "01") == 0 &&
+		// Legacy handling of AI (01) to pad up to a GTIN-14, when feature enabled
+		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			for (i = 0; i <= 13; i++)
 				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
@@ -895,17 +895,41 @@ void test_dl_parseDLuri(void) {
 		"https://a/01/12312312312333",
 		"^0112312312312333");
 
+
+	/*
+	 * Test legacy expansion of GTIN-{8,12,13} in AI (01) path component
+	 *
+	 */
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,					// GTIN-13 -> GTIN-14
 		"https://a/01/2112345678900",
 		"^0102112345678900");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
+	test_parseDLuri(ctx, false,
+		"https://a/01/2112345678900",
+		"");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,					// GTIN-12 -> GTIN-14
 		"https://a/01/416000336108",
 		"^0100416000336108");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
+	test_parseDLuri(ctx, false,
+		"https://a/01/416000336108",
+		"");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,					// GTIN-8 -> GTIN-14
 		"https://a/01/02345673",
 		"^0100000002345673");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
+
+	test_parseDLuri(ctx, false,
+		"https://a/01/02345673",
+		"");
+
 
 	test_parseDLuri(ctx, true,
 		"https://a/01/12312312312333/22/TEST/10/ABC/21/XYZ",
@@ -1033,13 +1057,17 @@ void test_dl_parseDLuri(void) {
 		"https://id.gs1.org/01/09520123456788",
 		"^0109520123456788");
 
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,
 		"https://brand.example.com/01/9520123456788",
 		"^0109520123456788");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,
 		"https://brand.example.com/some-extra/pathinfo/01/9520123456788",
 		"^0109520123456788");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/09520123456788/22/2A",
@@ -1063,20 +1091,44 @@ void test_dl_parseDLuri(void) {
 		"https://id.gs1.org/01/09520123456788?3103=000195",
 		"^01095201234567883103000195");
 
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/09520123456788?3103=000195&3922=0299&17=201225",
+		"^0109520123456788310300019539220299^17201225");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
+	test_parseDLuri(ctx, true,
+		"https://example.com/01/09520123456788?3103=000195&3922=0299&17=201225",
+		"^0109520123456788310300019539220299^17201225");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
 	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788?3103=000195&3922=0299&17=201225",
+		"^0109520123456788310300019539220299^17201225");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
+	test_parseDLuri(ctx, true,
 		"https://id.gs1.org/01/9520123456788?17=201225&3103=000195&3922=0299",
+		"^010952012345678817201225310300019539220299");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
+
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788?17=201225&3103=000195&3922=0299",
 		"^010952012345678817201225310300019539220299");
 
 	test_parseDLuri(ctx, true,
@@ -1099,22 +1151,21 @@ void test_dl_parseDLuri(void) {
 		"https://example.com/8004/9520614141234567?01=9520123456788",
 		"^80049520614141234567^0109520123456788");
 
-
 	// Examples with unknown AIs, not permitted
 	test_parseDLuri(ctx, false,
-		"https://example.com/01/9520123456788/89/ABC123?99=XYZ",
+		"https://example.com/01/09520123456788/89/ABC123?99=XYZ",
 		"");
 
 	test_parseDLuri(ctx, false,
-		"https://example.com/01/9520123456788?99=XYZ&89=ABC123",
+		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 
 	// Examples with unknown AIs, permitted
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-
 	test_parseDLuri(ctx, true,
-		"https://example.com/01/9520123456788?99=XYZ&89=ABC123",
+		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"^010952012345678899XYZ^89ABC123");
+	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
 	gs1_encoder_free(ctx);
 

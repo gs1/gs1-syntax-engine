@@ -73,6 +73,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem) {
 	ctx->sym = gs1_encoder_sNONE;
 	ctx->addCheckDigit = false;
 	ctx->permitUnknownAIs = false;
+	ctx->permitZeroSuppressedGTINinDLuris = false;
 	ctx->includeDataTitlesInHRI = false;
 	strcpy(ctx->dataStr, "");
 	ctx->aiTable = NULL;
@@ -137,6 +138,19 @@ GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder *ctx, const bool 
 	assert(ctx);
 	reset_error(ctx);
 	ctx->addCheckDigit = addCheckDigit;
+	return true;
+}
+
+
+GS1_ENCODERS_API bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris(gs1_encoder *ctx) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->permitZeroSuppressedGTINinDLuris;
+}
+GS1_ENCODERS_API bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(gs1_encoder *ctx, const bool permitZeroSuppressedGTINinDLuris) {
+	assert(ctx);
+	reset_error(ctx);
+	ctx->permitZeroSuppressedGTINinDLuris = permitZeroSuppressedGTINinDLuris;
 	return true;
 }
 
@@ -671,6 +685,26 @@ void test_api_permitUnknownAIs(void) {
 
 	TEST_CHECK(gs1_encoder_setPermitUnknownAIs(ctx, false));	// Reset
 	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_permitZeroSuppressedGTINinDLuris(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	TEST_CHECK(!gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));		// Default
+
+	TEST_CHECK(gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true));		// Set
+	TEST_CHECK(gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));
+
+	TEST_CHECK(gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false));		// Reset
+	TEST_CHECK(!gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));
 
 	gs1_encoder_free(ctx);
 

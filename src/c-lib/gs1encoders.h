@@ -579,6 +579,43 @@ GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder *ctx, bool per
 
 
 /**
+ * @brief Get the current status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
+ *
+ * @see gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return current status of the permit zero-suppressed GTINs in GS1 DL URIs mode
+ */
+GS1_ENCODERS_API bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris(gs1_encoder *ctx);
+
+
+/**
+ * @brief Enable or disable "permit zero-suppressed GTIN in GS1 DL URIs" mode for
+ * parsing of GS1 Digital Link URIs.
+ *
+ *   * If false (default), then the value of a path component for AI (01) must
+ *     be provided as a full GTIN-14.
+ *   * If true, then the value of a path component for AI (01) may contain the
+ *     GTIN-14 with zeros suppressed, in the format of a GTIN-13, GTIN-12 or
+ *     GTIN-8.
+ *
+ * \note
+ * The option only applies to parsed input data, specifically GS1 Digital Link
+ * URIs supplied with gs1_encoder_setDataStr(). Since zero-suppressed GTINs are
+ * deprecated, this option should only be enabled when it is necessary to
+ * accept legacy GS1 Digital Link URIs having zero-suppressed GTIN-14.
+ *
+ * @see gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
+ * @see gs1_encoder_setDataStr()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] permitZeroSuppressedGTINinDLuris enabled if true; disabled if false
+ * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
+ */
+GS1_ENCODERS_API bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(gs1_encoder *ctx, bool permitZeroSuppressedGTINinDLuris);
+
+
+/**
  * @brief Get the current status of the "include data titles in HRI" flag.
  *
  * @see gs1_encoder_setIncludeDataTitlesInHRI()

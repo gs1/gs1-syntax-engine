@@ -65,6 +65,7 @@ TEST_LIST = {
     { "api_sym", test_api_sym },
     { "api_addCheckDigit", test_api_addCheckDigit },
     { "api_permitUnknownAIs", test_api_permitUnknownAIs },
+    { "api_permitZeroSuppressedGTINinDLuris", test_api_permitZeroSuppressedGTINinDLuris },
     { "api_validateAIassociations", test_api_validateAIassociations },
     { "api_dataStr", test_api_dataStr },
     { "api_getAIdataStr", test_api_getAIdataStr },
