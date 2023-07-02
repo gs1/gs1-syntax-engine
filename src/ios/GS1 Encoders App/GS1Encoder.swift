@@ -2,7 +2,7 @@
  * Wrapper class for accessing the functions exported by the GS1 Syntax Engine
  * native library (via the "bridging header") from Swift
  *
- * Copyright (c) 2022 GS1 AISBL.
+ * Copyright (c) 2022-2023 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,6 +255,32 @@ class GS1Encoder {
      */
     func setPermitUnknownAIs(_ value: Bool) throws {
         if (!gs1_encoder_setPermitUnknownAIs(ctx, value)) {
+            throw GS1EncoderError.parameterError(msg: self.getErrMsg())
+        }
+    }
+
+    /**
+     * Get the status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
+     *
+     */
+    func getPermitZeroSuppressedGTINinDLuris() -> Bool {
+        return gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx)
+    }
+
+    /**
+     * Set the status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
+     *
+     */
+    func setPermitZeroSuppressedGTINinDLuris(_ value: Bool) throws {
+        if (!gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, value)) {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }

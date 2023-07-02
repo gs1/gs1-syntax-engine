@@ -7,7 +7,7 @@ namespace GS1.Encoders
     /// <summary>
     /// Wrapper class for accessing the GS1 Syntax Engine native library from C#.
     ///
-    /// Copyright (c) 2021 GS1 AISBL.
+    /// Copyright (c) 2021-2023 GS1 AISBL.
     ///
     /// Licensed under the Apache License, Version 2.0 (the "License");
     /// you may not use this file except in compliance with the License.
@@ -148,6 +148,14 @@ namespace GS1.Encoders
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setPermitUnknownAIs", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setPermitUnknownAIs(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool permitUnknownAIs);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getPermitZeroSuppressedGTINinDLuris", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris(IntPtr ctx);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setPermitZeroSuppressedGTINinDLuris", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool permitZeroSuppressedGTINinDLuris);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getValidateAIassociations", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -335,6 +343,30 @@ namespace GS1.Encoders
                     throw new GS1EncoderParameterException(ErrMsg);
             }
         }
+
+
+        /// <summary>
+        /// Get/set the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
+        ///
+        /// See the native library documentation for details:
+        ///
+        ///   - gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
+        ///   - gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
+        ///
+        /// </summary>
+        public bool PermitZeroSuppressedGTINinDLuris
+        {
+            get
+            {
+                return gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx);
+            }
+            set
+            {
+                if (!gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, value))
+                    throw new GS1EncoderParameterException(ErrMsg);
+            }
+        }
+
 
         /// <summary>
         /// Get/set the "validate AI associations" flag.

@@ -16,7 +16,7 @@ package org.gs1.gs1encoders;
  *
  * https://gs1.github.io/gs1-syntax-engine/
  *
- * @author Copyright (c) 2022 GS1 AISBL.
+ * @author Copyright (c) 2022-2023 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ public class GS1Encoder {
     private static native boolean gs1encoderSetIncludeDataTitlesInHRIJNI(long ctx, boolean value);
     private static native boolean gs1encoderGetPermitUnknownAIsJNI(long ctx);
     private static native boolean gs1encoderSetPermitUnknownAIsJNI(long ctx, boolean value);
+    private static native boolean gs1encoderGetPermitZeroSuppressedGTINinDLurisJNI(long ctx);
+    private static native boolean gs1encoderSetPermitZeroSuppressedGTINinDLurisJNI(long ctx, boolean value);
     private static native boolean gs1encoderGetValidateAIassociationsJNI(long ctx);
     private static native boolean gs1encoderSetValidateAIassociationsJNI(long ctx, boolean value);
     private static native String gs1encoderGetDataStrJNI(long ctx);
@@ -323,6 +325,31 @@ public class GS1Encoder {
      */
     public void setPermitUnknownAIs(boolean value) throws GS1EncoderParameterException {
         if (!gs1encoderSetPermitUnknownAIsJNI(ctx, value))
+            throw new GS1EncoderParameterException(this.getErrMsg());
+    }
+
+    /**
+     * Get the status of the "permit zero-suppressed GTINs in GS1 DL URIs" mode.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
+     *
+     */
+    public boolean getPermitZeroSuppressedGTINinDLuris() {
+        return gs1encoderGetPermitZeroSuppressedGTINinDLurisJNI(ctx);
+    }
+
+    /**
+     * Set the status of the "permit zero-suppressed GTINs in GS1 DL URIs" mode.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
+     *
+     */
+    public void setPermitZeroSuppressedGTINinDLuris(boolean value) throws GS1EncoderParameterException {
+        if (!gs1encoderSetPermitZeroSuppressedGTINinDLurisJNI(ctx, value))
             throw new GS1EncoderParameterException(this.getErrMsg());
     }
 

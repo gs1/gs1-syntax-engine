@@ -2,7 +2,7 @@
  *  JavaScript wrapper for the GS1 Syntax Engine compiled as a WASM by
  *  Emscripten.
  *
- *  Copyright (c) 2022 GS1 AISBL.
+ *  Copyright (c) 2022-2023 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -105,6 +105,10 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_getPermitUnknownAIs', 'number', ['number']),
             gs1_encoder_setPermitUnknownAIs:
                 this.module.cwrap('gs1_encoder_setPermitUnknownAIs', 'number', ['number', 'number']),
+            gs1_encoder_getPermitZeroSuppressedGTINinDLuris:
+                this.module.cwrap('gs1_encoder_getPermitZeroSuppressedGTINinDLuris', 'number', ['number']),
+            gs1_encoder_setPermitZeroSuppressedGTINinDLuris:
+                this.module.cwrap('gs1_encoder_setPermitZeroSuppressedGTINinDLuris', 'number', ['number', 'number']),
             gs1_encoder_getIncludeDataTitlesInHRI:
                 this.module.cwrap('gs1_encoder_getIncludeDataTitlesInHRI', 'number', ['number']),
             gs1_encoder_setIncludeDataTitlesInHRI:
@@ -237,6 +241,26 @@ export class GS1encoder {
     }
     set permitUnknownAIs(value) {
         if (!this.api.gs1_encoder_setPermitUnknownAIs(this.ctx, value ? 1 : 0))
+            throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
+    }
+
+
+    /**
+     * Get/set the status of the "permit zero-supressed GTIN in GS1 DL URIs" mode.
+     *
+     * @throws {GS1encoderParameterException}
+     *
+     * @example See the native library documentation for details:
+     *
+     *   - gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
+     *   - gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
+     *
+     */
+    get permitZeroSuppressedGTINinDLuris() {
+        return this.api.gs1_encoder_getPermitZeroSuppressedGTINinDLuris(this.ctx);
+    }
+    set permitZeroSuppressedGTINinDLuris(value) {
+        if (!this.api.gs1_encoder_setPermitZeroSuppressedGTINinDLuris(this.ctx, value ? 1 : 0))
             throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
     }
 
