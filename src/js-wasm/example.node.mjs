@@ -91,12 +91,14 @@ while (!exit) {
     console.log(" 2) Process a bracketed AI element string");
     console.log(" 3) Process barcode scan data (prefixed by AIM Symbology Identifier)");
 
-    console.log("\n 4) Toggle 'include data titles in HRI' flag.  Current value = %s",
+    console.log("\n 4) Set 'include data titles in HRI' flag.                  Current value = %s",
                                         gs1encoder.includeDataTitlesInHRI ? "ON" : "OFF");
-    console.log(" 5) Toggle 'permit unknown AIs' flag.          Current value = %s",
+    console.log(" 5) Set 'permit unknown AIs' flag.                          Current value = %s",
                                         gs1encoder.permitUnknownAIs ? "ON" : "OFF");
-    console.log(" 6) Toggle 'validate AI associations' flag.    Current value = %s",
+    console.log(" 6) Set 'validate AI associations' flag.                    Current value = %s",
                                         gs1encoder.validateAIassociations ? "ON" : "OFF");
+    console.log(" 7) Set 'permit zero-suppressed GTIN in GS1 DL URIs' flag.  Current value = %s",
+                                        gs1encoder.permitZeroSuppressedGTINinDLuris ? "ON" : "OFF");
 
     console.log("\n 0) Exit program");
 
@@ -127,6 +129,7 @@ while (!exit) {
         case "4":
         case "5":
         case "6":
+        case "7":
             var inpStr = await rl.question("\nEnter 0 for OFF or 1 for ON: ");
             if (!inpStr)
                 continue;
@@ -139,8 +142,10 @@ while (!exit) {
                     gs1encoder.includeDataTitlesInHRI = (inpStr === "1");
                 else if (menuVal === "5")
                     gs1encoder.permitUnknownAIs = (inpStr === "1");
-                else           // "6"
-                    gs1encoder.validateAIassociations = (inpStr === "1");
+                else if (menuVal === "6")
+                    gs1encoder.permitUnknownAIs = (inpStr === "1");
+                else if (menuVal === "7")
+                    gs1encoder.permitZeroSuppressedGTINinDLuris = (inpStr === "1");
             } catch (err) {
                 console.log("\n\nERROR: %s", err.message);
                 continue;
