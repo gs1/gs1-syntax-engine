@@ -76,7 +76,7 @@ namespace GS1.EncodersApp
         {
 
             ClearRender();
-            
+
             try
             {
                 if (inputTextBox.Text.Length > 0 && inputTextBox.Text[0] == '(')
@@ -153,7 +153,7 @@ namespace GS1.EncodersApp
                 }
                 return;
             }
-            
+
             LoadDataValues();
 
         }
@@ -163,11 +163,11 @@ namespace GS1.EncodersApp
             if (_disableEvents) return;
             ClearRender();
         }
-       
+
         private void GenericTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (_disableEvents) return;
-            ClearRender();            
+            ClearRender();
             LoadDataValues();
         }
 
