@@ -1,7 +1,7 @@
 /*
  * GS1 Encoders App for Swift
  *
- * Copyright (c) 2022 GS1 AISBL.
+ * Copyright (c) 2022-2023 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ struct ContentView: View {
 
         clearRender()
 
-        let data = inputData.trimmingCharacters(in: .whitespacesAndNewlines)
+        let data = inputData
         if (data == "") {
             return
         }

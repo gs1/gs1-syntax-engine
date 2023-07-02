@@ -2,7 +2,7 @@
  *  Event-driven functions for example HTML app. which uses the JavaScript
  *  wrapper around the WASM build of the GS1 Syntax Engine.
  *
- *  Copyright (c) 2022 GS1 AISBL.
+ *  Copyright (c) 2022-2023 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ function process_clicked() {
 
 	try {
 
-		var data = document.getElementById("data").value.trim();
+		var data = document.getElementById("data").value;
 		if (data == "") return;
 
 		if (data.startsWith('(')) {
