@@ -261,6 +261,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a2bc832a4d200f75f9caca7a873098096"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096">gs1_encoder_setPermitUnknownAIs</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, bool permitUnknownAIs)</td></tr>
 <tr class="memdesc:a2bc832a4d200f75f9caca7a873098096"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable "permit unknown AIs" mode for parsing of bracketed AI element strings and GS1 Digital Link URIs.  <a href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096">More...</a><br /></td></tr>
 <tr class="separator:a2bc832a4d200f75f9caca7a873098096"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e0962cf958114340b9b8153c82f326b"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a4e0962cf958114340b9b8153c82f326b">gs1_encoder_getPermitZeroSuppressedGTINinDLuris</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a4e0962cf958114340b9b8153c82f326b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode.  <a href="gs1encoders_8h.html#a4e0962cf958114340b9b8153c82f326b">More...</a><br /></td></tr>
+<tr class="separator:a4e0962cf958114340b9b8153c82f326b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4190ef38e36d1f490fd5dbbbf9b5b4cd"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a4190ef38e36d1f490fd5dbbbf9b5b4cd">gs1_encoder_setPermitZeroSuppressedGTINinDLuris</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, bool permitZeroSuppressedGTINinDLuris)</td></tr>
+<tr class="memdesc:a4190ef38e36d1f490fd5dbbbf9b5b4cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable "permit zero-suppressed GTIN in GS1 DL URIs" mode for parsing of GS1 Digital Link URIs.  <a href="gs1encoders_8h.html#a4190ef38e36d1f490fd5dbbbf9b5b4cd">More...</a><br /></td></tr>
+<tr class="separator:a4190ef38e36d1f490fd5dbbbf9b5b4cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbcb3c651203535e3e0ccf0930c113d1"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#abbcb3c651203535e3e0ccf0930c113d1">gs1_encoder_getIncludeDataTitlesInHRI</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:abbcb3c651203535e3e0ccf0930c113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of the "include data titles in HRI" flag.  <a href="gs1encoders_8h.html#abbcb3c651203535e3e0ccf0930c113d1">More...</a><br /></td></tr>
 <tr class="separator:abbcb3c651203535e3e0ccf0930c113d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -995,6 +1001,34 @@ Data validation checks</h3>
 
 </div>
 </div>
+<a id="a4e0962cf958114340b9b8153c82f326b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e0962cf958114340b9b8153c82f326b">&#9670;&nbsp;</a></span>gs1_encoder_getPermitZeroSuppressedGTINinDLuris()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the current status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a4190ef38e36d1f490fd5dbbbf9b5b4cd" title="Enable or disable &quot;permit zero-suppressed GTIN in GS1 DL URIs&quot; mode for parsing of GS1 Digital Link U...">gs1_encoder_setPermitZeroSuppressedGTINinDLuris()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>current status of the permit zero-suppressed GTINs in GS1 DL URIs mode </dd></dl>
+
+</div>
+</div>
 <a id="a9fbea46b1179c7e866ad4a2ebede9ab4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9fbea46b1179c7e866ad4a2ebede9ab4">&#9670;&nbsp;</a></span>gs1_encoder_getScanData()</h2>
 
@@ -1464,6 +1498,52 @@ Data validation checks</h3>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">permitUnknownAIs</td><td>enabled if true; disabled if false </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, otherwise false and an error message is set that can be read using <a class="el" href="gs1encoders_8h.html#aee9e7c8b49fe2a8fa7bd0b21c1e7510b" title="Read an error message generated by the library.">gs1_encoder_getErrMsg()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a4190ef38e36d1f490fd5dbbbf9b5b4cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4190ef38e36d1f490fd5dbbbf9b5b4cd">&#9670;&nbsp;</a></span>gs1_encoder_setPermitZeroSuppressedGTINinDLuris()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_API bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
+          <td class="paramname"><em>ctx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>permitZeroSuppressedGTINinDLuris</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable or disable "permit zero-suppressed GTIN in GS1 DL URIs" mode for parsing of GS1 Digital Link URIs. </p>
+<ul>
+<li>If false (default), then the value of a path component for AI (01) must be provided as a full GTIN-14.</li>
+<li>If true, then the value of a path component for AI (01) may contain the GTIN-14 with zeros suppressed, in the format of a GTIN-13, GTIN-12 or GTIN-8.</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>The option only applies to parsed input data, specifically GS1 Digital Link URIs supplied with <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>. Since zero-suppressed GTINs are deprecated, this option should only be enabled when it is necessary to accept legacy GS1 Digital Link URIs having zero-suppressed GTIN-14.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a4e0962cf958114340b9b8153c82f326b" title="Get the current status of the &quot;permit zero-suppressed GTIN in GS1 DL URIs&quot; mode.">gs1_encoder_getPermitZeroSuppressedGTINinDLuris()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">permitZeroSuppressedGTINinDLuris</td><td>enabled if true; disabled if false </td></tr>
   </table>
   </dd>
 </dl>

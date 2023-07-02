@@ -22,4 +22,5 @@
 
  @licend  The above is the entire license notice for the JavaScript code in this file
 */
-var menudata={}
+var menudata={children:[
+{text:"Related Pages",url:"pages.html"}]}
