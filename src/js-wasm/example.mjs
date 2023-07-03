@@ -65,6 +65,7 @@ function load_data_values() {
 	document.getElementById("unknownais").checked = gs1encoder.permitUnknownAIs;
 	document.getElementById("associations").checked = gs1encoder.validateAIassociations;
 	document.getElementById("datatitles").checked = gs1encoder.includeDataTitlesInHRI;
+	document.getElementById("zerosuppdl").checked = gs1encoder.permitZeroSuppressedGTINinDLuris;
 
 	if (gs1encoder.dataStr == "") return;
 
@@ -185,9 +186,16 @@ function datatitles_clicked() {
 }
 
 
+function zerosuppdl_clicked() {
+	clear_render();
+	gs1encoder.permitZeroSuppressedGTINinDLuris = document.getElementById("zerosuppdl").checked;
+}
+
+
 window.init = init;
 window.process_clicked = process_clicked;
 window.data_changed = data_changed;
 window.unknownais_clicked = unknownais_clicked;
 window.associations_clicked = associations_clicked;
 window.datatitles_clicked = datatitles_clicked;
+window.zerosuppdl_clicked = zerosuppdl_clicked
