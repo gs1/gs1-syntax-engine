@@ -66,6 +66,7 @@ namespace GS1.EncodersApp
 
             validateAIassociationsCheckBox.IsChecked = App.gs1Encoder.ValidateAIassociations;
             permitUnknownAIsCheckBox.IsChecked = App.gs1Encoder.PermitUnknownAIs;
+            permitZeroSuppressedGTINinDLurisCheckBox.IsChecked = App.gs1Encoder.PermitZeroSuppressedGTINinDLuris;
             includeDataTitlesInHRIcheckBox.IsChecked = App.gs1Encoder.IncludeDataTitlesInHRI;
 
             _disableEvents = false;
@@ -190,6 +191,13 @@ namespace GS1.EncodersApp
             if (_disableEvents) return;
             ClearRender();
             App.gs1Encoder.IncludeDataTitlesInHRI = includeDataTitlesInHRIcheckBox.IsChecked ?? false;
+        }
+
+        private void PermitZeroSuppressedGTINinDLruisCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            ClearRender();
+            App.gs1Encoder.PermitZeroSuppressedGTINinDLuris = permitZeroSuppressedGTINinDLurisCheckBox.IsChecked ?? false;
         }
 
         private void InfoLabel_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

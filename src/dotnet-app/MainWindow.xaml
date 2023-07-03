@@ -54,5 +54,12 @@
                 </Style>
             </CheckBox.Resources>
         </CheckBox>
+        <CheckBox x:Name="permitZeroSuppressedGTINinDLurisCheckBox" Content="Permit 0-supp (01) in DL" FlowDirection="RightToLeft" Margin="13,216,18,0" VerticalAlignment="Top" Click="PermitZeroSuppressedGTINinDLruisCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1">
+            <CheckBox.Resources>
+                <Style TargetType="{x:Type Path}">
+                    <Setter Property="FlowDirection" Value="LeftToRight"/>
+                </Style>
+            </CheckBox.Resources>
+        </CheckBox>
     </Grid>
 </Window>
