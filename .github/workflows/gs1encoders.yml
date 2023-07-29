@@ -78,7 +78,7 @@ jobs:
 
     - name: MSVC CI
       run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" src\gs1encoders.sln
+        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /warnaserror src\gs1encoders.sln
 
         # Load AI table from external Syntax Dictionary
         copy src\c-lib\gs1-syntax-dictionary.txt .
@@ -296,8 +296,8 @@ jobs:
 
     - name: Windows release build
       run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 src\gs1encoders.sln
-        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\netcoreapp3.1\win-x86\publish\ src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
+        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 /warnaserror src\gs1encoders.sln
+        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\netcoreapp3.1\win-x86\publish\ /warnaserror src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
 
     - name: ZIP development libs
       working-directory: src/c-lib/build/library/Win32/Release
