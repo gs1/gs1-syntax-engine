@@ -69,7 +69,6 @@
     <IntDir>build\library\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>build\library\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\library\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -86,7 +85,7 @@
       <PreprocessorDefinitions>WIN32;GS1_LINTER_ERR_STR_EN;_DEBUG;PRNT;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>

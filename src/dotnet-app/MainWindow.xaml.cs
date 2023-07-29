@@ -214,7 +214,7 @@ namespace GS1.EncodersApp
             }
         }
 
-        private void errorMessageLabel_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ErrorMessageLabel_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             for (int i = 0; i < 10; i++)
             {

@@ -20,7 +20,7 @@
         <TextBox x:Name="dataStrTextBox" Height="45" Margin="233,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"  Grid.Row="1" IsReadOnly="True" />
         <Button x:Name="processInputButton" Content="Process input data" Margin="0,76,24,0" VerticalAlignment="Top" Click="ProcessInputButton_Click" Height="26" Grid.Row="1" Grid.Column="1" Width="160" HorizontalAlignment="Right"/>
         <Label x:Name="infoLabel" Margin="22,0,26,0" VerticalAlignment="Center" Height="31" Background="Transparent" Grid.Row="2" Grid.ColumnSpan="2" MouseDoubleClick="InfoLabel_MouseDoubleClick"/>
-        <Label x:Name="errorMessageLabel" Content="" Margin="22,0,26,50" FontWeight="Bold" Grid.Row="2" Grid.ColumnSpan="2" Height="31" VerticalAlignment="Bottom" MouseDoubleClick="errorMessageLabel_MouseDoubleClick"/>
+        <Label x:Name="errorMessageLabel" Content="" Margin="22,0,26,50" FontWeight="Bold" Grid.Row="2" Grid.ColumnSpan="2" Height="31" VerticalAlignment="Bottom" MouseDoubleClick="ErrorMessageLabel_MouseDoubleClick"/>
         <TextBox x:Name="hriTextBox"  FontFamily="Consolas" IsReadOnly="True" FontSize="14" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="233,341,0,0" VerticalContentAlignment="Top" Height="108" VerticalAlignment="Top" Grid.Row="1" Grid.RowSpan="2" />
         <CheckBox x:Name="permitUnknownAIsCheckBox" Content="Permit unknown AIs" FlowDirection="RightToLeft" Margin="37,120,18,0" VerticalAlignment="Top" Click="PermitUnknownAIsCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1">
             <CheckBox.Resources>
