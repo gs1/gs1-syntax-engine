@@ -186,7 +186,7 @@ GS1_ENCODERS_API bool gs1_encoder_getIncludeDataTitlesInHRI(gs1_encoder *ctx) {
 	reset_error(ctx);
 	return ctx->includeDataTitlesInHRI;
 }
-GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder *ctx, bool includeDataTitles) {
+GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder *ctx, const bool includeDataTitles) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->includeDataTitlesInHRI = includeDataTitles;
