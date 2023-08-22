@@ -30,12 +30,12 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "couponcode",		.fn = gs1_lint_couponcode },
 	{ .name = "couponposoffer",	.fn = gs1_lint_couponposoffer },
 	{ .name = "cset39",		.fn = gs1_lint_cset39 },
-	{ .name = "cset64",		.fn = gs1_lint_cset64 },
 	{ .name = "cset82",		.fn = gs1_lint_cset82 },
 	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
 	{ .name = "csum",		.fn = gs1_lint_csum },
 	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
 	{ .name = "hhmm",		.fn = gs1_lint_hhmm },
+	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
 	{ .name = "iban",		.fn = gs1_lint_iban },
 	{ .name = "importeridx",	.fn = gs1_lint_importeridx },
 	{ .name = "iso3166",		.fn = gs1_lint_iso3166 },
@@ -208,6 +208,7 @@ const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"The longitude must be 10 digits.",
 	"A non-CSET 64 character was found where a CSET 64 character is expected.",
 	"Incorrect number of CSET 64 pad characters.",
+	"Only hyphens are permitted.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

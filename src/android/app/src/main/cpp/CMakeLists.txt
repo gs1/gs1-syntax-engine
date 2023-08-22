@@ -19,6 +19,7 @@ gs1encoders/syntax/lint_csetnumeric.c
 gs1encoders/syntax/lint_csumalpha.c
 gs1encoders/syntax/lint_csum.c
 gs1encoders/syntax/lint_hhmm.c
+gs1encoders/syntax/lint_hyphen.c
 gs1encoders/syntax/lint_iban.c
 gs1encoders/syntax/lint_importeridx.c
 gs1encoders/syntax/lint_iso3166999.c

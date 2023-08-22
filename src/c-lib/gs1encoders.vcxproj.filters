@@ -60,6 +60,9 @@
     <ClCompile Include="syntax\lint_hhmm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_hyphen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_iban.c">
       <Filter>Source Files</Filter>
     </ClCompile>

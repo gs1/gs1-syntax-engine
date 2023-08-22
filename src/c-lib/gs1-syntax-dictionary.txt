@@ -1,7 +1,7 @@
 # GS1 Application Identifier Syntax Dictionary
 # --------------------------------------------
 #
-# Release: 2023-07-04
+# Release: NOT SET
 #
 # This is the GS1 Application Identifier format "Syntax Dictionary".
 #
@@ -233,6 +233,10 @@
 4324        N6,yymmd0 N4,hhmm           req=00                             # NOT BEF DEL DT
 4325        N6,yymmd0 N4,hhmm           req=00                             # NOT AFT DEL DT
 4326        N6,yymmdd                   req=00                             # REL DATE
+4330        N6 [X1],hyphen              req=00 ex=4331                     # MAX TEMP F.
+4331        N6 [X1],hyphen              req=00 ex=4330                     # MAX TEMP C.
+4332        N6 [X1],hyphen              req=00 ex=4333                     # MIN TEMP F.
+4333        N6 [X1],hyphen              req=00 ex=4332                     # MIN TEMP C.
 7001        N13                         req=01,02,8006,8026                # NSN
 7002        X..30                       req=01,02                          # MEAT CUT
 7003        N6,yymmdd N4,hhmm           req=01,02                          # EXPIRY TIME

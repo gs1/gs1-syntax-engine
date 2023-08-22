@@ -172,6 +172,7 @@ typedef enum
 	GS1_LINTER_LONGITUDE_INVALID_LENGTH,				///< The longitude value must be 10 digits.
 	GS1_LINTER_INVALID_CSET64_CHARACTER,				///< A non-CSET 64 character was found where a CSET 64 character is expected.
 	GS1_LINTER_INVALID_CSET64_PADDING,				///< Incorrect number of CSET 64 pad characters.
+	GS1_LINTER_NOT_HYPHEN,						///< Only hyphens are permitted.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -223,6 +224,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char *dat
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len);
 
 GS1_SYNTAX_DICTIONARY_API gs1_linter_t gs1_linter_from_name(const char *name);
 

@@ -65,17 +65,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char *data, size_
 		"abcdefghijklmnopqrstuvwxyz"
 		"0123456789-_";
 
-	size_t pads, pos, len;
+	size_t pads, len, pos;
 
 	assert(data);
-
-	len = strlen(data);
 
 	/*
 	 * Count the number of padding characters, which are optional.
 	 *
 	 */
-	for (pads = 0; len > 0 && data[len-1] == '='; pads++, len--);
+	for (pads = 0, len = strlen(data);
+	     len > 0 && data[len-1] == '=';
+	     pads++, len--);
 
 	if (pads > 2 || (pads > 0 && (len + pads) % 3 != 0)) {
 		if (err_pos) *err_pos = len;

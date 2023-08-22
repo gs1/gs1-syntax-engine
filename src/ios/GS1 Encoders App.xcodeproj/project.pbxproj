@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C61FD91F516A6C861323F7AE /* Pods_GS1_Encoders_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8E9779FA2B3E64A62BA5D1F /* Pods_GS1_Encoders_App.framework */; };
 		F72D9196293AB3F300809E9B /* BarcodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */; };
+		F72E912B2A94E29C00C746FC /* lint_hyphen.c in Sources */ = {isa = PBXBuildFile; fileRef = F72E912A2A94E29C00C746FC /* lint_hyphen.c */; };
 		F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */; };
 		F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AD2909D225008E17F4 /* ContentView.swift */; };
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		6E6A486084227C4CC5414BBB /* Pods-GS1 Encoders App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GS1 Encoders App.release.xcconfig"; path = "Target Support Files/Pods-GS1 Encoders App/Pods-GS1 Encoders App.release.xcconfig"; sourceTree = "<group>"; };
 		E8E9779FA2B3E64A62BA5D1F /* Pods_GS1_Encoders_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GS1_Encoders_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodeScannerView.swift; sourceTree = "<group>"; };
+		F72E912A2A94E29C00C746FC /* lint_hyphen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hyphen.c; sourceTree = "<group>"; };
 		F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS1 Encoders App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1_Encoders_AppApp.swift; sourceTree = "<group>"; };
 		F73EC9AD2909D225008E17F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F72E912A2A94E29C00C746FC /* lint_hyphen.c */,
 				F7A662AB2A50A95200638051 /* lint_cset64.c */,
 				F7A662AA2A50A95200638051 /* lint_latitude.c */,
 				F7A662A92A50A95200638051 /* lint_longitude.c */,
@@ -389,6 +392,7 @@
 				F79827852909D35500F00DDA /* lint_key.c in Sources */,
 				F798278B2909D35500F00DDA /* lint_mmoptss.c in Sources */,
 				F79827772909D35500F00DDA /* lint_iso4217.c in Sources */,
+				F72E912B2A94E29C00C746FC /* lint_hyphen.c in Sources */,
 				F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */,
 				F798276D2909D35500F00DDA /* dl.c in Sources */,
 				F79827702909D35500F00DDA /* gs1encoders.c in Sources */,
