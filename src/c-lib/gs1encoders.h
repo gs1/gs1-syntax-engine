@@ -876,7 +876,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * @param [in] stem a URI "stem" used as a prefix for the URI. If NULL, the GS1 canonical stem (`https://id.gs1.org/`) will be used.
  * @return a pointer to a string representing the GS1 Digital Link URI for the input data
  */
-GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, char *stem);
+GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem);
 
 
 /**

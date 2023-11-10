@@ -353,7 +353,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx) {
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, char *stem) {
+GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem) {
 	assert(ctx);
 	return gs1_generateDLuri(ctx, stem);
 }
