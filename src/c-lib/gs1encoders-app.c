@@ -32,7 +32,7 @@ static char *inpStr;
 // Replacement for the deprecated gets(3) function
 #define gets(i) _gets(i)
 
-static char* _gets(char* in) {
+static char* _gets(char* const in) {
 
 	char* s;
 
@@ -43,12 +43,13 @@ static char* _gets(char* in) {
 	return s;
 }
 
-static bool userInt(gs1_encoder *ctx) {
+static bool userInt(gs1_encoder* const ctx) {
 
 	while (true) {
 
 		bool ret = false;
-		char *dataStr, *aiDataStr, *dlURI, **hri = NULL;
+		const char *dataStr, *aiDataStr, *dlURI = NULL;
+		char **hri = NULL;
 		int menuVal, numHRI, i;
 
 		printf("\n\n\nCurrent state:\n");

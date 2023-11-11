@@ -44,12 +44,12 @@ int LLVMFuzzerInitialize(int *argc, char ***argv) {
 }
 
 
-int LLVMFuzzerTestOneInput(const uint8_t *buf, size_t len) {
+int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	char in[MAX_DATA+1];
 	char outDL1[MAX_DATA+1];
 	char outDL2[MAX_DATA+1];
-	char *out;
+	const char *out;
 
 	if (len > MAX_DATA)
 		return 0;

@@ -43,9 +43,9 @@
 } while(0)
 
 
-static int processComponent(gs1_encoder *ctx, char* component, struct aiComponent *part) {
+static int processComponent(gs1_encoder* const ctx, char* const component, struct aiComponent* const part) {
 
-	char *token, *p;
+	const char *token, *p;
 	char *saveptr = NULL;
 	int numlinters, linter;
 	size_t len;
@@ -131,9 +131,9 @@ fail:
 
 }
 
-int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct aiEntry *sd, struct aiEntry **entry, uint16_t cap) {
+int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
-	struct aiEntry *lastEntry;
+	const struct aiEntry *lastEntry;
 	char *token;
 	char *saveptr = NULL;
 	char *p, *q;
@@ -331,9 +331,9 @@ fail:
 }
 
 
-static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder *ctx, const char *fname) {
+static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const char* const fname) {
 
-	uint16_t cap = AI_TABLE_CAPACITY;
+	const uint16_t cap = AI_TABLE_CAPACITY;
 	FILE *fp = NULL;
 	char buf[MAX_SD_ENTRY_LEN];
 	char errbuf[sizeof(ctx->errMsg)];
@@ -383,11 +383,11 @@ fail:
 }
 
 
-bool gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname) {
+bool gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
 
 	struct aiEntry *sd;
 
-	const char *filename = fname ? fname : DEFAULT_SYNTAX_FILENAME;
+	const char* const filename = fname ? fname : DEFAULT_SYNTAX_FILENAME;
 
 	/*
 	 * If a name isn't provided then attempt to load the default Syntax Dictionary file.
@@ -409,7 +409,7 @@ bool gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname) {
 
 }
 
-void gs1_freeSyntaxDictionaryEntries(gs1_encoder *ctx, struct aiEntry *sd) {
+void gs1_freeSyntaxDictionaryEntries(gs1_encoder* const ctx, struct aiEntry *sd) {
 
 	(void)ctx;
 
@@ -432,9 +432,9 @@ void gs1_freeSyntaxDictionaryEntries(gs1_encoder *ctx, struct aiEntry *sd) {
 #define TEST_NO_MAIN
 #include "acutest.h"
 
-static void test_parseSyntaxDictionaryEntry(gs1_encoder *ctx, char *sdEntry, struct aiEntry expectedAIentries[], bool expectSuccess) {
+static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const sdEntry, const struct aiEntry expectedAIentries[], bool expectSuccess) {
 
-	uint16_t cap = 600;
+	const uint16_t cap = 600;
 	int16_t numOut, expectOut = 0;
 	size_t i, j, k;
 	char buf[256];

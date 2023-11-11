@@ -41,7 +41,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv) {
 }
 
 
-int LLVMFuzzerTestOneInput(const uint8_t *buf, size_t len) {
+int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	char in[MAX_DATA+1];
 	struct aiEntry sd[150];

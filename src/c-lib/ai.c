@@ -83,7 +83,7 @@
  *  with the same two digits shall have the same AI length.
  *
  */
-static bool populateAIlengthByPrefix(gs1_encoder *ctx) {
+static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 	const struct aiEntry *e;
 
 	memset(ctx->aiLengthByPrefix, 0, sizeof(ctx->aiLengthByPrefix));
@@ -102,13 +102,13 @@ static bool populateAIlengthByPrefix(gs1_encoder *ctx) {
 	return true;
 }
 
-static inline uint8_t aiLengthByPrefix(gs1_encoder *ctx, const char *ai) {
+static inline uint8_t aiLengthByPrefix(gs1_encoder* const ctx, const char *ai) {
 	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
 	return ctx->aiLengthByPrefix[(ai[0] - '0') * 10 + (ai[1] - '0')];
 }
 
 
-void gs1_setAItable(gs1_encoder *ctx, struct aiEntry *aiTable) {
+void gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable) {
 
 	struct aiEntry *e;
 
@@ -200,7 +200,7 @@ static const uint8_t fixedAIprefixLengths[100] = {
 	VL, VL, VL, VL, VL, VL, VL, VL, VL, VL,
 };
 
-static inline uint8_t valLengthByPrefix(const char *ai) {
+static inline uint8_t valLengthByPrefix(const char* const ai) {
 	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
 	return fixedAIprefixLengths[(ai[0] - '0') * 10 + (ai[1] - '0')];
 }
@@ -241,7 +241,7 @@ static const struct aiEntry unknownAI4fixed6 =
  * an AI in the table that matches a prefix of the given data.
  *
  */
-const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t ailen) {
+const struct aiEntry* gs1_lookupAIentry(gs1_encoder* const ctx, const char *p, size_t ailen) {
 
 	size_t aiLenByPrefix;
 	uint8_t valLenByPrefix;
@@ -320,7 +320,7 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder *ctx, const char *p, size_t 
  *  Validate string between start and end pointers according to rules for an AI
  *
  */
-static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiEntry *entry, const char *start, const char *end) {
+static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, const struct aiEntry* const entry, const char* const start, const char* const end) {
 
 	const struct aiComponent *part;
 	char compval[MAX_AI_LEN+1];
@@ -411,7 +411,7 @@ static size_t validate_ai_val(gs1_encoder *ctx, const char *ai, const struct aiE
  * isn't helpful when the AI is too long
  *
  */
-bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct aiEntry *entry, const char *aiVal, const size_t vallen) {
+bool gs1_aiValLengthContentCheck(gs1_encoder* const ctx, const char* const ai, const struct aiEntry* const entry, const char* const aiVal, const size_t vallen) {
 
 	const struct aiComponent *part;
 	size_t minlen = 0, maxlen = 0;
@@ -448,10 +448,10 @@ bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct 
  * Convert bracketed AI syntax data to regular AI data string with ^ = FNC1
  *
  */
-bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr) {
+bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* const dataStr) {
 
 	const char *p, *r, *ai;
-	char *outai, *outval;
+	const char *outai, *outval;
 	size_t ailen;
 	bool fnc1req = true;
 	const struct aiEntry *entry;
@@ -550,7 +550,7 @@ fail:
  *  Validate regular AI data ("^...") and optionally extract AIs
  *
  */
-bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extractAIs) {
+bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const bool extractAIs) {
 
 	const char *p, *ai;
 	const struct aiEntry *entry;
@@ -655,12 +655,12 @@ bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, const bool extract
  *  itself when matching by a self-referencing pattern.
  *
  */
-static bool aiExists(gs1_encoder *ctx, const char *ai, const char *ignoreAI, char *matchedAI) {
+static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, char* const matchedAI) {
 	int i;
-	size_t prefixlen = strspn(ai, "0123456789");
+	const size_t prefixlen = strspn(ai, "0123456789");
 
 	for (i = 0; i < ctx->numAIs; i++) {
-		struct aiValue *ai2 = &ctx->aiData[i];
+		const struct aiValue* const ai2 = &ctx->aiData[i];
 		if (ai2->kind != aiValue_aival)
 			continue;
 		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
@@ -672,15 +672,15 @@ static bool aiExists(gs1_encoder *ctx, const char *ai, const char *ignoreAI, cha
 	return false;
 }
 
-bool gs1_validateAIassociations(gs1_encoder *ctx) {
+bool gs1_validateAIassociations(gs1_encoder* const ctx) {
 
 	char *saveptr = NULL, *saveptr2 = NULL;
 	char *token;
 	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 	int i, j;
-	struct aiValue *ai2;
+	const struct aiValue *ai2;
 	char matchedAI[5] = { 0 };
-	char *reqErr;
+	const char *reqErr;
 	int reqLen;
 
 	assert(ctx);
@@ -688,7 +688,7 @@ bool gs1_validateAIassociations(gs1_encoder *ctx) {
 
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		struct aiValue *ai = &ctx->aiData[i];
+		const struct aiValue* const ai = &ctx->aiData[i];
 		if (ai->kind != aiValue_aival)
 			continue;
 
@@ -774,7 +774,7 @@ bool gs1_validateParity(uint8_t *str) {
 }
 
 
-bool gs1_allDigits(const uint8_t *str, size_t len) {
+bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 	size_t i;
 
@@ -937,7 +937,7 @@ void test_ai_AItableVsIsFNC1required(void) {
 
 }
 
-static void test_parseAIdata(gs1_encoder *ctx, const bool should_succeed, const char *aiData, const char* expect) {
+static void test_parseAIdata(gs1_encoder* const ctx, const bool should_succeed, const char* const aiData, const char* const expect) {
 
 	char out[256];
 	char casename[256];
@@ -993,7 +993,7 @@ void test_ai_parseAIdata(void) {
 }
 
 
-static void test_linters(gs1_encoder *ctx, const char *aiData, gs1_lint_err_t expect) {
+static void test_linters(gs1_encoder* const ctx, const char* const aiData, gs1_lint_err_t expect) {
 
 	char out[256];
 	char casename[256];
@@ -1153,7 +1153,7 @@ void test_ai_linters(void) {
 }
 
 
-static void test_processAIdata(gs1_encoder *ctx, const bool should_succeed, const char *dataStr) {
+static void test_processAIdata(gs1_encoder* const ctx, const bool should_succeed, const char* const dataStr) {
 
 	char casename[256];
 
@@ -1251,7 +1251,7 @@ void test_ai_processAIdata(void) {
 }
 
 
-static void test_validateAIassociations(gs1_encoder *ctx, const bool should_succeed, const char *aiData) {
+static void test_validateAIassociations(gs1_encoder* const ctx, const bool should_succeed, const char* const aiData) {
 
 	bool ret;
 	char out[256];

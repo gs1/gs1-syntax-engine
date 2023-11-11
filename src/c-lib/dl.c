@@ -60,14 +60,14 @@ static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
  *  array of space-separated AI sequences which we can efficiently search.
  *
  */
-static bool addDLkeyQualifiers(gs1_encoder *ctx, char ***dlKeyQualifiers, size_t *pos, size_t *cap, const char *key, const char *qualifiers) {
+static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
 
 	int i, j, k, num;
 	size_t req;
 	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	char qualifiersbuf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	char *saveptr = NULL;
-	char *token;
+	const char *token;
 	char **addedQualifiers;
 	char **reallocDLkeyQualifiers;
 
@@ -131,11 +131,11 @@ static bool addDLkeyQualifiers(gs1_encoder *ctx, char ***dlKeyQualifiers, size_t
 
 }
 
-static int q_cmp(const void *a, const void *b) {
+static int q_cmp(const void* const a, const void* const b) {
 	return strcmp(*(const char**)a, *(const char**)b);
 }
 
-bool gs1_populateDLkeyQualifiers(gs1_encoder *ctx) {
+bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 
 	char *saveptr = NULL, *saveptr2 = NULL;
 	char *token;
@@ -201,7 +201,7 @@ fail:
 }
 
 
-void gs1_freeDLkeyQualifiers(gs1_encoder *ctx) {
+void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
 
 	int i;
 
@@ -224,7 +224,7 @@ void gs1_freeDLkeyQualifiers(gs1_encoder *ctx) {
  *  the position in the list or -1 if missing
  *
  */
-static int getDLpathAIseqEntry(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) {
+static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][5], const int len) {
 
 	char aiseq[5 * MAX_AIS] = { 0 };
 	char *p = aiseq;
@@ -260,18 +260,18 @@ static int getDLpathAIseqEntry(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) 
 
 }
 
-static inline bool isValidDLpathAIseq(gs1_encoder *ctx, char seq[MAX_AIS][5], int len) {
+static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX_AIS][5], const int len) {
 	return getDLpathAIseqEntry(ctx, seq, len) != -1;
 }
 
-static inline bool isDLpkey(gs1_encoder *ctx, const char* p) {
+static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
 	char seq[MAX_AIS][5] = { 0 };
 	strcpy(seq[0], p);
-	return getDLpathAIseqEntry(ctx, seq, 1) != -1;
+	return getDLpathAIseqEntry(ctx, (const char(*)[5])seq, 1) != -1;
 }
 
 
-static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t inlen, bool is_query_component) {
+static size_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
 	char hex[3] = { 0 };
@@ -297,7 +297,7 @@ static size_t URIunescape(char *out, size_t maxlen, const char *in, const size_t
 }
 
 
-static size_t URIescape(char *out, size_t maxlen, const char *in, const size_t inlen, bool is_query_component) {
+static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
 
@@ -332,13 +332,14 @@ static size_t URIescape(char *out, size_t maxlen, const char *in, const size_t i
  * deprecated) are not supported.
  *
  */
-bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
+bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const dataStr) {
 
-	char* p, * r, * e, * ai, * outai, * outval;
-	char* pi = NULL;	// Path info
+	char* p, *r;
+	const char *e, *ai, *outai, *outval;
+	const char* pi = NULL;	// Path info
 	char* qp = NULL;	// Query params
 	char* fr = NULL;	// Fragment
-	char* dp = NULL;	// DL path info
+	const char* dp = NULL;	// DL path info
 	bool ret;
 	size_t i;
 	size_t ailen, vallen;
@@ -436,7 +437,7 @@ bool gs1_parseDLuri(gs1_encoder* ctx, char* dlData, char* dataStr) {
 	DEBUG_PRINT("  DL path info: %s\n", dp);
 
 	// Process each AI value pair in the DL path info
-	p = dp;
+	p = (char*)dp;
 	numPathAIs = 0;
 	while (*p) {
 		assert(*p == '/');
@@ -619,7 +620,7 @@ add_query_param_to_ai_data:
 
 	// Validate that the AI sequence in the path info is a valid
 	// key-qualifier association
-	if (!isValidDLpathAIseq(ctx, pathAIseq, numPathAIs)) {
+	if (!isValidDLpathAIseq(ctx, (const char(*)[5])pathAIseq, numPathAIs)) {
 		strcpy(ctx->errMsg, "The AIs in the path are not a valid key-qualifier sequence for the key");
 		ctx->errFlag = true;
 		ret = false;
@@ -670,17 +671,17 @@ fail:
  *  Generate a DL URI from the AI data
  *
  */
-char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
+char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 	int i, j, maxQualifiers, numQualifiers;
 	const char *key = NULL;
 	int keyEntry = -1, ke, bestKeyEntry;
 	char seq[MAX_AIS][5] = { 0 };
 	char *p;
-	struct aiValue *ai;
+	const struct aiValue *ai;
 	char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
 	char *saveptr = NULL;
-	char *token;
+	const char *token;
 	char tmp[256];
 	bool emitFixed;
 
@@ -696,7 +697,7 @@ char* gs1_generateDLuri(gs1_encoder* ctx, const char* stem) {
 			continue;
 		assert(ai->aiEntry);
 		strcpy(seq[0], ai->aiEntry->ai);
-		if ((ke = getDLpathAIseqEntry(ctx, seq, 1)) != -1) {
+		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[5])seq, 1)) != -1) {
 			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
 			break;
@@ -825,7 +826,7 @@ again:
 #include "acutest.h"
 
 
-static void test_parseDLuri(gs1_encoder *ctx, bool should_succeed, const char *dlData, const char* expect) {
+static void test_parseDLuri(gs1_encoder* const ctx, bool should_succeed, const char* const dlData, const char* const expect) {
 
 	char in[256];
 	char out[256];
@@ -1172,7 +1173,7 @@ void test_dl_parseDLuri(void) {
 }
 
 
-static void test_URIunescape(const char *in, const char *expect_path, const char *expect_query) {
+static void test_URIunescape(const char* const in, const char* const expect_path, const char* const expect_query) {
 
 	char out[MAX_AI_LEN+1];
 
@@ -1234,7 +1235,7 @@ void test_dl_URIunescape(void) {
 }
 
 
-static void test_URIescape(const char *in, const char *expect_path, const char *expect_query) {
+static void test_URIescape(const char* const in, const char* const expect_path, const char* const expect_query) {
 
 	char out[MAX_AI_LEN*3+1];
 
@@ -1298,7 +1299,7 @@ void test_dl_URIescape(void) {
 
 void test_dl_testValidateDLpathAIseq(void) {
 
-	char seq[][MAX_AIS][5] = {
+	const char seq[][MAX_AIS][5] = {
 
 		// SSCC
 		{ "00" },
@@ -1392,11 +1393,11 @@ void test_dl_testValidateDLpathAIseq(void) {
 }
 
 
-static void test_testGenerateDLuri(gs1_encoder* ctx, bool should_succeed, const char* stem, const char* aiData, const char* expect) {
+static void test_testGenerateDLuri(gs1_encoder* const ctx, const bool should_succeed, const char* const stem, const char* const aiData, const char* const expect) {
 
 	char out[256];
 	char casename[256];
-	char *uri;
+	const char *uri;
 	bool ret;
 
 	strcpy(casename, aiData);

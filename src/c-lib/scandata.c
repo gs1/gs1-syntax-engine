@@ -60,7 +60,7 @@ static const struct symIdEntry symIdTable[] = {
 };
 
 
-static void scancat(char* out, const char* in) {
+static void scancat(char* const out, const char* const in) {
 
 	const char *p;
 	char *q;
@@ -100,9 +100,9 @@ static void scancat(char* out, const char* in) {
 }
 
 
-static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
+static bool gs1_normaliseEAN13(gs1_encoder* const ctx, const char* dataStr, char* const primaryStr) {
 
-	unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
+	const unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
 
 	if (strlen(dataStr) >= 17-(size_t)digits && strncmp(dataStr, "^0100", 17-(size_t)digits) == 0)
 		dataStr += 17-digits;
@@ -150,7 +150,7 @@ static bool gs1_normaliseEAN13(gs1_encoder *ctx, const char *dataStr, char *prim
 }
 
 
-static bool gs1_normaliseEAN8(gs1_encoder *ctx, const char* dataStr, char* primaryStr) {
+static bool gs1_normaliseEAN8(gs1_encoder* const ctx, const char* dataStr, char* const primaryStr) {
 
 	if (strlen(dataStr) >= 9 && strncmp(dataStr, "^01000000", 9) == 0)
 		dataStr += 9;
@@ -196,7 +196,7 @@ static bool gs1_normaliseEAN8(gs1_encoder *ctx, const char* dataStr, char* prima
 }
 
 
-static bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
+static bool gs1_normaliseUPCE(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
 
 	if (strlen(dataStr) >= 5 && strncmp(dataStr, "^0100", 5) == 0)
 		dataStr += 5;
@@ -242,7 +242,7 @@ static bool gs1_normaliseUPCE(gs1_encoder *ctx, const char *dataStr, char *prima
 }
 
 
-static bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
+static bool gs1_normaliseRSS14(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
 
 	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
 		dataStr += 3;
@@ -288,7 +288,7 @@ static bool gs1_normaliseRSS14(gs1_encoder *ctx, const char *dataStr, char *prim
 }
 
 
-static bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *primaryStr) {
+static bool gs1_normaliseRSSLim(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
 
 	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
 	dataStr += 3;
@@ -341,12 +341,12 @@ static bool gs1_normaliseRSSLim(gs1_encoder *ctx, const char *dataStr, char *pri
 }
 
 
-char* gs1_generateScanData(gs1_encoder* ctx) {
+char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	char* cc = NULL;
 	int i;
 	bool lastAIfnc1;
-	char *prefix;
+	const char *prefix;
 	char primaryStr[15];
 	char* ret;
 
@@ -494,7 +494,7 @@ fail:
 }
 
 
-bool gs1_processScanData(gs1_encoder* ctx, const char* scanData) {
+bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 	size_t i;
 	bool aiMode = false;
@@ -647,7 +647,7 @@ fail:
 	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
 } while (0)
 
-static void do_test_testGenerateScanData(gs1_encoder* ctx, const char* name, const int sym, const char* dataStr, const char* expect) {
+static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const int sym, const char* const dataStr, const char* const expect) {
 
 	char *out;
 	char casename[256];
@@ -752,8 +752,8 @@ void test_scandata_generateScanData(void) {
 	do_test_testProcessScanData(ctx, ss, sd, #s, gs1_encoder_s##s, d);	\
 } while (0)
 
-static void do_test_testProcessScanData(gs1_encoder *ctx, const bool should_succeed, const char *scanData,
-		const char *expectSymName, const enum gs1_encoder_symbologies expectSym, const char *expectDataStr) {
+static void do_test_testProcessScanData(gs1_encoder* const ctx, const bool should_succeed, const char* const scanData,
+		const char* const expectSymName, const enum gs1_encoder_symbologies expectSym, const char* const expectDataStr) {
 
 	char casename[256];
 
