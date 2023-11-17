@@ -672,16 +672,103 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
 	return false;
 }
 
-bool gs1_validateAIassociations(gs1_encoder* const ctx) {
+
+static bool validateAImutex(gs1_encoder* const ctx) {
 
 	char *saveptr = NULL, *saveptr2 = NULL;
 	char *token;
 	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-	int i, j;
-	const struct aiValue *ai2;
+	int i;
+	char matchedAI[5] = { 0 };
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+
+	for (i = 0; i < ctx->numAIs; i++) {
+
+		const struct aiValue* const ai = &ctx->aiData[i];
+		if (ai->kind != aiValue_aival)
+			continue;
+
+		/*
+		 *  Process "ex" attributes
+		 *
+		 */
+		assert(ai->aiEntry);
+		*attrs = '\0';
+		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+			if (strncmp(token, "ex=", 3) == 0) {
+				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
+					if (aiExists(ctx, token, ai->ai, matchedAI)) {
+						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
+						ctx->errFlag = true;
+						return false;
+					}
+			}
+		}
+
+	}
+
+	return true;
+
+}
+
+
+static bool validateAIrequisites(gs1_encoder* const ctx) {
+
+	char *saveptr = NULL, *saveptr2 = NULL;
+	char *token;
+	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+	int i;
 	char matchedAI[5] = { 0 };
 	const char *reqErr;
 	int reqLen;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+
+	for (i = 0; i < ctx->numAIs; i++) {
+
+		const struct aiValue* const ai = &ctx->aiData[i];
+		if (ai->kind != aiValue_aival)
+			continue;
+
+		/*
+		 *  Process "req" attributes
+		 *
+		 */
+		assert(ai->aiEntry);
+		*attrs = '\0';
+		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+			if (strncmp(token, "req=", 4) == 0) {
+				reqErr = token+4;
+				reqLen = (int)strlen(token)-4;
+
+				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
+					if (aiExists(ctx, token, ai->ai, matchedAI))
+						break;
+
+				if (!token) {		/* Loop finished without a matching "req" */
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %.*s", ai->ailen, ai->ai, reqLen, reqErr);
+					ctx->errFlag = true;
+					return false;
+				}
+			}
+		}
+
+	}
+
+	return true;
+
+}
+
+
+static bool validateAIrepeats(gs1_encoder* const ctx) {
+
+	int i, j;
+	const struct aiValue *ai2;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -708,42 +795,25 @@ bool gs1_validateAIassociations(gs1_encoder* const ctx) {
 			}
 		}
 
-		/*
-		 *  Process "ex" and "req" attributes
-		 *
-		 */
-		assert(ai->aiEntry);
-		*attrs = '\0';
-		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
-		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+	}
 
-			if (strncmp(token, "ex=", 3) == 0) {
+	return true;
 
-				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
-					if (aiExists(ctx, token, ai->ai, matchedAI)) {
-						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
-						ctx->errFlag = true;
-						return false;
-					}
+}
 
-			} else if (strncmp(token, "req=", 4) == 0) {
 
-				reqErr = token+4;
-				reqLen = (int)strlen(token)-4;
+/*
+ *  Execute each enabled validation function in turn
+ *
+ */
+bool gs1_validateAIs(gs1_encoder* const ctx) {
 
-				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
-					if (aiExists(ctx, token, ai->ai, matchedAI))
-						break;
+	int i;
 
-				if (!token) {		/* Loop finished without a matching "req" */
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %.*s", ai->ailen, ai->ai, reqLen, reqErr);
-					ctx->errFlag = true;
-					return false;
-				}
-
-			}
-		}
-
+	for (i = 0; i < gs1_encoder_vNUMVALIDATIONS; i++) {
+		const struct validationEntry v = ctx->validationTable[i];
+		if (v.enabled && !v.fn(ctx))
+			return false;
 	}
 
 	return true;
@@ -788,6 +858,21 @@ bool gs1_allDigits(const uint8_t* const str, size_t len) {
 			return false;
 	}
 	return true;
+
+}
+
+
+void gs1_loadValidationTable(gs1_encoder* const ctx) {
+
+#define SET_VALIDATION_ENTRY(n,l,e,f) ctx->validationTable[n] =			\
+		(struct validationEntry){ .locked = l, .enabled = e, .fn = f };
+
+	//                                                locked  enabled  fn
+	SET_VALIDATION_ENTRY( gs1_encoder_vMUTEX_AIS,     true,   true,    validateAImutex      );	// Validation of mutually exclusive AIs
+	SET_VALIDATION_ENTRY( gs1_encoder_vREQUISITE_AIS, false,  true,    validateAIrequisites );	// Validation of requisite AI associations
+	SET_VALIDATION_ENTRY( gs1_encoder_vREPEATED_AIS,  true,   true,    validateAIrepeats    );	// Validation of repeated AIs
+
+#undef SET_VALIDATION_ENTRY
 
 }
 
@@ -1250,8 +1335,7 @@ void test_ai_processAIdata(void) {
 
 }
 
-
-static void test_validateAIassociations(gs1_encoder* const ctx, const bool should_succeed, const char* const aiData) {
+static void test_validateAIs(gs1_encoder* const ctx, const bool should_succeed, gs1_encoder_validation_func_t fn, const char* const aiData) {
 
 	bool ret;
 	char out[256];
@@ -1267,16 +1351,16 @@ static void test_validateAIassociations(gs1_encoder* const ctx, const bool shoul
 		return;
 
 	if (!should_succeed) {
-		TEST_CHECK(!gs1_validateAIassociations(ctx));
+		TEST_CHECK(!fn(ctx));
 		return;
 	}
 
-	TEST_CHECK(gs1_validateAIassociations(ctx));
+	TEST_CHECK(fn(ctx));
 	TEST_MSG("Expected success. Got: %s", ctx->errMsg);
 
 }
 
-void test_ai_validateAIassociations(void) {
+void test_ai_validateAIs(void) {
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1289,39 +1373,39 @@ void test_ai_validateAIassociations(void) {
 	 * Test for repeated attributes
 	 *
 	 */
-	test_validateAIassociations(ctx, true,  "(400)ABC");
-	test_validateAIassociations(ctx, true,  "(400)ABC(400)ABC");
-	test_validateAIassociations(ctx, true,  "(400)ABC(99)DEF(400)ABC");
-	test_validateAIassociations(ctx, true,  "(99)ABC(400)XYZ(400)XYZ");
-	test_validateAIassociations(ctx, false, "(400)ABC(400)AB");
-	test_validateAIassociations(ctx, false, "(400)ABC(400)ABCD");
-	test_validateAIassociations(ctx, false, "(400)ABC(400)ABC(400)XYZ");
-	test_validateAIassociations(ctx, false, "(400)ABC(400)XYZ(400)ABC");
-	test_validateAIassociations(ctx, false, "(400)ABC(400)XYZ(400)XYZ");
-	test_validateAIassociations(ctx, false, "(400)ABC(99)DEF(400)XYZ");
-	test_validateAIassociations(ctx, false, "(99)ABC(400)ABC(400)XYZ");
-	test_validateAIassociations(ctx, true,  "(89)ABC(89)ABC(89)ABC");
-	test_validateAIassociations(ctx, false, "(89)ABC(89)ABC(89)XYZ");
-	test_validateAIassociations(ctx, false, "(89)ABC(89)XYZ(89)ABC");
-	test_validateAIassociations(ctx, false, "(89)ABC(89)XYZ(89)XYZ");
-	test_validateAIassociations(ctx, false, "(89)ABC(89)AB(89)ABC");
-	test_validateAIassociations(ctx, false, "(89)ABC(89)ABCD(89)ABC");
+	test_validateAIs(ctx, true,  validateAIrepeats, "(400)ABC");
+	test_validateAIs(ctx, true,  validateAIrepeats, "(400)ABC(400)ABC");
+	test_validateAIs(ctx, true,  validateAIrepeats, "(400)ABC(99)DEF(400)ABC");
+	test_validateAIs(ctx, true,  validateAIrepeats, "(99)ABC(400)XYZ(400)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(400)AB");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(400)ABCD");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(400)ABC(400)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(400)XYZ(400)ABC");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(400)XYZ(400)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(400)ABC(99)DEF(400)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(99)ABC(400)ABC(400)XYZ");
+	test_validateAIs(ctx, true,  validateAIrepeats, "(89)ABC(89)ABC(89)ABC");
+	test_validateAIs(ctx, false, validateAIrepeats, "(89)ABC(89)ABC(89)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(89)ABC(89)XYZ(89)ABC");
+	test_validateAIs(ctx, false, validateAIrepeats, "(89)ABC(89)XYZ(89)XYZ");
+	test_validateAIs(ctx, false, validateAIrepeats, "(89)ABC(89)AB(89)ABC");
+	test_validateAIs(ctx, false, validateAIrepeats, "(89)ABC(89)ABCD(89)ABC");
 
 
 	/*
 	 * "Ex" attribute
 	 *
 	 */
-	test_validateAIassociations(ctx, false, "(01)12345678901231(02)12345678901231");
-	test_validateAIassociations(ctx, false, "(99)ABC123(01)12345678901231(02)12345678901231");
-	test_validateAIassociations(ctx, false, "(01)12345678901231(99)ABC123(02)12345678901231");
-	test_validateAIassociations(ctx, false, "(01)12345678901231(02)12345678901231(99)ABC123");
-	test_validateAIassociations(ctx, false, "(01)12345678901231(255)5412345000150");
-	test_validateAIassociations(ctx, false, "(01)12345678901231(37)123");
-	test_validateAIassociations(ctx, false, "(21)ABC123(235)XYZ");
-	test_validateAIassociations(ctx, false, "(3940)1234(8111)9999");
-	test_validateAIassociations(ctx, false, "(3940)1234(3941)9999");	// Match by "394n", ignoring self
-	test_validateAIassociations(ctx, false, "(3955)123456(3929)123");	// Match by "392n"
+	test_validateAIs(ctx, false, validateAImutex, "(01)12345678901231(02)12345678901231");
+	test_validateAIs(ctx, false, validateAImutex, "(99)ABC123(01)12345678901231(02)12345678901231");
+	test_validateAIs(ctx, false, validateAImutex, "(01)12345678901231(99)ABC123(02)12345678901231");
+	test_validateAIs(ctx, false, validateAImutex, "(01)12345678901231(02)12345678901231(99)ABC123");
+	test_validateAIs(ctx, false, validateAImutex, "(01)12345678901231(255)5412345000150");
+	test_validateAIs(ctx, false, validateAImutex, "(01)12345678901231(37)123");
+	test_validateAIs(ctx, false, validateAImutex, "(21)ABC123(235)XYZ");
+	test_validateAIs(ctx, false, validateAImutex, "(3940)1234(8111)9999");
+	test_validateAIs(ctx, false, validateAImutex, "(3940)1234(3941)9999");	// Match by "394n", ignoring self
+	test_validateAIs(ctx, false, validateAImutex, "(3955)123456(3929)123");	// Match by "392n"
 
 
 	/*
@@ -1330,35 +1414,35 @@ void test_ai_validateAIassociations(void) {
 	 */
 
 	// (02) req=37; (37) req=02,8026
-	test_validateAIassociations(ctx, false, "(02)12345678901231");
-	test_validateAIassociations(ctx, false, "(02)12345678901231(37)123");
-	test_validateAIassociations(ctx, false, "(99)AAA(02)12345678901231(37)123");
-	test_validateAIassociations(ctx, false, "(02)12345678901231(99)AAA(37)123");
-	test_validateAIassociations(ctx, false, "(02)12345678901231(37)123(99)AAA");
-	test_validateAIassociations(ctx, true,  "(02)12345678901231(37)123(00)123456789012345675");
-	test_validateAIassociations(ctx, true,  "(91)XXX(02)12345678901231(92)YYY(37)123(93)ZZZ(00)123456789012345675");
+	test_validateAIs(ctx, false, validateAIrequisites, "(02)12345678901231");
+	test_validateAIs(ctx, false, validateAIrequisites, "(02)12345678901231(37)123");
+	test_validateAIs(ctx, false, validateAIrequisites, "(99)AAA(02)12345678901231(37)123");
+	test_validateAIs(ctx, false, validateAIrequisites, "(02)12345678901231(99)AAA(37)123");
+	test_validateAIs(ctx, false, validateAIrequisites, "(02)12345678901231(37)123(99)AAA");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(02)12345678901231(37)123(00)123456789012345675");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(91)XXX(02)12345678901231(92)YYY(37)123(93)ZZZ(00)123456789012345675");
 
 	// (21) req=01,8006
-	test_validateAIassociations(ctx, false, "(21)ABC123");
-	test_validateAIassociations(ctx, true,  "(21)ABC123(01)12345678901231");
-	test_validateAIassociations(ctx, true,  "(21)ABC123(8006)123456789012310510");
+	test_validateAIs(ctx, false, validateAIrequisites, "(21)ABC123");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(21)ABC123(01)12345678901231");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(21)ABC123(8006)123456789012310510");
 
 	// (250) req=01,8006 req=21
-	test_validateAIassociations(ctx, false,  "(01)12345678901231(250)ABC123");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(21)XYZ999(250)ABC123");
+	test_validateAIs(ctx, false, validateAIrequisites, "(01)12345678901231(250)ABC123");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(21)XYZ999(250)ABC123");
 
 	// (392n) req=01 req=30,31nn,32nn,35nn,36nn
-	test_validateAIassociations(ctx, false,  "(01)12345678901231(3925)12599");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(30)123");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3100)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3105)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3160)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3165)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3295)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3500)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3575)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3600)654321");
-	test_validateAIassociations(ctx, true,  "(01)12345678901231(3925)12599(3695)654321");
+	test_validateAIs(ctx, false, validateAIrequisites, "(01)12345678901231(3925)12599");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(30)123");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3100)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3105)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3160)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3165)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3295)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3500)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3575)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3600)654321");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3695)654321");
 
 	gs1_encoder_free(ctx);
 

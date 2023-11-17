@@ -63,7 +63,6 @@ struct gs1_encoder {
 	bool addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
 	bool permitUnknownAIs;			// Extract AIs that are not in our AI table during AI element string and DL URI parsing
 	bool permitZeroSuppressedGTINinDLuris;	// Whether to permit a path component GTIN value to be in GTIN-{8,12,13} format
-	bool validateAIassociations;		// Whether to validate AI associations when adding data
 	bool includeDataTitlesInHRI;		// Whether to include the Data Titles in HRI string output
 
 	char VERSION[16];
@@ -88,6 +87,9 @@ struct gs1_encoder {
 	struct aiValue aiData[MAX_AIS];		// List of AI components
 	int numAIs;
 
+	struct validationEntry validationTable[gs1_encoder_vNUMVALIDATIONS];
+						// Table of all global validation functions
+
 	uint8_t aiLengthByPrefix[100];		// AI length by two-digit prefix
 
 	char** dlKeyQualifiers;			// List of valid DL key qualifier association strings
@@ -107,6 +109,7 @@ void test_api_addCheckDigit(void);
 void test_api_permitUnknownAIs(void);
 void test_api_permitZeroSuppressedGTINinDLuris(void);
 void test_api_validateAIassociations(void);
+void test_api_validations(void);
 void test_api_dataStr(void);
 void test_api_getAIdataStr(void);
 void test_api_getScanData(void);

@@ -79,12 +79,12 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void* const mem) {
 	ctx->aiTable = NULL;
 	ctx->aiTableEntries = 0;
 	ctx->aiTableIsDynamic = false;
-	ctx->validateAIassociations = true;
 	ctx->dlKeyQualifiers = NULL;
 	ctx->numDLkeyQualifiers = 0;
 	ctx->numAIs = 0;
 
 	gs1_loadSyntaxDictionary(ctx, NULL);
+	gs1_loadValidationTable(ctx);
 
 	return ctx;
 
@@ -171,12 +171,36 @@ GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder* const ctx, co
 GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
-	return ctx->validateAIassociations;
+	return ctx->validationTable[gs1_encoder_vREQUISITE_AIS].enabled;
 }
 GS1_ENCODERS_API bool gs1_encoder_setValidateAIassociations(gs1_encoder* const ctx, const bool validateAIassociations) {
 	assert(ctx);
 	reset_error(ctx);
-	ctx->validateAIassociations = validateAIassociations;
+	assert(!ctx->validationTable[gs1_encoder_vREQUISITE_AIS].locked);
+	ctx->validationTable[gs1_encoder_vREQUISITE_AIS].enabled = validateAIassociations;
+	return true;
+}
+
+
+GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation) {
+	assert(ctx);
+	reset_error(ctx);
+	return ctx->validationTable[validation].enabled;
+}
+GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation, const bool enabled) {
+	assert(ctx);
+	reset_error(ctx);
+	if (validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {
+		strcpy(ctx->errMsg, "Unknown validation");
+		ctx->errFlag = true;
+		return false;
+	}
+	if (ctx->validationTable[validation].locked) {
+		strcpy(ctx->errMsg, "This validation cannont be amended");
+		ctx->errFlag = true;
+		return false;
+	}
+	ctx->validationTable[validation].enabled = enabled;
 	return true;
 }
 
@@ -251,7 +275,7 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char*
 			goto fail;
 	}
 
-	if (ctx->validateAIassociations && !gs1_validateAIassociations(ctx))
+	if (!gs1_validateAIs(ctx))
 		goto fail;
 
 	return true;
@@ -306,7 +330,7 @@ GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const cha
 			goto fail;
 	}
 
-	if (ctx->validateAIassociations && !gs1_validateAIassociations(ctx))
+	if (!gs1_validateAIs(ctx))
 		goto fail;
 
 	return true;
@@ -372,7 +396,7 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char
 	if (!gs1_processScanData(ctx, scanData))
 		goto fail;
 
-	if (ctx->validateAIassociations && !gs1_validateAIassociations(ctx))
+	if (!gs1_validateAIs(ctx))
 		goto fail;
 
 	return true;
@@ -717,13 +741,48 @@ void test_api_validateAIassociations(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
+	/*
+	 *  Legacy function that now updates gs1_encoder_vREQUISITE_AIS, but
+	 *  not gs1_encoder_vMUTEX_AIS.
+	 *
+	 */
+
 	TEST_CHECK(gs1_encoder_getValidateAIassociations(ctx));		// Default
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vMUTEX_AIS));
 
 	TEST_CHECK(gs1_encoder_setValidateAIassociations(ctx, false));	// Set
 	TEST_CHECK(!gs1_encoder_getValidateAIassociations(ctx));
+	TEST_CHECK(!gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vMUTEX_AIS));	// Untouched
 
 	TEST_CHECK(gs1_encoder_setValidateAIassociations(ctx, true));	// Reset
 	TEST_CHECK(gs1_encoder_getValidateAIassociations(ctx));
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vMUTEX_AIS));
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_api_validations(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	// Unlocked validation that is enabled by default
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));		// Default
+	TEST_CHECK(gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false));
+	TEST_CHECK(!gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));
+	TEST_CHECK(gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, true));	// Reset
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS));
+
+	// Locked validation (always enabled)
+	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREPEATED_AIS));		// Default
+	TEST_CHECK(!gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREPEATED_AIS, false));
 
 	gs1_encoder_free(ctx);
 

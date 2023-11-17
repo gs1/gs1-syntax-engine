@@ -88,8 +88,8 @@ static bool userInt(gs1_encoder* const ctx) {
 					gs1_encoder_getIncludeDataTitlesInHRI(ctx) ? "ON" : "OFF");
 		printf("\n 5) Set 'permit unknown AIs' flag.                          Current value = %s",
 					gs1_encoder_getPermitUnknownAIs(ctx) ? "ON" : "OFF");
-		printf("\n 6) Set 'validate AI associations' flag.                    Current value = %s",
-					gs1_encoder_getValidateAIassociations(ctx) ? "ON" : "OFF");
+		printf("\n 6) Set 'validate AI mandatory associations' flag.          Current value = %s",
+					gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS) ? "ON" : "OFF");
 		printf("\n 7) Set 'permit zero-suppressed GTIN in GS1 DL URIs' flag.  Current value = %s",
 					gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx) ? "ON" : "OFF");
 
@@ -137,7 +137,7 @@ static bool userInt(gs1_encoder* const ctx) {
 				else if (menuVal == 5)
 					ret = gs1_encoder_setPermitUnknownAIs(ctx, i);
 				else if (menuVal == 6)
-					ret = gs1_encoder_setValidateAIassociations(ctx, i);
+					ret = gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, i);
 				else if (menuVal == 7)
 					ret = gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, i);
 				if (!ret) {

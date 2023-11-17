@@ -67,6 +67,7 @@ TEST_LIST = {
     { "api_permitUnknownAIs", test_api_permitUnknownAIs },
     { "api_permitZeroSuppressedGTINinDLuris", test_api_permitZeroSuppressedGTINinDLuris },
     { "api_validateAIassociations", test_api_validateAIassociations },
+    { "api_validations", test_api_validations },
     { "api_dataStr", test_api_dataStr },
     { "api_getAIdataStr", test_api_getAIdataStr },
     { "api_getScanData", test_api_getScanData },
@@ -95,7 +96,7 @@ TEST_LIST = {
     { "ai_gs1_parseAIdata", test_ai_parseAIdata },
     { "ai_linters", test_ai_linters },
     { "ai_gs1_processAIdata", test_ai_processAIdata },
-    { "ai_validateAIassociations", test_ai_validateAIassociations },
+    { "ai_validateAIs", test_ai_validateAIs },
     { "ai_validateParity", test_ai_validateParity },
 
 

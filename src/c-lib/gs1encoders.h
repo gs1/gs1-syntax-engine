@@ -182,9 +182,9 @@
  * \code
  * gs1_encoder *ctx = gs1_encoder_init(NULL);
  *
- * // Disable AI association checking if the symbol may be one of multiple on a
- * // label
- * setValidateAIassociations(ctx, false);
+ * // Disable validation of mandatory association between AIs if the symbol may
+ * // be one of multiple on a label
+ * setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);
  *
  * bool ret = gs1_encoder_setScanData(ctx,
  *                "]Q1011231231231233310ABC123" "\x1D" "99TEST");
@@ -265,7 +265,17 @@ enum gs1_encoder_symbologies {
 	gs1_encoder_sGS1_128_CCC,		///< GS1-128 with CC-C
 	gs1_encoder_sQR,			///< (GS1) QR Code
 	gs1_encoder_sDM,			///< (GS1) Data Matrix
-	gs1_encoder_sNUMSYMS,			///< Value is the number of symbologies
+	gs1_encoder_sNUMSYMS,
+};
+
+
+/// Optional AI validation procedures that may be applied to detect invalid inputs when AI data is provided using gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or gs1_encoder_setScanData().
+/// @note Only AI validation procedures whose enabled status can be updated are described.
+enum gs1_encoder_validations {
+	gs1_encoder_vMUTEX_AIS = 0,
+	gs1_encoder_vREQUISITE_AIS,	///< **Default: Enabled**. Validates that the input satisfies the mandatory associations for each AI.
+	gs1_encoder_vREPEATED_AIS,
+	gs1_encoder_vNUMVALIDATIONS,
 };
 
 
@@ -441,7 +451,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *       * Validate that its length is within limits.
  *       * Validate that it conforms to the specified character set.
  *       * Apply each of the Linters in turn.
- *     * Validate the overall AI associations, unless disabled using gs1_encoder_setValidateAIassociations()
+ *     * Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via gs1_encoder_setValidationEnabled()), for example:
  *       * Ensure that repeated AIs have the same value.
  *       * Ensure that mutually-exclusive AIs are not present.
  *       * Ensure that all requisite AIs are accounted for.
@@ -495,8 +505,8 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
 /**
  * @brief Set the symbology type.
  *
- * This allows the symbology to be specified as any one of the known
- * ::gs1_encoder_symbologies other than ::gs1_encoder_sNONE or ::gs1_encoder_sNUMSYMS.
+ * This allows the symbology to be specified as any one of the described
+ * ::gs1_encoder_symbologies
  *
  * @see ::gs1_encoder_symbologies
  * @see gs1_encoder_getSym()
@@ -646,42 +656,80 @@ GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder *ctx, bo
 
 
 /**
- * @brief Get the current status of the "validate AI associations" flag.
+ * @brief Get the current enabled status of the provided AI validation procedure
  *
- * @see gs1_encoder_setValidateAIassociations()
+ * @see gs1_encoder_setValidationEnabled()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return current status of the validate AI associations flag
+ * @param [in] validation a validation procedure of type ::gs1_encoder_validations to check the status of
+ * @return true if the AI validation procedure is currently enabled, false otherwise including when the procedure is unknown
  */
-GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
+GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, enum gs1_encoder_validations validation);
 
 
 /**
- * @brief Enable or disable "validate AI associations" flag for validating the
- * exclusive and mandatory AI pairings when data is provided using
- * gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or
- * gs1_encoder_setScanData().
+ * @brief Enable or disable the given AI validation procedure of type
+ * ::gs1_encoder_validations, that determines whether certain checks are
+ * enfored when data is provided using gs1_encoder_setAIdataStr(),
+ * gs1_encoder_setDataStr() or gs1_encoder_setScanData().
  *
- *   * If true (default), then the AI relationships are validated.
- *   * If false, then the AI relationships are not validated.
+ *   * If enabled is true (default), then the corresponding validation will be enforced.
+ *   * If enabled is false, then the corresponding validation will not be enforced.
  *
  * \note
  * The option only applies to AI input data, specifically AI data supplied with
- * gs1_encoder_setAIdataStr() or gs1_encoder_setDataStr(), or GS1 Digital Link URIs
- * supplied with gs1_encoder_setDataStr(). It is necessary to disable AI
- * association checking in order to satisfy mandatory association checks when
- * the provided AI data represents only part if the overall AI data on a label.
+ * gs1_encoder_setAIdataStr() or gs1_encoder_setDataStr(), or GS1 Digital Link
+ * URIs supplied with gs1_encoder_setDataStr(). Under certain circumstances it
+ * may be necessary to disable certain AI validation procedures in order to
+ * satisfy checks when the provided AI data represents only part if the overall
+ * AI data on a label.
+ *
  * Nevertheless, the full AI data should be validated by concatinating it and
- * verifying it with this library with the "validate AI associations" flag
+ * verifying it with this library with all relivant AI validation procedures
  * enabled.
  *
- * @see gs1_encoder_getValidateAIassociations()
+ * @see gs1_encoder_getValidationEnabled()
  * @see gs1_encoder_setAIdataStr()
  * @see gs1_encoder_setDataStr()
  * @see gs1_encoder_setScanData()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @param [in] validateAIassociations enabled if true; disabled if false
+ * @param [in] validation a validation procedure of type ::gs1_encoder_validations to attempt to set the enabled status of
+ * @param [in] enabled validation is enabled if true; disabled if false
+ * @return true on success, otherwise false (for example when an attempt is made to modify a "locked" validation) and an error message is set that can be read using gs1_encoder_getErrMsg()
+ */
+GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, enum gs1_encoder_validations validation, bool enabled);
+
+
+/**
+ * @brief Provided for backwards compatibility to get the current enabled
+ * status of the ::gs1_encoder_vREQUISITE_AIS validation procedure.
+ *
+ * @deprecated This is equivalent to `gs1_encoder_getValidationEnabled(ctx,
+ * gs1_encoder_vREQUISITE_AIS)`, which should be called instead.
+ *
+ * @see gs1_encoder_getValidationEnabled()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @return current status of the ::gs1_encoder_vREQUISITE_AIS validation procedure
+ */
+GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
+
+
+/**
+ * @brief Provided for backwards compatibility to enable or disable the
+ * ::gs1_encoder_vREQUISITE_AIS validation procedure, that determines whether
+ * mandatory AI pairings are enfored when data is provided using
+ * gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or
+ * gs1_encoder_setScanData().
+ *
+ * @deprecated This is equivalent to `gs1_encoder_setValidationEnabled(ctx,
+ * gs1_encoder_vREQUISITE_AIS, enabled)`, which should be called instead.
+ *
+ * @see gs1_encoder_setValidationEnabled()
+ *
+ * @param [in,out] ctx ::gs1_encoder context
+ * @param [in] validateAIassociations enable the ::gs1_encoder_vREQUISITE_AIS validation procedure if true; otherwise disable
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
 GS1_ENCODERS_API bool gs1_encoder_setValidateAIassociations(gs1_encoder *ctx, bool validateAIassociations);
