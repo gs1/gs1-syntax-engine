@@ -111,6 +111,23 @@ JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetPerm
     return gs1_encoder_setPermitUnknownAIs((gs1_encoder*)ctx, value);
 }
 
+JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetValidationEnabledJNI(
+        JNIEnv* env,
+        jobject obj,
+        jlong ctx,
+        jint validation) {
+    return gs1_encoder_getValidationEnabled((gs1_encoder*)ctx, (enum gs1_encoder_validations)validation);
+}
+
+JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetValidationEnabledJNI(
+        JNIEnv* env,
+        jobject obj,
+        jlong ctx,
+        jint validation,
+        jboolean value) {
+    return gs1_encoder_setValidationEnabled((gs1_encoder*)ctx, (enum gs1_encoder_validations)validation, value);
+}
+
 JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetValidateAIassociationsJNI(
         JNIEnv* env,
         jobject obj,

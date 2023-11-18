@@ -53,6 +53,8 @@ public class GS1Encoder {
     private static native boolean gs1encoderSetPermitUnknownAIsJNI(long ctx, boolean value);
     private static native boolean gs1encoderGetPermitZeroSuppressedGTINinDLurisJNI(long ctx);
     private static native boolean gs1encoderSetPermitZeroSuppressedGTINinDLurisJNI(long ctx, boolean value);
+    private static native boolean gs1encoderGetValidationEnabledJNI(long ctx, int validation);
+    private static native boolean gs1encoderSetValidationEnabledJNI(long ctx, int validation, boolean value);
     private static native boolean gs1encoderGetValidateAIassociationsJNI(long ctx);
     private static native boolean gs1encoderSetValidateAIassociationsJNI(long ctx, boolean value);
     private static native String gs1encoderGetDataStrJNI(long ctx);
@@ -161,6 +163,39 @@ public class GS1Encoder {
              */
             NUMSYMS
     }
+
+
+    /**
+     * List of AI validation procedures, mirroring the corresponding list in the
+     * C library.
+     *
+     * See the native library documentation for details:
+     *
+     *   - enum gs1_encoder_validations
+     *
+     */
+    public enum Validation {
+            /**
+             * Mutually exclusive AIs
+             */
+            MutexAIs,
+
+            /**
+             * Mandatory associations between AIs
+             */
+            RequisiteAIs,
+
+            /**
+             * Repeated AIs having same value
+             */
+            RepeatedAIs,
+
+            /**
+             * Value is the number of validations
+             */
+            NUMVALIDATIONS
+    }
+
 
     /**
      * An opaque pointer used by the native code to represent an
@@ -354,7 +389,32 @@ public class GS1Encoder {
     }
 
     /**
-     * Get the "validate AI associations" flag.
+     * Get whether an AI validation procedure is enabled.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_getValidationEnabled()
+     *
+     */
+    public boolean getValidationEnabled(Validation validation) {
+        return gs1encoderGetValidationEnabledJNI(ctx, validation.ordinal());
+    }
+
+    /**
+     * Set the enabled status for an AI validation procedure.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_setValidationEnabled()
+     *
+     */
+    public void setValidationEnabled(Validation validation, boolean value) throws GS1EncoderParameterException {
+        if (!gs1encoderSetValidationEnabledJNI(ctx, validation.ordinal(), value))
+            throw new GS1EncoderParameterException(this.getErrMsg());
+    }
+
+    /**
+     * Get the checking of mandatory associations is enabled.
      *
      * See the native library documentation for details:
      *
@@ -366,7 +426,7 @@ public class GS1Encoder {
     }
 
     /**
-     * Set the "validate AI associations" flag.
+     * Set the checking of mandatory associations.
      *
      * See the native library documentation for details:
      *

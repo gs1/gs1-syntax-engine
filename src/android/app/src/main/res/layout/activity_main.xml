@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="associationsCheckBoxClicked"
-                    android:text="Validate AI associations" />
+                    android:text="Validate AI requisites" />
 
                 <CheckBox
                     android:id="@+id/dataTitlesCheckBox"

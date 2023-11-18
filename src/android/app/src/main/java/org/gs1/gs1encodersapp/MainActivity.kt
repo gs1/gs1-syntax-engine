@@ -241,7 +241,7 @@ class MainActivity : AppCompatActivity() {
 
     fun associationsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
         clearRender()
-        gs1encoder.validateAIassociations = binding.associationsCheckBox.isChecked
+        gs1encoder.setValidationEnabled(GS1Encoder.Validation.RequisiteAIs, binding.associationsCheckBox.isChecked);
     }
 
     fun dataTitlesCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {

@@ -84,8 +84,8 @@ public class Example {
                                                 gs1encoder.getIncludeDataTitlesInHRI() ? "ON" : "OFF");
             System.out.format(" 5) Toggle 'permit unknown AIs' flag.          Current value = %s\n",
                                                 gs1encoder.getPermitUnknownAIs() ? "ON" : "OFF");
-            System.out.format(" 6) Toggle 'validate AI associations' flag.    Current value = %s\n",
-                                                gs1encoder.getValidateAIassociations() ? "ON" : "OFF");
+            System.out.format(" 6) Toggle 'validate AI requisites'.           Current value = %s\n",
+                                                gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs) ? "ON" : "OFF");
 
             System.out.println("\n 0) Exit program");
 
