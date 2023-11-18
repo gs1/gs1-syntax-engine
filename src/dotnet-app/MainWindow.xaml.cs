@@ -64,7 +64,7 @@ namespace GS1.EncodersApp
                 hriTextBox.Text = "⧚ Not AI-based data ⧛";
             }
 
-            validateAIassociationsCheckBox.IsChecked = App.gs1Encoder.ValidateAIassociations;
+            validateAIassociationsCheckBox.IsChecked = App.gs1Encoder.GetValidationEnabled(GS1Encoder.Validation.RequisiteAIs);
             permitUnknownAIsCheckBox.IsChecked = App.gs1Encoder.PermitUnknownAIs;
             permitZeroSuppressedGTINinDLurisCheckBox.IsChecked = App.gs1Encoder.PermitZeroSuppressedGTINinDLuris;
             includeDataTitlesInHRIcheckBox.IsChecked = App.gs1Encoder.IncludeDataTitlesInHRI;
@@ -183,7 +183,7 @@ namespace GS1.EncodersApp
         {
             if (_disableEvents) return;
             ClearRender();
-            App.gs1Encoder.ValidateAIassociations = validateAIassociationsCheckBox.IsChecked ?? false;
+            App.gs1Encoder.SetValidationEnabled(GS1Encoder.Validation.RequisiteAIs, validateAIassociationsCheckBox.IsChecked ?? false);
         }
 
         private void IncludeDataTitlesInHRIcheckBox_Click(object sender, RoutedEventArgs e)

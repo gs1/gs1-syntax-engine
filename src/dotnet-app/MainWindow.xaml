@@ -29,7 +29,7 @@
                 </Style>
             </CheckBox.Resources>
         </CheckBox>
-        <CheckBox x:Name="validateAIassociationsCheckBox" Content="Validate AI associations" FlowDirection="RightToLeft" Margin="37,152,18,0" VerticalAlignment="Top" Click="ValidateAIassociationsCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1" IsChecked="True">
+        <CheckBox x:Name="validateAIassociationsCheckBox" Content="Validate AI requisites" FlowDirection="RightToLeft" Margin="37,152,18,0" VerticalAlignment="Top" Click="ValidateAIassociationsCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1" IsChecked="True">
             <CheckBox.Resources>
                 <Style TargetType="{x:Type Path}">
                     <Setter Property="FlowDirection" Value="LeftToRight"/>

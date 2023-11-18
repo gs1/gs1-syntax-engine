@@ -86,6 +86,27 @@ namespace GS1.Encoders
         };
 
         /// <summary>
+        /// List of validations, mirroring the corresponding list in the
+        /// C library.
+        ///
+        /// See the native library documentation for details:
+        ///
+        ///   - enum gs1_encoder_validations
+        ///
+        /// </summary>
+        public enum Validation
+        {
+            /// <summary>Mutually exclusive AIs</summary>
+            MutexAIs = 0,
+            /// <summary>Mandatory associations between AIs</summary>
+            RequisiteAIs,
+            /// <summary>Repeated AIs having same value</summary>
+            RepeatedAIs,
+            /// <summary>Value is the number of validations</summary>
+            NUMVALIDATIONS,
+        };
+
+        /// <summary>
         /// The expected name of the GS1 Syntax Engine dynamic-link library
         /// </summary>
         private const String gs1_dll = "gs1encoders.dll";
@@ -156,6 +177,14 @@ namespace GS1.Encoders
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setPermitZeroSuppressedGTINinDLuris", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool permitZeroSuppressedGTINinDLuris);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getValidationEnabled", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_getValidationEnabled(IntPtr ctx, int validation);
+
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setValidationEnabled", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool gs1_encoder_setValidationEnabled(IntPtr ctx, int validation, [MarshalAs(UnmanagedType.U1)] bool enabled);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getValidateAIassociations", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -365,6 +394,35 @@ namespace GS1.Encoders
                 if (!gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, value))
                     throw new GS1EncoderParameterException(ErrMsg);
             }
+        }
+
+
+        /// <summary>
+        /// Set the enabled status for an AI validation procedure.
+        ///
+        /// See the native library documentation for details:
+        ///
+        ///   - gs1_encoder_setValidationEnabled()
+        ///
+        /// </summary>
+        public void SetValidationEnabled(Validation validation, bool enabled)
+        {
+            if (!gs1_encoder_setValidationEnabled(ctx, (int)validation, enabled))
+                throw new GS1EncoderParameterException(ErrMsg);
+        }
+
+
+        /// <summary>
+        /// Get the checking of mandatory associations is enabled.
+        ///
+        /// See the native library documentation for details:
+        ///
+        ///   - gs1_encoder_getValidationEnabled()
+        ///
+        /// </summary>
+        public bool GetValidationEnabled(Validation validation)
+        {
+            return gs1_encoder_getValidationEnabled(ctx, (int)validation);        
         }
 
 
