@@ -68,6 +68,7 @@ struct ContentView: View {
     func loadDataValues() {
         unknownAIs = gs1encoder.getPermitUnknownAIs()
         associations = gs1encoder.getValidateAIassociations()
+        associations = gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs)
         datatitles = gs1encoder.getIncludeDataTitlesInHRI()
 
         if (gs1encoder.getDataStr() == "") {
@@ -194,9 +195,9 @@ struct ContentView: View {
                         clearRender()
                         try! gs1encoder.setPermitUnknownAIs(value)
                     }
-                    Toggle("Validate AI associations", isOn: $associations).toggleStyle(CheckboxToggleStyle()).onChange(of: associations) { value in
+                    Toggle("Validate AI requisites", isOn: $associations).toggleStyle(CheckboxToggleStyle()).onChange(of: associations) { value in
                         clearRender()
-                        try! gs1encoder.setValidateAIassociations(value)
+                        try! gs1encoder.setValidationEnabled(validation: GS1Encoder.Validation.RequisiteAIs, enabled: value)
                     }
                     Toggle("Include data titles in HRI", isOn: $datatitles).toggleStyle(CheckboxToggleStyle()).onChange(of: datatitles) { value in
                         clearRender()

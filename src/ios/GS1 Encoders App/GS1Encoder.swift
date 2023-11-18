@@ -41,7 +41,7 @@ class GS1Encoder {
      *   - enum gs1_encoder_symbologies
      *
      */
-    enum Symbology: Int {
+    enum Symbology: Int32 {
 
         /// None defined
         case NONE = -1,
@@ -92,6 +92,30 @@ class GS1Encoder {
         NUMSYMS
     };
 
+    /**
+     * List of validations, mirroring the corresponding list in the
+     * C library.
+     *
+     * See the native library documentation for details:
+     *
+     *   - enum gs1_encoder_validations
+     *
+     */
+    enum Validation: UInt32 {
+
+        /// Mutually exclusive AIs
+        case MutexAIs = 0,
+
+        /// Mandatory associations between AIs
+        RequisiteAIs,
+
+        /// Repeated AIs having same value
+        RepeatedAIs,
+
+        /// Value is the number of valudations
+        NUMVALIDATIONS
+    };
+    
     /**
      * An opaque pointer used by the native code to represent an
      * "instance" of the library. It is hidden behind the object
@@ -284,7 +308,33 @@ class GS1Encoder {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
+    
+    /**
+     * Get the checking of mandatory associations is enabled.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_getValidationEnabled()
+     *
+     */
+    func getValidationEnabled(_ validation: Validation) -> Bool {
+        return gs1_encoder_getValidationEnabled(ctx, gs1_encoder_validations(validation.rawValue))
+    }
 
+    /**
+     * Set the checking of mandatory associations.
+     *
+     * See the native library documentation for details:
+     *
+     *   - gs1_encoder_setValidationEnabled()
+     *
+     */
+    func setValidationEnabled(validation: Validation, enabled: Bool) throws {
+        if (!gs1_encoder_setValidationEnabled(ctx, gs1_encoder_validations(validation.rawValue), enabled)) {
+            throw GS1EncoderError.parameterError(msg: self.getErrMsg())
+        }
+    }
+    
     /**
      * Get the "validate AI associations" flag.
      *
