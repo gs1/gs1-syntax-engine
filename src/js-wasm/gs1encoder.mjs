@@ -113,6 +113,10 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_getIncludeDataTitlesInHRI', 'number', ['number']),
             gs1_encoder_setIncludeDataTitlesInHRI:
                 this.module.cwrap('gs1_encoder_setIncludeDataTitlesInHRI', 'number', ['number', 'number']),
+            gs1_encoder_getValidationEnabled:
+                this.module.cwrap('gs1_encoder_getValidationEnabled', 'number', ['number', 'number']),
+            gs1_encoder_setValidationEnabled:
+                this.module.cwrap('gs1_encoder_setValidationEnabled', 'number', ['number', 'number', 'number']),
             gs1_encoder_getValidateAIassociations:
                 this.module.cwrap('gs1_encoder_getValidateAIassociations', 'number', ['number']),
             gs1_encoder_setValidateAIassociations:
@@ -286,6 +290,37 @@ export class GS1encoder {
 
 
     /**
+     * Get whether an AI validation procedure is enabled.
+     *
+     * @throws {GS1encoderParameterException}
+     *
+     * @example See the native library documentation for details:
+     *
+     *   - gs1_encoder_getValidationEnabled()
+     *
+     */
+    getValidationEnabled(validation) {
+        return this.api.gs1_encoder_getValidationEnabled(this.ctx, validation);
+    }
+
+
+    /**
+     * Set the enabled status for an AI validation procedure.
+     *
+     * @throws {GS1encoderParameterException}
+     *
+     * @example See the native library documentation for details:
+     *
+     *   - gs1_encoder_setValidationEnabled()
+     *
+     */
+    setValidationEnabled(validation, value) {
+        if (!this.api.gs1_encoder_setValidationEnabled(this.ctx, validation, value ? 1 : 0))
+            throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
+    }
+
+
+    /**
      * Get/set the "validate AI associations" flag.
      *
      * @throws {GS1encoderParameterException}
@@ -303,6 +338,7 @@ export class GS1encoder {
         if (!this.api.gs1_encoder_setValidateAIassociations(this.ctx, value ? 1 : 0))
             throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
     }
+
 
     /**
      * Get/set the barcode data input buffer using GS1 AI syntax.
@@ -448,8 +484,18 @@ const symbology = {
     NUMSYMS: 14,
 };
 
-
 GS1encoder.symbology = symbology;
+
+
+/** @ignore */
+const validation = {
+    MutexAIs: 0,         ///< Mutually exclusive AIs
+    RequisiteAIs: 1,     ///< Mandatory associations between AIs
+    RepeatedAIs: 2,      ///< Repeated AIs having same value
+    NUMVALIDATIONS: 3,   ///< Value is the number of validations
+};
+
+GS1encoder.validation = validation;
 
 
 function GS1encoderGeneralException(message) {

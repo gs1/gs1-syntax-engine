@@ -95,8 +95,8 @@ while (!exit) {
                                         gs1encoder.includeDataTitlesInHRI ? "ON" : "OFF");
     console.log(" 5) Set 'permit unknown AIs' flag.                          Current value = %s",
                                         gs1encoder.permitUnknownAIs ? "ON" : "OFF");
-    console.log(" 6) Set 'validate AI associations' flag.                    Current value = %s",
-                                        gs1encoder.validateAIassociations ? "ON" : "OFF");
+    console.log(" 6) Set 'validate AI requisites'.                           Current value = %s",
+                                        gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs) ? "ON" : "OFF");
     console.log(" 7) Set 'permit zero-suppressed GTIN in GS1 DL URIs' flag.  Current value = %s",
                                         gs1encoder.permitZeroSuppressedGTINinDLuris ? "ON" : "OFF");
 
@@ -143,7 +143,7 @@ while (!exit) {
                 else if (menuVal === "5")
                     gs1encoder.permitUnknownAIs = (inpStr === "1");
                 else if (menuVal === "6")
-                    gs1encoder.permitUnknownAIs = (inpStr === "1");
+                    gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, inpStr === "1");
                 else if (menuVal === "7")
                     gs1encoder.permitZeroSuppressedGTINinDLuris = (inpStr === "1");
             } catch (err) {

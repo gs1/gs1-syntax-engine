@@ -63,7 +63,7 @@ function clear_render() {
 function load_data_values() {
 
 	document.getElementById("unknownais").checked = gs1encoder.permitUnknownAIs;
-	document.getElementById("associations").checked = gs1encoder.validateAIassociations;
+	document.getElementById("associations").checked = gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs);
 	document.getElementById("datatitles").checked = gs1encoder.includeDataTitlesInHRI;
 	document.getElementById("zerosuppdl").checked = gs1encoder.permitZeroSuppressedGTINinDLuris;
 
@@ -176,7 +176,7 @@ function unknownais_clicked() {
 
 function associations_clicked() {
 	clear_render();
-	gs1encoder.validateAIassociations = document.getElementById("associations").checked;
+	gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, document.getElementById("associations").checked);
 }
 
 
