@@ -812,7 +812,7 @@ bool gs1_validateAIs(gs1_encoder* const ctx) {
 
 	for (i = 0; i < gs1_encoder_vNUMVALIDATIONS; i++) {
 		const struct validationEntry v = ctx->validationTable[i];
-		if (v.enabled && !v.fn(ctx))
+		if (v.enabled && v.fn && !v.fn(ctx))
 			return false;
 	}
 
