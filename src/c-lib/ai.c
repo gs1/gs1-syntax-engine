@@ -660,19 +660,29 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
 	const size_t prefixlen = strspn(ai, "0123456789");
 
 	for (i = 0; i < ctx->numAIs; i++) {
+
 		const struct aiValue* const ai2 = &ctx->aiData[i];
+
 		if (ai2->kind != aiValue_aival)
 			continue;
+
 		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
 		    strncmp(ai2->ai, ignoreAI, strlen(ai)) != 0) {
 			strncpy(matchedAI, ai2->ai, strlen(ai));
 			return true;
 		}
+
 	}
+
 	return false;
 }
 
 
+/*
+ * AI validation routine that process the "ex" attributes of an AI table entry
+ * to ensure that AIs that are mutually exclusive do not appear in the data.
+ *
+ */
 static bool validateAImutex(gs1_encoder* const ctx) {
 
 	char *saveptr = NULL, *saveptr2 = NULL;
@@ -687,17 +697,17 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+
 		if (ai->kind != aiValue_aival)
 			continue;
 
-		/*
-		 *  Process "ex" attributes
-		 *
-		 */
 		assert(ai->aiEntry);
+
 		*attrs = '\0';
 		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+
 			if (strncmp(token, "ex=", 3) == 0) {
 				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
 					if (aiExists(ctx, token, ai->ai, matchedAI)) {
@@ -706,6 +716,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 						return false;
 					}
 			}
+
 		}
 
 	}
@@ -715,6 +726,11 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 }
 
 
+/*
+ * AI validation routine that process the "req" attributes of an AI table entry
+ * to ensure that all AIs required to satisfy some other AI exist in the data.
+ *
+ */
 static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 	char *saveptr = NULL, *saveptr2 = NULL;
@@ -731,17 +747,17 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+
 		if (ai->kind != aiValue_aival)
 			continue;
 
-		/*
-		 *  Process "req" attributes
-		 *
-		 */
 		assert(ai->aiEntry);
+
 		*attrs = '\0';
 		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+
 			if (strncmp(token, "req=", 4) == 0) {
 				reqErr = token+4;
 				reqLen = (int)strlen(token)-4;
@@ -756,6 +772,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 					return false;
 				}
 			}
+
 		}
 
 	}
@@ -765,6 +782,12 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 }
 
 
+/*
+ * AI validation routine that ensure that any repeated AIs in the data have the
+ * same value. (Repeated AIs may occur when the AI data from reads of multiple
+ * symbol carriers on the same label is concatenated.)
+ *
+ */
 static bool validateAIrepeats(gs1_encoder* const ctx) {
 
 	int i, j;
@@ -776,23 +799,24 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+
 		if (ai->kind != aiValue_aival)
 			continue;
 
-		/*
-		 *  Ensure that any repeated AIs have the same value
-		 *
-		 */
 		for (j = i + 1; j < ctx->numAIs; j++) {
+
 			ai2 = &ctx->aiData[j];
+
 			if (ai2->kind != aiValue_aival)
 				continue;
+
 			if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
 			   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Multiple instances of AI (%.*s) have different values", ai->ailen, ai->ai);
 				ctx->errFlag = true;
 				return false;
 			}
+
 		}
 
 	}
