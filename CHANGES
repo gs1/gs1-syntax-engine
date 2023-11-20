@@ -1,0 +1,88 @@
+2023-11-20
+
+* Core: New "validation function table" feature was added with corresponding
+  {get,set}ValidationEnabled API options. Allows global validation checks (e.g.
+  AI mandatory associations) to be differentiated and enabled/disabled by the
+  library user.
+* Wrappers: Add support for new {get,set}ValidationEnabled API functions.
+* Core: {get,set}ValidateAIassociations API functions are now deprecated since
+  the new validation function table functionality subsumes the legacy
+  functionality.
+* Core: Deprecated setValidateAIassociations no longer disables
+  mutually-exclusive AI validation. (Mutually-exclusive AI validation is now
+  mandatory.)
+* Wrappers: Replace deprecated {get,set}ValidateAIassociations API functions
+  with new {get,set}ValidationEnabled.
+* MSVC: Build process amended to treat warnings as errors.
+* C: Applied maximal const declarations throughout library.
+
+
+2023-07-05
+
+* Update to Syntax Dictionary release 2023-07-04.
+* C: Expose "permit zero-suppressed GTIN in GS1 DL URIs" option in console example.
+* C# .NET: Expose "permit zero-suppressed GTIN in GS1 DL URIs" option in the
+  desktop app.
+* JS: Expose "permit zero-suppressed GTIN in GS1 DL URIs" option in the Node.js
+  application.
+* JS: Expose "permit zero-suppressed GTIN in GS1 DL URIs" option in the browser
+  application.
+* Core: Don't report empty AI elements as "too long" in GS1 DL URIs.
+* Core: In a GS1 Digital Link URI, a "+" character should only be interpretted
+  as space in a query parameter, not a path component, per rules for
+  interpretation of URIs and CGI.
+* Core: In GS1 Digital Link URIs, represent "+" characters in AI expressed in
+  path info as "%2B", per GS1 preference.
+* Core: Add support for GenSpecs CSET 64 required by Digital Signatures.
+* Core: New permitZeroSuppressedGTINinDLuris API option (default false) since
+  GTIN-{8,12,13} use is now deprecated by the GS1 Digital Link standard.
+* Wrappers: Support for new permitZeroSuppressedGTINinDLuris API option.
+
+
+2023-03-22
+
+* Update to Syntax Dictionary release 2023-03-22.
+* JS: Minor tweaks to the HTML application.
+
+
+2023-01-21
+
+* JS: New "jsonly" asset which is compiled to pure JavaScript without the need
+  for WASM.
+* Core: copyHRI and copyDLignoredQueryParams API function are now deprecated.
+* JS: Update wrapper to use getHRI and getDLignoredQueryParams instead of
+  deprecated functions.
+
+
+2022-12-11
+
+* Android: App was enhanced to use ML kit to read barcodes from a device's
+  camera.
+* iOS: App was enhanced to use ML kit to read barcodes from a device's camera.
+* JS: Node.js app amended so that HRI shows when input is not AI data.
+
+
+2022-11-24-1
+
+* Update to Syntax Dictionary release 2022-11-24.
+
+
+2022-11-24
+
+* Android: New app programmed in Kotlin.
+* iOS: New app programmed in Swift.
+* Java: Console app enhanced to have parity with other console demos.
+* JS: Node.js application change to use native readline/promises module.
+
+
+2022-09-03
+
+* JS: Node.js application was enhanced.
+* JS: API wrapper fixes to allow generation of GS1 DL URIs with a user-provided
+  stem.
+* JS: Targets renamed from .js to .mjs since they are modular ECMAScript 6.
+
+
+2022-08-10
+
+* Initial release.
