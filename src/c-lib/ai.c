@@ -660,14 +660,15 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 
 /*
- *  Search the AIs for any match with the given AI pattern, returning the
- *  matched AI.
+ *  Search the AIs for any match with the given AI pattern, optionally
+ *  returning the matched AI.
  *
  *  Ignore AI can be set to the current AI to avoid matching triggering on
  *  itself when matching by a self-referencing pattern.
  *
  */
 static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, char* const matchedAI) {
+
 	int i;
 	const size_t prefixlen = strspn(ai, "0123456789");
 
@@ -680,13 +681,18 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
 
 		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
 		    strncmp(ai2->ai, ignoreAI, strlen(ai)) != 0) {
-			strncpy(matchedAI, ai2->ai, strlen(ai));
+
+			if (matchedAI)
+				strncpy(matchedAI, ai2->ai, strlen(ai));
+
 			return true;
+
 		}
 
 	}
 
 	return false;
+
 }
 
 
@@ -749,7 +755,6 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	char *token;
 	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 	int i;
-	char matchedAI[5] = { 0 };
 	const char *reqErr;
 	int reqLen;
 
@@ -775,7 +780,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 				reqLen = (int)strlen(token)-4;
 
 				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
-					if (aiExists(ctx, token, ai->ai, matchedAI))
+					if (aiExists(ctx, token, ai->ai, NULL))
 						break;
 
 				if (!token) {		/* Loop finished without a matching "req" */
