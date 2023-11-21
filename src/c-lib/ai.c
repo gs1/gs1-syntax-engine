@@ -406,6 +406,24 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 
 /*
+ * Return the overall minimum and maximum lengths for an AI, by summing the components.
+ *
+ */
+static inline size_t aiEntryMinLength(const struct aiEntry* const entry) {
+	const struct aiComponent *part;
+	size_t l;
+	for (part = entry->parts, l = 0; part->cset; l+= (part->opt == MAN ? part->min : 0), part++);
+	return l;
+}
+static inline size_t aiEntryMaxLength(const struct aiEntry* const entry) {
+	const struct aiComponent *part;
+	size_t l;
+	for (part = entry->parts, l = 0; part->cset; l+= part->max, part++);
+	return l;
+}
+
+
+/*
  * AI length and content check (no "^") used by parsers prior to performing
  * component-based validation since reporting issues such as checksum failure
  * isn't helpful when the AI is too long
@@ -413,22 +431,16 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
  */
 bool gs1_aiValLengthContentCheck(gs1_encoder* const ctx, const char* const ai, const struct aiEntry* const entry, const char* const aiVal, const size_t vallen) {
 
-	const struct aiComponent *part;
-	size_t minlen = 0, maxlen = 0;
-
 	assert(ctx);
 	assert(entry);
 	assert(aiVal);
 
-	for (part = entry->parts; part->cset; part++) {
-		minlen += part->opt == MAN ? part->min : 0;
-		maxlen += part->max;
-	}
-	if (vallen < minlen) {
+	if (vallen < aiEntryMinLength(entry)) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too short", (int)strlen(entry->ai), ai);
 		return false;
 	}
-	if (vallen > maxlen) {
+
+	if (vallen > aiEntryMaxLength(entry)) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too long", (int)strlen(entry->ai), ai);
 		return false;
 	}
