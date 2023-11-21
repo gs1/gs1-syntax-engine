@@ -270,8 +270,9 @@ enum gs1_encoder_symbologies {
 
 
 /// Optional AI validation procedures that may be applied to detect invalid inputs when AI data is provided using gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or gs1_encoder_setScanData().
-/// @note Only AI validation procedures whose enabled status can be updated are described.
+/// @note Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
 enum gs1_encoder_validations {
+	// Exported as API. Not to be re-ordered.
 	gs1_encoder_vMUTEX_AIS = 0,
 	gs1_encoder_vREQUISITE_AIS,	///< **Default: Enabled**. Validates that the input satisfies the mandatory associations for each AI.
 	gs1_encoder_vREPEATED_AIS,
