@@ -330,6 +330,8 @@ fail:
 
 }
 
+#undef error
+
 
 static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const char* const fname) {
 

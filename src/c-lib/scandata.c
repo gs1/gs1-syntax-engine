@@ -31,13 +31,6 @@
 #include "dl.h"
 
 
-#define SYM(i, a, s) {				\
-	.identifier = i,			\
-	.aiMode = a,				\
-	.defaultSym = s,			\
-}
-
-
 struct symIdEntry {
 	char *identifier;
 	bool aiMode;
@@ -48,16 +41,26 @@ struct symIdEntry {
 #define AI true
 #define NON_AI false
 
+#define SYM(i, a, s) {				\
+	.identifier = i,			\
+	.aiMode = a,				\
+	.defaultSym = s,			\
+}
+
 static const struct symIdEntry symIdTable[] = {
-	SYM( "]C1", AI,     gs1_encoder_sGS1_128_CCA ),
-	SYM( "]E0", NON_AI, gs1_encoder_sEAN13 ),
-	SYM( "]E4", NON_AI, gs1_encoder_sEAN8 ),
+	SYM( "]C1", AI,     gs1_encoder_sGS1_128_CCA     ),
+	SYM( "]E0", NON_AI, gs1_encoder_sEAN13           ),
+	SYM( "]E4", NON_AI, gs1_encoder_sEAN8            ),
 	SYM( "]e0", AI,     gs1_encoder_sDataBarExpanded ),	// Shared with GS1-128 CC
-	SYM( "]d1", NON_AI, gs1_encoder_sDM ),
-	SYM( "]d2", AI,     gs1_encoder_sDM ),
-	SYM( "]Q1", NON_AI, gs1_encoder_sQR ),
-	SYM( "]Q3", AI,     gs1_encoder_sQR ),
+	SYM( "]d1", NON_AI, gs1_encoder_sDM              ),
+	SYM( "]d2", AI,     gs1_encoder_sDM              ),
+	SYM( "]Q1", NON_AI, gs1_encoder_sQR              ),
+	SYM( "]Q3", AI,     gs1_encoder_sQR              ),
 };
+
+#undef AI
+#undef NON_AI
+#undef SYM
 
 
 static void scancat(char* const out, const char* const in) {
@@ -643,10 +646,6 @@ fail:
 #include "acutest.h"
 
 
-#define test_testGenerateScanData(n, d, e) do {					\
-	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
-} while (0)
-
 static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const int sym, const char* const dataStr, const char* const expect) {
 
 	char *out;
@@ -670,6 +669,10 @@ void test_scandata_generateScanData(void) {
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+
+#define test_testGenerateScanData(n, d, e) do {					\
+	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
+} while (0)
 
 	test_testGenerateScanData(NONE, "", "");
 	test_testGenerateScanData(NONE, "TESTING", "");
@@ -743,14 +746,12 @@ void test_scandata_generateScanData(void) {
 	test_testGenerateScanData(EAN8, "02345673|^99COMPOSITE^98XYZ",
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
 
+#undef test_testGenerateScanData
+
 	gs1_encoder_free(ctx);
 
 }
 
-
-#define test_testProcessScanData(ss, sd, s, d) do {				\
-	do_test_testProcessScanData(ctx, ss, sd, #s, gs1_encoder_s##s, d);	\
-} while (0)
 
 static void do_test_testProcessScanData(gs1_encoder* const ctx, const bool should_succeed, const char* const scanData,
 		const char* const expectSymName, const enum gs1_encoder_symbologies expectSym, const char* const expectDataStr) {
@@ -776,6 +777,10 @@ void test_scandata_processScanData(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);											// Satisfy analyzer
+
+#define test_testProcessScanData(ss, sd, s, d) do {				\
+	do_test_testProcessScanData(ctx, ss, sd, #s, gs1_encoder_s##s, d);	\
+} while (0)
 
 	test_testProcessScanData(false, "", NONE, "");			// No data
 	test_testProcessScanData(false, "ABC", NONE, "");		// No symbology identifier
@@ -848,6 +853,8 @@ void test_scandata_processScanData(void) {
 		EAN8, "02345673");
 	test_testProcessScanData(true, "]E402345673|]e099COMPOSITE" "\x1D" "98XYZ",
 		EAN8, "02345673|^99COMPOSITE^98XYZ");
+
+#undef test_testProcessScanData
 
 	gs1_encoder_free(ctx);
 
