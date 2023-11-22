@@ -784,16 +784,16 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 			if (strncmp(token, "req=", 4) == 0) {
 
-				const int reqLen = (int)strlen(token)-4;
-				const char *reqErr = token+4;
 				char *saveptr2 = NULL;
+				char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
+				strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
 
 				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
 					if (aiExists(ctx, token, ai->ai, NULL))
 						break;
 
 				if (!token) {		/* Loop finished without a matching "req" */
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %.*s", ai->ailen, ai->ai, reqLen, reqErr);
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
 					ctx->errFlag = true;
 					return false;
 				}
