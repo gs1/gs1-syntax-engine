@@ -845,6 +845,45 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 
 
 /*
+ * AI validation routine that enforces that AIs (253), (255) and (8003) include
+ * a serial component when used with a (8030) digital signature.
+ *
+ */
+static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
+
+	int i;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+
+	if (!aiExists(ctx, "8030", NULL, NULL))
+		return true;
+
+	for (i = 0; i < ctx->numAIs; i++) {
+
+		const struct aiValue* ai = &ctx->aiData[i];
+
+		if (ai->kind != aiValue_aival ||
+		        (strcmp(ai->aiEntry->ai, "253") != 0 &&
+		         strcmp(ai->aiEntry->ai, "255") != 0 &&
+		         strcmp(ai->aiEntry->ai, "8003") != 0)
+		   )
+			continue;
+
+		if (ai->vallen == aiEntryMinLength(ai->aiEntry)) {
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Serial component must be present for AI (%.*s) when used with AI (8030)", ai->ailen, ai->ai);
+			ctx->errFlag = true;
+			return false;
+		}
+
+	}
+
+	return true;
+
+}
+
+
+/*
  *  Execute each enabled validation function in turn
  *
  */
@@ -906,15 +945,16 @@ bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 void gs1_loadValidationTable(gs1_encoder* const ctx) {
 
-#define SET_VALIDATION_ENTRY(n,l,e,f) ctx->validationTable[n] =			\
+#define ENTRY(n,l,e,f) ctx->validationTable[n] =			\
 		(struct validationEntry){ .locked = l, .enabled = e, .fn = f };
 
-	//                                                locked  enabled  fn
-	SET_VALIDATION_ENTRY( gs1_encoder_vMUTEX_AIS,     true,   true,    validateAImutex      );	// Validation of mutually exclusive AIs
-	SET_VALIDATION_ENTRY( gs1_encoder_vREQUISITE_AIS, false,  true,    validateAIrequisites );	// Validation of requisite AI associations
-	SET_VALIDATION_ENTRY( gs1_encoder_vREPEATED_AIS,  true,   true,    validateAIrepeats    );	// Validation of repeated AIs
+	//     enum exported in public API      locked  enabled  fn
+	ENTRY( gs1_encoder_vMUTEX_AIS,          true,   true,    validateAImutex                     );
+	ENTRY( gs1_encoder_vREQUISITE_AIS,      false,  true,    validateAIrequisites                );
+	ENTRY( gs1_encoder_vREPEATED_AIS,       true,   true,    validateAIrepeats                   );
+	ENTRY( gs1_encoder_vDIGSIG_SERIAL_KEY,  true,   true,    validateDigSigRequiresSerialisedKey );
 
-#undef SET_VALIDATION_ENTRY
+#undef ENTRY
 
 }
 
@@ -1485,6 +1525,26 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3575)654321");
 	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3600)654321");
 	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3695)654321");
+
+
+	/*
+	 * AI (8030) digital signatures require serialised components with AIs (253), (255) and (8003)
+	 *
+	 */
+
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(253)1234567890128");
+	test_validateAIs(ctx, false, validateDigSigRequiresSerialisedKey, "(253)1234567890128(8030)ABC123");
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(253)1234567890128X(8030)ABC123");
+
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(255)1234567890128");
+	test_validateAIs(ctx, false, validateDigSigRequiresSerialisedKey, "(255)1234567890128(8030)ABC123");
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(255)12345678901280(8030)ABC123");
+
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(8003)01234567890128");
+	test_validateAIs(ctx, false, validateDigSigRequiresSerialisedKey, "(8003)01234567890128(8030)ABC123");
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(8003)01234567890128X(8030)ABC123");
+
+	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(00)123456789012345675(8030)ABC123");
 
 	gs1_encoder_free(ctx);
 

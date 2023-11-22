@@ -276,6 +276,7 @@ enum gs1_encoder_validations {
 	gs1_encoder_vMUTEX_AIS = 0,
 	gs1_encoder_vREQUISITE_AIS,	///< **Default: Enabled**. Validates that the input satisfies the mandatory associations for each AI.
 	gs1_encoder_vREPEATED_AIS,
+	gs1_encoder_vDIGSIG_SERIAL_KEY,
 	gs1_encoder_vNUMVALIDATIONS,
 };
 
