@@ -680,7 +680,8 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
 			continue;
 
 		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
-		    strncmp(ai2->ai, ignoreAI, strlen(ai)) != 0) {
+		    (!ignoreAI || strncmp(ai2->ai, ignoreAI, strlen(ai)) != 0)
+		   ) {
 
 			if (matchedAI)
 				strncpy(matchedAI, ai2->ai, strlen(ai));
