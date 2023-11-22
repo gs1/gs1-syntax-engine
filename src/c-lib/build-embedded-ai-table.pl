@@ -153,7 +153,7 @@ while (<>) {
     $specstr = sprintf("%-100s", $specstr);
 
     $keyvals =~ s/\s+/ /g;
-    $keyvals = sprintf("%-53s", "\"$keyvals\",");
+    $keyvals = sprintf("%-62s", "\"$keyvals\",");
 
     $title =~ s/²/^2/;
     $title =~ s/³/^3/;
