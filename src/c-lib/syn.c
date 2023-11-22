@@ -243,7 +243,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 				error("Attribute name contains illegal characters");
 			*q = '=';
 
-			if (strspn(q+1, "abcdefghijklmnopqrstuvwxyz0123456789-_,|") != strlen(q+1))
+			if (strspn(q+1, "abcdefghijklmnopqrstuvwxyz0123456789-+_,|") != strlen(q+1))
 				error("Attribute value contain illegal characters");
 
 			if (*(q+1) == '\0')

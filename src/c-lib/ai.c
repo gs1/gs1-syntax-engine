@@ -784,15 +784,27 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 			if (strncmp(token, "req=", 4) == 0) {
 
+				bool satisfied = true;
 				char *saveptr2 = NULL;
 				char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
 				strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
 
-				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
-					if (aiExists(ctx, token, ai->ai, NULL))
+				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+
+					char *saveptr3 = NULL;
+					satisfied = true;
+
+					// All members of a group (e.g. "01+21") must be present
+					for (token = strtok_r(token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
+						if (!aiExists(ctx, token, ai->ai, NULL))
+							satisfied = false;
+
+					if (satisfied)		// Any wholly satisfied group is sufficient for req
 						break;
 
-				if (!token) {		/* Loop finished without a matching "req" */
+				}
+
+				if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
 					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
 					ctx->errFlag = true;
 					return false;
@@ -1537,6 +1549,22 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3600)654321");
 	test_validateAIs(ctx, true,  validateAIrequisites, "(01)12345678901231(3925)12599(3695)654321");
 
+	// (8030) req=00,01+21,253,255,8003,8004,8006+21,8010+8011,8017,8018
+	test_validateAIs(ctx, false, validateAIrequisites, "(8030)DIGSIG");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(00)123456789012345675");
+	test_validateAIs(ctx, false, validateAIrequisites, "(8030)DIGSIG(01)12345678901231");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(01)12345678901231(21)ABC123");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(253)1234567890128X");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(255)12345678901280");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8003)01234567890128X");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8004)01234567890");
+	test_validateAIs(ctx, false, validateAIrequisites, "(8030)DIGSIG(8006)123456789012310102");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8006)123456789012310102(21)ABC123");
+	test_validateAIs(ctx, false, validateAIrequisites, "(8030)DIGSIG(8010)1234567890");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8010)1234567890(8011)123456789012");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8017)123456789012345675");
+	test_validateAIs(ctx, true,  validateAIrequisites, "(8030)DIGSIG(8018)123456789012345675");
+
 
 	/*
 	 * AI (8030) digital signatures require serialised components with AIs (253), (255) and (8003)
@@ -1554,8 +1582,6 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(8003)01234567890128");
 	test_validateAIs(ctx, false, validateDigSigRequiresSerialisedKey, "(8003)01234567890128(8030)ABC123");
 	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(8003)01234567890128X(8030)ABC123");
-
-	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(00)123456789012345675(8030)ABC123");
 
 	gs1_encoder_free(ctx);
 
