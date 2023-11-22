@@ -1,3 +1,9 @@
+UNRELEASED
+
+* Core: New DIGSIG_SERIAL_KEY validation function to ensure that keys include a serial component when used with AI (8030).
+* Core: Support for new Syntax Dictionary AI group syntax (e.g. "01+21") for req attributes where each listed AI must be present to be a satisfactory the constraint.
+
+
 2023-11-20
 
 * Core: New "validation function table" feature was added with corresponding
