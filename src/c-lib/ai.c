@@ -704,11 +704,7 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
  */
 static bool validateAImutex(gs1_encoder* const ctx) {
 
-	char *saveptr = NULL, *saveptr2 = NULL;
-	char *token;
-	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 	int i;
-	char matchedAI[5] = { 0 };
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -716,6 +712,9 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+		char *token;
+		char *saveptr = NULL;
 
 		if (ai->kind != aiValue_aival)
 			continue;
@@ -728,12 +727,21 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
 			if (strncmp(token, "ex=", 3) == 0) {
-				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
+
+				char *saveptr2 = NULL;
+
+				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+
+					char matchedAI[5] = { 0 };
+
 					if (aiExists(ctx, token, ai->ai, matchedAI)) {
 						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
 						ctx->errFlag = true;
 						return false;
 					}
+
+				}
+
 			}
 
 		}
@@ -752,12 +760,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
  */
 static bool validateAIrequisites(gs1_encoder* const ctx) {
 
-	char *saveptr = NULL, *saveptr2 = NULL;
-	char *token;
-	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 	int i;
-	const char *reqErr;
-	int reqLen;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -765,6 +768,9 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+		char *token;
+		char *saveptr = NULL;
 
 		if (ai->kind != aiValue_aival)
 			continue;
@@ -777,8 +783,10 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
 			if (strncmp(token, "req=", 4) == 0) {
-				reqErr = token+4;
-				reqLen = (int)strlen(token)-4;
+
+				const int reqLen = (int)strlen(token)-4;
+				const char *reqErr = token+4;
+				char *saveptr2 = NULL;
 
 				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2))
 					if (aiExists(ctx, token, ai->ai, NULL))
@@ -808,8 +816,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
  */
 static bool validateAIrepeats(gs1_encoder* const ctx) {
 
-	int i, j;
-	const struct aiValue *ai2;
+	int i;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -817,13 +824,14 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
+		int j;
 
 		if (ai->kind != aiValue_aival)
 			continue;
 
 		for (j = i + 1; j < ctx->numAIs; j++) {
 
-			ai2 = &ctx->aiData[j];
+			const struct aiValue* const ai2 = &ctx->aiData[j];
 
 			if (ai2->kind != aiValue_aival)
 				continue;
@@ -892,9 +900,12 @@ bool gs1_validateAIs(gs1_encoder* const ctx) {
 	int i;
 
 	for (i = 0; i < gs1_encoder_vNUMVALIDATIONS; i++) {
+
 		const struct validationEntry v = ctx->validationTable[i];
+
 		if (v.enabled && v.fn && !v.fn(ctx))
 			return false;
+
 	}
 
 	return true;
