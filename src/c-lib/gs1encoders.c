@@ -347,7 +347,6 @@ fail:
 GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 
 	int i, j;
-	const struct aiValue *ai;
 	char *p = ctx->outStr;
 
 	assert(ctx);
@@ -358,7 +357,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 		return NULL;
 
 	for (i = 0; i < ctx->numAIs; i++) {
-		ai = &ctx->aiData[i];
+		const struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind == aiValue_aival) {
 			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s)", ai->ailen, ai->ai);
 			for (j = 0; j < ai->vallen; j++) {

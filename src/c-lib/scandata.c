@@ -65,11 +65,8 @@ static const struct symIdEntry symIdTable[] = {
 
 static void scancat(char* const out, const char* const in) {
 
-	const char *p;
-	char *q;
-
-	p = in;
-	q = out;
+	const char *p = in;
+	char *q = out;
 
 	while (*q)
 		q++;					// Got to end of output
@@ -347,10 +344,8 @@ static bool gs1_normaliseRSSLim(gs1_encoder* const ctx, const char *dataStr, cha
 char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	char* cc = NULL;
-	int i;
-	bool lastAIfnc1;
-	const char *prefix;
 	char primaryStr[15];
+	const char *prefix;
 	char* ret;
 
 	assert(ctx);
@@ -401,17 +396,21 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		scancat(ctx->outStr, ctx->dataStr);
 
 		if (cc) {
+
+			bool lastAIfnc1 = false;
+			int i;
+
 			if (*cc != '^')
 				goto fail;
 
 			// Append GS if last AI of linear component isn't fixed-length
-			lastAIfnc1 = false;
 			for (i = 0; i < ctx->numAIs && ctx->aiData[i].aiEntry; i++)
 				lastAIfnc1 = ctx->aiData[i].aiEntry->fnc1;
 			if (lastAIfnc1)
 				strcat(ctx->outStr, "\x1D");
 
 			scancat(ctx->outStr, cc);
+
 		}
 
 		break;
@@ -502,11 +501,8 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	size_t i;
 	bool aiMode = false;
 	enum gs1_encoder_symbologies sym = gs1_encoder_sNONE;
-	const struct symIdEntry *entry;
-	const size_t symIdTable_len = SIZEOF_ARRAY(symIdTable);
 	char *p;
-	const char *q, *cc = NULL;
-	size_t primaryLen;
+	const char *q;
 
 	assert(ctx);
 	assert(scanData);
@@ -525,8 +521,8 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		goto fail;
 	}
 
-	for (i = 0; i < symIdTable_len; i++) {
-		entry = &symIdTable[i];
+	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
+		const struct symIdEntry* const entry = &symIdTable[i];
 		if (strncmp(scanData, entry->identifier, 3) != 0)
 			continue;
 		aiMode = entry->aiMode;
@@ -545,7 +541,8 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 	if (sym == gs1_encoder_sEAN13 || sym == gs1_encoder_sEAN8) {
 
-		primaryLen = (sym == gs1_encoder_sEAN13) ? 13 : 8;
+		size_t primaryLen = (sym == gs1_encoder_sEAN13) ? 13 : 8;
+		const char *cc = NULL;
 
 		if (strlen(scanData) < primaryLen) {
 			strcpy(ctx->errMsg, "Primary scan data is too short");

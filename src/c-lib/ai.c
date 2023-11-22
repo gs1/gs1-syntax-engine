@@ -323,12 +323,7 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder* const ctx, const char *p, s
 static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, const struct aiEntry* const entry, const char* const start, const char* const end) {
 
 	const struct aiComponent *part;
-	char compval[MAX_AI_LEN+1];
-	gs1_linter_t linter;
-	gs1_lint_err_t err;
-	size_t errpos, errlen;
-	const gs1_linter_t *l;
-	const char *p, *r;
+	const char *p = start, *r = end;
 
 	assert(ctx);
 	assert(entry);
@@ -336,10 +331,8 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 	assert(end);
 	assert(end >= start);
 
-	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)strlen(entry->ai), ai, (int)(end-start), start);
+	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)strlen(entry->ai), ai, (int)(r-p), start);
 
-	p = start;
-	r = end;
 	if (p == r) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is empty", (int)strlen(entry->ai), ai);
 		ctx->errFlag = true;
@@ -347,6 +340,10 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 	}
 
 	for (part = entry->parts; part->cset; part++) {
+
+		char compval[MAX_AI_LEN+1];
+		gs1_linter_t linter;
+		const gs1_linter_t *l;
 
 		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
 		if (part->max < r-p)
@@ -380,6 +377,10 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 		assert(linter);
 		l = &linter;
 		do {
+
+			gs1_lint_err_t err;
+			size_t errpos, errlen;
+
 			err = (*l)(compval, &errpos, &errlen);
 			if (err) {
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s): %s", (int)strlen(entry->ai), ai, gs1_lint_err_str[err]);
@@ -394,6 +395,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 				return 0;
 			}
 			l = (l == &linter) ? &(part->linters[0]) : l+1;
+
 		} while (*l);
 
 		p += complen;
@@ -462,11 +464,8 @@ bool gs1_aiValLengthContentCheck(gs1_encoder* const ctx, const char* const ai, c
  */
 bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* const dataStr) {
 
-	const char *p, *r, *ai;
-	const char *outai, *outval;
-	size_t ailen;
+	const char *p = aiData;
 	bool fnc1req = true;
-	const struct aiEntry *entry;
 
 	assert(ctx);
 	assert(aiData);
@@ -477,10 +476,13 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
-	DEBUG_PRINT("\nParsing AI data: %s\n", aiData);
+	DEBUG_PRINT("\nParsing AI data: %s\n", p);
 
-	p = aiData;
 	while (*p) {
+
+		const struct aiEntry *entry;
+		const char *outai, *outval, *r, *ai;
+		size_t ailen;
 
 		if (*p++ != '(') goto fail; 			// Expect start of AI
 		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
@@ -564,8 +566,7 @@ fail:
  */
 bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const bool extractAIs) {
 
-	const char *p, *ai;
-	const struct aiEntry *entry;
+	const char *p;
 
 	assert(ctx);
 	assert(dataStr);
@@ -593,7 +594,8 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 	while (*p) {
 
-		const char *r;
+		const char *r, *ai;
+		const struct aiEntry *entry;
 		size_t vallen;
 
 		/* Find AI that matches a prefix of our data
@@ -713,7 +715,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
 		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		char *token;
+		const char *token;
 		char *saveptr = NULL;
 
 		if (ai->kind != aiValue_aival)
@@ -730,7 +732,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 				char *saveptr2 = NULL;
 
-				for (token = strtok_r(token+3, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+				for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
 					char matchedAI[5] = { 0 };
 
@@ -769,7 +771,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
 		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		char *token;
+		const char *token;
 		char *saveptr = NULL;
 
 		if (ai->kind != aiValue_aival)
@@ -789,13 +791,13 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 				char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
 				strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
 
-				for (token = strtok_r(token+4, ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+				for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
 					char *saveptr3 = NULL;
 					satisfied = true;
 
 					// All members of a group (e.g. "01+21") must be present
-					for (token = strtok_r(token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
+					for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
 						if (!aiExists(ctx, token, ai->ai, NULL))
 							satisfied = false;
 

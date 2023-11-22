@@ -134,7 +134,7 @@ fail:
 int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
 	const struct aiEntry *lastEntry;
-	char *token;
+	const char *token;
 	char *saveptr = NULL;
 	char *p, *q;
 	size_t len;
@@ -218,7 +218,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		if (numparts >= MAX_PARTS - 1)
 			error("Number of AI components exceeds implementation");
 
-		if (processComponent(ctx, token, &(*entry)->parts[numparts]) < 0)
+		if (processComponent(ctx, (char*)token, &(*entry)->parts[numparts]) < 0)
 			goto fail;
 
 		numparts++;

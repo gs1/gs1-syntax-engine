@@ -62,14 +62,13 @@ static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
  */
 static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
 
-	int i, j, k, num;
+	int i, j, num;
 	size_t req;
 	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	char qualifiersbuf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	char *saveptr = NULL;
 	const char *token;
 	char **addedQualifiers;
-	char **reallocDLkeyQualifiers;
 
 	/*
 	 *  Count number of qualifiers passed in
@@ -85,9 +84,9 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *  Grow dlKeyQualifiers if necessary
 	 *
 	 */
-	for (i = 0, req = 1; i < num; i++, req *= 2) {}
+	for (i = 0, req = 1; i < num; i++, req *= 2);
 	if (*pos + req >= *cap) {
-		reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
+		char **reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
 		if (!reallocDLkeyQualifiers) {
 			strcpy(ctx->errMsg, "Failed to reallocate memory for key-qualifiers");
 			ctx->errFlag = true;
@@ -95,6 +94,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		}
 		*dlKeyQualifiers = reallocDLkeyQualifiers;
 		*cap = (*pos + req);
+
 	}
 
 	/*
@@ -118,6 +118,9 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	for (i = 0, j = 1, token = strtok_r(qualifiersbuf, ",", &saveptr);
 	     i < num;
 	     i++, j *= 2, token = strtok_r(NULL, ",", &saveptr)) {
+
+		int k;
+
 		for (k = 0; k < j; k++) {
 			snprintf(buf, sizeof(buf), "%s %s", addedQualifiers[k], token);
 			addedQualifiers[k + j] = strdup(buf);
@@ -125,6 +128,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 				return false;
 			(*pos)++;
 		}
+
 	}
 
 	return true;
@@ -137,11 +141,8 @@ static int q_cmp(const void* const a, const void* const b) {
 
 bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 
-	char *saveptr = NULL, *saveptr2 = NULL;
-	char *token;
 	int i = 0;
 	size_t pos = 0, cap = DL_KEY_QUALIFIER_INITIAL_CAPACITY;
-	char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 
 	char **dlKeyQualifiers = malloc(cap * sizeof(char *));
 	if (!dlKeyQualifiers) {
@@ -155,7 +156,11 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	 *
 	 */
 	for (i = 0; i < (int)ctx->aiTableEntries; i++) {
-		*attrs = '\0';
+
+		const char *token;
+		char *saveptr = NULL;
+		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+
 		strncat(attrs, ctx->aiTable[i].attrs, MAX_AI_ATTR_LEN);
 		for (token = strtok_r(attrs, " ", &saveptr);
 		     token;
@@ -165,14 +170,19 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 							&pos, &cap, ctx->aiTable[i].ai, ""))
 					goto fail;
 			} else if (strncmp(token, "dlpkey=", 7) == 0) {
-				for (token = strtok_r(token + 7, "|", &saveptr2);
+
+				char *saveptr2 = NULL;
+
+				for (token = strtok_r((char*)(token+7), "|", &saveptr2);
 				     token;
 				     token = strtok_r(NULL, " ", &saveptr2))
 					if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
 							&pos, &cap, ctx->aiTable[i].ai, token))
 						goto fail;
+
 			}
 		}
+
 	}
 
 	/*
@@ -274,15 +284,13 @@ static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
 static size_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
-	char hex[3] = { 0 };
 
 	assert(in);
 	assert(out);
 
 	for (i = 0, j = 0; i < inlen && j < maxlen; i++, j++) {
 		if (i < inlen - 2 && in[i] == '%' && isxdigit(in[i+1]) && isxdigit(in[i+2])) {
-			hex[0] = in[i+1];
-			hex[1] = in[i+2];
+			const char hex[] = { in[i+1], in[i+2], '\0' };
 			out[j] = (char)strtoul(hex, NULL, 16);
 			i += 2;
 		} else if (is_query_component && in[i] == '+')
@@ -335,17 +343,12 @@ static size_t URIescape(char* const out, const size_t maxlen, const char* const 
 bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const dataStr) {
 
 	char* p, *r;
-	const char *e, *ai, *outai, *outval;
 	const char* pi = NULL;	// Path info
 	char* qp = NULL;	// Query params
 	char* fr = NULL;	// Fragment
 	const char* dp = NULL;	// DL path info
 	bool ret;
-	size_t i;
-	size_t ailen, vallen;
 	bool fnc1req = true;
-	const struct aiEntry* entry;
-	char aival[MAX_AI_LEN + 1];		// Unescaped AI value
 	char pathAIseq[MAX_AIS][5] = { 0 };	// Sequence of AIs extracted from the path info
 	int numPathAIs;
 
@@ -401,6 +404,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	// "/AI/value" pair where AI is a DL primary key
 	while ((r = strrchr(pi, '/')) != NULL) {
 
+		const struct aiEntry* entry;
+
 		*p = '/';				// Restore original pair separator
 							// Clobbers first character of path
 							// info on first iteration
@@ -440,6 +445,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	p = (char*)dp;
 	numPathAIs = 0;
 	while (*p) {
+
+		const struct aiEntry* entry;
+		size_t ailen, vallen;
+		char aival[MAX_AI_LEN + 1];		// Unescaped AI value
+		const char *outai, *outval;
+		const char *ai;
+
 		assert(*p == '/');
 		p++;
 		r = strchr(p, '/');
@@ -468,6 +480,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// Legacy handling of AI (01) to pad up to a GTIN-14, when feature enabled
 		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
+			size_t i;
 			for (i = 0; i <= 13; i++)
 				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
 			aival[14] = '\0';
@@ -518,10 +531,12 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	p = qp;
 	while (p && *p) {
 
+		const struct aiEntry* entry = NULL;
+		size_t ailen = 0, vallen;
+		char aival[MAX_AI_LEN + 1];		// Unescaped AI value
+		const char *outai = NULL, *outval, *ai, *e;
+
 		aiValueKind_t kind = alValue_dlign;
-		entry = NULL;
-		outai = NULL;
-		ailen = 0;
 
 		while (*p == '&')				// Jump any & separators
 			p++;
@@ -567,6 +582,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// Special handling of AI (01) to pad up to a GTIN-14
 		if (strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
+			size_t i;
 			for (i = 0; i <= 13; i++)
 				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
 			aival[14] = '\0';
@@ -675,11 +691,8 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 	int i, j, maxQualifiers, numQualifiers;
 	const char *key = NULL;
-	int keyEntry = -1, ke, bestKeyEntry;
-	char seq[MAX_AIS][5] = { 0 };
+	int keyEntry = -1, bestKeyEntry;
 	char *p;
-	const struct aiValue *ai;
-	char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
 	char *saveptr = NULL;
 	const char *token;
 	char tmp[256];
@@ -692,7 +705,11 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	for (i = 0; i < ctx->numAIs; i++) {
-		ai = &ctx->aiData[i];
+
+		char seq[MAX_AIS][5] = { 0 };
+		int ke;
+		const struct aiValue* const ai = &ctx->aiData[i];
+
 		if (ai->kind != aiValue_aival)
 			continue;
 		assert(ai->aiEntry);
@@ -702,6 +719,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			key = ctx->dlKeyQualifiers[keyEntry];
 			break;
 		}
+
 	}
 
 	if (keyEntry == -1) {
@@ -779,8 +797,9 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	for (i = 0; i < numQualifiers; i++) {
 		for (j = 0; j < ctx->numAIs; j++) {
-			ai = &ctx->aiData[j];
+			const struct aiValue* const ai = &ctx->aiData[j];
 			if (ai->kind == aiValue_aival && ai->dlPathOrder == i) {
+				char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
 				URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
 				p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
 				break;
@@ -796,11 +815,12 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	emitFixed = true;
 again:
 	for (i = 0; i < ctx->numAIs; i++) {
-		ai = &ctx->aiData[i];
+		const struct aiValue* ai = &ctx->aiData[i];
 		if (ai->dlPathOrder == DL_PATH_ORDER_ATTRIBUTE) {
 			if (ai->kind == aiValue_aival) {
 				assert(ai->aiEntry);
 				if (ai->aiEntry->fnc1 != emitFixed) {
+					char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
 					URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
 					p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
 				}
