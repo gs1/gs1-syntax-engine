@@ -61,27 +61,30 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void* const mem) {
 		ctx = malloc(sizeof(gs1_encoder));
 #endif
 		if (ctx == NULL) return NULL;
-		ctx->localAlloc = true;
 	} else {  // Use the provided storage
 		ctx = mem;
-		ctx->localAlloc = false;
 	}
 
-	reset_error(ctx);
-
 	// Set default parameters
-	ctx->sym = gs1_encoder_sNONE;
-	ctx->addCheckDigit = false;
-	ctx->permitUnknownAIs = false;
-	ctx->permitZeroSuppressedGTINinDLuris = false;
-	ctx->includeDataTitlesInHRI = false;
-	strcpy(ctx->dataStr, "");
-	ctx->aiTable = NULL;
-	ctx->aiTableEntries = 0;
-	ctx->aiTableIsDynamic = false;
-	ctx->dlKeyQualifiers = NULL;
-	ctx->numDLkeyQualifiers = 0;
-	ctx->numAIs = 0;
+	ctx = memcpy(ctx, &(struct gs1_encoder) {
+		.localAlloc = !mem,
+		.sym = gs1_encoder_sNONE,
+		.addCheckDigit = false,
+		.permitUnknownAIs = false,
+		.permitZeroSuppressedGTINinDLuris = false,
+		.includeDataTitlesInHRI = false,
+		.aiTable = NULL,
+		.aiTableEntries = 0,
+		.aiTableIsDynamic = false,
+		.dlKeyQualifiers = NULL,
+		.numDLkeyQualifiers = 0,
+		.numAIs = 0,
+		.dataStr = { 0 },
+		.errFlag = false,
+		.errMsg = { 0 },
+		.linterErr = GS1_LINTER_OK,
+		.linterErrMarkup = { 0 }
+	}, sizeof(struct gs1_encoder));
 
 	gs1_loadSyntaxDictionary(ctx, NULL);
 	gs1_loadValidationTable(ctx);
