@@ -509,14 +509,15 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto fail;
 		}
 
-		ctx->aiData[ctx->numAIs].kind = aiValue_aival;
-		ctx->aiData[ctx->numAIs].aiEntry = entry;
-		ctx->aiData[ctx->numAIs].ai = outai;
-		ctx->aiData[ctx->numAIs].ailen = (uint8_t)ailen;
-		ctx->aiData[ctx->numAIs].value = outval;
-		ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
-		ctx->aiData[ctx->numAIs].dlPathOrder = (uint8_t)numPathAIs;
-		ctx->numAIs++;
+		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
+			.kind = aiValue_aival,
+			.aiEntry = entry,
+			.ai = outai,
+			.ailen = (uint8_t)ailen,
+			.value = outval,
+			.vallen = (uint8_t)vallen,
+			.dlPathOrder = (uint8_t)numPathAIs
+		};
 
 		strcpy(pathAIseq[numPathAIs], entry->ai);
 		numPathAIs++;
@@ -614,14 +615,15 @@ add_query_param_to_ai_data:
 			goto fail;
 		}
 
-		ctx->aiData[ctx->numAIs].kind = kind;
-		ctx->aiData[ctx->numAIs].aiEntry = entry;
-		ctx->aiData[ctx->numAIs].ai = outai;
-		ctx->aiData[ctx->numAIs].ailen = (uint8_t)ailen;
-		ctx->aiData[ctx->numAIs].value = outval;
-		ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
-		ctx->aiData[ctx->numAIs].dlPathOrder = DL_PATH_ORDER_ATTRIBUTE;
-		ctx->numAIs++;
+		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
+			.kind = kind,
+			.aiEntry = entry,
+			.ai = outai,
+			.ailen = (uint8_t)ailen,
+			.value = outval,
+			.vallen = (uint8_t)vallen,
+			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
+		};
 
 		p = r;
 

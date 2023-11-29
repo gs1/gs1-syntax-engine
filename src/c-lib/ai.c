@@ -530,14 +530,15 @@ again:
 			goto fail;
 		}
 
-		ctx->aiData[ctx->numAIs].kind = aiValue_aival;
-		ctx->aiData[ctx->numAIs].aiEntry = entry;
-		ctx->aiData[ctx->numAIs].ai = outai;
-		ctx->aiData[ctx->numAIs].ailen = (uint8_t)ailen;
-		ctx->aiData[ctx->numAIs].value = outval;
-		ctx->aiData[ctx->numAIs].vallen = (uint8_t)strlen(outval);
-		ctx->aiData[ctx->numAIs].dlPathOrder = DL_PATH_ORDER_ATTRIBUTE;
-		ctx->numAIs++;
+		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
+			.kind = aiValue_aival,
+			.aiEntry = entry,
+			.ai = outai,
+			.ailen = (uint8_t)ailen,
+			.value = outval,
+			.vallen = (uint8_t)strlen(outval),
+			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
+		};
 
 	}
 
@@ -632,14 +633,15 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 				ctx->errFlag = true;
 				return false;
 			}
-			ctx->aiData[ctx->numAIs].kind = aiValue_aival;
-			ctx->aiData[ctx->numAIs].aiEntry = entry;
-			ctx->aiData[ctx->numAIs].ai = ai;
-			ctx->aiData[ctx->numAIs].ailen = (uint8_t)strlen(entry->ai);
-			ctx->aiData[ctx->numAIs].value = p;
-			ctx->aiData[ctx->numAIs].vallen = (uint8_t)vallen;
-			ctx->aiData[ctx->numAIs].dlPathOrder = DL_PATH_ORDER_ATTRIBUTE;
-			ctx->numAIs++;
+			ctx->aiData[ctx->numAIs++] = (struct aiValue) {
+				.kind = aiValue_aival,
+				.aiEntry = entry,
+				.ai = ai,
+				.ailen = (uint8_t)strlen(entry->ai),
+				.value = p,
+				.vallen = (uint8_t)vallen,
+				.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
+			};
 		}
 
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
