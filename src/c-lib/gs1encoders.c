@@ -33,7 +33,7 @@
 #include "syn.h"
 
 
-static void reset_error(gs1_encoder* const ctx) {
+static inline void reset_error(gs1_encoder* const ctx) {
 	assert(ctx);
 	ctx->errFlag = false;
 	*ctx->errMsg = '\0';
