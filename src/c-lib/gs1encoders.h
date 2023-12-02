@@ -1218,6 +1218,7 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 #endif
 
 
+#undef GS1_ENCODERS_API
 #undef DEPRECATED
 
 

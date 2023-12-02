@@ -42,17 +42,17 @@ static inline void reset_error(gs1_encoder* const ctx) {
 }
 
 
-GS1_ENCODERS_API size_t gs1_encoder_instanceSize(void) {
+size_t gs1_encoder_instanceSize(void) {
 	return sizeof(struct gs1_encoder);
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength(void) {
+int gs1_encoder_getMaxDataStrLength(void) {
 	return MAX_DATA;
 }
 
 
-GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void* const mem) {
+gs1_encoder* gs1_encoder_init(void* const mem) {
 
 	gs1_encoder *ctx = NULL;
 
@@ -94,7 +94,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void* const mem) {
 }
 
 
-GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder* const ctx) {
+void gs1_encoder_free(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 
@@ -109,17 +109,17 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder* const ctx) {
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getVersion(void) {
+char* gs1_encoder_getVersion(void) {
 	return __DATE__;
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder* const ctx) {
+int gs1_encoder_getSym(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->sym;
 }
-GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder* const ctx, const int sym) {
+bool gs1_encoder_setSym(gs1_encoder* const ctx, const int sym) {
 	assert(ctx);
 	reset_error(ctx);
 	if (sym < gs1_encoder_sNONE || sym >= gs1_encoder_sNUMSYMS) {
@@ -132,12 +132,12 @@ GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder* const ctx, const int sym) 
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getAddCheckDigit(gs1_encoder* const ctx) {
+bool gs1_encoder_getAddCheckDigit(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->addCheckDigit;
 }
-GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder* const ctx, const bool addCheckDigit) {
+bool gs1_encoder_setAddCheckDigit(gs1_encoder* const ctx, const bool addCheckDigit) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->addCheckDigit = addCheckDigit;
@@ -145,12 +145,12 @@ GS1_ENCODERS_API bool gs1_encoder_setAddCheckDigit(gs1_encoder* const ctx, const
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris(gs1_encoder* const ctx) {
+bool gs1_encoder_getPermitZeroSuppressedGTINinDLuris(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->permitZeroSuppressedGTINinDLuris;
 }
-GS1_ENCODERS_API bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(gs1_encoder* const ctx, const bool permitZeroSuppressedGTINinDLuris) {
+bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(gs1_encoder* const ctx, const bool permitZeroSuppressedGTINinDLuris) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->permitZeroSuppressedGTINinDLuris = permitZeroSuppressedGTINinDLuris;
@@ -158,12 +158,12 @@ GS1_ENCODERS_API bool gs1_encoder_setPermitZeroSuppressedGTINinDLuris(gs1_encode
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getPermitUnknownAIs(gs1_encoder* const ctx) {
+bool gs1_encoder_getPermitUnknownAIs(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->permitUnknownAIs;
 }
-GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder* const ctx, const bool permitUnknownAIs) {
+bool gs1_encoder_setPermitUnknownAIs(gs1_encoder* const ctx, const bool permitUnknownAIs) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->permitUnknownAIs = permitUnknownAIs;
@@ -171,12 +171,12 @@ GS1_ENCODERS_API bool gs1_encoder_setPermitUnknownAIs(gs1_encoder* const ctx, co
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder* const ctx) {
+bool gs1_encoder_getValidateAIassociations(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->validationTable[gs1_encoder_vREQUISITE_AIS].enabled;
 }
-GS1_ENCODERS_API bool gs1_encoder_setValidateAIassociations(gs1_encoder* const ctx, const bool validateAIassociations) {
+bool gs1_encoder_setValidateAIassociations(gs1_encoder* const ctx, const bool validateAIassociations) {
 	assert(ctx);
 	reset_error(ctx);
 	assert(!ctx->validationTable[gs1_encoder_vREQUISITE_AIS].locked);
@@ -185,12 +185,12 @@ GS1_ENCODERS_API bool gs1_encoder_setValidateAIassociations(gs1_encoder* const c
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation) {
+bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->validationTable[validation].enabled;
 }
-GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation, const bool enabled) {
+bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation, const bool enabled) {
 	assert(ctx);
 	reset_error(ctx);
 	if (validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {
@@ -208,12 +208,12 @@ GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, c
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_getIncludeDataTitlesInHRI(gs1_encoder* const ctx) {
+bool gs1_encoder_getIncludeDataTitlesInHRI(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->includeDataTitlesInHRI;
 }
-GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder* const ctx, const bool includeDataTitles) {
+bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder* const ctx, const bool includeDataTitles) {
 	assert(ctx);
 	reset_error(ctx);
 	ctx->includeDataTitlesInHRI = includeDataTitles;
@@ -221,12 +221,12 @@ GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder* const c
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getDataStr(gs1_encoder* const ctx) {
+char* gs1_encoder_getDataStr(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->dataStr;
 }
-GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
+bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	char *cc;
 
@@ -292,7 +292,7 @@ fail:
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) {
+bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) {
 
 	char *cc;
 
@@ -347,7 +347,7 @@ fail:
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
+char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 
 	int i, j;
 	char *p = ctx->outStr;
@@ -379,19 +379,19 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder* const ctx, const char* const stem) {
+char* gs1_encoder_getDLuri(gs1_encoder* const ctx, const char* const stem) {
 	assert(ctx);
 	return gs1_generateDLuri(ctx, stem);
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* const ctx) {
+char* gs1_encoder_getScanData(gs1_encoder* const ctx) {
 	assert(ctx);
 	return gs1_generateScanData(ctx);
 }
 
 
-GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char* const scanData) {
+bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char* const scanData) {
 	assert(ctx);
 	assert(scanData);
 
@@ -410,7 +410,7 @@ fail:
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const out) {
+int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const out) {
 
 	int i, j;
 	char *p = ctx->outStr;
@@ -441,7 +441,7 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const ou
 }
 
 
-GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder* const ctx) {
+size_t gs1_encoder_getHRIsize(gs1_encoder* const ctx) {
 
 	size_t sz = 0;
 	int i;
@@ -456,7 +456,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder* const ctx) {
 }
 
 
-GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder* const ctx, void* const buf, const size_t max) {
+void gs1_encoder_copyHRI(gs1_encoder* const ctx, void* const buf, const size_t max) {
 
 	char *p;
 	char **hri;
@@ -486,7 +486,7 @@ GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder* const ctx, void* const bu
 }
 
 
-GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx, char*** const out) {
+int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx, char*** const out) {
 
 	int i, j;
 	char *p = ctx->outStr;
@@ -512,7 +512,7 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx,
 }
 
 
-GS1_ENCODERS_API size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder* const ctx) {
+size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder* const ctx) {
 
 	size_t sz = 0;
 	int i;
@@ -527,7 +527,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder* con
 }
 
 
-GS1_ENCODERS_API void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const buf, const size_t max) {
+void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const buf, const size_t max) {
 
 	char *p;
 	char **qp;
@@ -557,14 +557,14 @@ GS1_ENCODERS_API void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ct
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder* const ctx) {
+char* gs1_encoder_getErrMsg(gs1_encoder* const ctx) {
 	assert(ctx);
 	assert((!ctx->errFlag) ^ *ctx->errMsg);
 	return ctx->errMsg;
 }
 
 
-GS1_ENCODERS_API char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
+char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
 	assert(ctx);
 	return ctx->linterErrMarkup;
 }
