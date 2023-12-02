@@ -738,6 +738,9 @@ void test_api_permitZeroSuppressedGTINinDLuris(void) {
 
 void test_api_validateAIassociations(void) {
 
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
 	gs1_encoder* ctx;
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -764,6 +767,8 @@ void test_api_validateAIassociations(void) {
 	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vMUTEX_AIS));
 
 	gs1_encoder_free(ctx);
+
+DIAG_POP
 
 }
 
@@ -1008,6 +1013,9 @@ void test_api_getHRI(void) {
 
 void test_api_copyHRI(void) {
 
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
 	gs1_encoder* ctx;
 	char buf[64];
 	size_t needed;
@@ -1036,6 +1044,8 @@ void test_api_copyHRI(void) {
 	TEST_CHECK(buf[0] == '\0');
 
 	gs1_encoder_free(ctx);
+
+DIAG_POP
 
 }
 
@@ -1106,6 +1116,9 @@ void test_api_getDLignoredQueryParams(void) {
 
 void test_api_copyDLignoredQueryParams(void) {
 
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
 	gs1_encoder* ctx;
 	char buf[64];
 	size_t needed;
@@ -1128,6 +1141,8 @@ void test_api_copyDLignoredQueryParams(void) {
 	TEST_CHECK(buf[0] == '\0');
 
 	gs1_encoder_free(ctx);
+
+DIAG_POP
 
 }
 

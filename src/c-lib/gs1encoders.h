@@ -243,6 +243,15 @@
 #endif
 
 
+#if defined(__GNUC__) || defined(__clang__)
+#  define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#  define DEPRECATED __declspec(deprecated)
+#else
+#  define DEPRECATED
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -715,7 +724,7 @@ GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, enum gs
  * @param [in,out] ctx ::gs1_encoder context
  * @return current status of the ::gs1_encoder_vREQUISITE_AIS validation procedure
  */
-GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
+GS1_ENCODERS_API DEPRECATED bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
 
 
 /**
@@ -734,7 +743,7 @@ GS1_ENCODERS_API bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
  * @param [in] validateAIassociations enable the ::gs1_encoder_vREQUISITE_AIS validation procedure if true; otherwise disable
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
-GS1_ENCODERS_API bool gs1_encoder_setValidateAIassociations(gs1_encoder *ctx, bool validateAIassociations);
+GS1_ENCODERS_API DEPRECATED bool gs1_encoder_setValidateAIassociations(gs1_encoder *ctx, bool validateAIassociations);
 
 
 /**
@@ -1093,7 +1102,7 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char ***hri);
  * @param [in,out] ctx ::gs1_encoder context
  * @return required length of the buffer
  */
-GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
+GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
 
 
 /**
@@ -1114,7 +1123,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
  * @param [out] buf a pointer to a buffer into which the formatted HRI text is copied
  * @param [in] max the maximum number of bytes that may be copied into the provided buffer
  */
-GS1_ENCODERS_API void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max);
+GS1_ENCODERS_API DEPRECATED void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max);
 
 
 /**
@@ -1169,7 +1178,7 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder* ctx, char 
  * @param [in,out] ctx ::gs1_encoder context
  * @return required length of the buffer
  */
-GS1_ENCODERS_API size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx);
+GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx);
 
 
 /**
@@ -1191,7 +1200,7 @@ GS1_ENCODERS_API size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx
  * @param [out] buf a pointer to a buffer into which the formatted non-numeric (ignored) query parameters are copied
  * @param [in] max the maximum number of bytes that may be copied into the provided buffer
  */
-GS1_ENCODERS_API void gs1_encoder_copyDLignoredQueryParams(gs1_encoder *ctx, void *buf, size_t max);
+GS1_ENCODERS_API DEPRECATED void gs1_encoder_copyDLignoredQueryParams(gs1_encoder *ctx, void *buf, size_t max);
 
 
 /**
@@ -1207,6 +1216,9 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 #ifdef __cplusplus
 }
 #endif
+
+
+#undef DEPRECATED
 
 
 #endif /* GS1_ENCODERS_H */

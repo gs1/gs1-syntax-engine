@@ -40,6 +40,19 @@
 
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
+#if defined(__clang__)
+#  define DIAG_PUSH _Pragma("clang diagnostic push")
+#  define DIAG_POP _Pragma("clang diagnostic pop")
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#elif defined(__GNUC__)
+#  define DIAG_PUSH _Pragma("GCC diagnostic push")
+#  define DIAG_POP _Pragma("GCC diagnostic pop")
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#elif defined(_MSC_VER)
+#  define DIAG_PUSH __pragma(warning(push))
+#  define DIAG_POP __pragma(warning(pop))
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
+#endif
 
 struct sPrints {
 	int elmCnt;
