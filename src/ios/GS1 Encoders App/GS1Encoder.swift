@@ -343,6 +343,7 @@ class GS1Encoder {
      *   - gs1_encoder_getValidateAIassociations()
      *
      */
+    @available(*, deprecated)
     func getValidateAIassociations() -> Bool {
         return gs1_encoder_getValidateAIassociations(ctx)
     }
@@ -355,6 +356,7 @@ class GS1Encoder {
      *   - gs1_encoder_setValidateAIassociations()
      *
      */
+    @available(*, deprecated)
     func setValidateAIassociations(_ value: Bool) throws {
         if (!gs1_encoder_setValidateAIassociations(ctx, value)) {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
