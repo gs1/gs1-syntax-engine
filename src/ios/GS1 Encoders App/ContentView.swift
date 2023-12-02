@@ -67,7 +67,6 @@ struct ContentView: View {
 
     func loadDataValues() {
         unknownAIs = gs1encoder.getPermitUnknownAIs()
-        associations = gs1encoder.getValidateAIassociations()
         associations = gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs)
         datatitles = gs1encoder.getIncludeDataTitlesInHRI()
 
