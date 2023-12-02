@@ -54,16 +54,6 @@
 #  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
 #endif
 
-struct sPrints {
-	int elmCnt;
-	int leftPad;
-	int rightPad;
-	int guards;
-	int height;
-	int whtFirst;
-	int reverse;
-	uint8_t *pattern;
-};
 
 
 #include "ai.h"
