@@ -42,6 +42,7 @@ limitations under the License.
     <exec executable="gcc" failonerror="true">
       <arg line="-fPIC -shared -O2 -g
                  -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed
+                 -Werror
                  -L${clib}/build -lgs1encoders
                  -I${clib}
                  -I${java.home}/../include
@@ -56,6 +57,7 @@ limitations under the License.
 
   <target name="compile" depends="jni,init" description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
+      <compilerarg value="-Werror"/>
       <exclude name="*"/>
     </javac>
   </target>
