@@ -422,7 +422,7 @@ namespace GS1.Encoders
         /// </summary>
         public bool GetValidationEnabled(Validation validation)
         {
-            return gs1_encoder_getValidationEnabled(ctx, (int)validation);        
+            return gs1_encoder_getValidationEnabled(ctx, (int)validation);
         }
 
 
@@ -435,6 +435,7 @@ namespace GS1.Encoders
         ///   - gs1_encoder_setValidateAIassociations()
         ///
         /// </summary>
+        [Obsolete]
         public bool ValidateAIassociations
         {
             get
