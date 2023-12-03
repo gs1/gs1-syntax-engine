@@ -323,6 +323,8 @@ export class GS1encoder {
     /**
      * Get/set the "validate AI associations" flag.
      *
+     * @deprecated
+     *
      * @throws {GS1encoderParameterException}
      *
      * @example See the native library documentation for details:
