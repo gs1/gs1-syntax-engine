@@ -416,11 +416,14 @@ public class GS1Encoder {
     /**
      * Get the checking of mandatory associations is enabled.
      *
+     * @deprecated
+     *
      * See the native library documentation for details:
      *
      *   - gs1_encoder_getValidateAIassociations()
      *
      */
+    @Deprecated
     public boolean getValidateAIassociations() {
         return gs1encoderGetValidateAIassociationsJNI(ctx);
     }
@@ -428,11 +431,14 @@ public class GS1Encoder {
     /**
      * Set the checking of mandatory associations.
      *
+     * @deprecated
+     *
      * See the native library documentation for details:
      *
      *   - gs1_encoder_setValidateAIassociations()
      *
      */
+    @Deprecated
     public void setValidateAIassociations(boolean value) throws GS1EncoderParameterException {
         if (!gs1encoderSetValidateAIassociationsJNI(ctx, value))
             throw new GS1EncoderParameterException(this.getErrMsg());
