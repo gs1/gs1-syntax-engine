@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadDataValues() {
 
         binding.unknownAIsCheckBox.isChecked = gs1encoder.permitUnknownAIs
-        binding.associationsCheckBox.isChecked = gs1encoder.validateAIassociations
+        binding.associationsCheckBox.isChecked = gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs);
         binding.dataTitlesCheckBox.isChecked = gs1encoder.includeDataTitlesInHRI
 
         if (gs1encoder.dataStr == "")
