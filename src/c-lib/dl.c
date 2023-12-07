@@ -350,7 +350,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	bool ret;
 	bool fnc1req = true;
 	char pathAIseq[MAX_AIS][5] = { 0 };	// Sequence of AIs extracted from the path info
-	int numPathAIs;
+	int numPathAIs, i;
 
 	assert(ctx);
 	assert(dlData);
@@ -645,6 +645,41 @@ add_query_param_to_ai_data:
 		goto out;
 	}
 
+	// Validate that any attributes in the query params do not instead
+	// belong within path info
+	if (numPathAIs < MAX_AIS) {
+		for (i = 0; i < ctx->numAIs; i++) {
+
+			char seq[MAX_AIS][5] = { 0 };
+			const struct aiValue* const ai = &ctx->aiData[i];
+			int j;
+
+			if (ai->kind != aiValue_aival || ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
+				continue;
+
+			assert(ai->aiEntry);
+
+			// Trial the AI at each non-initial position of the
+			// path info to see if it results in a valid
+			// key-qualifier sequence
+			for (j = 1; j <= numPathAIs; j++) {
+
+				memcpy(&seq[0], &pathAIseq[0], (size_t)j * sizeof(seq[0]));
+				strcpy(seq[j], ai->aiEntry->ai);
+				memcpy(&seq[j+1], &pathAIseq[j], (size_t)(numPathAIs-j) * sizeof(seq[0]));
+
+				if (getDLpathAIseqEntry(ctx, (const char(*)[5])seq, numPathAIs + 1) != -1) {
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%s) from query params should be in the path info", seq[j]);
+					ctx->errFlag = true;
+					ret = false;
+					goto out;
+				}
+
+			}
+
+		}
+	}
+
 	// Validate the data that we have written
 	if (!gs1_processAIdata(ctx, dataStr, false))
 		ret = false;
@@ -714,7 +749,9 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 		if (ai->kind != aiValue_aival)
 			continue;
+
 		assert(ai->aiEntry);
+
 		strcpy(seq[0], ai->aiEntry->ai);
 		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[5])seq, 1)) != -1) {
 			keyEntry = ke;
@@ -1173,6 +1210,16 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(ctx, true,
 		"https://example.com/8004/9520614141234567?01=9520123456788",
 		"^80049520614141234567^0109520123456788");
+
+	// AI in query params that should be in the path info
+	test_parseDLuri(ctx, false,
+		"https://example.com/01/09520123456788?10=ABC123",
+		"");
+
+	// This is fine because we chose an alternate key qualifier
+	test_parseDLuri(ctx, true,
+		"https://id.gs1.org/01/09520123456788/10/ABC123?235=XYZ",
+		"^010952012345678810ABC123^235XYZ");
 
 	// Examples with unknown AIs, not permitted
 	test_parseDLuri(ctx, false,
