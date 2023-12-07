@@ -448,7 +448,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		const struct aiEntry* entry;
 		size_t ailen, vallen;
-		char aival[MAX_AI_LEN + 1];		// Unescaped AI value
+		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai, *outval;
 		const char *ai;
 
@@ -472,7 +472,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_LEN, r, (size_t)(p-r), false)) == 0) {
+		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false)) == 0) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
 			goto fail;
 		}
@@ -534,7 +534,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		const struct aiEntry* entry = NULL;
 		size_t ailen = 0, vallen;
-		char aival[MAX_AI_LEN + 1];		// Unescaped AI value
+		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai = NULL, *outval, *ai, *e;
 
 		aiValueKind_t kind = alValue_dlign;
@@ -575,7 +575,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_LEN, e, (size_t)(r-e), true)) == 0) {
+		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params too long", (int)strlen(entry->ai), ai);
 			goto fail;
 		}
@@ -838,7 +838,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		for (j = 0; j < ctx->numAIs; j++) {
 			const struct aiValue* const ai = &ctx->aiData[j];
 			if (ai->kind == aiValue_aival && ai->dlPathOrder == i) {
-				char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
+				char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 				URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
 				p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
 				break;
@@ -859,7 +859,7 @@ again:
 			if (ai->kind == aiValue_aival) {
 				assert(ai->aiEntry);
 				if (ai->aiEntry->fnc1 != emitFixed) {
-					char encval[MAX_AI_LEN*3+1];	// Assuming that we %-escape everything
+					char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 					URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
 					p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
 				}
@@ -1244,7 +1244,7 @@ void test_dl_parseDLuri(void) {
 
 static void test_URIunescape(const char* const in, const char* const expect_path, const char* const expect_query) {
 
-	char out[MAX_AI_LEN+1];
+	char out[MAX_AI_VALUE_LEN+1];
 
 	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
@@ -1259,7 +1259,7 @@ static void test_URIunescape(const char* const in, const char* const expect_path
 
 void test_dl_URIunescape(void) {
 
-	char out[MAX_AI_LEN+1];
+	char out[MAX_AI_VALUE_LEN+1];
 
 	test_URIunescape("", "", "");
 	test_URIunescape("test", "test", "test");
@@ -1284,11 +1284,11 @@ void test_dl_URIunescape(void) {
 	test_URIunescape("A%G4B", "A%G4B", "A%G4B");			// Non hex digit
 
 	// Check that \0 is sane, although we are only working with strings
-	TEST_CHECK(URIunescape(out, MAX_AI_LEN, "A%00B", 5, false) == 3);
+	TEST_CHECK(URIunescape(out, MAX_AI_VALUE_LEN, "A%00B", 5, false) == 3);
 	TEST_CHECK(memcmp(out, "A" "\x00" "B", 4) == 0);
 
 	// Truncated input
-	TEST_CHECK(URIunescape(out, MAX_AI_LEN, "ABCD", 2, false) == 2);
+	TEST_CHECK(URIunescape(out, MAX_AI_VALUE_LEN, "ABCD", 2, false) == 2);
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);				// Includes \0
 
 	// Truncated output
@@ -1306,7 +1306,7 @@ void test_dl_URIunescape(void) {
 
 static void test_URIescape(const char* const in, const char* const expect_path, const char* const expect_query) {
 
-	char out[MAX_AI_LEN*3+1];
+	char out[MAX_AI_VALUE_LEN*3+1];
 
 	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
@@ -1320,7 +1320,7 @@ static void test_URIescape(const char* const in, const char* const expect_path, 
 
 void test_dl_URIescape(void) {
 
-	char out[MAX_AI_LEN*3+1];
+	char out[MAX_AI_VALUE_LEN*3+1];
 
 	// Reserved characters that do not need escaping
 	test_URIescape("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -1338,7 +1338,7 @@ void test_dl_URIescape(void) {
 	test_URIescape("A  B", "A%20%20B", "A++B");			// Run together
 
 	// Truncated input
-	TEST_CHECK(URIescape(out, MAX_AI_LEN, "ABCD", 2, false) == 2);
+	TEST_CHECK(URIescape(out, MAX_AI_VALUE_LEN, "ABCD", 2, false) == 2);
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
 
 	// Truncated output

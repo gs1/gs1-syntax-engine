@@ -341,7 +341,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 	for (part = entry->parts; part->cset; part++) {
 
-		char compval[MAX_AI_LEN+1];
+		char compval[MAX_AI_VALUE_LEN+1];
 		gs1_linter_t linter;
 		const gs1_linter_t *l;
 

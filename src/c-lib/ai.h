@@ -27,9 +27,9 @@
 
 #include "syntax/gs1syntaxdictionary.h"
 
-#define MAX_AIS		64
-#define MAX_AI_LEN	90
-#define MAX_AI_ATTR_LEN	64
+#define MAX_AIS			64
+#define MAX_AI_VALUE_LEN	90
+#define MAX_AI_ATTR_LEN		64
 
 
 /*
