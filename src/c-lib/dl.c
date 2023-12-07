@@ -234,9 +234,9 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
  *  the position in the list or -1 if missing
  *
  */
-static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][5], const int len) {
+static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][MAX_AI_LEN+1], const int len) {
 
-	char aiseq[5 * MAX_AIS] = { 0 };
+	char aiseq[(MAX_AI_LEN+1) * MAX_AIS] = { 0 };
 	char *p = aiseq;
 	int i;
 	size_t s = 0;
@@ -270,14 +270,14 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][5
 
 }
 
-static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX_AIS][5], const int len) {
+static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX_AIS][MAX_AI_LEN+1], const int len) {
 	return getDLpathAIseqEntry(ctx, seq, len) != -1;
 }
 
 static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
-	char seq[MAX_AIS][5] = { 0 };
+	char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
 	strcpy(seq[0], p);
-	return getDLpathAIseqEntry(ctx, (const char(*)[5])seq, 1) != -1;
+	return getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1) != -1;
 }
 
 
@@ -349,7 +349,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	const char* dp = NULL;	// DL path info
 	bool ret;
 	bool fnc1req = true;
-	char pathAIseq[MAX_AIS][5] = { 0 };	// Sequence of AIs extracted from the path info
+	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { 0 };	// Sequence of AIs extracted from the path info
 	int numPathAIs, i;
 
 	assert(ctx);
@@ -638,7 +638,7 @@ add_query_param_to_ai_data:
 
 	// Validate that the AI sequence in the path info is a valid
 	// key-qualifier association
-	if (!isValidDLpathAIseq(ctx, (const char(*)[5])pathAIseq, numPathAIs)) {
+	if (!isValidDLpathAIseq(ctx, (const char(*)[MAX_AI_LEN+1])pathAIseq, numPathAIs)) {
 		strcpy(ctx->errMsg, "The AIs in the path are not a valid key-qualifier sequence for the key");
 		ctx->errFlag = true;
 		ret = false;
@@ -650,7 +650,7 @@ add_query_param_to_ai_data:
 	if (numPathAIs < MAX_AIS) {
 		for (i = 0; i < ctx->numAIs; i++) {
 
-			char seq[MAX_AIS][5] = { 0 };
+			char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
 			const struct aiValue* const ai = &ctx->aiData[i];
 			int j;
 
@@ -668,7 +668,7 @@ add_query_param_to_ai_data:
 				strcpy(seq[j], ai->aiEntry->ai);
 				memcpy(&seq[j+1], &pathAIseq[j], (size_t)(numPathAIs-j) * sizeof(seq[0]));
 
-				if (getDLpathAIseqEntry(ctx, (const char(*)[5])seq, numPathAIs + 1) != -1) {
+				if (getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
 					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%s) from query params should be in the path info", seq[j]);
 					ctx->errFlag = true;
 					ret = false;
@@ -743,7 +743,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char seq[MAX_AIS][5] = { 0 };
+		char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
 		int ke;
 		const struct aiValue* const ai = &ctx->aiData[i];
 
@@ -753,7 +753,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		assert(ai->aiEntry);
 
 		strcpy(seq[0], ai->aiEntry->ai);
-		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[5])seq, 1)) != -1) {
+		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1)) != -1) {
 			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
 			break;
@@ -1368,7 +1368,7 @@ void test_dl_URIescape(void) {
 
 void test_dl_testValidateDLpathAIseq(void) {
 
-	const char seq[][MAX_AIS][5] = {
+	const char seq[][MAX_AIS][MAX_AI_LEN+1] = {
 
 		// SSCC
 		{ "00" },

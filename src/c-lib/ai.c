@@ -249,11 +249,11 @@ const struct aiEntry* gs1_lookupAIentry(gs1_encoder* const ctx, const char *p, s
 
 	assert(ailen <= strlen(p));
 
-	if (ailen == 1 || ailen > 4)	// AI length between 2 and 4, even for unknown AIs
+	if (ailen != 0 && (ailen < MIN_AI_LEN || ailen > MAX_AI_LEN))	// Even for unknown AIs
 		return NULL;
 
 	// Don't attempt to find a non-digit AI
-	if (!gs1_allDigits((uint8_t *)p, ailen != 0 ? ailen : 2))
+	if (!gs1_allDigits((uint8_t *)p, ailen != 0 ? ailen : MIN_AI_LEN))
 		return NULL;
 
 	/*
@@ -736,7 +736,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 				for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
-					char matchedAI[5] = { 0 };
+					char matchedAI[MAX_AI_LEN+1] = { 0 };
 
 					if (aiExists(ctx, token, ai->ai, matchedAI)) {
 						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);

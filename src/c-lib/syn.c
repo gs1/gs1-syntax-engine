@@ -163,7 +163,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	len = strlen(token);
 	if ((p = strchr(token, '-')) != NULL) {
 
-		if (len < 5 || len > 9)
+		if (len < MIN_AI_LEN*2+1 || len > MAX_AI_LEN*2+1)
 			error("AI range has wrong width");
 
 		if ((len%2 != 1) || ((size_t)(p - token) != len/2))
@@ -187,7 +187,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 	} else {
 
-		if (len < 2 || len > 4)
+		if (len < MIN_AI_LEN || len > MAX_AI_LEN)
 			error("AI has wrong width");
 
 		if (strspn(token, "0123456789") != len)
