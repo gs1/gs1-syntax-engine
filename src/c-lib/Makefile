@@ -308,6 +308,11 @@ docs:
 	cp docstmp/nav_g.png ../../docs
 	cp docstmp/nav_h.png ../../docs
 	cp docstmp/tabs.css ../../docs
-
+	docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make wasm JSONLY=yes
+	cp ../js-wasm/example.html ../../docs/demo
+	cp ../js-wasm/example.mjs ../../docs/demo
+	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
+	cp ../js-wasm/gs1encoder-wasm.mjs ../../docs/demo
+	cp ../js-wasm/gs1encoder-wasm.mjs.mem ../../docs/demo
 
 -include $(DEPS)
