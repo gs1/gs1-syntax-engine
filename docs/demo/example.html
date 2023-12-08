@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+
+<!--
+
+Example HTML app that uses the JS + WASM build of the GS1 Syntax Engine.
+
+Copyright (c) 2022 GS1 AISBL.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+The API reference for the native C library is available here:
+
+    https://gs1.github.io/gs1-syntax-engine/
+
+-->
+
+<title>GS1 Syntax Engine HTML demo | Loading ...</title>
+
+<script type="module" src="example.mjs"></script>
+
+<style>
+body {
+padding: 0;
+margin: 0;
+background-color: #f6f6f6;
+background: #ccc;
+background-repeat: no-repeat;
+}
+#container {
+position: relative;
+min-width: 900px;
+max-width: 1000px;
+min-height: 650px;
+margin: 20px auto 0 auto;
+padding: 8px;
+background-color: #fff;
+border-style: solid;
+border-width: 0 1px 1px 1px;
+border-color: #bbb;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 0.9em
+}
+#topbar {
+position: absolute;
+left: 0;
+top: 0;
+width: 100%;
+line-height: 175%;
+padding: 10px 0 0 30px;
+}
+#rightbar {
+display: block;
+position: absolute;
+right: 25px;
+top: 80px;
+bottom: 0;
+height: auto;
+line-height: 250%;
+text-align: right;
+}
+#contents {
+padding: 65px 230px 20px 20px;
+}
+#maintable table {
+width: 100%;
+}
+#messages {
+padding: 10px;
+}
+.datatextarea {
+width: 100%;
+height: 50px;
+margin: 5px 0 5px 0;
+resize: vertical;
+word-break: break-all;
+}
+.bigbox {
+width: 100%;
+height: 50px;
+margin: 5px 0 5px 0;
+resize: vertical;
+word-break: break-all;
+}
+.smallbox {
+width: 100%;
+height: 25px;
+margin: 5px 0 5px 0;
+resize: none;
+word-break: break-all;
+}
+.hritextarea {
+width: 100%;
+height: 100px;
+margin: 5px 0 5px 0;
+resize: vertical;
+word-break: break-all;
+}
+.processbutton {
+width: 175px;
+height: 40px;
+}
+.infobox {
+width: 100%;
+border: none;
+font-size: 1.2em;
+}
+.errbox {
+width: 100%;
+border: none;
+font-size: 1.2em;
+font-weight: bold;
+}
+</style>
+
+</head>
+
+<body onload="init();">
+
+<div id="container">
+
+<div id="topbar">
+1. Enter bracketed AI syntax, unbracketed AI syntax ("^..."), GS1 Digital Link URI, plain or barcode scan data ("]Sm..."; "{GS}" for ASCII 29)
+<br>
+2. Click "Process input data"
+</div><!-- topbar -->
+
+<div id="contents">
+
+<div id="rightbar">
+<button id="process" type="button" onclick="process_clicked();" class="processbutton">Process input data</button>
+<br><br>
+<label for="unknownais">Permit unknown AIs</label><input id="unknownais" type="checkbox" onclick="unknownais_clicked();">
+<br>
+<label for="associations">Validate AI requisites</label><input id="associations" type="checkbox" onclick="associations_clicked();">
+<br>
+<label for="datatitles">Include data titles in HRI</label><input id="datatitles" type="checkbox" onclick="datatitles_clicked();">
+<br>
+<label for="zerosuppdl">Permit 0-supp (01) in DL</label><input id="zerosuppdl" type="checkbox" onclick="zerosuppdl_clicked();">
+</div><!-- rightbar -->
+
+<div id="maintable">
+<table>
+<tr>
+<td style="width: 210px; font-weight: bold"><label for="data">Input data</label></td>
+<td><textarea id="data" maxlength="2048" oninput="data_changed();" class="datatextarea"></textarea></td>
+</tr>
+<tr>
+<td><label for="syntax">Detected syntax</label></td>
+<td><textarea id="syntax" readonly class="smallbox"></textarea></td>
+</tr>
+<tr>
+<td><label for="datastr">Barcode message (^ = FNC1)</label></td>
+<td><textarea id="datastr" readonly class="bigbox"></textarea></td>
+</tr>
+<tr>
+<td><label for="elementstring">GS1 AI Element String</label></td>
+<td><textarea id="elementstring" readonly class="bigbox"></textarea></td>
+</tr>
+<tr>
+<td><label for="dl">GS1 Digital Link URI<br>(canonical form)</label></td>
+<td><textarea id="dl" readonly class="bigbox"></textarea></td>
+</tr>
+<tr>
+<td><label for="hri">HRI text</label></td>
+<td><textarea id="hri" readonly class="hritextarea"></textarea>
+</tr>
+</table>
+</div><!-- maintable -->
+
+</div><!-- contents -->
+
+<div id="messages">
+<input type="text" id="info" value="" readonly class="infobox">
+<br><br>
+<input type="text" id="errmsg" value="" readonly class="errbox">
+</div><!-- messages -->
+
+
+</div><!-- container -->
+
+</body>
+
+</html>
