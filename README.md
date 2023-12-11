@@ -25,8 +25,8 @@ This project includes:
     * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper.
     * A browser-based web application that shows how to use the WebAssembly or pure JavaScript build of the library.
     * A Node.js console application that shows how to use the WebAssembly or pure JavaScript build of the library.
-    * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app.
-    * An Xcode project that shows how to use the native library from Swift to create an iOS app.
+    * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
+    * An Xcode project that shows how to use the native library from Swift to create an iOS app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
 
 
 Documentation
