@@ -16,15 +16,15 @@ This project includes:
   * A C library that can be:
     * Vendored into third-party code.
     * Compiled to native code for use as a shared library (Linux / MacOS / BSD) or dynamic-link library (Windows).
-    * Compiled to WebAssembly (or pure JavaScript) for use in a browser-based web application or Node.js application.
+    * Compiled to WebAssembly or pure JavaScript for use in a browser-based web application or Node.js application.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
   * A Java wrapper class that provides an object interface to the native library from managed code, using Java Native Interface.
   * Several example applications:
     * A console application whose C code shows how to use the native library.
     * A console application whose Java code shows how to use the Java Native Interface wrapper.
     * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper.
-    * A browser-based web application that shows how to use the WebAssembly (or JavaScript) build of the library.
-    * A Node.js console application that shows how to use the WebAssembly (or JavaScript) build of the library.
+    * A browser-based web application that shows how to use the WebAssembly or pure JavaScript build of the library.
+    * A Node.js console application that shows how to use the WebAssembly or pure JavaScript build of the library.
     * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app.
     * An Xcode project that shows how to use the native library from Swift to create an iOS app.
 
