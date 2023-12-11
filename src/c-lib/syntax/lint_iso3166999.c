@@ -48,7 +48,7 @@
  *         country code or the string "999".
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	gs1_lint_err_t ret;

@@ -53,7 +53,7 @@
  *         single character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t len;
@@ -62,7 +62,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char *data, 
 	 * All valid Importer Index characters.
 	 *
 	 */
-	static const char *importeridx =
+	static const char* const importeridx =
 		"-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 
 	assert(data);

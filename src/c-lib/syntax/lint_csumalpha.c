@@ -65,7 +65,7 @@
  * may choose to support longer data inputs.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -92,7 +92,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, si
 	 * Sequence of all characters in CSET 82, ordered by weight.
 	 *
 	 */
-	static const char *cset82 =
+	static const char* const cset82 =
 		"!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 		"abcdefghijklmnopqrstuvwxyz";
 
@@ -100,14 +100,15 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, si
 	 * Sequence of all characters in CSET 32, ordered by weight.
 	 *
 	 */
-	static const char *cset32 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+	static const char* const cset32 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-	size_t i, pos;
+	size_t i, pos, len;
 	unsigned int sum = 0;
-	size_t len = strlen(data);
 	const unsigned int *p;
 
 	assert(data);
+
+	len = strlen(data);
 
 	/*
 	 * Data must include at least the check character pair.

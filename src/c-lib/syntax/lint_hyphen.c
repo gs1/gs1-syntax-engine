@@ -43,7 +43,7 @@
  * @return #GS1_LINTER_NOT_HYPHEN if the data contains a non-hyphen character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t len;

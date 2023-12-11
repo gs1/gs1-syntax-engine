@@ -57,7 +57,7 @@
  * @return #GS1_LINTER_ILLEGAL_DAY if the data contains an invalid day of the month.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond

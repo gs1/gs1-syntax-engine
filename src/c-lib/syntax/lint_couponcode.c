@@ -180,7 +180,7 @@
  *         contains an optional field 9 whose Don't Multiply Flag is invalid.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	gs1_lint_err_t ret;

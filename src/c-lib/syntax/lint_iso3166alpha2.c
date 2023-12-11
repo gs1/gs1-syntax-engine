@@ -73,7 +73,7 @@
  * @return #GS1_LINTER_NOT_ISO3166_ALPHA2 if the data is not a alpha-2 country code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*

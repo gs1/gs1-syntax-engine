@@ -53,14 +53,14 @@
  *         non-CSET 64 character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
 	 * All characters in "CSET 64", the 64 character alphabet.
 	 *
 	 */
-	static const char *cset64 =
+	static const char* const cset64 =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz"
 		"0123456789-_";

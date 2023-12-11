@@ -74,7 +74,7 @@
  * @return #GS1_LINTER_INVALID_MEDIA_TYPE if the data is not a num-3 country code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*

@@ -30,6 +30,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "couponcode",		.fn = gs1_lint_couponcode },
 	{ .name = "couponposoffer",	.fn = gs1_lint_couponposoffer },
 	{ .name = "cset39",		.fn = gs1_lint_cset39 },
+	{ .name = "cset64",		.fn = gs1_lint_cset64 },
 	{ .name = "cset82",		.fn = gs1_lint_cset82 },
 	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
 	{ .name = "csum",		.fn = gs1_lint_csum },
@@ -66,7 +67,7 @@ const struct name_function_s name_function_map[] = {
  * Return the linter function corresponding to a linter name.
  *
  */
-gs1_linter_t gs1_linter_from_name(const char *name) {
+gs1_linter_t gs1_linter_from_name(const char* const name) {
 
 	size_t s = 0, e = sizeof(name_function_map) / sizeof(name_function_map[0]);
 

@@ -52,7 +52,7 @@
 #   KeyVal:
 #
 #     "req=01+21,02,35nn"   - Mandatory association with one of the listed AI or pattern groups
-#                           - Note: Example means require either (01) and (21), or (02), or (35nn)
+#                           - Note: Example means require either (01) with (21), or (02), or (35nn)
 #     "ex=8111,394n"        - Invalid to pair with any of the listed AIs or patterns
 #                           - Note: An AI is not exclusive of itself even if it matches a pattern
 #     "dlpkey"              - GS1 Digital Link primary key, no qualifiers accepted

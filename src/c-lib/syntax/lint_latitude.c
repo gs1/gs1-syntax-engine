@@ -47,7 +47,7 @@
  * @return #GS1_LINTER_INVALID_LATITUDE if the latitude is outside the range `0000000000` - `1800000000`.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t len, pos;

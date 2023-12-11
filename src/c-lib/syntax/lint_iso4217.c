@@ -74,7 +74,7 @@
  *         currency code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -97,7 +97,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char *data, size
 	 *
 	 */
 	static const char iso4217[][4] = {
-
 		"008", "012", "032", "036", "044", "048",
 		"050", "051", "052", "060", "064", "068", "072", "084", "090", "096",
 		"104", "108", "116", "124", "132", "136", "144",

@@ -44,7 +44,7 @@
  * @return #GS1_LINTER_NON_DIGIT_CHARACTER if the data contains non-digit characters.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t pos;

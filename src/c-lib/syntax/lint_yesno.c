@@ -44,7 +44,7 @@
  * @return #GS1_LINTER_NOT_ZERO_OR_ONE if the data is not "0" or "1".
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	assert(data);

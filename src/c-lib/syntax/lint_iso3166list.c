@@ -50,7 +50,7 @@
  *         that is not a num-3 country code, or the data is empty.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166list(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	const char *p, *q;

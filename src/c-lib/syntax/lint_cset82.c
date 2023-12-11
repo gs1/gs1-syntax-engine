@@ -52,14 +52,14 @@
  *         non-CSET 82 character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset82(const char *data, size_t *err_pos, size_t *err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset82(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
 	 * All characters in "CSET 82", the 82 character alphabet.
 	 *
 	 */
-	static const char *cset82 =
+	static const char* const cset82 =
 		"!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRS"
 		"TUVWXYZ_abcdefghijklmnopqrstuvwxyz";
 
