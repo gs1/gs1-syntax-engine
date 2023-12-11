@@ -1,7 +1,11 @@
-UNRELEASED
+2023-12-11
 
 * Core: New DIGSIG_SERIAL_KEY validation function to ensure that keys include a serial component when used with AI (8030).
 * Core: Support for new Syntax Dictionary AI group syntax (e.g. "01+21") for req attributes where each listed AI must be present to be a satisfactory the constraint.
+* Core: Ensure that valid key-qualifier AIs appear in path info, where possible, rather than in query parameters.
+* Java: Build process amended to treat warnings as errors.
+* Where possible, use compiler and language features to mark depreceated functions as such in C library and bindings.
+* Update to Syntax Dictionary release 2023-12-11.
 
 
 2023-11-20
