@@ -680,19 +680,16 @@ static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* c
 
 		const struct aiValue* const ai2 = &ctx->aiData[i];
 
-		if (ai2->kind != aiValue_aival)
+		if (ai2->kind != aiValue_aival ||
+		    strncmp(ai2->ai, ai, prefixlen) != 0 ||
+		    (ignoreAI && strncmp(ai2->ai, ignoreAI, strlen(ai)) == 0)
+		   )
 			continue;
 
-		if (strncmp(ai2->ai, ai, prefixlen) == 0 &&
-		    (!ignoreAI || strncmp(ai2->ai, ignoreAI, strlen(ai)) != 0)
-		   ) {
+		if (matchedAI)
+			strncpy(matchedAI, ai2->ai, strlen(ai));
 
-			if (matchedAI)
-				strncpy(matchedAI, ai2->ai, strlen(ai));
-
-			return true;
-
-		}
+		return true;
 
 	}
 
@@ -730,20 +727,19 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
-			if (strncmp(token, "ex=", 3) == 0) {
+			char *saveptr2 = NULL;
 
-				char *saveptr2 = NULL;
+			if (strncmp(token, "ex=", 3) != 0)
+				continue;
 
-				for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+			for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
-					char matchedAI[MAX_AI_LEN+1] = { 0 };
+				char matchedAI[MAX_AI_LEN+1] = { 0 };
 
-					if (aiExists(ctx, token, ai->ai, matchedAI)) {
-						snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
-						ctx->errFlag = true;
-						return false;
-					}
-
+				if (aiExists(ctx, token, ai->ai, matchedAI)) {
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
+					ctx->errFlag = true;
+					return false;
 				}
 
 			}
@@ -786,33 +782,34 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
-			if (strncmp(token, "req=", 4) == 0) {
+			bool satisfied = true;
+			char *saveptr2 = NULL;
+			char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
 
-				bool satisfied = true;
-				char *saveptr2 = NULL;
-				char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
-				strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
+			if (strncmp(token, "req=", 4) != 0)
+				continue;
 
-				for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+			strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
 
-					char *saveptr3 = NULL;
-					satisfied = true;
+			for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
-					// All members of a group (e.g. "01+21") must be present
-					for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
-						if (!aiExists(ctx, token, ai->ai, NULL))
-							satisfied = false;
+				char *saveptr3 = NULL;
+				satisfied = true;
 
-					if (satisfied)		// Any wholly satisfied group is sufficient for req
-						break;
+				// All members of a group (e.g. "01+21") must be present
+				for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
+					if (!aiExists(ctx, token, ai->ai, NULL))
+						satisfied = false;
 
-				}
+				if (satisfied)		// Any wholly satisfied group is sufficient for req
+					break;
 
-				if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
-					ctx->errFlag = true;
-					return false;
-				}
+			}
+
+			if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
+				ctx->errFlag = true;
+				return false;
 			}
 
 		}
