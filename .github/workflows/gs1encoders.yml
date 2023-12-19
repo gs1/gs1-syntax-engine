@@ -161,6 +161,8 @@ jobs:
             -U GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP \
             -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP_H \
+            -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP \
+            -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP_H \
             -U CLOCK_MONOTONIC -U RUNNING_ON_VALGRIND -U TEST_FINI -U TEST_INIT \
             -i gs1encoders-fuzzer-ais.c \
             -i gs1encoders-fuzzer-dl.c \
