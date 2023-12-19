@@ -500,8 +500,7 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 		nwriteDataStr(p, ailen);			// Write AI
 		fnc1req = entry->fnc1;				// Record whether FNC1 required before next AI
 
-		r++;						// Advance to start of AI value
-		if (!*r) goto fail;				// Fail if message ends after AI and no value
+		if (!*++r) goto fail;				// Advance to start of AI value and fail if at end
 
 		outval = dataStr + strlen(dataStr);		// Record the current start of the output value
 

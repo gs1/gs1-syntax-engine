@@ -69,19 +69,17 @@ static void scancat(char* const out, const char* const in) {
 	char *q = out;
 
 	while (*q)
-		q++;					// Got to end of output
+		q++;						// Got to end of output
 
-	if (*p == '^') {				// GS1 mode
-		p++;					// Skip the leading FNC1 since we are following a symbology identifier
-		while (*p) {
-			if (*p == '^')			// Convert encoded FNC1 to GS
-				*q++ = '\x1D';
-			else
-				*q++ = *p;
-			p++;
-		}
-		if (*(p - 1) == '^')			// Strip any trailing FNC1
+	if (*p == '^') {					// GS1 mode
+
+		// Skip the leading FNC1 since we are following a symbology identifier
+		while (*++p)
+			*q++ = (*p == '^') ? '\x1D' : *p;	// Convert encoded FNC1 to GS
+
+		if (*(p - 1) == '^')				// Strip any trailing FNC1
 			q--;
+
 	}
 	else {
 

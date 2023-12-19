@@ -453,8 +453,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		const char *ai;
 
 		assert(*p == '/');
-		p++;
-		r = strchr(p, '/');
+		r = strchr(++p, '/');
 		assert(r);
 
 		// AI is known to be valid since we previously walked over it
@@ -568,8 +567,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
-		e++;
-		if (r == e) {
+		if (r == ++e) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value query element is empty", (int)strlen(entry->ai), ai);
 			goto fail;
 		}
@@ -775,8 +773,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	DEBUG_PRINT("Considering DL key-qualifier sequences\n");
 	bestKeyEntry = keyEntry;
 	maxQualifiers = 0;
-	keyEntry++;
-	while (keyEntry < ctx->numDLkeyQualifiers) {
+	while (++keyEntry < ctx->numDLkeyQualifiers) {
 
 		strcpy(tmp, ctx->dlKeyQualifiers[keyEntry]);
 		token = strtok_r(tmp, " ", &saveptr);
@@ -797,8 +794,6 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			bestKeyEntry = keyEntry;
 		}
 		DEBUG_PRINT("  %s: %d qualifier matches\n", ctx->dlKeyQualifiers[keyEntry], numQualifiers);
-
-		keyEntry++;
 
 	}
 	DEBUG_PRINT("  Selected '%s'\n", ctx->dlKeyQualifiers[bestKeyEntry]);
