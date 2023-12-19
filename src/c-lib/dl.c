@@ -350,7 +350,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	bool ret;
 	bool fnc1req = true;
 	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { 0 };	// Sequence of AIs extracted from the path info
-	int numPathAIs, i;
+	int numPathAIs;
 
 	assert(ctx);
 	assert(dlData);
@@ -646,6 +646,7 @@ add_query_param_to_ai_data:
 	// Validate that any attributes in the query params do not instead
 	// belong within path info
 	if (numPathAIs < MAX_AIS) {
+		int i;
 		for (i = 0; i < ctx->numAIs; i++) {
 
 			char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
