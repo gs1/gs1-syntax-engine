@@ -851,15 +851,12 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 again:
 	for (i = 0; i < ctx->numAIs; i++) {
 		const struct aiValue* ai = &ctx->aiData[i];
-		if (ai->dlPathOrder == DL_PATH_ORDER_ATTRIBUTE) {
-			if (ai->kind == aiValue_aival) {
-				assert(ai->aiEntry);
-				if (ai->aiEntry->fnc1 != emitFixed) {
-					char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-					URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-					p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
-				}
-			}
+		if (ai->dlPathOrder == DL_PATH_ORDER_ATTRIBUTE &&
+		    ai->kind == aiValue_aival &&
+		    ai->aiEntry->fnc1 != emitFixed) {
+			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+			URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
+			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
 		}
 	}
 	if (emitFixed) {
