@@ -1314,7 +1314,11 @@ acutest_cmdline_read_(const ACUTEST_CMDLINE_OPTION_* options, int argc, char** a
                             if(opt->flags & (ACUTEST_CMDLINE_OPTFLAG_OPTIONALARG_ | ACUTEST_CMDLINE_OPTFLAG_REQUIREDARG_)) {
                                 ret = callback(opt->id, argv[i]+2+len+1);
                             } else {
+#if defined(ACUTEST_WIN_)
+                                _snprintf(auxbuf, sizeof(auxbuf)-1, "--%s", opt->longname);
+#else
                                 snprintf(auxbuf, sizeof(auxbuf), "--%s", opt->longname);
+#endif
                                 ret = callback(ACUTEST_CMDLINE_OPTID_BOGUSARG_, auxbuf);
                             }
                             break;
