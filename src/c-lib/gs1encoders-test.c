@@ -18,29 +18,19 @@
  *
  */
 
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wgnu-folding-constant"
-#pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
-#elif defined(_MSC_VER)
+
+/*
+ *  Permit sprintf on MacOS clang.
+ *  Don't perform code analysis of third-party code that is only used for testing.
+ *
+ */
+#if defined(_MSC_VER)
 #include <CodeAnalysis/warnings.h>
 #pragma warning(push)
 #pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
 #endif
 #include "acutest.h"
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
 
