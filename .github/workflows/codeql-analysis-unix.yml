@@ -29,6 +29,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    #
+    #  Remove "bridging" files not compiled as part of C library builds so that
+    #  the coverage reports are clean
+    #
+    - if: matrix.language == 'c-cpp'
+      name: Prune for C build
+      run: |
+        rm -rf src/java
+        rm -rf src/ios
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
@@ -40,7 +50,9 @@ jobs:
     - if: matrix.language == 'c-cpp'
       name: Build C
       run: |
-        make -C src/c-lib
+        make -C src/c-lib -j `nproc`
+        make -C src/c-lib -j `nproc` test
+        make -C src/c-lib -j `nproc` fuzzer
 
     - if: matrix.language == 'java-kotlin'
       uses: actions/setup-java@v3
@@ -50,10 +62,16 @@ jobs:
         cache: 'gradle'
 
     - if: matrix.language == 'java-kotlin'
-      name: Build Java
+      name: Build Android app
       working-directory: src/android
       run: |
         ./gradlew build --no-daemon
+
+    - if: matrix.language == 'java-kotlin'
+      name: Build Java
+      run: |
+        make -C src/c-lib -j `nproc` libshared
+        ant -f src/java/build.xml test
 
     - if: matrix.language == 'swift' || matrix.language == 'javascript-typescript'
       name: Autobuild
