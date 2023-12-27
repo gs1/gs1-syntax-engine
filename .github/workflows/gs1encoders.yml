@@ -187,7 +187,7 @@ jobs:
 
     - name: Java CI
       run: |
-        make -C src/c-lib -j `nproc`
+        make -C src/c-lib -j `nproc` libshared
         ant -f src/java/build.xml test
 
   ci-wasm:
