@@ -1,0 +1,63 @@
+name: "CodeQL Unix"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '27 9 * * 0'
+
+jobs:
+  analyze:
+    name: Analyze
+
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'c-cpp', 'javascript-typescript', 'swift', 'java-kotlin' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        config: |
+          paths:
+            - src
+
+    - if: matrix.language == 'c-cpp'
+      name: Build C
+      run: |
+        make -C src/c-lib
+
+    - if: matrix.language == 'java-kotlin'
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - if: matrix.language == 'java-kotlin'
+      name: Build Java
+      working-directory: src/android
+      run: |
+        ./gradlew build --no-daemon
+
+    - if: matrix.language == 'swift' || matrix.language == 'javascript-typescript'
+      name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
