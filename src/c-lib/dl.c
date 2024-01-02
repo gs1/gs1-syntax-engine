@@ -246,8 +246,11 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][M
 	 *  Build a space separated AI sequence string
 	 *
 	 */
-	for (i = 0 ; i < len; i++)
-		p += snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
+	for (i = 0 ; i < len; i++) {
+		int n = snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
+		assert(n >= 1 && n < (int)(sizeof(aiseq) - (size_t)(p - aiseq)));
+		p += n;
+	}
 	*--p = '\0';		// Chop stray space
 
 	/*
@@ -835,8 +838,11 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			const struct aiValue* const ai = &ctx->aiData[j];
 			if (ai->kind == aiValue_aival && ai->dlPathOrder == i) {
 				char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+				int n;
 				URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-				p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
+				n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
+				assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
+				p += n;
 				break;
 			}
 		}
@@ -855,8 +861,11 @@ again:
 		    ai->kind == aiValue_aival &&
 		    ai->aiEntry->fnc1 != emitFixed) {
 			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+			int n;
 			URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
+			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
+			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
+			p += n;
 		}
 	}
 	if (emitFixed) {

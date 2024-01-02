@@ -362,7 +362,9 @@ char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		const struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind == aiValue_aival) {
-			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s)", ai->ailen, ai->ai);
+			int n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s)", ai->ailen, ai->ai);
+			assert(n >= 0 || n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
+			p += n;
 			for (j = 0; j < ai->vallen; j++) {
 				if (ai->value[j] == '(')	// Escape data "("
 					*p++ = '\\';
@@ -421,17 +423,28 @@ int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const out) {
 
 	*p = '\0';
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
+
 		const struct aiValue* const ai = &ctx->aiData[i];
+		int n;
+
 		if (ai->kind != aiValue_aival)
 			continue;
+
 		assert(ai->aiEntry);
+
 		ctx->outHRI[j] = p;
+
 		if (!ctx->includeDataTitlesInHRI || *ai->aiEntry->title == '\0')
-			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s) %.*s", ai->ailen, ai->ai, ai->vallen, ai->value);
+			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s) %.*s", ai->ailen, ai->ai, ai->vallen, ai->value);
 		else
-			p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%s (%.*s) %.*s", ai->aiEntry->title, ai->ailen, ai->ai, ai->vallen, ai->value);
+			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%s (%.*s) %.*s", ai->aiEntry->title, ai->ailen, ai->ai, ai->vallen, ai->value);
+		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
+		p += n;
+
 		*p++ = '\0';
+
 		j++;
+
 	}
 
 	*out = ctx->outHRI;
@@ -497,13 +510,23 @@ int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx, char*** const ou
 
 	*p = '\0';
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
+
 		const struct aiValue* const ai = &ctx->aiData[i];
+		int n;
+
 		if (ai->kind != alValue_dlign)
 			continue;
+
 		ctx->outHRI[j] = p;
-		p += snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s", ai->vallen, ai->value);
+
+		n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s", ai->vallen, ai->value);
+		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
+		p += n;
+
 		*p++ = '\0';
+
 		j++;
+
 	}
 
 	*out = ctx->outHRI;
