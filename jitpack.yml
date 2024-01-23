@@ -5,4 +5,4 @@ before_install:
 install:
   - echo "Android GS1 Library"
   - cd src/androidlibrary/
-  - ./gradlew clean gs1library:assemble publish
+  - ./gradlew publishToMavenLocal
