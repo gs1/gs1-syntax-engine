@@ -1,11 +1,26 @@
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    `maven-publish`
+}
+
+val libNamespace = "org.gs1.gs1androidlibrary"
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication> (project.name) {
+                from(components["release"])
+                groupId = libNamespace
+                artifactId = project.name
+                version = "1.0.0"
+            }
+        }
+    }
 }
 
 android {
-    namespace = "org.gs1.gs1androidlibrary"
+    namespace = libNamespace
     compileSdk = 34
 
     defaultConfig {
@@ -58,6 +73,7 @@ android {
         }
     }
 }
+
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
