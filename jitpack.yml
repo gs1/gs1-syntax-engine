@@ -1,0 +1,8 @@
+jdk:
+  - openjdk17
+before_install:
+  - ./scripts/prepareJitpackEnvironment.sh
+install:
+  - echo "Android GS1 Library"
+  - cd src/androidlibrary/
+  - ./gradlew clean gs1library:assemble publish
