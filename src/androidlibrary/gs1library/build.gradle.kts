@@ -55,25 +55,7 @@ android {
             version = "3.22.1"
         }
     }
-
-    afterEvaluate {
-        android.libraryVariants.forEach { libraryVariant ->
-            libraryVariant.outputs.forEach { _ ->
-                val archivesBaseName = project.name
-                val filePrefix = "$buildDir/outputs/aar/$archivesBaseName"
-                val fileSuffix = "aar"
-                val originalFile = file("$filePrefix-${libraryVariant.buildType.name}.$fileSuffix")
-                val renamedFile = file("$filePrefix.$fileSuffix")
-                tasks.named("assemble").configure {
-                    doLast {
-                        originalFile.renameTo(renamedFile)
-                    }
-                }
-            }
-        }
-    }
 }
-
 
 dependencies {
     testImplementation("junit:junit:4.13.2")

@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
-            if (it.resultCode != Activity.RESULT_OK) {
+            if (it.resultCode != RESULT_OK) {
                 binding.inputData.setText("Scan failed")
                 return@registerForActivityResult
             }
