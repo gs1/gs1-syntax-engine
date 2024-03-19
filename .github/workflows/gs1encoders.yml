@@ -402,7 +402,7 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v12
+    - uses: mymindstorm/setup-emsdk@v14
 
     - uses: actions/checkout@v3
 
@@ -411,7 +411,7 @@ jobs:
         make -C src/c-lib -j `nproc` wasm JSONLY=yes
         cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs src/js-wasm/example.node.mjs src/c-lib/build-wasm/
         cd src/c-lib/build-wasm
-        tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs.mem gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
+        tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store JSONLY build
       if: startsWith(github.ref, 'refs/tags/')

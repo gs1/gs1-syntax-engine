@@ -313,6 +313,5 @@ docs:
 	cp ../js-wasm/example.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder-wasm.mjs ../../docs/demo
-	cp ../js-wasm/gs1encoder-wasm.mjs.mem ../../docs/demo
 
 -include $(DEPS)
