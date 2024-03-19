@@ -913,7 +913,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * #include "gs1encoders.h"
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
- * gs1_encoder_setGS1DataStr(ctx,                           // Set the input data (AI format on this occasion)
+ * gs1_encoder_setAIdataStr(ctx,                            // Set the input data (AI format on this occasion)
  *        "(01)12345678901231(10)ABC123(11)210630");
  * printf("DL URI: %s\n", gs1_encoder_getDLuri(ctx,         // Print the GS1 Digital Link URI with a custom domain and stem
  *        "https://id.example.com/stem"));
@@ -970,9 +970,9 @@ GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem);
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);                  // Create a new instance of the library
  * if (!gs1_encoder_setScanData(ctx,                           // Process the scan data, setting dataStr and Sym)
- *        "]C1011231231231233310ABC123{GS}99TESTING"))
+ *        "]C1011231231231233310ABC123" "\x1D" "99TESTING"))
  *     exit 1;                                                 // Handle failure if bad AI data is received
- * printf("AI data: %s\n", gs1_encoder_setGS1DataStr(ctx));    // Print the AI scan data in human-friendly format
+ * printf("AI data: %s\n", gs1_encoder_getAIdataStr(ctx));     // Print the AI scan data in human-friendly format
  * gs1_encoder_free(ctx);                                      // Release the instance of the library
  * \endcode
  *
@@ -1034,7 +1034,7 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  *
  * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
  * gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded);   // Choose the symbology
- * gs1_encoder_setGS1DataStr(ctx,                           // Set the input data (AI format on this occasion)
+ * gs1_encoder_setAIdataStr(ctx,                            // Set the input data (AI format on this occasion)
  *        "(01)12345678901231(10)ABC123(11)210630");
  * printf("Scan data: %s\n", gs1_encoder_getScanData(ctx)); // Print the scan data that a reader should return
  * gs1_encoder_free(ctx);                                   // Release the instance of the library
