@@ -1,7 +1,7 @@
 /**
  * GS1 Syntax Engine
  *
- * @author Copyright (c) 2021-2022 GS1 AISBL.
+ * @author Copyright (c) 2021-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 
 
 struct symIdEntry {
-	char *identifier;
+	char identifier[2];
 	bool aiMode;
 	enum gs1_encoder_symbologies defaultSym;
 };
@@ -41,21 +41,21 @@ struct symIdEntry {
 #define AI true
 #define NON_AI false
 
-#define SYM(i, a, s) {				\
-	.identifier = i,			\
+#define SYM(i1, i2, a, s) {			\
+	.identifier = { i1, i2 },		\
 	.aiMode = a,				\
 	.defaultSym = s,			\
 }
 
 static const struct symIdEntry symIdTable[] = {
-	SYM( "]C1", AI,     gs1_encoder_sGS1_128_CCA     ),
-	SYM( "]E0", NON_AI, gs1_encoder_sEAN13           ),
-	SYM( "]E4", NON_AI, gs1_encoder_sEAN8            ),
-	SYM( "]e0", AI,     gs1_encoder_sDataBarExpanded ),	// Shared with GS1-128 CC
-	SYM( "]d1", NON_AI, gs1_encoder_sDM              ),
-	SYM( "]d2", AI,     gs1_encoder_sDM              ),
-	SYM( "]Q1", NON_AI, gs1_encoder_sQR              ),
-	SYM( "]Q3", AI,     gs1_encoder_sQR              ),
+	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCA     ),
+	SYM( 'E','0', NON_AI, gs1_encoder_sEAN13           ),
+	SYM( 'E','4', NON_AI, gs1_encoder_sEAN8            ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarExpanded ),	// Shared with GS1-128 CC
+	SYM( 'd','1', NON_AI, gs1_encoder_sDM              ),
+	SYM( 'd','2', AI,     gs1_encoder_sDM              ),
+	SYM( 'Q','1', NON_AI, gs1_encoder_sQR              ),
+	SYM( 'Q','3', AI,     gs1_encoder_sQR              ),
 };
 
 #undef AI
@@ -521,7 +521,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
 		const struct symIdEntry* const entry = &symIdTable[i];
-		if (strncmp(scanData, entry->identifier, 3) != 0)
+		if (memcmp(scanData+1, entry->identifier, 2) != 0)
 			continue;
 		aiMode = entry->aiMode;
 		sym = entry->defaultSym;
