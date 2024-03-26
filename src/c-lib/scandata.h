@@ -30,6 +30,7 @@ bool gs1_processScanData(gs1_encoder* ctx, const char* scanData);
 
 #ifdef UNIT_TESTS
 
+void test_scandata_validateParity(void);
 void test_scandata_generateScanData(void);
 void test_scandata_processScanData(void);
 

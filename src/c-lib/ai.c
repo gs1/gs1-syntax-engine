@@ -925,29 +925,6 @@ bool gs1_validateAIs(gs1_encoder* const ctx) {
 }
 
 
-// Validate and set the parity digit
-bool gs1_validateParity(uint8_t *str) {
-
-	int weight;
-	int parity = 0;
-
-	assert(*str);
-
-	weight = strlen((char*)str) % 2 == 0 ? 3 : 1;
-	while (*(str+1)) {
-		parity += weight * (*str++ - '0');
-		weight = 4 - weight;
-	}
-	parity = (10 - parity%10) % 10;
-
-	if (parity + '0' == *str) return true;
-
-	*str = (uint8_t)(parity + '0');		// Recalculate
-	return false;
-
-}
-
-
 bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 	size_t i;
@@ -1584,36 +1561,6 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(ctx, true,  validateDigSigRequiresSerialisedKey, "(8003)01234567890128X(8030)ABC123");
 
 	gs1_encoder_free(ctx);
-
-}
-
-
-void test_ai_validateParity(void) {
-
-	char good_gtin14[] = "24012345678905";
-	char bad_gtin14[]  = "24012345678909";
-	char good_gtin13[] = "2112233789657";
-	char bad_gtin13[]  = "2112233789658";
-	char good_gtin12[] = "416000336108";
-	char bad_gtin12[]  = "416000336107";
-	char good_gtin8[]  = "02345680";
-	char bad_gtin8[]   = "02345689";
-
-	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin14));
-	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin14));
-	TEST_CHECK(bad_gtin14[13] == '5');		// Recomputed
-
-	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin13));
-	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin13));
-	TEST_CHECK(bad_gtin13[12] == '7');		// Recomputed
-
-	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin12));
-	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin12));
-	TEST_CHECK(bad_gtin12[11] == '8');		// Recomputed
-
-	TEST_CHECK(gs1_validateParity((uint8_t*)good_gtin8));
-	TEST_CHECK(!gs1_validateParity((uint8_t*)bad_gtin8));
-	TEST_CHECK(bad_gtin8[7] == '0');		// Recomputed
 
 }
 

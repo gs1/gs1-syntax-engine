@@ -87,7 +87,6 @@ TEST_LIST = {
     { "ai_linters", test_ai_linters },
     { "ai_gs1_processAIdata", test_ai_processAIdata },
     { "ai_validateAIs", test_ai_validateAIs },
-    { "ai_validateParity", test_ai_validateParity },
 
 
     /*
@@ -105,6 +104,7 @@ TEST_LIST = {
      * scandata.c
      *
      */
+    { "scandata_validateParity", test_scandata_validateParity },
     { "scandata_generateScanData", test_scandata_generateScanData },
     { "scandata_processScanData", test_scandata_processScanData },
 

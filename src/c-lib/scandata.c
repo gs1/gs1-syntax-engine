@@ -98,7 +98,29 @@ static void scancat(char* const out, const char* const in) {
 }
 
 
-static bool gs1_checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
+static bool validateParity(uint8_t *str) {
+
+	int weight;
+	int parity = 0;
+
+	assert(*str);
+
+	weight = strlen((char*)str) % 2 == 0 ? 3 : 1;
+	while (*(str+1)) {
+		parity += weight * (*str++ - '0');
+		weight = 4 - weight;
+	}
+	parity = (10 - parity%10) % 10;
+
+	if (parity + '0' == *str) return true;
+
+	*str = (uint8_t)(parity + '0');		// Recalculate
+	return false;
+
+}
+
+
+static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
 
 	if (strlen(dataStr) != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
 		if (ctx->addCheckDigit)
@@ -120,7 +142,7 @@ static bool gs1_checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char 
 	if (ctx->addCheckDigit)
 		strcat(primaryStr, "-");
 
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
+	if (!validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
 		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
 		ctx->errFlag = true;
 		return false;
@@ -219,7 +241,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
 			dataStr += 3;
 
-		if (!gs1_checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
 			goto fail;
 
 		// GS1 DataBar Limited is restricted to low-valued inputs
@@ -269,7 +291,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (strlen(dataStr) >= (size_t)aizeros && strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
 			dataStr += aizeros;
 
-		if (!gs1_checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
 			goto fail;
 
 		strcat(ctx->outStr, prefix);
@@ -369,7 +391,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 			goto fail;
 		}
 
-		if (!gs1_validateParity((uint8_t*)p)) {
+		if (!validateParity((uint8_t*)p)) {
 			strcpy(ctx->errMsg, "Primary message check digit is incorrect");
 			goto fail;
 		}
@@ -445,6 +467,36 @@ fail:
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+
+
+void test_scandata_validateParity(void) {
+
+	char good_gtin14[] = "24012345678905";
+	char bad_gtin14[]  = "24012345678909";
+	char good_gtin13[] = "2112233789657";
+	char bad_gtin13[]  = "2112233789658";
+	char good_gtin12[] = "416000336108";
+	char bad_gtin12[]  = "416000336107";
+	char good_gtin8[]  = "02345680";
+	char bad_gtin8[]   = "02345689";
+
+	TEST_CHECK(validateParity((uint8_t*)good_gtin14));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin14));
+	TEST_CHECK(bad_gtin14[13] == '5');		// Recomputed
+
+	TEST_CHECK(validateParity((uint8_t*)good_gtin13));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin13));
+	TEST_CHECK(bad_gtin13[12] == '7');		// Recomputed
+
+	TEST_CHECK(validateParity((uint8_t*)good_gtin12));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin12));
+	TEST_CHECK(bad_gtin12[11] == '8');		// Recomputed
+
+	TEST_CHECK(validateParity((uint8_t*)good_gtin8));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin8));
+	TEST_CHECK(bad_gtin8[7] == '0');		// Recomputed
+
+}
 
 
 static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const int sym, const char* const dataStr, const char* const expect) {
