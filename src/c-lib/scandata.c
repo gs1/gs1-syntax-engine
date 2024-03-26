@@ -98,82 +98,20 @@ static void scancat(char* const out, const char* const in) {
 }
 
 
-static bool gs1_normaliseEAN13(gs1_encoder* const ctx, const char* dataStr, char* const primaryStr) {
+static bool gs1_checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
 
-	const unsigned int digits = ctx->sym == gs1_encoder_sEAN13 ? 13 : 12;
-
-	if (strlen(dataStr) >= 17-(size_t)digits && strncmp(dataStr, "^0100", 17-(size_t)digits) == 0)
-		dataStr += 17-digits;
-
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != digits) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %u digits", digits);
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-	else {
-		if (strlen(dataStr) != (size_t)digits-1) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %u digits without check digit", digits-1);
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
+	if (strlen(dataStr) != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
+		if (ctx->addCheckDigit)
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", length - 1);
+		else
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", length);
+		ctx->errFlag = true;
+		return false;
 	}
 
 	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "Primary data must be all digits");
 		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	primaryStr[0] = ctx->sym == gs1_encoder_sEAN13 ? '\0' : '0';  // Convert GTIN-12 to GTIN-13 if UPC-A
-	primaryStr[1] = '\0';
-	strcat(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	return true;
-
-}
-
-
-static bool gs1_normaliseEAN8(gs1_encoder* const ctx, const char* dataStr, char* const primaryStr) {
-
-	if (strlen(dataStr) >= 9 && strncmp(dataStr, "^01000000", 9) == 0)
-		dataStr += 9;
-
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 8) {
-			strcpy(ctx->errMsg, "Primary data must be 8 digits");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 7) {
-			strcpy(ctx->errMsg, "Primary data must be 7 digits without check digit");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
 		return false;
 	}
 
@@ -185,152 +123,6 @@ static bool gs1_normaliseEAN8(gs1_encoder* const ctx, const char* dataStr, char*
 	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
 		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
 		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	return true;
-
-}
-
-
-static bool gs1_normaliseUPCE(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
-
-	if (strlen(dataStr) >= 5 && strncmp(dataStr, "^0100", 5) == 0)
-		dataStr += 5;
-
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 12) {
-			strcpy(ctx->errMsg, "Primary data must be 12 digits");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 11) {
-			strcpy(ctx->errMsg, "Primary data must be 11 digits without check digit");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	return true;
-
-}
-
-
-static bool gs1_normaliseRSS14(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
-
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
-		dataStr += 3;
-
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "Primary data must be a GTIN-14");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "Primary data must be a GTIN-14 without check digit");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	return true;
-
-}
-
-
-static bool gs1_normaliseRSSLim(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr) {
-
-	if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
-	dataStr += 3;
-
-	if (!ctx->addCheckDigit) {
-		if (strlen(dataStr) != 14) {
-			strcpy(ctx->errMsg, "Primary data must be 14 digits");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-	else {
-		if (strlen(dataStr) != 13) {
-			strcpy(ctx->errMsg, "Primary data must be 13 digits without check digit");
-			ctx->errFlag = true;
-			*primaryStr = '\0';
-			return false;
-		}
-	}
-
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	strcpy(primaryStr, dataStr);
-
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
-
-	if (!gs1_validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
-		return false;
-	}
-
-	if (atof((char*)primaryStr) > 19999999999999.) {
-		strcpy(ctx->errMsg, "Primary data item value is too large");
-		ctx->errFlag = true;
-		*primaryStr = '\0';
 		return false;
 	}
 
@@ -344,6 +136,8 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 	char* cc = NULL;
 	char primaryStr[15];
 	const char *prefix;
+	const char *dataStr;
+	int length, aizeros;
 	char* ret;
 
 	assert(ctx);
@@ -383,9 +177,9 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			break;
 		}
 
-		/* FALLTHROUGH */  // For GS1-128 Composite
+		/* FALLTHROUGH */
 
-	case gs1_encoder_sDataBarExpanded:
+	case gs1_encoder_sDataBarExpanded:  // And GS1-128 Composite
 
 		// "]e0" followed by concatenated AI data from linear and CC
 		if (*ctx->dataStr != '^')
@@ -421,14 +215,21 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 		// "]e0" followed by concatenated AI data from linear and CC
 
-		// Normalise input to 14 digits
-		if (ctx->sym == gs1_encoder_sDataBarLimited)
-			gs1_normaliseRSSLim(ctx, ctx->dataStr, primaryStr);
-		else
-			gs1_normaliseRSS14(ctx, ctx->dataStr, primaryStr);
+		dataStr = ctx->dataStr;
+		if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
+			dataStr += 3;
 
-		if (*primaryStr == '\0')
+		if (!gs1_checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
 			goto fail;
+
+		// GS1 DataBar Limited is restricted to low-valued inputs
+		if (ctx->sym == gs1_encoder_sDataBarLimited) {
+			if (atof((char*)primaryStr) > 19999999999999.) {
+				strcpy(ctx->errMsg, "Primary data item value is too large");
+				ctx->errFlag = true;
+				goto fail;
+			}
+		}
 
 		strcat(ctx->outStr, "]e001");		// Convert to AI (01)
 		scancat(ctx->outStr, primaryStr);
@@ -449,21 +250,26 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// Primary is "]E0" then 13 digits (or "]E4" then 8 digits for EAN-8)
 		// CC is new message beginning "]e0"
 
-		// Normalise input
-		if (ctx->sym == gs1_encoder_sEAN8) {
-			gs1_normaliseEAN8(ctx, ctx->dataStr, primaryStr);
-			prefix = "]E4";
-		}
-		else if (ctx->sym == gs1_encoder_sUPCE) {
-			gs1_normaliseUPCE(ctx, ctx->dataStr, primaryStr);
-			prefix = "]E00";	// UPCE is normalised to 12 digits
-		}
-		else {	// EAN13 and UPC-A
-			gs1_normaliseEAN13(ctx, ctx->dataStr, primaryStr);
+		if (ctx->sym == gs1_encoder_sEAN13) {
+			length = 13;
 			prefix = "]E0";
 		}
+		else if (ctx->sym == gs1_encoder_sEAN8) {
+			length = 8;
+			prefix = "]E4";
+		}
+		else { // UPC-A or UPC-E
+			length = 12;
+			prefix = "]E00";	// As normalised to 12 digits
+		}
 
-		if (*primaryStr == '\0')
+		// If AI data beginning (01) then skip leading zeros of the GTIN-14
+		dataStr = ctx->dataStr;
+		aizeros = 17 - length;
+		if (strlen(dataStr) >= (size_t)aizeros && strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
+			dataStr += aizeros;
+
+		if (!gs1_checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
 			goto fail;
 
 		strcat(ctx->outStr, prefix);
