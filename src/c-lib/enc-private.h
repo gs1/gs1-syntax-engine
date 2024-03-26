@@ -99,6 +99,13 @@ struct gs1_encoder {
 };
 
 
+/*
+ *  Utility functions
+ *
+ */
+bool gs1_allDigits(const uint8_t *str, size_t len);
+
+
 #ifdef UNIT_TESTS
 
 void test_api_getVersion(void);

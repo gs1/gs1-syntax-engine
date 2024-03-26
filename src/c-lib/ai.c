@@ -925,24 +925,6 @@ bool gs1_validateAIs(gs1_encoder* const ctx) {
 }
 
 
-bool gs1_allDigits(const uint8_t* const str, size_t len) {
-
-	size_t i;
-
-	assert(str);
-
-	if (!len)
-		len = strlen((char *)str);
-
-	for (i = 0; i < len; i++) {
-		if (str[i] < '0' || str[i] > '9')
-			return false;
-	}
-	return true;
-
-}
-
-
 void gs1_loadValidationTable(gs1_encoder* const ctx) {
 
 #define ENTRY(n,l,e,f) ctx->validationTable[n] =			\

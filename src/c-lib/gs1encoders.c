@@ -593,6 +593,29 @@ char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
 }
 
 
+/*
+ *  Utility functions
+ *
+ */
+
+bool gs1_allDigits(const uint8_t* const str, size_t len) {
+
+	size_t i;
+
+	assert(str);
+
+	if (!len)
+		len = strlen((char *)str);
+
+	for (i = 0; i < len; i++) {
+		if (str[i] < '0' || str[i] > '9')
+			return false;
+	}
+	return true;
+
+}
+
+
 #ifdef UNIT_TESTS
 
 #define TEST_NO_MAIN

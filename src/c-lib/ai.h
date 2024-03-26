@@ -153,7 +153,6 @@ bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct 
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, bool extractAIs);
 bool gs1_validateAIs(gs1_encoder* ctx);
-bool gs1_allDigits(const uint8_t *str, size_t len);
 void gs1_loadValidationTable(gs1_encoder* ctx);
 
 
