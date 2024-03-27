@@ -705,6 +705,8 @@ void test_api_sym(void) {
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN8));
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCC));
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDM));
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sNONE));          // First
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
