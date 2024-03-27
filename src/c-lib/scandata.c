@@ -32,35 +32,97 @@
 
 
 struct symIdEntry {
-	char identifier[2];
+	char symId[2];
 	bool aiMode;
-	enum gs1_encoder_symbologies defaultSym;
+	enum gs1_encoder_symbologies sym;
 };
 
 
 #define AI true
 #define NON_AI false
 
-#define SYM(i1, i2, a, s) {			\
-	.identifier = { i1, i2 },		\
-	.aiMode = a,				\
-	.defaultSym = s,			\
+#define SYM(i1, i2, a, s) {		\
+	.symId = { i1, i2 },		\
+	.aiMode = a,			\
+	.sym = s,			\
 }
 
+
+/*
+ *  First matching instance in a lookup is the default
+ *
+ */
 static const struct symIdEntry symIdTable[] = {
-	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCA     ),
-	SYM( 'E','0', NON_AI, gs1_encoder_sEAN13           ),
-	SYM( 'E','4', NON_AI, gs1_encoder_sEAN8            ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarExpanded ),	// Shared with GS1-128 CC
-	SYM( 'd','1', NON_AI, gs1_encoder_sDM              ),
-	SYM( 'd','2', AI,     gs1_encoder_sDM              ),
-	SYM( 'Q','1', NON_AI, gs1_encoder_sQR              ),
-	SYM( 'Q','3', AI,     gs1_encoder_sQR              ),
+	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCA        ),
+	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCC        ),
+	SYM( 'E','0', NON_AI, gs1_encoder_sEAN13              ),
+	SYM( 'E','0', AI,     gs1_encoder_sEAN13              ),
+	SYM( 'E','0', NON_AI, gs1_encoder_sUPCA               ),
+	SYM( 'E','0', AI,     gs1_encoder_sUPCA               ),
+	SYM( 'E','0', NON_AI, gs1_encoder_sUPCE               ),
+	SYM( 'E','0', AI,     gs1_encoder_sUPCE               ),
+	SYM( 'E','4', NON_AI, gs1_encoder_sEAN8               ),
+	SYM( 'E','4', AI,     gs1_encoder_sEAN8               ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarExpanded    ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarOmni        ),
+	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarOmni        ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarTruncated   ),
+	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarTruncated   ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarStacked     ),
+	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarStacked     ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarStackedOmni ),
+	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarStackedOmni ),
+	SYM( 'e','0', AI,     gs1_encoder_sDataBarLimited     ),
+	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarLimited     ),
+	// e0 is also shared with GS1-128 with CC
+	SYM( 'd','1', NON_AI, gs1_encoder_sDM                 ),
+	SYM( 'd','2', AI,     gs1_encoder_sDM                 ),
+	SYM( 'Q','1', NON_AI, gs1_encoder_sQR                 ),
+	SYM( 'Q','3', AI,     gs1_encoder_sQR                 ),
 };
 
-#undef AI
-#undef NON_AI
 #undef SYM
+
+#define CC_SYM_ID "]e0"
+
+
+static const char* lookupSymId(gs1_encoder* const ctx) {
+
+	size_t i;
+	const char *symId = NULL;
+
+	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
+		const struct symIdEntry* const entry = &symIdTable[i];
+		if (entry->sym != ctx->sym ||
+		    entry->aiMode != (*ctx->dataStr == '^' ? AI : NON_AI))
+			continue;
+		symId = entry->symId;
+		break;
+	}
+
+	assert(symId);
+
+	return symId;
+
+}
+
+static void lookupSymAndModeBySymId(const char* const symId, enum gs1_encoder_symbologies* const sym, bool* const aiMode) {
+
+	size_t i;
+
+	*sym = gs1_encoder_sNONE;
+	*aiMode = NON_AI;
+
+	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
+		const struct symIdEntry* const entry = &symIdTable[i];
+		if (memcmp(symId, entry->symId, 2) != 0)
+			continue;
+		*sym = entry->sym;
+		*aiMode = entry->aiMode;
+		break;
+	}
+
+}
 
 
 static void scancat(char* const out, const char* const in) {
@@ -157,7 +219,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	char* cc = NULL;
 	char primaryStr[15];
-	const char *prefix;
+	const char *pad;
 	const char *dataStr;
 	int length, aizeros;
 	char* ret;
@@ -177,13 +239,12 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// QR: "]Q1" for plain data; "]Q3" for GS1 data
 		// DM: "]d1" for plain data; "]d2" for GS1 data
 
-		if (*ctx->dataStr == '^') {
-			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q3" : "]d2");
-		} else {
-			strcat(ctx->outStr, ctx->sym == gs1_encoder_sQR ? "]Q1" : "]d1");
-			if (cc)
-				*--cc = '|';	// Plain data so put original character back
-		}
+		// If plain data then put original faux CC delimiter back
+		if (*ctx->dataStr != '^' && cc)
+			*--cc = '|';
+
+		strcat(ctx->outStr, "]");
+		strncat(ctx->outStr, lookupSymId(ctx), 2);
 		scancat(ctx->outStr, ctx->dataStr);
 		break;
 
@@ -194,7 +255,8 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			// "]C1" for linear-only GS1-128
 			if (*ctx->dataStr != '^')
 				goto fail;
-			strcat(ctx->outStr, "]C1");
+			strcat(ctx->outStr, "]");
+			strncat(ctx->outStr, lookupSymId(ctx), 2);
 			scancat(ctx->outStr, ctx->dataStr);
 			break;
 		}
@@ -206,7 +268,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// "]e0" followed by concatenated AI data from linear and CC
 		if (*ctx->dataStr != '^')
 			goto fail;
-		strcat(ctx->outStr, "]e0");
+		strcat(ctx->outStr, CC_SYM_ID);
 		scancat(ctx->outStr, ctx->dataStr);
 
 		if (cc) {
@@ -253,7 +315,9 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			}
 		}
 
-		strcat(ctx->outStr, "]e001");		// Convert to AI (01)
+		strcat(ctx->outStr, "]");
+		strncat(ctx->outStr, lookupSymId(ctx), 2);
+		strcat(ctx->outStr, "01");		// Convert to AI (01)
 		scancat(ctx->outStr, primaryStr);
 
 		if (cc) {
@@ -274,15 +338,15 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 		if (ctx->sym == gs1_encoder_sEAN13) {
 			length = 13;
-			prefix = "]E0";
+			pad = "";
 		}
 		else if (ctx->sym == gs1_encoder_sEAN8) {
 			length = 8;
-			prefix = "]E4";
+			pad = "";
 		}
-		else { // UPC-A or UPC-E
+		else {  // UPC-A or UPC-E
 			length = 12;
-			prefix = "]E00";	// As normalised to 12 digits
+			pad = "0";		// As normalised to 12 digits
 		}
 
 		// If AI data beginning (01) then skip leading zeros of the GTIN-14
@@ -294,12 +358,14 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
 			goto fail;
 
-		strcat(ctx->outStr, prefix);
+		strcat(ctx->outStr, "]");
+		strncat(ctx->outStr, lookupSymId(ctx), 2);
+		strcat(ctx->outStr, pad);
 		scancat(ctx->outStr, primaryStr);
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
-			strcat(ctx->outStr, "|]e0");		// "|" means start of new message
+			strcat(ctx->outStr, "|" CC_SYM_ID);		// "|" means start of new message
 			scancat(ctx->outStr, cc);
 		}
 		break;
@@ -311,7 +377,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 out:
 
 	if (cc)
-		*(cc - 1) = '|';			// Put original separator back
+		*--cc = '|';			// Put original separator back
 	return ret;
 
 fail:
@@ -324,9 +390,8 @@ fail:
 
 bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
-	size_t i;
-	bool aiMode = false;
-	enum gs1_encoder_symbologies sym = gs1_encoder_sNONE;
+	enum gs1_encoder_symbologies sym;
+	bool aiMode;
 	char *p;
 	const char *q;
 
@@ -347,14 +412,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		goto fail;
 	}
 
-	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
-		const struct symIdEntry* const entry = &symIdTable[i];
-		if (memcmp(scanData+1, entry->identifier, 2) != 0)
-			continue;
-		aiMode = entry->aiMode;
-		sym = entry->defaultSym;
-		break;
-	}
+	lookupSymAndModeBySymId(scanData + 1, &sym, &aiMode);
 
 	if (sym == gs1_encoder_sNONE) {
 		strcpy(ctx->errMsg, "Unsupported symbology identifier");
@@ -375,9 +433,9 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 			goto fail;
 		}
 
-		if (strlen(scanData) >= primaryLen + 4 &&
-		    strncmp(scanData + primaryLen, "|]e0", 4) == 0) {
-			cc = scanData + primaryLen + 4;
+		if (strlen(scanData) >= primaryLen + sizeof(CC_SYM_ID) &&
+		    strncmp(scanData + primaryLen, "|" CC_SYM_ID, sizeof(CC_SYM_ID)) == 0) {
+			cc = scanData + primaryLen + sizeof(CC_SYM_ID);
 		} else if (strlen(scanData) > primaryLen) {
 			strcpy(ctx->errMsg, "Primary message is too long");
 			goto fail;
@@ -403,11 +461,11 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		p += primaryLen;
 		*p++ = '|';
 		scanData = cc;
-		aiMode = true;
+		aiMode = AI;
 
 	}
 
-	if (aiMode) {
+	if (aiMode == AI) {
 
 		q = p;
 		*p++ = '^';
@@ -556,10 +614,12 @@ void test_scandata_generateScanData(void) {
 		"^011231231231233310ABC123^11991225|^98COMPOSITE^97XYZ",
 		"]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ");
 
-	/* GS1-128 */
 	test_testGenerateScanData(GS1_128_CCA, "^011231231231233310ABC123^99TESTING",
 		"]C1011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(GS1_128_CCA,					// Composite uses ]e0
+		"^011231231231233310ABC123^99TESTING|^98COMPOSITE^97XYZ",
+		"]e0011231231231233310ABC123" "\x1D" "99TESTING" "\x1D" "98COMPOSITE" "\x1D" "97XYZ");
+	test_testGenerateScanData(GS1_128_CCC,					// Composite uses ]e0
 		"^011231231231233310ABC123^99TESTING|^98COMPOSITE^97XYZ",
 		"]e0011231231231233310ABC123" "\x1D" "99TESTING" "\x1D" "98COMPOSITE" "\x1D" "97XYZ");
 
@@ -652,7 +712,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]Q3011231231231233310ABC123" "\x1D" "99TESTING",
 		QR, "^011231231231233310ABC123^99TESTING");
 
-	// GS1 Digital Link URI
+	/* QR Code with GS1 Digital Link URI */
 	test_testProcessScanData(true, "]Q1https://example.com/01/12312312312333?99=TEST",
 		QR, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
@@ -666,7 +726,7 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]d2011231231231233310ABC123" "\x1D" "99TESTING",
 		DM, "^011231231231233310ABC123^99TESTING");
 
-	// GS1 Digital Link URI
+	/* DM with GS1 Digital Link URI */
 	test_testProcessScanData(true, "]d1https://example.com/01/12312312312333?99=TEST",
 		DM, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
