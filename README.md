@@ -59,16 +59,17 @@ library to be redistributed with an application.
 
 This repository contains:
 
-| Directory      | Purpose                                                                                                                                         |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| src/c-lib      | Source for the native C library ("The library"), unit tests, fuzzers and demo console application                                               |
-| docs           | Documentation for the public API of the native C library                                                                                        |
-| src/dotnet-lib | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                                                     |
-| src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                              |
-| src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or pure JavaScript build, with demo web and console applications |
-| src/java       | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                         |
-| src/android    | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                                     |
-| src/ios        | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                                |
+| Directory          | Purpose                                                                                                                                         |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| src/c-lib          | Source for the native C library ("The library"), unit tests, fuzzers and demo console application                                               |
+| docs               | Documentation for the public API of the native C library                                                                                        |
+| src/dotnet-lib     | C# .NET wrappers that provide a managed code interface to the native library using P/Invoke                                                     |
+| src/dotnet-app     | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                              |
+| src/js-wasm        | A JavaScript wrapper that provides an developer-friendly interface to the WASM or pure JavaScript build, with demo web and console applications |
+| src/java           | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                         |
+| src/android        | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                                    |
+| src/androidlibrary | An Android Studio project that demonstrates how to use the android library to create an Android app                                             |
+| src/ios            | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                                |
 
 
 ### Building on Windows
