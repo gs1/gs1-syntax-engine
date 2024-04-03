@@ -31,19 +31,22 @@
 #include "dl.h"
 
 
+typedef enum {
+	aiMode_AI,
+	aiMode_NON_AI
+} aiMode_t;
+
+
 struct symIdEntry {
 	char symId[2];
-	bool aiMode;
+	aiMode_t aiMode;
 	enum gs1_encoder_symbologies sym;
 };
 
 
-#define AI true
-#define NON_AI false
-
 #define SYM(i1, i2, a, s) {		\
 	.symId = { i1, i2 },		\
-	.aiMode = a,			\
+	.aiMode = aiMode_##a,		\
 	.sym = s,			\
 }
 
@@ -94,7 +97,7 @@ static const char* lookupSymId(gs1_encoder* const ctx) {
 	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
 		const struct symIdEntry* const entry = &symIdTable[i];
 		if (entry->sym != ctx->sym ||
-		    entry->aiMode != (*ctx->dataStr == '^' ? AI : NON_AI))
+		    entry->aiMode != (*ctx->dataStr == '^' ? aiMode_AI : aiMode_NON_AI))
 			continue;
 		symId = entry->symId;
 		break;
@@ -106,12 +109,12 @@ static const char* lookupSymId(gs1_encoder* const ctx) {
 
 }
 
-static void lookupSymAndModeBySymId(const char* const symId, enum gs1_encoder_symbologies* const sym, bool* const aiMode) {
+static void lookupSymAndModeBySymId(const char* const symId, enum gs1_encoder_symbologies* const sym, aiMode_t* const aiMode) {
 
 	size_t i;
 
 	*sym = gs1_encoder_sNONE;
-	*aiMode = NON_AI;
+	*aiMode = aiMode_NON_AI;
 
 	for (i = 0; i < SIZEOF_ARRAY(symIdTable); i++) {
 		const struct symIdEntry* const entry = &symIdTable[i];
@@ -391,7 +394,7 @@ fail:
 bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 	enum gs1_encoder_symbologies sym;
-	bool aiMode;
+	aiMode_t aiMode;
 	char *p;
 	const char *q;
 
@@ -461,11 +464,11 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		p += primaryLen;
 		*p++ = '|';
 		scanData = cc;
-		aiMode = AI;
+		aiMode = aiMode_AI;
 
 	}
 
-	if (aiMode == AI) {
+	if (aiMode == aiMode_AI) {
 
 		q = p;
 		*p++ = '^';
