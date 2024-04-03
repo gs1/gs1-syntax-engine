@@ -114,12 +114,12 @@ char* gs1_encoder_getVersion(void) {
 }
 
 
-int gs1_encoder_getSym(gs1_encoder* const ctx) {
+gs1_encoder_symbologies_t gs1_encoder_getSym(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->sym;
 }
-bool gs1_encoder_setSym(gs1_encoder* const ctx, const int sym) {
+bool gs1_encoder_setSym(gs1_encoder* const ctx, const gs1_encoder_symbologies_t sym) {
 	assert(ctx);
 	reset_error(ctx);
 	if (sym < gs1_encoder_sNONE || sym >= gs1_encoder_sNUMSYMS) {
@@ -185,12 +185,12 @@ bool gs1_encoder_setValidateAIassociations(gs1_encoder* const ctx, const bool va
 }
 
 
-bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation) {
+bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_validations_t validation) {
 	assert(ctx);
 	reset_error(ctx);
 	return ctx->validationTable[validation].enabled;
 }
-bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const enum gs1_encoder_validations validation, const bool enabled) {
+bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_validations_t validation, const bool enabled) {
 	assert(ctx);
 	reset_error(ctx);
 	if (validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {

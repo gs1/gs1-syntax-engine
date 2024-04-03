@@ -61,7 +61,7 @@
 
 struct gs1_encoder {
 
-	int sym;				// Symbology type
+	gs1_encoder_symbologies_t sym;		// Symbology type
 
 	bool addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
 	bool permitUnknownAIs;			// Extract AIs that are not in our AI table during AI element string and DL URI parsing

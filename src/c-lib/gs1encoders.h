@@ -277,6 +277,12 @@ enum gs1_encoder_symbologies {
 	gs1_encoder_sNUMSYMS,
 };
 
+/**
+ * @brief Equivalent to the `enum gs1_encoder_symbologies` type.
+ *
+ */
+typedef enum gs1_encoder_symbologies gs1_encoder_symbologies_t;
+
 
 /// Optional AI validation procedures that may be applied to detect invalid inputs when AI data is provided using gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or gs1_encoder_setScanData().
 /// @note Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
@@ -288,6 +294,13 @@ enum gs1_encoder_validations {
 	gs1_encoder_vDIGSIG_SERIAL_KEY,
 	gs1_encoder_vNUMVALIDATIONS,
 };
+
+
+/**
+ * @brief Equivalent to the `enum gs1_encoder_validations` type.
+ *
+ */
+typedef enum gs1_encoder_validations gs1_encoder_validations_t;
 
 
 /**
@@ -510,7 +523,7 @@ GS1_ENCODERS_API char* gs1_encoder_getErrMarkup(gs1_encoder *ctx);
  * @param [in,out] ctx ::gs1_encoder context
  * @return symbology type, one of ::gs1_encoder_symbologies
  */
-GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
+GS1_ENCODERS_API gs1_encoder_symbologies_t gs1_encoder_getSym(gs1_encoder *ctx);
 
 
 /**
@@ -526,7 +539,7 @@ GS1_ENCODERS_API int gs1_encoder_getSym(gs1_encoder *ctx);
  * @param [in] sym symbology type
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
-GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym);
+GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, gs1_encoder_symbologies_t sym);
 
 
 /**
@@ -675,7 +688,7 @@ GS1_ENCODERS_API bool gs1_encoder_setIncludeDataTitlesInHRI(gs1_encoder *ctx, bo
  * @param [in] validation a validation procedure of type ::gs1_encoder_validations to check the status of
  * @return true if the AI validation procedure is currently enabled, false otherwise including when the procedure is unknown
  */
-GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, enum gs1_encoder_validations validation);
+GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, gs1_encoder_validations_t validation);
 
 
 /**
@@ -709,7 +722,7 @@ GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, enum gs
  * @param [in] enabled validation is enabled if true; disabled if false
  * @return true on success, otherwise false (for example when an attempt is made to modify a "locked" validation) and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
-GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, enum gs1_encoder_validations validation, bool enabled);
+GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, gs1_encoder_validations_t validation, bool enabled);
 
 
 /**
@@ -926,6 +939,10 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * functions that modify the input data buffer such as
  * gs1_encoder_setDataStr(), gs1_encoder_setAIdataStr() and
  * gs1_encoder_setScanData().
+ *
+ * \note
+ * The returned pointer should be checked for NULL which indicates that invalid
+ * input was provided for the selected symbology.
  *
  * @see gs1_encoder_setScanData()
  * @see gs1_encoder_setDataStr()

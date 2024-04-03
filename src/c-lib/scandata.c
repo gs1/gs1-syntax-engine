@@ -40,7 +40,7 @@ typedef enum {
 struct symIdEntry {
 	char symId[2];
 	aiMode_t aiMode;
-	enum gs1_encoder_symbologies sym;
+	gs1_encoder_symbologies_t sym;
 };
 
 
@@ -109,7 +109,7 @@ static const char* lookupSymId(gs1_encoder* const ctx) {
 
 }
 
-static void lookupSymAndModeBySymId(const char* const symId, enum gs1_encoder_symbologies* const sym, aiMode_t* const aiMode) {
+static void lookupSymAndModeBySymId(const char* const symId, gs1_encoder_symbologies_t* const sym, aiMode_t* const aiMode) {
 
 	size_t i;
 
@@ -373,6 +373,10 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		}
 		break;
 
+	case gs1_encoder_sNONE:
+	case gs1_encoder_sNUMSYMS:
+		goto fail;
+
 	}
 
 	ret = ctx->outStr;
@@ -395,7 +399,7 @@ fail:
 
 bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
-	enum gs1_encoder_symbologies sym;
+	gs1_encoder_symbologies_t sym;
 	aiMode_t aiMode;
 	char *p;
 	const char *q;
@@ -562,7 +566,7 @@ void test_scandata_validateParity(void) {
 }
 
 
-static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const int sym, const char* const dataStr, const char* const expect) {
+static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const gs1_encoder_symbologies_t sym, const char* const dataStr, const char* const expect) {
 
 	char *out;
 	char casename[256];
@@ -572,7 +576,13 @@ static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* con
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, sym));
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, dataStr));
-	TEST_ASSERT((out = gs1_generateScanData(ctx)) != NULL);
+	out = gs1_generateScanData(ctx);
+	if (!expect) {
+		TEST_CHECK(out == NULL);
+		TEST_MSG("Given: %s; Got: %s; Expected: NULL", dataStr, out);
+		return;
+	}
+	TEST_ASSERT(out != NULL);
 	assert(out);
 	TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s", dataStr, out, expect);
@@ -590,8 +600,8 @@ void test_scandata_generateScanData(void) {
 	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
 } while (0)
 
-	test_testGenerateScanData(NONE, "", "");
-	test_testGenerateScanData(NONE, "TESTING", "");
+	test_testGenerateScanData(NONE, "", NULL);
+	test_testGenerateScanData(NONE, "TESTING", NULL);
 
 	/* QR */
 	test_testGenerateScanData(QR, "TESTING", "]Q1TESTING");
@@ -672,7 +682,7 @@ void test_scandata_generateScanData(void) {
 
 
 static void do_test_testProcessScanData(gs1_encoder* const ctx, const bool should_succeed, const char* const scanData,
-		const char* const expectSymName, const enum gs1_encoder_symbologies expectSym, const char* const expectDataStr) {
+		const char* const expectSymName, const gs1_encoder_symbologies_t expectSym, const char* const expectDataStr) {
 
 	char casename[256];
 
