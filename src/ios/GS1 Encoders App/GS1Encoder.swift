@@ -187,8 +187,8 @@ class GS1Encoder {
      *   - gs1_encoder_getVersion()
      *
      */
-    func getSym() -> Int {
-        return Int(gs1_encoder_getSym(ctx))
+    func getSym() -> Symbology {
+        return Symbology(rawValue: gs1_encoder_getSym(ctx).rawValue) ?? Symbology.NONE
     }
 
     /**
@@ -199,8 +199,8 @@ class GS1Encoder {
      *   - gs1_encoder_setVersion()
      *
      */
-    func setSym(_ value: Int) throws {
-        if (!gs1_encoder_setSym(ctx, Int32(value))) {
+    func setSym(_ value: Symbology) throws {
+        if (!gs1_encoder_setSym(ctx, gs1_encoder_symbologies(value.rawValue))) {
             throw GS1EncoderError.parameterError(msg: self.getErrMsg())
         }
     }
