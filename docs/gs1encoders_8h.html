@@ -136,7 +136,7 @@ GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                  <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a2e0cae29460a28e7415ab312dee7183c"><div class="ttname"><a href="gs1encoders_8h.html#a2e0cae29460a28e7415ab312dee7183c">gs1_encoder_getErrMarkup</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getErrMarkup(gs1_encoder *ctx)</div><div class="ttdoc">Read the error markup generated when parsing AI data fails due to a linting failure.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:321</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:334</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3fe65a09fa62afe033b6697970778e25"><div class="ttname"><a href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a></div><div class="ttdeci">GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char ***hri)</div><div class="ttdoc">Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a6e10980e07a7e70d81592243171e9cff"><div class="ttname"><a href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_abdce5a9347ff7cbbd153b1a13e3273dd"><div class="ttname"><a href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...</div></div>
@@ -185,7 +185,7 @@ Barcode scan data processing</h3>
 <div class="line"><span class="comment">// description of gs1_encoder_setScanData()</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);</div>
-<div class="ttc" id="ags1encoders_8h_html_a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"><div class="ttname"><a href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a></div><div class="ttdeci">@ gs1_encoder_vREQUISITE_AIS</div><div class="ttdoc">Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:286</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"><div class="ttname"><a href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a></div><div class="ttdeci">@ gs1_encoder_vREQUISITE_AIS</div><div class="ttdoc">Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:292</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ac137de565a438241f6e8b80598cef464"><div class="ttname"><a href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder *ctx, const char *scanData)</div><div class="ttdoc">Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is required that AIM Symbology Identifiers are enabled on the barcode reader.</dd>
 <dd>
@@ -193,6 +193,14 @@ It is assumed the scanned barcode message "survives the channel" intact, i.e. th
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a144e851913c5a265ef16602d35386773"><td class="memItemLeft" align="right" valign="top"><a id="a144e851913c5a265ef16602d35386773"></a>
+typedef enum <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053">gs1_encoder_symbologies</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a144e851913c5a265ef16602d35386773">gs1_encoder_symbologies_t</a></td></tr>
+<tr class="memdesc:a144e851913c5a265ef16602d35386773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equivalent to the <code>enum gs1_encoder_symbologies</code> type. <br /></td></tr>
+<tr class="separator:a144e851913c5a265ef16602d35386773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab94060b79d4be0e310c7de0ddbd000d5"><td class="memItemLeft" align="right" valign="top"><a id="ab94060b79d4be0e310c7de0ddbd000d5"></a>
+typedef enum <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab94060b79d4be0e310c7de0ddbd000d5">gs1_encoder_validations_t</a></td></tr>
+<tr class="memdesc:ab94060b79d4be0e310c7de0ddbd000d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equivalent to the <code>enum gs1_encoder_validations</code> type. <br /></td></tr>
+<tr class="separator:ab94060b79d4be0e310c7de0ddbd000d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34f786d8479759fd8894c6d22a9f5c34"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></td></tr>
 <tr class="memdesc:a34f786d8479759fd8894c6d22a9f5c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">A gs1_encoder context.  <a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">More...</a><br /></td></tr>
 <tr class="separator:a34f786d8479759fd8894c6d22a9f5c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,12 +262,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a2e0cae29460a28e7415ab312dee7183c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a2e0cae29460a28e7415ab312dee7183c">gs1_encoder_getErrMarkup</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:a2e0cae29460a28e7415ab312dee7183c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the error markup generated when parsing AI data fails due to a linting failure.  <a href="gs1encoders_8h.html#a2e0cae29460a28e7415ab312dee7183c">More...</a><br /></td></tr>
 <tr class="separator:a2e0cae29460a28e7415ab312dee7183c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2ba9da9aff475c78d2e58bfc1632056"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056">gs1_encoder_getSym</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
-<tr class="memdesc:ae2ba9da9aff475c78d2e58bfc1632056"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current symbology type.  <a href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056">More...</a><br /></td></tr>
-<tr class="separator:ae2ba9da9aff475c78d2e58bfc1632056"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c6e9e761ef9d0be70222b5b15767d7f"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, int sym)</td></tr>
-<tr class="memdesc:a4c6e9e761ef9d0be70222b5b15767d7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the symbology type.  <a href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">More...</a><br /></td></tr>
-<tr class="separator:a4c6e9e761ef9d0be70222b5b15767d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a701eddf5ca4737149567d7a7b97cb884"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a144e851913c5a265ef16602d35386773">gs1_encoder_symbologies_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a701eddf5ca4737149567d7a7b97cb884">gs1_encoder_getSym</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
+<tr class="memdesc:a701eddf5ca4737149567d7a7b97cb884"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current symbology type.  <a href="gs1encoders_8h.html#a701eddf5ca4737149567d7a7b97cb884">More...</a><br /></td></tr>
+<tr class="separator:a701eddf5ca4737149567d7a7b97cb884"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0dde3809298ee931ebfcfd7bec442d2"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, <a class="el" href="gs1encoders_8h.html#a144e851913c5a265ef16602d35386773">gs1_encoder_symbologies_t</a> sym)</td></tr>
+<tr class="memdesc:ac0dde3809298ee931ebfcfd7bec442d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the symbology type.  <a href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">More...</a><br /></td></tr>
+<tr class="separator:ac0dde3809298ee931ebfcfd7bec442d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef6ebfc63b8088b22bb3cc0926430ac6"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aef6ebfc63b8088b22bb3cc0926430ac6">gs1_encoder_getAddCheckDigit</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:aef6ebfc63b8088b22bb3cc0926430ac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of the "add check digit" mode.  <a href="gs1encoders_8h.html#aef6ebfc63b8088b22bb3cc0926430ac6">More...</a><br /></td></tr>
 <tr class="separator:aef6ebfc63b8088b22bb3cc0926430ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -284,12 +292,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a597b02c6c7fa732891bd28c6634d2847"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a597b02c6c7fa732891bd28c6634d2847">gs1_encoder_setIncludeDataTitlesInHRI</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, bool includeDataTitles)</td></tr>
 <tr class="memdesc:a597b02c6c7fa732891bd28c6634d2847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable "include data titles in HRI" flag.  <a href="gs1encoders_8h.html#a597b02c6c7fa732891bd28c6634d2847">More...</a><br /></td></tr>
 <tr class="separator:a597b02c6c7fa732891bd28c6634d2847"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a872381c23b0f7022199f40ceb42d8136"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a872381c23b0f7022199f40ceb42d8136">gs1_encoder_getValidationEnabled</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, enum <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a> validation)</td></tr>
-<tr class="memdesc:a872381c23b0f7022199f40ceb42d8136"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current enabled status of the provided AI validation procedure.  <a href="gs1encoders_8h.html#a872381c23b0f7022199f40ceb42d8136">More...</a><br /></td></tr>
-<tr class="separator:a872381c23b0f7022199f40ceb42d8136"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af54e8727c69c88cc7732a2773ee79f7e"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#af54e8727c69c88cc7732a2773ee79f7e">gs1_encoder_setValidationEnabled</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, enum <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a> validation, bool enabled)</td></tr>
-<tr class="memdesc:af54e8727c69c88cc7732a2773ee79f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable the given AI validation procedure of type <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a>, that determines whether certain checks are enfored when data is provided using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.  <a href="gs1encoders_8h.html#af54e8727c69c88cc7732a2773ee79f7e">More...</a><br /></td></tr>
-<tr class="separator:af54e8727c69c88cc7732a2773ee79f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab73fae7db60e4cdc3ec0b7720322bad9"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9">gs1_encoder_getValidationEnabled</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, <a class="el" href="gs1encoders_8h.html#ab94060b79d4be0e310c7de0ddbd000d5">gs1_encoder_validations_t</a> validation)</td></tr>
+<tr class="memdesc:ab73fae7db60e4cdc3ec0b7720322bad9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current enabled status of the provided AI validation procedure.  <a href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9">More...</a><br /></td></tr>
+<tr class="separator:ab73fae7db60e4cdc3ec0b7720322bad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa946d38ee07b2d0347bddbfb36fbb0c8"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8">gs1_encoder_setValidationEnabled</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx, <a class="el" href="gs1encoders_8h.html#ab94060b79d4be0e310c7de0ddbd000d5">gs1_encoder_validations_t</a> validation, bool enabled)</td></tr>
+<tr class="memdesc:aa946d38ee07b2d0347bddbfb36fbb0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable the given AI validation procedure of type <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a>, that determines whether certain checks are enfored when data is provided using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.  <a href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8">More...</a><br /></td></tr>
+<tr class="separator:aa946d38ee07b2d0347bddbfb36fbb0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a349ab6dfeb0ab4d53a2b6f290e9fb97b"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API DEPRECATED bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a349ab6dfeb0ab4d53a2b6f290e9fb97b">gs1_encoder_getValidateAIassociations</a> (<a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx)</td></tr>
 <tr class="memdesc:a349ab6dfeb0ab4d53a2b6f290e9fb97b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provided for backwards compatibility to get the current enabled status of the <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" title="Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.">gs1_encoder_vREQUISITE_AIS</a> validation procedure.  <a href="gs1encoders_8h.html#a349ab6dfeb0ab4d53a2b6f290e9fb97b">More...</a><br /></td></tr>
 <tr class="separator:a349ab6dfeb0ab4d53a2b6f290e9fb97b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -760,7 +768,9 @@ The return data does not need to be free()ed and the content should be copied if
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html"><div class="ttname"><a href="gs1encoders_8h.html">gs1encoders.h</a></div></div>
 <div class="ttc" id="ags1encoders_8h_html_a14b22ec14d95f55d4bb3b0071b3aca61"><div class="ttname"><a href="gs1encoders_8h.html#a14b22ec14d95f55d4bb3b0071b3aca61">gs1_encoder_getDLuri</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem)</div><div class="ttdoc">Returns a GS1 Digital Link URI representing AI-based input data.</div></div>
-</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd></dl>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd>
+<dd>
+The returned pointer should be checked for NULL which indicates that invalid input was provided for the selected symbology.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> </dd>
@@ -857,7 +867,7 @@ Data validation checks</h3>
 <li>Apply each of the Linters in turn.</li>
 </ul>
 </li>
-<li>Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via <a class="el" href="gs1encoders_8h.html#af54e8727c69c88cc7732a2773ee79f7e" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a>), for example:<ul>
+<li>Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via <a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a>), for example:<ul>
 <li>Ensure that repeated AIs have the same value.</li>
 <li>Ensure that mutually-exclusive AIs are not present.</li>
 <li>Ensure that all requisite AIs are accounted for.</li>
@@ -1113,14 +1123,14 @@ Data validation checks</h3>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code" href="gs1encoders_8h.html#a6e10980e07a7e70d81592243171e9cff">gs1_encoder_init</a>(NULL);               <span class="comment">// Create a new instance of the library</span></div>
-<div class="line"><a class="code" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>);   <span class="comment">// Choose the symbology</span></div>
+<div class="line"><a class="code" href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a>(ctx, <a class="code" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>);   <span class="comment">// Choose the symbology</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(ctx,                            <span class="comment">// Set the input data (AI format on this occasion)</span></div>
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line">printf(<span class="stringliteral">&quot;Scan data: %s\n&quot;</span>, <a class="code" href="gs1encoders_8h.html#a9fbea46b1179c7e866ad4a2ebede9ab4">gs1_encoder_getScanData</a>(ctx)); <span class="comment">// Print the scan data that a reader should return</span></div>
 <div class="line"><a class="code" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
-<div class="ttc" id="ags1encoders_8h_html_a4c6e9e761ef9d0be70222b5b15767d7f"><div class="ttname"><a href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f">gs1_encoder_setSym</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, int sym)</div><div class="ttdoc">Set the symbology type.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a></div><div class="ttdeci">@ gs1_encoder_sDataBarExpanded</div><div class="ttdoc">GS1 DataBar Expanded (Stacked)</div><div class="ttdef"><b>Definition:</b> gs1encoders.h:268</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a9fbea46b1179c7e866ad4a2ebede9ab4"><div class="ttname"><a href="gs1encoders_8h.html#a9fbea46b1179c7e866ad4a2ebede9ab4">gs1_encoder_getScanData</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getScanData(gs1_encoder *ctx)</div><div class="ttdoc">Returns the string that should be returned by scanners when reading a symbol that is an instance of t...</div></div>
+<div class="ttc" id="ags1encoders_8h_html_ac0dde3809298ee931ebfcfd7bec442d2"><div class="ttname"><a href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, gs1_encoder_symbologies_t sym)</div><div class="ttdoc">Set the symbology type.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a> </dd>
 <dd>
@@ -1137,14 +1147,14 @@ Data validation checks</h3>
 
 </div>
 </div>
-<a id="ae2ba9da9aff475c78d2e58bfc1632056"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2ba9da9aff475c78d2e58bfc1632056">&#9670;&nbsp;</a></span>gs1_encoder_getSym()</h2>
+<a id="a701eddf5ca4737149567d7a7b97cb884"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a701eddf5ca4737149567d7a7b97cb884">&#9670;&nbsp;</a></span>gs1_encoder_getSym()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GS1_ENCODERS_API int gs1_encoder_getSym </td>
+          <td class="memname">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a144e851913c5a265ef16602d35386773">gs1_encoder_symbologies_t</a> gs1_encoder_getSym </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td>
           <td class="paramname"><em>ctx</em></td><td>)</td>
@@ -1154,10 +1164,10 @@ Data validation checks</h3>
 </div><div class="memdoc">
 
 <p>Get the current symbology type. </p>
-<dl class="section note"><dt>Note</dt><dd>This might be set manually via <a class="el" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f" title="Set the symbology type.">gs1_encoder_setSym()</a> or automatically when processing scan data with gs1_encoder_setScanData.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This might be set manually via <a class="el" href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2" title="Set the symbology type.">gs1_encoder_setSym()</a> or automatically when processing scan data with gs1_encoder_setScanData.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="Recognised GS1 barcode formats (&quot;symbologies&quot;) for processing scan data.">gs1_encoder_symbologies</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#a4c6e9e761ef9d0be70222b5b15767d7f" title="Set the symbology type.">gs1_encoder_setSym()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2" title="Set the symbology type.">gs1_encoder_setSym()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1186,7 +1196,7 @@ Data validation checks</h3>
 
 <p>Provided for backwards compatibility to get the current enabled status of the <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" title="Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.">gs1_encoder_vREQUISITE_AIS</a> validation procedure. </p>
 <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a872381c23b0f7022199f40ceb42d8136" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1197,8 +1207,8 @@ Data validation checks</h3>
 
 </div>
 </div>
-<a id="a872381c23b0f7022199f40ceb42d8136"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a872381c23b0f7022199f40ceb42d8136">&#9670;&nbsp;</a></span>gs1_encoder_getValidationEnabled()</h2>
+<a id="ab73fae7db60e4cdc3ec0b7720322bad9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab73fae7db60e4cdc3ec0b7720322bad9">&#9670;&nbsp;</a></span>gs1_encoder_getValidationEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1212,7 +1222,7 @@ Data validation checks</h3>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#ab94060b79d4be0e310c7de0ddbd000d5">gs1_encoder_validations_t</a>&#160;</td>
           <td class="paramname"><em>validation</em>&#160;</td>
         </tr>
         <tr>
@@ -1224,7 +1234,7 @@ Data validation checks</h3>
 </div><div class="memdoc">
 
 <p>Get the current enabled status of the provided AI validation procedure. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#af54e8727c69c88cc7732a2773ee79f7e" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1673,7 +1683,7 @@ Data validation checks</h3>
 <dd>
 <a class="el" href="gs1encoders_8h.html#a30d5e311f56f119fbfe6c2d9e1405731" title="Return the barcode input data buffer in human-friendly AI syntax.">gs1_encoder_getAIdataStr()</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#a701eddf5ca4737149567d7a7b97cb884" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1685,8 +1695,8 @@ Data validation checks</h3>
 
 </div>
 </div>
-<a id="a4c6e9e761ef9d0be70222b5b15767d7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c6e9e761ef9d0be70222b5b15767d7f">&#9670;&nbsp;</a></span>gs1_encoder_setSym()</h2>
+<a id="ac0dde3809298ee931ebfcfd7bec442d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0dde3809298ee931ebfcfd7bec442d2">&#9670;&nbsp;</a></span>gs1_encoder_setSym()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1700,7 +1710,7 @@ Data validation checks</h3>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#a144e851913c5a265ef16602d35386773">gs1_encoder_symbologies_t</a>&#160;</td>
           <td class="paramname"><em>sym</em>&#160;</td>
         </tr>
         <tr>
@@ -1715,7 +1725,7 @@ Data validation checks</h3>
 <p>This allows the symbology to be specified as any one of the described <a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="Recognised GS1 barcode formats (&quot;symbologies&quot;) for processing scan data.">gs1_encoder_symbologies</a></p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053" title="Recognised GS1 barcode formats (&quot;symbologies&quot;) for processing scan data.">gs1_encoder_symbologies</a> </dd>
 <dd>
-<a class="el" href="gs1encoders_8h.html#ae2ba9da9aff475c78d2e58bfc1632056" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
+<a class="el" href="gs1encoders_8h.html#a701eddf5ca4737149567d7a7b97cb884" title="Get the current symbology type.">gs1_encoder_getSym()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1755,7 +1765,7 @@ Data validation checks</h3>
 
 <p>Provided for backwards compatibility to enable or disable the <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" title="Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.">gs1_encoder_vREQUISITE_AIS</a> validation procedure, that determines whether mandatory AI pairings are enfored when data is provided using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>. </p>
 <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, enabled)</code>, which should be called instead.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#af54e8727c69c88cc7732a2773ee79f7e" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">ctx</td><td><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context </td></tr>
@@ -1767,8 +1777,8 @@ Data validation checks</h3>
 
 </div>
 </div>
-<a id="af54e8727c69c88cc7732a2773ee79f7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af54e8727c69c88cc7732a2773ee79f7e">&#9670;&nbsp;</a></span>gs1_encoder_setValidationEnabled()</h2>
+<a id="aa946d38ee07b2d0347bddbfb36fbb0c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa946d38ee07b2d0347bddbfb36fbb0c8">&#9670;&nbsp;</a></span>gs1_encoder_setValidationEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1782,7 +1792,7 @@ Data validation checks</h3>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9">gs1_encoder_validations</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="gs1encoders_8h.html#ab94060b79d4be0e310c7de0ddbd000d5">gs1_encoder_validations_t</a>&#160;</td>
           <td class="paramname"><em>validation</em>, </td>
         </tr>
         <tr>
@@ -1806,7 +1816,7 @@ Data validation checks</h3>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>The option only applies to AI input data, specifically AI data supplied with <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> or <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, or GS1 Digital Link URIs supplied with <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>. Under certain circumstances it may be necessary to disable certain AI validation procedures in order to satisfy checks when the provided AI data represents only part if the overall AI data on a label.</dd></dl>
 <p>Nevertheless, the full AI data should be validated by concatinating it and verifying it with this library with all relivant AI validation procedures enabled.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a872381c23b0f7022199f40ceb42d8136" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> </dd>
 <dd>
