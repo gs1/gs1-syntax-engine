@@ -379,8 +379,10 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 out:
 
-	if (cc)
-		*--cc = '|';			// Put original separator back
+	if (cc) {
+//		*(cc-1) = '|';					// Put original separator back
+		ctx->dataStr[cc - ctx->dataStr - 1] = '|';	// Ugly hack generates same code as above to satiate GCC 11
+	}
 	return ret;
 
 fail:
