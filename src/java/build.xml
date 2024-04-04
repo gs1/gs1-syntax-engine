@@ -73,7 +73,9 @@ limitations under the License.
   </target>
 
   <target name="example" depends="jar,jni">
-    <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}" />
+    <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}">
+      <compilerarg value="-Werror"/>
+    </javac>
     <echo>To run:
 LD_LIBRARY_PATH=${clib}/build java -Djava.library.path=${src} -classpath ${src}:${jar} Example
     </echo>
