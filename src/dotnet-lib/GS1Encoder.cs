@@ -292,15 +292,15 @@ namespace GS1.Encoders
         ///   - gs1_encoder_setSym()
         ///
         /// </summary>
-        public int Sym
+        public Symbology Sym
         {
             get
             {
-                return gs1_encoder_getSym(ctx);
+                return (Symbology)gs1_encoder_getSym(ctx);
             }
             set
             {
-                if (!gs1_encoder_setSym(ctx, value))
+                if (!gs1_encoder_setSym(ctx, (int)value))
                     throw new GS1EncoderParameterException(ErrMsg);
             }
         }
