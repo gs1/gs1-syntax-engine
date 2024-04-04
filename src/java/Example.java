@@ -136,7 +136,7 @@ public class Example {
                         else if (menuVal.equals("5"))
                             gs1encoder.setPermitUnknownAIs(inpStr.equals("1"));
                         else           // "6"
-                            gs1encoder.setValidateAIassociations(inpStr.equals("1"));
+                            gs1encoder.setValidationEnabled(GS1Encoder.Validation.RequisiteAIs, inpStr.equals("1"));
                     } catch (GS1EncoderParameterException e) {
                         System.out.format("\n\nERROR: %s\n", e.getMessage());
                         continue;
