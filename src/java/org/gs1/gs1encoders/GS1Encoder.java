@@ -271,8 +271,8 @@ public class GS1Encoder {
      *   - gs1_encoder_getVersion()
      *
      */
-    public int getSym() {
-        return gs1encoderGetSymJNI(ctx);
+    public Symbology getSym() {
+        return Symbology.values()[gs1encoderGetSymJNI(ctx) + 1];
     }
 
     /**
@@ -283,8 +283,8 @@ public class GS1Encoder {
      *   - gs1_encoder_setVersion()
      *
      */
-    public void setSym(int value) throws GS1EncoderParameterException {
-        if (!gs1encoderSetSymJNI(ctx, value))
+    public void setSym(Symbology value) throws GS1EncoderParameterException {
+        if (!gs1encoderSetSymJNI(ctx, value.ordinal() - 1))
             throw new GS1EncoderParameterException(this.getErrMsg());
     }
 
