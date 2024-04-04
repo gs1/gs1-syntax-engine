@@ -35,7 +35,7 @@ jobs:
 
     - if: matrix.language == 'csharp'
       name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
 
     - if: matrix.language == 'csharp'
       name: Build C#

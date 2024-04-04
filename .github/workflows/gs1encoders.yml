@@ -16,7 +16,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: clang CI (with sanitizers)
       run: |
@@ -46,7 +46,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: gcc CI
       run: |
@@ -72,9 +72,10 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
 
     - name: MSVC CI
       run: |
@@ -98,7 +99,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: clang CI
       run: |
@@ -124,7 +125,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: clang static analyser CI
       run: |
@@ -135,7 +136,7 @@ jobs:
         [ "$(find plist/ -name *.html)" = '' ];
 
     - name: "clang static analyzer: Store assets on failure"
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: clang-scan.tgz
         path: plist/**/*.html
@@ -177,9 +178,9 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -196,16 +197,16 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v12
+    - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: WASM build
       run: |
         make -C src/c-lib -j `nproc` wasm
         ls -l src/c-lib/build-wasm
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: 18
 
@@ -220,16 +221,16 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v12
+    - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: WASM build
       run: |
         make -C src/c-lib -j `nproc` wasm JSONLY=yes
         ls -l src/c-lib/build-wasm
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: 18
 
@@ -244,9 +245,9 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: src/ios/Pods
         key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
@@ -265,9 +266,9 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -291,10 +292,10 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v2
 
     - name: Windows release build
       run: |
@@ -308,7 +309,7 @@ jobs:
 
     - name: Store Windows development libs
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-libs
         path: src/c-lib/build/library/Win32/Release/gs1encoders-windows-libs.zip
@@ -320,7 +321,7 @@ jobs:
 
     - name: Store Windows console app
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-console-app
         path: src/c-lib/build/console-app/Win32/Release/gs1encoders-windows-console-app.zip
@@ -332,7 +333,7 @@ jobs:
 
     - name: Store Windows GUI app
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-gui-app
         path: src/dotnet-app/bin/Release/netcoreapp3.1/win-x86/publish/gs1encoders-windows-gui-app.zip
@@ -348,7 +349,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Linux release build
       run: |
@@ -360,7 +361,7 @@ jobs:
 
     - name: Store Linux build
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: linux-app
         path: src/c-lib/build/gs1encoders-linux-app.tgz
@@ -374,9 +375,9 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v12
+    - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: WASM release build
       run: |
@@ -387,7 +388,7 @@ jobs:
 
     - name: Store WASM build
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wasm-app
         path: src/c-lib/build-wasm/gs1encoders-wasm-app.tgz
@@ -404,7 +405,7 @@ jobs:
 
     - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: JSONLY release build
       run: |
@@ -415,7 +416,7 @@ jobs:
 
     - name: Store JSONLY build
       if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jsonly-app
         path: src/c-lib/build-wasm/gs1encoders-jsonly-app.tgz
@@ -450,32 +451,32 @@ jobs:
     steps:
 
     - name: Load Windows libs
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: windows-libs
 
     - name: Load Windows console app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: windows-console-app
 
     - name: Load Windows GUI app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: windows-gui-app
 
     - name: Load Linux app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: linux-app
 
     - name: Load WASM app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: wasm-app
 
     - name: Load JSONLY app
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: jsonly-app
 

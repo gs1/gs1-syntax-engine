@@ -55,7 +55,7 @@ jobs:
         make -C src/c-lib -j `nproc` fuzzer
 
     - if: matrix.language == 'java-kotlin'
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
