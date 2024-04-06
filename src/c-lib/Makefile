@@ -34,10 +34,20 @@ BUILD_DIR = build-test
 UNIT_TEST_CFLAGS = -DUNIT_TESTS
 endif
 
+WASM_DIR = ../js-wasm
+WASM_JS = $(BUILD_DIR)/gs1encoder-wasm.mjs
+WASM_JS_DIST = $(WASM_DIR)/gs1encoder-wasm.mjs
+WASM_WASM = $(WASM_JS:.mjs=.wasm)
+WASM_WASM_DIST = $(WASM_JS_DIST:.mjs=.wasm)
+WASM_OUT_FILES = $(WASM_JS) $(WASM_WASM)
+WASM_DIST_FILES = $(WASM_JS_DIST) $(WASM_WASM_DIST)
+
 ifeq ($(MAKECMDGOALS),wasm)
 DO_WASM = 1
 ifeq ($(JSONLY),yes)
 DO_WASM = 0
+WASM_OUT_FILES = $(WASM_JS)
+WASM_DIST_FILES = $(WASM_JS_DIST)
 endif
 CC = emcc
 CFLAGS_G =
@@ -105,10 +115,6 @@ APP = $(BUILD_DIR)/$(NAME).bin
 APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
 
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test
-
-WASM_JS = $(BUILD_DIR)/gs1encoder-wasm.mjs
-WASM_WASM = $(WASM_JS:.mjs=.wasm)
-WASM_MEM = $(WASM_JS).mem
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(BUILD_DIR)/lib$(NAME).so $(BUILD_DIR)/lib$(NAME).so.$(MAJOR)
@@ -247,6 +253,7 @@ $(BUILD_DIR)/$(FUZZER_PREFIX)syn: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o
 #  Utility targets
 #
 wasm: $(WASM_JS)
+	@cp -f $(WASM_OUT_FILES) $(WASM_DIR)/
 
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
@@ -267,7 +274,7 @@ clean-test:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 clean-wasm:
-	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(WASM_MEM) $(DEPS)
+	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(WASM_DIST_FILES) $(DEPS)
 
 install: install-static install-shared
 

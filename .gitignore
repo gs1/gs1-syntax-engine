@@ -25,5 +25,8 @@ src/dotnet-app/obj/
 src/js-wasm/node_modules/
 src/js-wasm/package.json
 src/js-wasm/package-lock.json
+src/js-wasm/gs1encoder-wasm.mjs
+src/js-wasm/gs1encoder-wasm.wasm
+src/js-wasm/gs1encoder-wasm.mem
 .DS_Store
 **/project.xcworkspace/xcuserdata/*

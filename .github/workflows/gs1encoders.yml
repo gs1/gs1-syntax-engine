@@ -381,8 +381,7 @@ jobs:
     - name: WASM release build
       run: |
         make -C src/c-lib -j `nproc` wasm
-        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs src/js-wasm/example.node.mjs src/c-lib/build-wasm/
-        cd src/c-lib/build-wasm
+        cd src/js-wasm
         tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store WASM build
@@ -390,7 +389,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: wasm-app
-        path: src/c-lib/build-wasm/gs1encoders-wasm-app.tgz
+        path: src/js-wasm/gs1encoders-wasm-app.tgz
 
 
   build-release-jsonly:
@@ -409,8 +408,7 @@ jobs:
     - name: JSONLY release build
       run: |
         make -C src/c-lib -j `nproc` wasm JSONLY=yes
-        cp src/js-wasm/gs1encoder.mjs src/js-wasm/example.html src/js-wasm/example.mjs src/js-wasm/example.node.mjs src/c-lib/build-wasm/
-        cd src/c-lib/build-wasm
+        cd src/js-wasm
         tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store JSONLY build
@@ -418,7 +416,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: jsonly-app
-        path: src/c-lib/build-wasm/gs1encoders-jsonly-app.tgz
+        path: src/js-wasm/gs1encoders-jsonly-app.tgz
 
 
   #
