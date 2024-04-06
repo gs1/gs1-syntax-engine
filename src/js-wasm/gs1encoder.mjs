@@ -2,7 +2,7 @@
  *  JavaScript wrapper for the GS1 Syntax Engine compiled as a WASM by
  *  Emscripten.
  *
- *  Copyright (c) 2022-2023 GS1 AISBL.
+ *  Copyright (c) 2022-2024 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -221,7 +221,7 @@ export class GS1encoder {
      *
      */
     get addCheckDigit() {
-        return this.api.gs1_encoder_getAddCheckDigit(this.ctx);
+        return this.api.gs1_encoder_getAddCheckDigit(this.ctx) != 0;
     }
     set addCheckDigit(value) {
         if (!this.api.gs1_encoder_setAddCheckDigit(this.ctx, value ? 1 : 0))
@@ -241,7 +241,7 @@ export class GS1encoder {
      *
      */
     get permitUnknownAIs() {
-        return this.api.gs1_encoder_getPermitUnknownAIs(this.ctx);
+        return this.api.gs1_encoder_getPermitUnknownAIs(this.ctx) != 0;
     }
     set permitUnknownAIs(value) {
         if (!this.api.gs1_encoder_setPermitUnknownAIs(this.ctx, value ? 1 : 0))
@@ -261,7 +261,7 @@ export class GS1encoder {
      *
      */
     get permitZeroSuppressedGTINinDLuris() {
-        return this.api.gs1_encoder_getPermitZeroSuppressedGTINinDLuris(this.ctx);
+        return this.api.gs1_encoder_getPermitZeroSuppressedGTINinDLuris(this.ctx) != 0;
     }
     set permitZeroSuppressedGTINinDLuris(value) {
         if (!this.api.gs1_encoder_setPermitZeroSuppressedGTINinDLuris(this.ctx, value ? 1 : 0))
@@ -281,7 +281,7 @@ export class GS1encoder {
      *
      */
     get includeDataTitlesInHRI() {
-        return this.api.gs1_encoder_getIncludeDataTitlesInHRI(this.ctx);
+        return this.api.gs1_encoder_getIncludeDataTitlesInHRI(this.ctx) != 0;
     }
     set includeDataTitlesInHRI(value) {
         if (!this.api.gs1_encoder_setIncludeDataTitlesInHRI(this.ctx, value ? 1 : 0))
@@ -300,7 +300,7 @@ export class GS1encoder {
      *
      */
     getValidationEnabled(validation) {
-        return this.api.gs1_encoder_getValidationEnabled(this.ctx, validation);
+        return this.api.gs1_encoder_getValidationEnabled(this.ctx, validation) != 0;
     }
 
 
@@ -334,7 +334,7 @@ export class GS1encoder {
      *
      */
     get validateAIassociations() {
-        return this.api.gs1_encoder_getValidateAIassociations(this.ctx);
+        return this.api.gs1_encoder_getValidateAIassociations(this.ctx) != 0;
     }
     set validateAIassociations(value) {
         if (!this.api.gs1_encoder_setValidateAIassociations(this.ctx, value ? 1 : 0))
