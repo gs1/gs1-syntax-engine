@@ -1,6 +1,6 @@
 {
   "name": "gs1encoder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Emscripten build and JavaScript wrappers for the GS1 Syntax Engine library",
   "keywords": [
     "digital-link",
