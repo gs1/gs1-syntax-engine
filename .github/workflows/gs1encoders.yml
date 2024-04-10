@@ -209,6 +209,12 @@ jobs:
       with:
         node-version: 18
 
+    - name: Node.js tests
+      working-directory: src/js-wasm
+      run: |
+        npm install
+        node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
+
     - name: Node.js run
       working-directory: src/js-wasm
       run: |
@@ -232,6 +238,12 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 18
+
+    - name: Node.js test
+      working-directory: src/js-wasm
+      run: |
+        npm install
+        node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
 
     - name: Node.js run
       working-directory: src/js-wasm
