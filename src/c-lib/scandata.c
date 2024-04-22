@@ -44,44 +44,43 @@ struct symIdEntry {
 };
 
 
-#define SYM(i1, i2, a, s) {		\
-	.symId = { i1, i2 },		\
-	.aiMode = aiMode_##a,		\
-	.sym = s,			\
+#define SYM(i, a, s) {		\
+	.symId = i,		\
+	.aiMode = aiMode_##a,	\
+	.sym = s,		\
 }
-
 
 /*
  *  First matching instance in a lookup is the default
  *
  */
 static const struct symIdEntry symIdTable[] = {
-	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCA        ),
-	SYM( 'C','1', AI,     gs1_encoder_sGS1_128_CCC        ),
-	SYM( 'E','0', NON_AI, gs1_encoder_sEAN13              ),
-	SYM( 'E','0', AI,     gs1_encoder_sEAN13              ),
-	SYM( 'E','0', NON_AI, gs1_encoder_sUPCA               ),
-	SYM( 'E','0', AI,     gs1_encoder_sUPCA               ),
-	SYM( 'E','0', NON_AI, gs1_encoder_sUPCE               ),
-	SYM( 'E','0', AI,     gs1_encoder_sUPCE               ),
-	SYM( 'E','4', NON_AI, gs1_encoder_sEAN8               ),
-	SYM( 'E','4', AI,     gs1_encoder_sEAN8               ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarExpanded    ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarOmni        ),
-	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarOmni        ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarTruncated   ),
-	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarTruncated   ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarStacked     ),
-	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarStacked     ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarStackedOmni ),
-	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarStackedOmni ),
-	SYM( 'e','0', AI,     gs1_encoder_sDataBarLimited     ),
-	SYM( 'e','0', NON_AI, gs1_encoder_sDataBarLimited     ),
+	SYM( "C1", AI,     gs1_encoder_sGS1_128_CCA        ),
+	SYM( "C1", AI,     gs1_encoder_sGS1_128_CCC        ),
+	SYM( "E0", NON_AI, gs1_encoder_sEAN13              ),
+	SYM( "E0", AI,     gs1_encoder_sEAN13              ),
+	SYM( "E0", NON_AI, gs1_encoder_sUPCA               ),
+	SYM( "E0", AI,     gs1_encoder_sUPCA               ),
+	SYM( "E0", NON_AI, gs1_encoder_sUPCE               ),
+	SYM( "E0", AI,     gs1_encoder_sUPCE               ),
+	SYM( "E4", NON_AI, gs1_encoder_sEAN8               ),
+	SYM( "E4", AI,     gs1_encoder_sEAN8               ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarExpanded    ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarOmni        ),
+	SYM( "e0", NON_AI, gs1_encoder_sDataBarOmni        ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarTruncated   ),
+	SYM( "e0", NON_AI, gs1_encoder_sDataBarTruncated   ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarStacked     ),
+	SYM( "e0", NON_AI, gs1_encoder_sDataBarStacked     ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarStackedOmni ),
+	SYM( "e0", NON_AI, gs1_encoder_sDataBarStackedOmni ),
+	SYM( "e0", AI,     gs1_encoder_sDataBarLimited     ),
+	SYM( "e0", NON_AI, gs1_encoder_sDataBarLimited     ),
 	// e0 is also shared with GS1-128 with CC
-	SYM( 'd','1', NON_AI, gs1_encoder_sDM                 ),
-	SYM( 'd','2', AI,     gs1_encoder_sDM                 ),
-	SYM( 'Q','1', NON_AI, gs1_encoder_sQR                 ),
-	SYM( 'Q','3', AI,     gs1_encoder_sQR                 ),
+	SYM( "d1", NON_AI, gs1_encoder_sDM                 ),
+	SYM( "d2", AI,     gs1_encoder_sDM                 ),
+	SYM( "Q1", NON_AI, gs1_encoder_sQR                 ),
+	SYM( "Q3", AI,     gs1_encoder_sQR                 ),
 };
 
 #undef SYM
