@@ -71,7 +71,7 @@ jobs:
       name: Build Java
       run: |
         make -C src/c-lib -j `nproc` libshared
-        ant -f src/java/build.xml test
+        ant -f src/java/build.xml test -Dlink_to_shared_lib=true
 
     - if: matrix.language == 'swift' || matrix.language == 'javascript-typescript'
       name: Autobuild
