@@ -1,6 +1,6 @@
 <!--
 
-Copyright (c) 2022 GS1 AISBL.
+Copyright (c) 2024 GS1 AISBL.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,9 +15,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+By default, we build a JNI library (.jar and .so files) that is statically
+linked against the GS1 Syntax Engine.
+
+It is sufficient to place the built libgs1encoders.{jar,so} files into
+accessible locations, then at runtime:
+
+  - Add the .jar file into the classpath.
+  - Add the directory containing the .so file into java.library.path.
+
+
+Alternatively, you can build a JNI library that is dynamically linked against
+the GS1 Syntax Engine with:
+
+    ant -Dlink_to_shared_lib=true
+
+This assumes that the GS1 Syntax Engine will be made available as a shared
+library pre-installed on any system to which projects using this JNI library
+are deployed.
+
+In addition to setting the classpath and java.library.path as above, when
+linking to a shared library instance of the GS1 Syntax Engine that is not
+installed in the system's regular library location, it is necessary to include
+the actual location in the dynamic linker's search path. For example by setting
+the environment variables:
+
+  - LD_LIBRARY_PATH   (Linux)
+  - DYLD_LIBRARY_PATH (MacOS)
+
 -->
 
-<project name="gs1encoders" default="all" basedir=".">
+<project name="gs1encoders" default="all" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <description>
     Java binding for GS1 Syntax Engine.
@@ -40,29 +69,30 @@ limitations under the License.
 
   <target name="jni">
     <exec executable="gcc" failonerror="true">
-      <arg line="-fPIC -shared -O2 -g
-                 -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed
-                 -Werror
-                 -L${clib}/build -lgs1encoders
-                 -I${clib}
-                 -I${java.home}/../include
-                 -I${java.home}/../include/linux
-                 -I${java.home}/include
-                 -I${java.home}/include/linux
-                 -o ${sofile}
-                 ${wrapfile}
-                "/>
+      <arg line="-fPIC -O2 -g" />
+      <arg line="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed" />
+      <arg line="-Werror" />
+      <arg line="-I${clib}" />
+      <arg line="-I${java.home}/../include" />
+      <arg line="-I${java.home}/../include/linux" />
+      <arg line="-I${java.home}/include" />
+      <arg line="-I${java.home}/include/linux" />
+      <arg line="-Wl,--whole-archive ../c-lib/build/libgs1encoders.a -Wl,--no-whole-archive" unless:set="link_to_shared_lib" />
+      <arg line="-L${clib}/build -lgs1encoders"                                              if:set="link_to_shared_lib" />
+      <arg line="-shared" />
+      <arg line="-o ${sofile}" />
+      <arg line="${wrapfile}" />
     </exec>
   </target>
 
-  <target name="compile" depends="jni,init" description="compile the source">
+  <target name="compile" depends="init" description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
       <compilerarg value="-Werror"/>
       <exclude name="*"/>
     </javac>
   </target>
 
-  <target name="jar" depends="compile,jni">
+  <target name="jar" depends="compile">
     <jar destfile="${jar}" basedir="${classes}">
     <manifest>
         <attribute name="Implementation-Vendor" value="GS1 AISBL"/>
@@ -72,18 +102,19 @@ limitations under the License.
     </jar>
   </target>
 
-  <target name="example" depends="jar,jni">
+  <target name="all" depends="jar,jni"/>
+
+  <target name="example" depends="all">
     <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}">
       <compilerarg value="-Werror"/>
     </javac>
-    <echo>To run:
-LD_LIBRARY_PATH=${clib}/build java -Djava.library.path=${src} -classpath ${src}:${jar} Example
-    </echo>
+    <echo unless:set="link_to_shared_lib">To run: java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
+    <echo if:set="link_to_shared_lib"    >To run: LD_LIBRARY_PATH=${clib}/build:$LD_LIBRARY_PATH java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
   </target>
 
   <target name="test" depends="example">
     <java classname="Example" failonerror="true" classpath="${src}:${jar}" fork="true">
-      <env key="LD_LIBRARY_PATH" value="${clib}/build:$LD_LIBRARY_PATH"/>
+      <env key="LD_LIBRARY_PATH" value="${clib}/build:$LD_LIBRARY_PATH" if:set="link_to_shared_lib" />
       <sysproperty key="java.library.path" path="${src}"/>
       <arg value="--version"/>
     </java>
@@ -95,7 +126,5 @@ LD_LIBRARY_PATH=${clib}/build java -Djava.library.path=${src} -classpath ${src}:
     <delete file="${sofile}"/>
     <delete file="${src}/Example.class"/>
   </target>
-
-  <target name="all" depends="jar,jni"/>
 
 </project>
