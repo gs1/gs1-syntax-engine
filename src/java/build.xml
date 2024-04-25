@@ -69,16 +69,16 @@ the environment variables:
 
   <target name="jni">
     <exec executable="gcc" failonerror="true">
-      <arg line="-fPIC -O2 -g" />
-      <arg line="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed" />
-      <arg line="-Werror" />
+      <arg line="-fPIC -O2 -g -Werror" />
       <arg line="-I${clib}" />
       <arg line="-I${java.home}/../include" />
       <arg line="-I${java.home}/../include/linux" />
       <arg line="-I${java.home}/include" />
       <arg line="-I${java.home}/include/linux" />
-      <arg line="-Wl,--whole-archive ../c-lib/build/libgs1encoders.a -Wl,--no-whole-archive" unless:set="link_to_shared_lib" />
-      <arg line="-L${clib}/build -lgs1encoders"                                              if:set="link_to_shared_lib" />
+      <arg line="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed" />
+      <arg line="-Wl,--whole-archive -Wl,-Bstatic"     unless:set="link_to_shared_lib" />
+      <arg line="-L${clib}/build -lgs1encoders" />
+      <arg line="-Wl,--no-whole-archive -Wl,-Bdynamic" unless:set="link_to_shared_lib" />
       <arg line="-shared" />
       <arg line="-o ${sofile}" />
       <arg line="${wrapfile}" />
