@@ -67,7 +67,7 @@ the environment variables:
     <mkdir dir="${classes}"/>
   </target>
 
-  <target name="jni">
+  <target name="cc">
     <exec executable="gcc" failonerror="true">
       <arg line="-fPIC -O2 -g -Werror" />
       <arg line="-I${clib}" />
@@ -84,6 +84,14 @@ the environment variables:
       <arg line="${wrapfile}" />
     </exec>
   </target>
+
+  <target name="strip" depends="cc">
+    <exec executable="strip" failonerror="true" unless:set="no_strip">
+      <arg line="${sofile}" />
+    </exec>
+  </target>
+
+  <target name="jni" depends="strip" />
 
   <target name="compile" depends="init" description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
