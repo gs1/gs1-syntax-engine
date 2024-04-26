@@ -98,13 +98,17 @@ SLOW_TESTS_CFLAGS=-DSLOW_TESTS
 endif
 
 ifneq ($(shell uname -s),Darwin)
+LIB_DYN_SUFFIX = so
+LIB_STATIC_SUFFIX = a
 LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
-LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).so.$(MAJOR)
+LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
 NPROC = nproc
 else
+LIB_DYN_SUFFIX = dylib
+LIB_STATIC_SUFFIX = a
 LDFLAGS =
-LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).so.$(MAJOR)
+LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 CFLAGS_FORTIFY =
 NPROC = sysctl -n hw.ncpu
 endif
@@ -117,8 +121,8 @@ APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
 
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test
 
-LIB_STATIC = $(BUILD_DIR)/lib$(NAME).a
-LIB_SHARED = $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(BUILD_DIR)/lib$(NAME).so $(BUILD_DIR)/lib$(NAME).so.$(MAJOR)
+LIB_STATIC = $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX)
+LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 
 PREFIX = /usr/local
 LIBDIR = $(PREFIX)/lib
@@ -172,20 +176,20 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)/
 #
 #  Shared library
 #
-$(BUILD_DIR)/lib$(NAME).so: $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(BUILD_DIR)/lib$(NAME).so.$(MAJOR)
+$(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 	ln -sf $(notdir $<) $@
 
-$(BUILD_DIR)/lib$(NAME).so.$(MAJOR): $(BUILD_DIR)/lib$(NAME).so.$(VERSION)
+$(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION)
 	ln -sf $(notdir $<) $@
 
-$(BUILD_DIR)/lib$(NAME).so.$(VERSION): $(OBJS)
+$(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDFLAGS_SO) $(LDLIBS) $^ -o $@
 
 
 #
 #  Static library
 #
-$(BUILD_DIR)/lib$(NAME).a: $(OBJS)
+$(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX): $(OBJS)
 	$(AR) cr $@ $^
 	ranlib $@
 
@@ -193,7 +197,7 @@ $(BUILD_DIR)/lib$(NAME).a: $(OBJS)
 #
 #  Application built to use shared library
 #
-$(APP): $(BUILD_DIR)/lib$(NAME).so $(APP_SRC)
+$(APP): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(APP_SRC)
 	$(CC) $(CFLAGS) $(APP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 
@@ -285,21 +289,21 @@ install-headers:
 
 install-static: libstatic install-headers
 	install -d $(DESTDIR)$(LIBDIR)
-	install -m 0644 $(BUILD_DIR)/lib$(NAME).a $(DESTDIR)$(LIBDIR)
+	install -m 0644 $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX) $(DESTDIR)$(LIBDIR)
 
 install-shared: libshared install-headers
 	install -d $(DESTDIR)$(LIBDIR)
-	install -m 0644 $(BUILD_DIR)/lib$(NAME).so.$(VERSION) $(DESTDIR)$(LIBDIR)
-	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so
-	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so.$(MAJOR)
+	install -m 0644 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(DESTDIR)$(LIBDIR)
+	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) lib$(NAME).$(LIB_DYN_SUFFIX)
+	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 	-ldconfig
 
 uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/include/$(NAME).h
-	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).so.$(VERSION)
-	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).so.$(MAJOR)
-	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).so
-	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).a
+	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION)
+	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_DYN_SUFFIX)
+	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_STATIC_SUFFIX)
 	-ldconfig
 
 docs:
