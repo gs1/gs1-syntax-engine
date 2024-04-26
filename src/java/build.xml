@@ -15,16 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
-This solution builds a JNI library (.jar and .so files) that wraps the GS1
-Syntax Engine.
-
-It is sufficient to place the built libgs1encoders.{jar,so} files into
-accessible locations, then at runtime:
-
-  - Add the .jar file into the classpath.
-  - Add the directory containing the .so file into java.library.path.
-
 -->
 
 <project name="gs1encoders" default="all" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
