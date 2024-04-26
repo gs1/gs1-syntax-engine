@@ -185,15 +185,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Java standalone
+    - name: Java CI
       run: |
         make -C src/c-lib -j `nproc` libstatic
         ant -f src/java/build.xml test
-
-    - name: Java linked dynamically
-      run: |
-        make -C src/c-lib -j `nproc` libshared
-        ant -f src/java/build.xml test -Dlink_to_shared_lib=true
 
   ci-wasm:
 

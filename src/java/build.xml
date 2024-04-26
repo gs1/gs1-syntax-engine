@@ -16,33 +16,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-By default, we build a JNI library (.jar and .so files) that is statically
-linked against the GS1 Syntax Engine.
+This solution builds a JNI library (.jar and .so files) that wraps the GS1
+Syntax Engine.
 
 It is sufficient to place the built libgs1encoders.{jar,so} files into
 accessible locations, then at runtime:
 
   - Add the .jar file into the classpath.
   - Add the directory containing the .so file into java.library.path.
-
-
-Alternatively, you can build a JNI library that is dynamically linked against
-the GS1 Syntax Engine with:
-
-    ant -Dlink_to_shared_lib=true
-
-This assumes that the GS1 Syntax Engine will be made available as a shared
-library pre-installed on any system to which projects using this JNI library
-are deployed.
-
-In addition to setting the classpath and java.library.path as above, when
-linking to a shared library instance of the GS1 Syntax Engine that is not
-installed in the system's regular library location, it is necessary to include
-the actual location in the dynamic linker's search path. For example by setting
-the environment variables:
-
-  - LD_LIBRARY_PATH   (Linux)
-  - DYLD_LIBRARY_PATH (MacOS)
 
 -->
 
@@ -52,14 +33,36 @@ the environment variables:
     Java binding for GS1 Syntax Engine.
   </description>
 
+  <condition property="no_strip" value="true">
+    <os family="mac"/>
+  </condition>
+
+  <condition property="dyn_lib_suffix" value="dylib" else="so">
+    <os family="mac"/>
+  </condition>
+
+  <condition property="os.family" value="darwin" else="linux">
+    <os family="mac"/>
+  </condition>
+
+  <condition property="ldargs" value="" else="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed">
+    <os family="mac"/>
+  </condition>
+
+  <condition property="ldwholearchive" value="" else="-Wl,--whole-archive">
+    <os family="mac"/>
+  </condition>
+
+  <condition property="ldnowholearchive" value="" else="-Wl,--no-whole-archive">
+    <os family="mac"/>
+  </condition>
+
   <property name="src" location="."/>
   <property name="build" location="build"/>
   <property name="classes" location="${build}/classes"/>
   <property name="jar" location="libgs1encoders.jar"/>
-
   <property name="wrapfile" location="gs1encoders_wrap.c"/>
-  <property name="sofile" location="libgs1encoders.so"/>
-
+  <property name="sofile" location="libgs1encoders.${dyn_lib_suffix}"/>
   <property name="clib" location="../c-lib"/>
 
   <target name="init">
@@ -68,17 +71,15 @@ the environment variables:
   </target>
 
   <target name="cc">
-    <exec executable="gcc" failonerror="true">
+    <exec executable="cc" failonerror="true">
       <arg line="-fPIC -O2 -g -Werror" />
       <arg line="-I${clib}" />
       <arg line="-I${java.home}/../include" />
-      <arg line="-I${java.home}/../include/linux" />
+      <arg line="-I${java.home}/../include/${os.family}" />
       <arg line="-I${java.home}/include" />
-      <arg line="-I${java.home}/include/linux" />
-      <arg line="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed" />
-      <arg line="-Wl,--whole-archive -Wl,-Bstatic"     unless:set="link_to_shared_lib" />
-      <arg line="-L${clib}/build -lgs1encoders" />
-      <arg line="-Wl,--no-whole-archive -Wl,-Bdynamic" unless:set="link_to_shared_lib" />
+      <arg line="-I${java.home}/include/${os.family}" />
+      <arg line="${ldargs}" />
+      <arg line="${ldwholearchive} ${clib}/build/libgs1encoders.a ${ldnowholearchive}" />
       <arg line="-shared" />
       <arg line="-o ${sofile}" />
       <arg line="${wrapfile}" />
@@ -116,13 +117,11 @@ the environment variables:
     <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}">
       <compilerarg value="-Werror"/>
     </javac>
-    <echo unless:set="link_to_shared_lib">To run: java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
-    <echo if:set="link_to_shared_lib"    >To run: LD_LIBRARY_PATH=${clib}/build:$LD_LIBRARY_PATH java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
+    <echo>To run: java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
   </target>
 
   <target name="test" depends="example">
     <java classname="Example" failonerror="true" classpath="${src}:${jar}" fork="true">
-      <env key="LD_LIBRARY_PATH" value="${clib}/build:$LD_LIBRARY_PATH" if:set="link_to_shared_lib" />
       <sysproperty key="java.library.path" path="${src}"/>
       <arg value="--version"/>
     </java>
