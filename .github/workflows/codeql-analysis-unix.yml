@@ -70,8 +70,8 @@ jobs:
     - if: matrix.language == 'java-kotlin'
       name: Build Java
       run: |
-        make -C src/c-lib -j `nproc` libshared
-        ant -f src/java/build.xml test -Dlink_to_shared_lib=true
+        make -C src/c-lib -j `nproc` libstatic
+        ant -f src/java/build.xml test
 
     - if: matrix.language == 'swift' || matrix.language == 'javascript-typescript'
       name: Autobuild
