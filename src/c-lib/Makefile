@@ -22,6 +22,8 @@ MINOR := 0
 PATCH := 0
 VERSION := $(MAJOR).$(MINOR).$(PATCH)
 
+ARCH := $(shell $(CC) -dumpmachine)
+
 NAME = gs1encoders
 
 BUILD_DIR = build
@@ -81,13 +83,13 @@ ifeq ($(SANITIZE),yes)
 CC=clang
 SAN_LDFLAGS = -fuse-ld=lld
 
-ifneq ($(shell uname -s),Darwin)
-SAN_CFLAGS = -fsanitize=address,leak,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
-SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
-else
+ifneq (, $(findstring darwin, $(ARCH)))
 # Leak detection is not supported on MacOS builds of LLVM
 SAN_CFLAGS = -fsanitize=address,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_ENV = ASAN_OPTIONS="symbolize=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" MallocNanoZone=0 ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
+else
+SAN_CFLAGS = -fsanitize=address,leak,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
+SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
 endif
 
 endif
@@ -97,20 +99,21 @@ ifeq ($(SLOW_TESTS),yes)
 SLOW_TESTS_CFLAGS=-DSLOW_TESTS
 endif
 
-ifneq ($(shell uname -s),Darwin)
-LIB_DYN_SUFFIX = so
-LIB_STATIC_SUFFIX = a
-LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
-LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
-CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
-NPROC = nproc
-else
+
+ifneq (, $(findstring darwin, $(ARCH)))
 LIB_DYN_SUFFIX = dylib
 LIB_STATIC_SUFFIX = a
 LDFLAGS =
 LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 CFLAGS_FORTIFY =
 NPROC = sysctl -n hw.ncpu
+else
+LIB_DYN_SUFFIX = so
+LIB_STATIC_SUFFIX = a
+LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
+LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
+NPROC = nproc
 endif
 
 LDLIBS = -lc
