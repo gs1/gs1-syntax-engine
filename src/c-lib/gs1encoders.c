@@ -66,7 +66,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 	}
 
 	// Set default parameters
-	ctx = memcpy(ctx, &(struct gs1_encoder) {
+	ctx = memcpy(ctx, (&(struct gs1_encoder) {
 		.localAlloc = !mem,
 		.sym = gs1_encoder_sNONE,
 		.addCheckDigit = false,
@@ -84,7 +84,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.errMsg = { 0 },
 		.linterErr = GS1_LINTER_OK,
 		.linterErrMarkup = { 0 }
-	}, sizeof(struct gs1_encoder));
+	}), sizeof(struct gs1_encoder));
 
 	gs1_loadSyntaxDictionary(ctx, NULL);
 	gs1_loadValidationTable(ctx);
