@@ -306,6 +306,15 @@
     #include <io.h>
 #endif
 
+#if defined(__APPLE__)
+    #define ACUTEST_MACOS_
+    #include <assert.h>
+    #include <stdbool.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+    #include <sys/sysctl.h>
+#endif
+
 #ifdef __cplusplus
     #include <exception>
 #endif
@@ -465,18 +474,7 @@ acutest_exit_(int exit_code)
     static double
     acutest_timer_diff_(struct timespec start, struct timespec end)
     {
-        double endns;
-        double startns;
-
-        endns = end.tv_sec;
-        endns *= 1e9;
-        endns += end.tv_nsec;
-
-        startns = start.tv_sec;
-        startns *= 1e9;
-        startns += start.tv_nsec;
-
-        return ((endns - startns)/ 1e9);
+        return (double)(end.tv_sec - start.tv_sec) + (double)(end.tv_nsec - start.tv_nsec) / 1e9;
     }
 
     static void
@@ -1141,7 +1139,7 @@ acutest_run_(const struct acutest_test_* test, int index, int master_index)
                     case SIGSEGV: signame = "SIGSEGV"; break;
                     case SIGILL:  signame = "SIGILL"; break;
                     case SIGTERM: signame = "SIGTERM"; break;
-                    default:      sprintf(tmp, "signal %d", WTERMSIG(exit_code)); signame = tmp; break;
+                    default:      snprintf(tmp, sizeof(tmp), "signal %d", WTERMSIG(exit_code)); signame = tmp; break;
                 }
                 acutest_error_("Test interrupted by %s.", signame);
             } else {
@@ -1316,7 +1314,11 @@ acutest_cmdline_read_(const ACUTEST_CMDLINE_OPTION_* options, int argc, char** a
                             if(opt->flags & (ACUTEST_CMDLINE_OPTFLAG_OPTIONALARG_ | ACUTEST_CMDLINE_OPTFLAG_REQUIREDARG_)) {
                                 ret = callback(opt->id, argv[i]+2+len+1);
                             } else {
-                                sprintf(auxbuf, "--%s", opt->longname);
+#if defined(ACUTEST_WIN_)
+                                _snprintf(auxbuf, sizeof(auxbuf)-1, "--%s", opt->longname);
+#else
+                                snprintf(auxbuf, sizeof(auxbuf), "--%s", opt->longname);
+#endif
                                 ret = callback(ACUTEST_CMDLINE_OPTID_BOGUSARG_, auxbuf);
                             }
                             break;
@@ -1360,7 +1362,7 @@ acutest_cmdline_read_(const ACUTEST_CMDLINE_OPTION_* options, int argc, char** a
                         /* Strip any argument from the long option. */
                         char* assignment = strchr(badoptname, '=');
                         if(assignment != NULL) {
-                            size_t len = assignment - badoptname;
+                            size_t len = (size_t)(assignment - badoptname);
                             if(len > ACUTEST_CMDLINE_AUXBUF_SIZE_)
                                 len = ACUTEST_CMDLINE_AUXBUF_SIZE_;
                             strncpy(auxbuf, badoptname, len);
@@ -1586,7 +1588,7 @@ acutest_is_tracer_present_(void)
     /* Must be large enough so the line 'TracerPid: ${PID}' can fit in. */
     static const int OVERLAP = 32;
 
-    char buf[256+OVERLAP+1];
+    char buf[512];
     int tracer_present = 0;
     int fd;
     size_t n_read = 0;
@@ -1605,7 +1607,7 @@ acutest_is_tracer_present_(void)
             n = read(fd, buf + n_read, sizeof(buf) - 1 - n_read);
             if(n <= 0)
                 break;
-            n_read += n;
+            n_read += (size_t)n;
         }
         buf[n_read] = '\0';
 
@@ -1616,8 +1618,10 @@ acutest_is_tracer_present_(void)
             break;
         }
 
-        if(n_read == sizeof(buf)-1) {
-            memmove(buf, buf + sizeof(buf)-1 - OVERLAP, OVERLAP);
+        if(n_read == sizeof(buf) - 1) {
+            /* Move the tail with the potentially incomplete line we're looking
+             * for to the beginning of the buffer. */
+            memmove(buf, buf + sizeof(buf) - 1 - OVERLAP, OVERLAP);
             n_read = OVERLAP;
         } else {
             break;
@@ -1629,10 +1633,40 @@ acutest_is_tracer_present_(void)
 }
 #endif
 
+#ifdef ACUTEST_MACOS_
+static bool
+acutest_AmIBeingDebugged(void)
+{
+    int junk;
+    int mib[4];
+    struct kinfo_proc info;
+    size_t size;
+
+    // Initialize the flags so that, if sysctl fails for some bizarre
+    // reason, we get a predictable result.
+    info.kp_proc.p_flag = 0;
+
+    // Initialize mib, which tells sysctl the info we want, in this case
+    // we're looking for information about a specific process ID.
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PID;
+    mib[3] = getpid();
+
+    // Call sysctl.
+    size = sizeof(info);
+    junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
+    assert(junk == 0);
+
+    // We're being debugged if the P_TRACED flag is set.
+    return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+}
+#endif
+
 int
 main(int argc, char** argv)
 {
-    int i;
+    int i, index;
 
     acutest_argv0_ = argv[0];
 
@@ -1693,6 +1727,10 @@ main(int argc, char** argv)
             if(acutest_is_tracer_present_())
                 acutest_no_exec_ = 1;
 #endif
+#ifdef ACUTEST_MACOS_
+            if(acutest_AmIBeingDebugged())
+                acutest_no_exec_ = 1;
+#endif
 #ifdef RUNNING_ON_VALGRIND
             /* RUNNING_ON_VALGRIND is provided by optionally included <valgrind.h> */
             if(RUNNING_ON_VALGRIND)
@@ -1715,7 +1753,7 @@ main(int argc, char** argv)
             printf("1..%d\n", (int) acutest_count_);
     }
 
-    int index = acutest_worker_index_;
+    index = acutest_worker_index_;
     for(i = 0; acutest_list_[i].func != NULL; i++) {
         int run = (acutest_test_data_[i].flags & ACUTEST_FLAG_RUN_);
         if (acutest_skip_mode_) /* Run all tests except those listed. */
