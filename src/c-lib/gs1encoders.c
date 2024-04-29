@@ -193,7 +193,7 @@ bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_
 bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_validations_t validation, const bool enabled) {
 	assert(ctx);
 	reset_error(ctx);
-	if (validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {
+	if ((signed int)validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {  // Cast satisfies "unsigned enum < 0" checks
 		strcpy(ctx->errMsg, "Unknown validation");
 		ctx->errFlag = true;
 		return false;
