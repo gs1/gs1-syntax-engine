@@ -38,7 +38,7 @@ jobs:
         ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `nproc` app-static CC=clang SANITIZE=yes
-        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
+        ( cd src/c-lib && build/gs1encoders-static.bin --version )
 
   ci-gcc:
 
@@ -64,7 +64,7 @@ jobs:
         ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `nproc` app-static CC=gcc
-        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
+        ( cd src/c-lib && build/gs1encoders-static.bin --version )
 
   ci-msvc:
 
@@ -117,7 +117,7 @@ jobs:
         ( cd src/c-lib && DYLD_LIBRARY_PATH=build build/gs1encoders.bin --version )
 
         make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static SANITIZE=yes
-        ( cd src/c-lib && build/gs1encoders-linux.bin --version )
+        ( cd src/c-lib && build/gs1encoders-static.bin --version )
 
   ci-scan-build:
 
@@ -365,10 +365,10 @@ jobs:
     - name: Linux release build
       run: |
         make -C src/c-lib -j `nproc` CC=clang
-        src/c-lib/build/gs1encoders-linux.bin --version
+        src/c-lib/build/gs1encoders-static.bin --version
         cp src/c-lib/gs1-syntax-dictionary.txt src/c-lib/build/
         cd src/c-lib/build
-        tar cvzf gs1encoders-linux-app.tgz gs1encoders-linux.bin gs1-syntax-dictionary.txt
+        tar cvzf gs1encoders-linux-app.tgz gs1encoders-static.bin gs1-syntax-dictionary.txt
 
     - name: Store Linux build
       if: startsWith(github.ref, 'refs/tags/')

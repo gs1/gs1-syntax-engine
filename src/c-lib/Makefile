@@ -103,6 +103,7 @@ endif
 ifneq (, $(findstring darwin, $(ARCH)))
 LIB_DYN_SUFFIX = dylib
 LIB_STATIC_SUFFIX = a
+BIN_SUFFIX = bin
 LDFLAGS =
 LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 CFLAGS_FORTIFY =
@@ -110,6 +111,7 @@ NPROC = sysctl -n hw.ncpu
 else
 LIB_DYN_SUFFIX = so
 LIB_STATIC_SUFFIX = a
+BIN_SUFFIX = bin
 LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
@@ -119,10 +121,10 @@ endif
 LDLIBS = -lc
 CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) -Wall -Wextra -Wconversion -Wformat -Wformat-security -Wdeclaration-after-statement -pedantic -Werror -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
-APP = $(BUILD_DIR)/$(NAME).bin
-APP_STATIC = $(BUILD_DIR)/$(NAME)-linux.bin
+APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
+APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
 
-TEST_BIN = $(BUILD_DIR)/$(NAME)-test
+TEST_BIN = $(BUILD_DIR)/$(NAME)-test.$(BIN_SUFFIX)
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX)
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
