@@ -278,7 +278,7 @@ static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX
 }
 
 static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
-	char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
+	char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
 	strcpy(seq[0], p);
 	return getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1) != -1;
 }
@@ -352,7 +352,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	const char* dp = NULL;	// DL path info
 	bool ret;
 	bool fnc1req = true;
-	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { 0 };	// Sequence of AIs extracted from the path info
+	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };	// Sequence of AIs extracted from the path info
 	int numPathAIs;
 
 	assert(ctx);
@@ -652,7 +652,7 @@ add_query_param_to_ai_data:
 		int i;
 		for (i = 0; i < ctx->numAIs; i++) {
 
-			char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
+			char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
 			const struct aiValue* const ai = &ctx->aiData[i];
 			int j;
 
@@ -745,7 +745,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char seq[MAX_AIS][MAX_AI_LEN+1] = { 0 };
+		char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
 		int ke;
 		const struct aiValue* const ai = &ctx->aiData[i];
 
