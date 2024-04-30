@@ -299,8 +299,6 @@ install-static: libstatic install-headers
 install-shared: libshared install-headers
 	install -d $(DESTDIR)$(LIBDIR)
 	install -m 0644 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(DESTDIR)$(LIBDIR)
-	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) lib$(NAME).$(LIB_DYN_SUFFIX)
-	cd $(DESTDIR)$(LIBDIR) && ln -sf lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 	-ldconfig
 
 uninstall:
