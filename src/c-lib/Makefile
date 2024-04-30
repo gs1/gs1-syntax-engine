@@ -104,21 +104,34 @@ ifneq (, $(findstring darwin, $(ARCH)))
 LIB_DYN_SUFFIX = dylib
 LIB_STATIC_SUFFIX = a
 BIN_SUFFIX = bin
+LDLIBS = -lc
 LDFLAGS =
 LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+LDFLAGS_APP_STATIC =
 CFLAGS_FORTIFY =
 NPROC = sysctl -n hw.ncpu
+else ifneq (, $(findstring mingw, $(ARCH)))
+LIB_DYN_SUFFIX = dll
+LIB_STATIC_SUFFIX = a
+BIN_SUFFIX = exe
+LDLIBS =
+LDFLAGS = -s -Wl,--as-needed -Wl,-Bsymbolic-functions $(SAN_LDFLAGS)
+LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+LDFLAGS_APP_STATIC = -s
+CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
+NPROC = nproc
 else
 LIB_DYN_SUFFIX = so
 LIB_STATIC_SUFFIX = a
 BIN_SUFFIX = bin
-LDFLAGS = -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
+LDLIBS = -lc
+LDFLAGS = -s -Wl,--as-needed -Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,-z,now $(SAN_LDFLAGS)
 LDFLAGS_SO = -shared -Wl,-soname,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+LDFLAGS_APP_STATIC = -s
 CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
 NPROC = nproc
 endif
 
-LDLIBS = -lc
 CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) -Wall -Wextra -Wconversion -Wformat -Wformat-security -Wdeclaration-after-statement -pedantic -Werror -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
 APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
@@ -127,7 +140,12 @@ APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test.$(BIN_SUFFIX)
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX)
+
+ifneq (, $(findstring mingw, $(ARCH)))
+LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX)
+else
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
+endif
 
 PREFIX = /usr/local
 LIBDIR = $(PREFIX)/lib
@@ -181,6 +199,13 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)/
 #
 #  Shared library
 #
+ifneq (, $(findstring mingw, $(ARCH)))
+
+$(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX): $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LDFLAGS_SO) $(LDLIBS) $^ -o $@
+
+else
+
 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 	ln -sf $(notdir $<) $@
 
@@ -190,6 +215,7 @@ $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR): $(BUILD_DIR)/lib$(NAME).$(LI
 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDFLAGS_SO) $(LDLIBS) $^ -o $@
 
+endif
 
 #
 #  Static library
@@ -203,7 +229,7 @@ $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX): $(OBJS)
 #  Application built to use shared library
 #
 $(APP): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(APP_SRC)
-	$(CC) $(CFLAGS) $(APP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+	$(CC) $(CFLAGS) $(LDFLAGS_APP_STATIC) $(APP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 
 #
