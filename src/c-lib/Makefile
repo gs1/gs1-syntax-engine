@@ -22,11 +22,22 @@ MINOR := 0
 PATCH := 0
 VERSION := $(MAJOR).$(MINOR).$(PATCH)
 
-ARCH := $(shell $(CC) -dumpmachine)
-
 NAME = gs1encoders
 
 BUILD_DIR = build
+
+
+ARCH := $(shell $(CC) -dumpmachine)
+ifneq (, $(findstring darwin, $(ARCH)))
+ARCH_OS := darwin
+else ifneq (, $(findstring mingw, $(ARCH)))
+ARCH_OS := windows
+else ifneq (, $(findstring windows, $(ARCH)))
+ARCH_OS := windows
+else
+ARCH_OS := linux
+endif
+
 
 ifeq ($(DEBUG),yes)
 DEBUG_CFLAGS = -DPRNT
@@ -83,7 +94,7 @@ ifeq ($(SANITIZE),yes)
 CC=clang
 SAN_LDFLAGS = -fuse-ld=lld
 
-ifneq (, $(findstring darwin, $(ARCH)))
+ifeq ($(ARCH_OS), darwin)
 # Leak detection is not supported on MacOS builds of LLVM
 SAN_CFLAGS = -fsanitize=address,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_ENV = ASAN_OPTIONS="symbolize=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" MallocNanoZone=0 ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
@@ -100,7 +111,7 @@ SLOW_TESTS_CFLAGS=-DSLOW_TESTS
 endif
 
 
-ifneq (, $(findstring darwin, $(ARCH)))
+ifeq ($(ARCH_OS), darwin)
 LIB_DYN_SUFFIX = dylib
 LIB_STATIC_SUFFIX = a
 BIN_SUFFIX = bin
@@ -110,7 +121,7 @@ LDFLAGS_SO = -shared -Wl,-install_name,lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
 LDFLAGS_APP_STATIC =
 CFLAGS_FORTIFY =
 NPROC = sysctl -n hw.ncpu
-else ifneq (, $(findstring mingw, $(ARCH)))
+else ifeq ($(ARCH_OS), windows)
 LIB_DYN_SUFFIX = dll
 LIB_STATIC_SUFFIX = a
 BIN_SUFFIX = exe
@@ -141,7 +152,7 @@ TEST_BIN = $(BUILD_DIR)/$(NAME)-test.$(BIN_SUFFIX)
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX)
 
-ifneq (, $(findstring mingw, $(ARCH)))
+ifeq ($(ARCH_OS), windows)
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX)
 else
 LIB_SHARED = $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(MAJOR)
@@ -199,7 +210,7 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)/
 #
 #  Shared library
 #
-ifneq (, $(findstring mingw, $(ARCH)))
+ifeq ($(ARCH_OS), windows)
 
 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDFLAGS_SO) $(LDLIBS) $^ -o $@
