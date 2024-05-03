@@ -688,22 +688,15 @@ add_query_param_to_ai_data:
 
 out:
 
+	if (qp) {			// Restore original query parameter delimiter
+//		*(qp-1) = '?';
+		dlData[qp - dlData - 1] = '?';  // Ugly hack generates same code as above to satiate GCC 11
+	}
 
-// Suppress erroneous "error: writing 1 byte into a region of size 0" on GCC 11.2.0
-#if __GNUC__ == 11
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
-
-	if (qp)			// Restore original query parameter delimiter
-		*(qp-1) = '?';
-
-	if (fr)			// Restore original fragment delimiter
-		*(fr-1) = '#';
-
-#if __GNUC__ == 11
-#pragma GCC diagnostic pop
-#endif
+	if (fr) {			// Restore original fragment delimiter
+//		*(fr-1) = '#';
+		dlData[fr - dlData - 1] = '#';  // Ditto
+	}
 
 	return ret;
 
