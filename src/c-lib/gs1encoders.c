@@ -245,7 +245,9 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
 	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// GS1 Digital Link URI
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
+	    (strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
@@ -881,13 +883,17 @@ void test_api_getAIdataStr(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
+	// Plain data
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "TESTING"));
+	TEST_CHECK((out = gs1_encoder_getAIdataStr(ctx)) == NULL);	// No AI extraction
+	TEST_CHECK((out = gs1_encoder_getDataStr(ctx)) != NULL);	// Just hold the data string
+	assert(out);
+	TEST_CHECK(strcmp(out, "TESTING") == 0);
+
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123"));
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
-
-	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "TESTING"));
-	TEST_CHECK((out = gs1_encoder_getAIdataStr(ctx)) == NULL);
 
 	// Escape data "(" characters
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC(123"));
@@ -900,6 +906,19 @@ void test_api_getAIdataStr(void) {
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123|(99)XYZ\\(TM)_CORP") == 0);
+
+	// GS1 DL URI
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://example.org/01/12312312312333/10/ABC123"));
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
+	assert(out);
+	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
+
+	// Mixed-case scheme is not a valid DL URI, so plain data
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "HtTp://example.org/01/12312312312333/10/ABC123"));
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) == NULL);	// No AI extraction
+	TEST_CHECK((out = gs1_encoder_getDataStr(ctx)) != NULL);	// Just a plain data string
+	assert(out);
+	TEST_CHECK(strcmp(out, "HtTp://example.org/01/12312312312333/10/ABC123") == 0);
 
 	gs1_encoder_free(ctx);
 

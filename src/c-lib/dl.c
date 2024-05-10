@@ -375,10 +375,14 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	if (strlen(p) >= 8 && strncmp(p, "https://", 8) == 0)
 		p += 8;
+	else if (strlen(p) >= 8 && strncmp(p, "HTTPS://", 8) == 0)
+		p += 8;
 	else if (strlen(p) >= 7 && strncmp(p, "http://", 7) == 0)
 		p += 7;
+	else if (strlen(p) >= 7 && strncmp(p, "HTTP://", 7) == 0)
+		p += 7;
 	else {
-		strcpy(ctx->errMsg, "Scheme must be http:// or https://");
+		strcpy(ctx->errMsg, "Scheme must be http:// or HTTP:// or https:// or HTTPS://");
 		goto fail;
 	}
 
@@ -926,9 +930,19 @@ void test_dl_parseDLuri(void) {
 		"http://a/00/006141411234567890",
 		"^00006141411234567890");
 
+	test_parseDLuri(ctx, true,					// HTTP
+		"HTTP://a/00/006141411234567890",
+		"^00006141411234567890");
+
 	test_parseDLuri(ctx, true,					// https
 		"https://a/00/006141411234567890",
 		"^00006141411234567890");
+
+	test_parseDLuri(ctx, true,					// HTTPS
+		"HTTPS://a/00/006141411234567890",
+		"^00006141411234567890");
+
+	test_parseDLuri(ctx, false, "HtTp://a/b/00/006141411234567890", "");	// Mixed-case scheme forbidden
 
 	test_parseDLuri(ctx, false,					// No domain
 		"https://00/006141411234567890",

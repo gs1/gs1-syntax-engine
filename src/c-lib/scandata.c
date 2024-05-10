@@ -509,7 +509,9 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 	// If a GS1 Digital Link URI is given then process it immediately
 	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0)) {
+	    (strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
+	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
@@ -727,9 +729,22 @@ void test_scandata_processScanData(void) {
 		QR, "^011231231231233310ABC123^99TESTING");
 
 	/* QR Code with GS1 Digital Link URI */
+	*ctx->dlAIbuffer = '\0';
 	test_testProcessScanData(true, "]Q1https://example.com/01/12312312312333?99=TEST",
 		QR, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+
+	/* QR Code with GS1 Digital Link URI (uppercase scheme) */
+	*ctx->dlAIbuffer = '\0';
+	test_testProcessScanData(true, "]Q1HTTPS://example.com/01/12312312312333?99=TEST",
+		QR, "HTTPS://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+
+	/* QR Code with GS1 Digital Link URI (forbidden mixed-case scheme) */
+	*ctx->dlAIbuffer = '\0';
+	test_testProcessScanData(true, "]Q1HtTps://example.com/01/12312312312333?99=TEST",
+		QR, "HtTps://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "") == 0);	// Check AI extraction
 
 	/* DM */
 	test_testProcessScanData(true, "]d1", DM, "");
@@ -741,9 +756,22 @@ void test_scandata_processScanData(void) {
 		DM, "^011231231231233310ABC123^99TESTING");
 
 	/* DM with GS1 Digital Link URI */
+	*ctx->dlAIbuffer = '\0';
 	test_testProcessScanData(true, "]d1https://example.com/01/12312312312333?99=TEST",
 		DM, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+
+	/* DM with GS1 Digital Link URI (uppercase scheme) */
+	*ctx->dlAIbuffer = '\0';
+	test_testProcessScanData(true, "]d1HTTPS://example.com/01/12312312312333?99=TEST",
+		DM, "HTTPS://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+
+	/* DM with GS1 Digital Link URI (forbidden mixed-case scheme) */
+	*ctx->dlAIbuffer = '\0';
+	test_testProcessScanData(true, "]d1HtTps://example.com/01/12312312312333?99=TEST",
+		DM, "HtTps://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "") == 0);	// Check AI extraction
 
 	/* DataBar Expanded, shared with all DataBar family and UCC-128 Composite */
 	test_testProcessScanData(false, "]e0", NONE, "");		// Empty GS1 data
