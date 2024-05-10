@@ -115,7 +115,7 @@ struct ContentView: View {
             } else if (data.starts(with: "^")) {
                 syntax = "Unbracketed AI element string"
                 try gs1encoder.setDataStr(data)
-            } else if (data.starts(with: "http://") || data.starts(with: "https://")) {
+            } else if (data.starts(with: "http://") || data.starts(with: "HTTP://") || data.starts(with: "https://") || data.starts(with: "HTTPS://")) {
                 syntax = "GS1 Digital Link URI"
                 try gs1encoder.setDataStr(data)
             } else if (CharacterSet(charactersIn: data).isSubset(of: CharacterSet(charactersIn: "0123456789"))) {

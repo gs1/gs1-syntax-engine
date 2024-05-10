@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             } else if (data.startsWith('^')) {
                 binding.syntaxTextBox.setText("Unbracketed AI element string")
                 gs1encoder.dataStr = data
-            } else if (data.startsWith("http://") || data.startsWith("https://")) {
+            } else if (data.startsWith("http://") || data.startsWith("HTTP://") || data.startsWith("https://") || data.startsWith("HTTPS://")) {
                 binding.syntaxTextBox.setText("GS1 Digital Link URI")
                 gs1encoder.dataStr = data
             } else if (data.matches("^\\d+$".toRegex())) {

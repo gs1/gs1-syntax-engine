@@ -181,7 +181,7 @@ class BarcodeScannerUIView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate
                 // for GS1 symbols we at least have a proxy in the form of GS in
                 // first position!
             case BarcodeFormat.dataMatrix:
-                if (raw.hasPrefix("http://") || raw.hasPrefix("https://")) {
+                if (raw.hasPrefix("http://") || raw.hasPrefix("HTTP://") || raw.hasPrefix("https://") || raw.hasPrefix("HTTPS://")) {
                     inputData = "]d1" + raw
                 } else if (raw.hasPrefix("\u{001d}")) {
                     inputData = "]d2" + raw.dropFirst()
@@ -193,7 +193,7 @@ class BarcodeScannerUIView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate
                 // worst of all for GS1 symbols there isn't even a proxy since there
                 // is no reported GS in first position
             case BarcodeFormat.qrCode:
-                if (raw.hasPrefix("http://") || raw.hasPrefix("https://")) {
+                if (raw.hasPrefix("http://") || raw.hasPrefix("HTTP://") || raw.hasPrefix("https://") || raw.hasPrefix("HTTPS://")) {
                     inputData = "]Q1" + raw
                 } else {  // Best we can do is to assume GS1 format
                     inputData = "]Q3" + raw

@@ -98,7 +98,7 @@ namespace GS1.EncodersApp
                     syntaxTextBox.Text = "Unbracketed AI element string";
                     App.gs1Encoder.DataStr = inputTextBox.Text;
                 }
-                else if (inputTextBox.Text.StartsWith("http://") || inputTextBox.Text.StartsWith("https://"))
+                else if (inputTextBox.Text.StartsWith("http://") || inputTextBox.Text.StartsWith("HTTP://") || inputTextBox.Text.StartsWith("https://") || inputTextBox.Text.StartsWith("HTTPS://"))
                 {  // GS1 Digital Link URI
                     syntaxTextBox.Text = "GS1 Digital Link URI";
                     App.gs1Encoder.DataStr = inputTextBox.Text;

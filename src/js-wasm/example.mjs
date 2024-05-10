@@ -113,7 +113,7 @@ function process_clicked() {
 		} else if (data.startsWith('^')) {
 			document.getElementById("syntax").value = "Unbracketed AI element string";
 			gs1encoder.dataStr = data;
-		} else if (data.startsWith("http://") || data.startsWith("https://")) {
+		} else if (data.startsWith("http://") || data.startsWith("HTTP://") || data.startsWith("https://") || data.startsWith("HTTPS://")) {
 			document.getElementById("syntax").value = "GS1 Digital Link URI";
 			gs1encoder.dataStr = data;
 		} else if (/^\d+$/.test(data)) {

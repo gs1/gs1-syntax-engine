@@ -84,7 +84,7 @@ class GS1BarcodeImageAnalyzer(private val result: (String) -> Unit) : ImageAnaly
                             // for GS1 symbols we at least have a proxy in the form of GS in
                             // first position!
                             Barcode.FORMAT_DATA_MATRIX -> {
-                                inputData = if (raw.startsWith("http://") or raw.startsWith("https://")) {
+                                inputData = if (raw.startsWith("http://") or raw.startsWith("HTTP://") or raw.startsWith("https://") or raw.startsWith("HTTPS://")) {
                                     "]d1$raw"
                                 } else if (raw.startsWith("\u001D")) {
                                     "]d2" + raw.drop(1)
@@ -97,7 +97,7 @@ class GS1BarcodeImageAnalyzer(private val result: (String) -> Unit) : ImageAnaly
                             // worst of all for GS1 symbols there isn't even a proxy since there
                             // is no reported GS in first position
                             Barcode.FORMAT_QR_CODE -> {
-                                inputData = if (raw.startsWith("http://") or raw.startsWith("https://")) {
+                                inputData = if (raw.startsWith("http://") or raw.startsWith("HTTP://") or raw.startsWith("https://") or raw.startsWith("HTTPS://")) {
                                     "]Q1$raw"
                                 } else {  // Best we can do is to assume GS1 format
                                     "]Q3$raw"
