@@ -134,7 +134,7 @@ fail:
 int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
 	const struct aiEntry *lastEntry;
-	const char *token;
+	const char *token, *flags = "";
 	char *saveptr = NULL;
 	char *p, *q;
 	size_t len;
@@ -202,15 +202,16 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	if (!token)
 		error("Truncated after AI");
 
-	// Next token may be a "no FNC1" indicator flag
-	if (strcmp(token, "*") == 0) {
-		(*entry)->fnc1 = NO_FNC1;
+	// Check if we have exclusively flag characters
+	if (strspn(token, "*?") == strlen(token)) {
+		flags = token;
 		token = strtok_r(NULL, " \t", &saveptr);
 		if (!token)
 			error("Truncated after flags");
-	} else {
-		(*entry)->fnc1 = DO_FNC1;
 	}
+
+	// We may have a '*' (no FNC1) indicator flag
+	(*entry)->fnc1 = strchr(flags, '*') ? NO_FNC1 : DO_FNC1;
 
 	// Read and process the AI components
 	numparts = 0;
