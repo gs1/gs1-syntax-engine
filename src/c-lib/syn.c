@@ -203,7 +203,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		error("Truncated after AI");
 
 	// Check if we have exclusively flag characters
-	if (strspn(token, "*?") == strlen(token)) {
+	if (strspn(token, "*?!\"$%&'()+,-./:;<=>@[\\]^_`{|}~") == strlen(token)) {
 		flags = token;
 		token = strtok_r(NULL, " \t", &saveptr);
 		if (!token)
