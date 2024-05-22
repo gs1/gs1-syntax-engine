@@ -24,7 +24,12 @@ my $ai_rx = qr/
 
 my $ai_rng_rx = qr/${ai_rx}(-${ai_rx})?/;
 
-my $flags_rx = qr/[\*]+/;
+my $flags_rx = qr/
+    [
+        *?!"%&'()+,.:;<=>@[_`{|}~
+        \$  \-  \/  \\  \]  \^
+    ]+
+/x;
 
 my $type_mand_rx = qr/
     [XNYZ]
