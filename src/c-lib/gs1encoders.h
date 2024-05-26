@@ -460,8 +460,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *       this is required.
  *   * For GS1 Digital Link URIs:
  *     * Ensure that the data does not contain illegal URI characters
- *     * Ensure that the scheme (`http` or `https`), domain and stem are
- *       present.
+ *     * Ensure that the scheme, domain and stem are present.
  *     * Ensure that the path info structure is correct allowing for AI
  *       extraction.
  *     * For each extracted AI, validate that the data corresponds to a known
@@ -479,6 +478,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *       * Ensure that repeated AIs have the same value.
  *       * Ensure that mutually-exclusive AIs are not present.
  *       * Ensure that all requisite AIs are accounted for.
+ *       * Ensure that serialisation qualifier AIs are present with Digital Signature.
  *
  * @param [in,out] ctx ::gs1_encoder context
  * @return pointer to error message string

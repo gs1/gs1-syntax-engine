@@ -853,7 +853,7 @@ Data validation checks</h3>
 </li>
 <li>For GS1 Digital Link URIs:<ul>
 <li>Ensure that the data does not contain illegal URI characters</li>
-<li>Ensure that the scheme (<code>http</code> or <code>https</code>), domain and stem are present.</li>
+<li>Ensure that the scheme, domain and stem are present.</li>
 <li>Ensure that the path info structure is correct allowing for AI extraction.</li>
 <li>For each extracted AI, validate that the data corresponds to a known AI, unless disabled using <a class="el" href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096" title="Enable or disable &quot;permit unknown AIs&quot; mode for parsing of bracketed AI element strings and GS1 Digit...">gs1_encoder_setPermitUnknownAIs()</a>, and that the overall length is within limits.</li>
 <li>Ensure that the AIs extracted from the path info form a valid primary key to key-qualifier association.</li>
@@ -871,6 +871,7 @@ Data validation checks</h3>
 <li>Ensure that repeated AIs have the same value.</li>
 <li>Ensure that mutually-exclusive AIs are not present.</li>
 <li>Ensure that all requisite AIs are accounted for.</li>
+<li>Ensure that serialisation qualifier AIs are present with Digital Signature.</li>
 </ul>
 </li>
 </ul>
