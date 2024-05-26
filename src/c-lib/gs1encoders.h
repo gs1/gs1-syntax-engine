@@ -4,7 +4,7 @@
  * @file gs1encoders.h
  * @author GS1 AISBL
  *
- * \copyright Copyright (c) 2000-2022 GS1 AISBL.
+ * \copyright Copyright (c) 2000-2024 GS1 AISBL.
  *
  * @licenseblock{License}
  *

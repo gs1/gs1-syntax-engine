@@ -219,7 +219,7 @@ directory and start it by running the following from within the same directory:
 License
 -------
 
-Copyright (c) 2000-2022 GS1 AISBL
+Copyright (c) 2000-2024 GS1 AISBL
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this library except in compliance with the License.
