@@ -15,6 +15,10 @@
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
 		F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */; };
 		F7478BFC29CB222E00080607 /* lint_mediatype.c in Sources */ = {isa = PBXBuildFile; fileRef = F7478BFB29CB222E00080607 /* lint_mediatype.c */; };
+		F76F569A2C03D8F400A58C2E /* lint_iso5218.c in Sources */ = {isa = PBXBuildFile; fileRef = F76F56962C03D8F400A58C2E /* lint_iso5218.c */; };
+		F76F569B2C03D8F400A58C2E /* lint_posinseqslash.c in Sources */ = {isa = PBXBuildFile; fileRef = F76F56972C03D8F400A58C2E /* lint_posinseqslash.c */; };
+		F76F569C2C03D8F400A58C2E /* lint_yyyymmd0.c in Sources */ = {isa = PBXBuildFile; fileRef = F76F56982C03D8F400A58C2E /* lint_yyyymmd0.c */; };
+		F76F569D2C03D8F400A58C2E /* lint_yyyymmdd.c in Sources */ = {isa = PBXBuildFile; fileRef = F76F56992C03D8F400A58C2E /* lint_yyyymmdd.c */; };
 		F79827612909D35500F00DDA /* ai.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827202909D35400F00DDA /* ai.c */; };
 		F79827662909D35500F00DDA /* scandata.c in Sources */ = {isa = PBXBuildFile; fileRef = F798272A2909D35400F00DDA /* scandata.c */; };
 		F798276D2909D35500F00DDA /* dl.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827342909D35400F00DDA /* dl.c */; };
@@ -67,6 +71,10 @@
 		F73EC9AF2909D226008E17F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F7478BFB29CB222E00080607 /* lint_mediatype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_mediatype.c; sourceTree = "<group>"; };
+		F76F56962C03D8F400A58C2E /* lint_iso5218.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso5218.c; sourceTree = "<group>"; };
+		F76F56972C03D8F400A58C2E /* lint_posinseqslash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_posinseqslash.c; sourceTree = "<group>"; };
+		F76F56982C03D8F400A58C2E /* lint_yyyymmd0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yyyymmd0.c; sourceTree = "<group>"; };
+		F76F56992C03D8F400A58C2E /* lint_yyyymmdd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yyyymmdd.c; sourceTree = "<group>"; };
 		F798271D2909D35400F00DDA /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		F79827202909D35400F00DDA /* ai.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ai.c; sourceTree = "<group>"; };
 		F79827212909D35400F00DDA /* enc-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "enc-private.h"; sourceTree = "<group>"; };
@@ -218,6 +226,10 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F76F56962C03D8F400A58C2E /* lint_iso5218.c */,
+				F76F56972C03D8F400A58C2E /* lint_posinseqslash.c */,
+				F76F56982C03D8F400A58C2E /* lint_yyyymmd0.c */,
+				F76F56992C03D8F400A58C2E /* lint_yyyymmdd.c */,
 				F72E912A2A94E29C00C746FC /* lint_hyphen.c */,
 				F7A662AB2A50A95200638051 /* lint_cset64.c */,
 				F7A662AA2A50A95200638051 /* lint_latitude.c */,
@@ -377,11 +389,14 @@
 				F7A662AC2A50A95200638051 /* lint_longitude.c in Sources */,
 				F798277D2909D35500F00DDA /* lint_importeridx.c in Sources */,
 				F79827762909D35500F00DDA /* lint_csum.c in Sources */,
+				F76F569A2C03D8F400A58C2E /* lint_iso5218.c in Sources */,
 				F79827742909D35500F00DDA /* lint_winding.c in Sources */,
 				F79827882909D35500F00DDA /* lint_yymmdd.c in Sources */,
+				F76F569B2C03D8F400A58C2E /* lint_posinseqslash.c in Sources */,
 				F798278A2909D35500F00DDA /* lint_pieceoftotal.c in Sources */,
 				F79827792909D35500F00DDA /* lint_yymmddhh.c in Sources */,
 				F79827842909D35500F00DDA /* lint_nonzero.c in Sources */,
+				F76F569D2C03D8F400A58C2E /* lint_yyyymmdd.c in Sources */,
 				F79827732909D35500F00DDA /* lint_iso3166list.c in Sources */,
 				F798277A2909D35500F00DDA /* lint_zero.c in Sources */,
 				F79827862909D35500F00DDA /* lint_csumalpha.c in Sources */,
@@ -396,6 +411,7 @@
 				F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */,
 				F798276D2909D35500F00DDA /* dl.c in Sources */,
 				F79827702909D35500F00DDA /* gs1encoders.c in Sources */,
+				F76F569C2C03D8F400A58C2E /* lint_yyyymmd0.c in Sources */,
 				F79827892909D35500F00DDA /* lint_yesno.c in Sources */,
 				F79827662909D35500F00DDA /* scandata.c in Sources */,
 				F72D9196293AB3F300809E9B /* BarcodeScannerView.swift in Sources */,
