@@ -226,9 +226,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	}
 	vli = *p - '0' + 6;
 
-	p++;
-
-	if (q - p < vli) {
+	if (q - ++p < vli) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_GCP;
@@ -286,9 +284,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	}
 	vli = *p - '0';
 
-	p++;
-
-	if (q - p < vli) {
+	if (q - ++p < vli) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_SAVE_VALUE;
@@ -316,9 +312,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	}
 	vli = *p - '0';
 
-	p++;
-
-	if (q - p < vli) {
+	if (q - ++p < vli) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_REQUIREMENT;
@@ -346,14 +340,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		return GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_CODE;
 	}
 
-	p++;
-
 
 	/*
 	 * Validate the existence of the three-digit 1st Purchase Family Code.
 	 *
 	 */
-	if (q - p < 3) {
+	if (q - ++p < 3) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_FAMILY_CODE;
@@ -371,8 +363,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '1') {
 
-		p++;
-
 		/*
 		 * Validate the single-digit Additional Purchase Rules Code.
 		 *
@@ -380,7 +370,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "3".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_ADDITIONAL_PURCHASE_RULES_CODE;
@@ -392,8 +382,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			return GS1_LINTER_COUPON_INVALID_ADDITIONAL_PURCHASE_RULES_CODE;
 		}
 
-		p++;
-
 
 		/*
 		 * Validate 2nd Purchase Requirement follows its VLI and has
@@ -403,7 +391,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "5".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_REQUIREMENT_VLI;
@@ -415,9 +403,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		}
 		vli = *p - '0';
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_REQUIREMENT;
@@ -445,15 +431,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			return GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_REQUIREMENT_CODE;
 		}
 
-		p++;
-
 
 		/*
 		 * Validate the existence of the three-digit 2nd Purchase
 		 * Family Code.
 		 *
 		 */
-		if (q - p < 3) {
+		if (q - ++p < 3) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_FAMILY_CODE;
@@ -482,9 +466,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		}
 		vli = (*p != '9') ? *p - '0' + 6 : 0;
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_GCP;
@@ -521,8 +503,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '2') {
 
-		p++;
-
 		/*
 		 * Validate 3rd Purchase Requirement follows its VLI and has
 		 * the corresponding length.
@@ -531,7 +511,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "5".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_REQUIREMENT_VLI;
@@ -543,9 +523,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		}
 		vli = *p - '0';
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_REQUIREMENT;
@@ -573,15 +551,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			return GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_REQUIREMENT_CODE;
 		}
 
-		p++;
-
 
 		/*
 		 * Validate that existence of the three digit 3rd Purchase
 		 * Family Code.
 		 *
 		 */
-		if (q - p < 3) {
+		if (q - ++p < 3) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_FAMILY_CODE;
@@ -610,9 +586,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		}
 		vli = (*p != '9') ? *p - '0' + 6 : 0;
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_GCP;
@@ -649,13 +623,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '3') {
 
-		p++;
-
 		/*
 		 * Validate that the expiration date is in YYMMDD format.
 		 *
 		 */
-		if (q - p < 6) {
+		if (q - ++p < 6) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TOO_SHORT_FOR_EXPIRATION_DATE;
@@ -695,13 +667,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 
 		char start_date[7] = {0};
 
-		p++;
-
 		/*
 		 * Validate that the start date is in YYMMDD format.
 		 *
 		 */
-		if (q - p < 6) {
+		if (q - ++p < 6) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TOO_SHORT_FOR_START_DATE;
@@ -748,23 +718,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '5') {
 
-		p++;
-
 		/*
 		 * Validate Serial Number follows its VLI and has the corresponding
 		 * length (plus 6).
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_SERIAL_NUMBER_VLI;
 		}
 		vli = *p - '0' + 6;
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER;
@@ -784,8 +750,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '6') {
 
-		p++;
-
 		/*
 		 * Validate that the Retailer GCP/GLN follows its VLI and has
 		 * the corresponding length (plus 6).
@@ -793,7 +757,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for the Retailer GCP/GLN VLI are "1" to "7".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_RETAILER_GCP_OR_GLN_VLI;
@@ -805,9 +769,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		}
 		vli = *p - '0' + 6;
 
-		p++;
-
-		if (q - p < vli) {
+		if (q - ++p < vli) {
 			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 			return GS1_LINTER_COUPON_TRUNCATED_RETAILER_GCP_OR_GLN;
@@ -844,8 +806,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '9') {
 
-		p++;
-
 		/*
 		 * Validate the single-digit Save Value Code.
 		 *
@@ -853,7 +813,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "6".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_SAVE_VALUE_CODE;
@@ -864,8 +824,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			return GS1_LINTER_COUPON_INVALID_SAVE_VALUE_CODE;
 		}
 
-		p++;
-
 
 		/*
 		 * Validate the single-digit Save Value Applies to Item value.
@@ -873,7 +831,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for Save Value Applies to Item are "0" to "2".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_SAVE_VALUE_APPLIES_TO_ITEM;
@@ -884,21 +842,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			return GS1_LINTER_COUPON_INVALID_SAVE_VALUE_APPLIES_TO_ITEM;
 		}
 
-		p++;
-
 
 		/*
 		 * Validate the existence of the single-digit Store Coupon
 		 * Flag.
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_STORE_COUPON_FLAG;
 		}
-
-		p++;
 
 
 		/*
@@ -907,7 +861,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for the Don't Multiply Flag are "0" and "1".
 		 *
 		 */
-		if (p == q) {
+		if (++p == q) {
 			if (err_pos) *err_pos = 0;
 			if (err_len) *err_len = (size_t)(q - data);
 			return GS1_LINTER_COUPON_MISSING_DONT_MULTIPLY_FLAG;

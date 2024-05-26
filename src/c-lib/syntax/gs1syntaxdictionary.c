@@ -44,6 +44,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "iso3166alpha2",	.fn = gs1_lint_iso3166alpha2 },
 	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },
 	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
+	{ .name = "iso5218",		.fn = gs1_lint_iso5218 },
 	{ .name = "key",		.fn = gs1_lint_key },
 	{ .name = "latitude",		.fn = gs1_lint_latitude },
 	{ .name = "longitude",		.fn = gs1_lint_longitude },
@@ -53,11 +54,14 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
 	{ .name = "pcenc",		.fn = gs1_lint_pcenc },
 	{ .name = "pieceoftotal",	.fn = gs1_lint_pieceoftotal },
+	{ .name = "posinseqslash",	.fn = gs1_lint_posinseqslash },
 	{ .name = "winding",		.fn = gs1_lint_winding },
 	{ .name = "yesno",		.fn = gs1_lint_yesno },
 	{ .name = "yymmd0",		.fn = gs1_lint_yymmd0 },
 	{ .name = "yymmdd",		.fn = gs1_lint_yymmdd },
 	{ .name = "yymmddhh",		.fn = gs1_lint_yymmddhh },
+	{ .name = "yyyymmd0",		.fn = gs1_lint_yyyymmd0 },
+	{ .name = "yyyymmdd",		.fn = gs1_lint_yyyymmdd },
 	{ .name = "zero",		.fn = gs1_lint_zero },
 };
 
@@ -128,8 +132,8 @@ const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"The IBAN contains an invalid character.",
 	"The IBAN must start with a valid ISO 3166 two-character country code.",
 	"The IBAN is invalid since the check characters are incorrect.",
-	"The date is too short for YYMMDD format.",
-	"The date is too long for YYMMDD format.",
+	"The date is too short.",
+	"The date is too long.",
 	"The date with hour is too short for YYMMDDHH format.",
 	"The date with hour is too long for YYMMDDHH format.",
 	"The hour with minute is too short for HHMM format.",
@@ -210,6 +214,9 @@ const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"A non-CSET 64 character was found where a CSET 64 character is expected.",
 	"Incorrect number of CSET 64 pad characters.",
 	"Only hyphens are permitted.",
+	"A valid ISO/IEC 5218 biological sex code required.",
+	"The data must have the format \"<pos>/<end>\".",
+	"The position number must not exceed the end number.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

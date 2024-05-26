@@ -125,8 +125,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 		 * Next character, wrapping at the end.
 		 *
 		 */
-		p++;
-		if (p == data + len)
+		if (++p == data + len)
 			p = data;
 
 	} while (p != data + 4);

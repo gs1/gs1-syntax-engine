@@ -1,7 +1,7 @@
 /**
  * GS1 Syntax Engine
  *
- * @author Copyright (c) 2021-2022 GS1 AISBL.
+ * @author Copyright (c) 2021-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1283,6 +1283,10 @@ void test_ai_linters(void) {
 		{ "(4309)18000000010000000000",				GS1_LINTER_INVALID_LATITUDE },
 		{ "(4309)00000000003600000001",				GS1_LINTER_INVALID_LONGITUDE },
 		{ "(4330)000000X",					GS1_LINTER_NOT_HYPHEN },
+		{ "(7252)5",						GS1_LINTER_INVALID_BIOLOGICAL_SEX_CODE },
+		{ "(7258)111",						GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED },
+		{ "(7258)0/3",						GS1_LINTER_ILLEGAL_ZERO_PREFIX },
+		{ "(7258)2/1",						GS1_LINTER_POSITION_EXCEEDS_END },
 
 		// Multiple AIs
 		{ "(01)95012345678903(3103)000123",			GS1_LINTER_OK },

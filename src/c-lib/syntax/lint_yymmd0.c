@@ -61,17 +61,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 {
 
 /// \cond
-#define XX(d) ( (data[d] - '0') * 10 + (data[d+1] - '0') )
-#define YY XX(0)
-#define MM XX(2)
-#define DD XX(4)
+#define YY ( (data[0] - '0') * 10 + (data[1] - '0') )
 /// \endcond
 
-	static const int daysinmonth[] =
-		{ 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
 	size_t len, pos;
-	int yyyy, maxdd;
+	char yyyymmdd[9] = {0};
+	gs1_lint_err_t ret;
 
 	assert(data);
 
@@ -97,40 +92,32 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 		return GS1_LINTER_NON_DIGIT_CHARACTER;
 	}
 
-	/*
-	 * Validate that the month is 01 to 12.
-	 *
-	 */
-	if (MM < 1 || MM > 12) {
-		if (err_pos) *err_pos = 2;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_MONTH;
-	}
+	memcpy(yyyymmdd + 2, data, 6);
 
 	/*
 	 * Convert YY to a year using a horizon based on CURRENT_YEAR.
 	 *
 	 */
-	if (YY - CURRENT_YEAR >= 51)
-		yyyy = 1900 + YY;
-	else if (YY - CURRENT_YEAR > -50)
-		yyyy = 2000 + YY;
-	else
-		yyyy = 2100 + YY;
+	if (YY - CURRENT_YEAR >= 51) {
+		yyyymmdd[0] = '1'; yyyymmdd[1] = '9';
+	} else if (YY - CURRENT_YEAR > -50) {
+		yyyymmdd[0] = '2'; yyyymmdd[1] = '0';
+	} else {
+		yyyymmdd[0] = '2'; yyyymmdd[1] = '1';
+	}
 
-	/*
-	 * Validate the day, accounting for leap years, and permitting "00".
-	 *
-	 */
-	maxdd = daysinmonth[MM - 1];		/* Based at 0 */
-	if (maxdd == -1)			/* February; account for leap years */
-		maxdd = ((yyyy % 4 == 0 && yyyy % 100 != 0) ||
-			 yyyy % 400 == 0) ? 29 : 28;
+	ret = gs1_lint_yyyymmd0(yyyymmdd, err_pos, err_len);
 
-	if (DD > maxdd) {
-		if (err_pos) *err_pos = 4;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_DAY;
+	assert(ret == GS1_LINTER_OK ||
+	       ret == GS1_LINTER_ILLEGAL_MONTH ||
+	       ret == GS1_LINTER_ILLEGAL_DAY);
+
+	assert(!err_pos || ret == GS1_LINTER_OK || (*err_pos >= 2));
+	assert(!err_pos || !err_len || ret == GS1_LINTER_OK || (*err_pos + *err_len <= len + 2));
+
+	if (ret != GS1_LINTER_OK) {
+		if (err_pos) *err_pos -= 2;
+		return ret;
 	}
 
 	return GS1_LINTER_OK;

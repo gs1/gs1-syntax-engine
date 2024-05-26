@@ -110,15 +110,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 		return GS1_LINTER_COUPON_INVALID_FORMAT_CODE;
 	}
 
-	p++;
-
 
 	/*
 	 * Validate the Funder VLI is in the range "0" to "6" and that the
 	 * following Funder ID has the corresponding length (plus 6).
 	 *
 	 */
-	if (p == q) {
+	if (++p == q) {
 		if (err_pos) *err_pos = 0;
 		if (err_len) *err_len = (size_t)(q - data);
 		return GS1_LINTER_COUPON_MISSING_FUNDER_VLI;
@@ -130,9 +128,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	}
 	vli = *p - '0' + 6;
 
-	p++;
-
-	if (q - p < vli) {
+	if (q - ++p < vli) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_FUNDER;
@@ -166,9 +162,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	}
 	vli = *p - '0' + 6;
 
-	p++;
-
-	if (q - p < vli) {
+	if (q - ++p < vli) {
 		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
 		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
 		return GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER;
