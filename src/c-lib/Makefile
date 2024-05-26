@@ -1,7 +1,7 @@
 #
 # GS1 Syntax Engine
 #
-# @author Copyright (c) 2021-2022 GS1 AISBL.
+# @author Copyright (c) 2021-2024 GS1 AISBL.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -360,7 +360,7 @@ docs:
 	cp docstmp/nav_g.png ../../docs
 	cp docstmp/nav_h.png ../../docs
 	cp docstmp/tabs.css ../../docs
-	docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make wasm JSONLY=yes
+	(cd ../.. && docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make -C src/c-lib wasm)
 	cp ../js-wasm/example.html ../../docs/demo
 	cp ../js-wasm/example.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
