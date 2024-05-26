@@ -27,6 +27,7 @@ gs1encoders/syntax/lint_iso3166alpha2.c
 gs1encoders/syntax/lint_iso3166.c
 gs1encoders/syntax/lint_iso3166list.c
 gs1encoders/syntax/lint_iso4217.c
+gs1encoders/syntax/lint_iso5218.c
 gs1encoders/syntax/lint_key.c
 gs1encoders/syntax/lint_latitude.c
 gs1encoders/syntax/lint_longitude.c
@@ -36,11 +37,14 @@ gs1encoders/syntax/lint_nonzero.c
 gs1encoders/syntax/lint_nozeroprefix.c
 gs1encoders/syntax/lint_pcenc.c
 gs1encoders/syntax/lint_pieceoftotal.c
+gs1encoders/syntax/lint_posinseqslash.c
 gs1encoders/syntax/lint_winding.c
 gs1encoders/syntax/lint_yesno.c
 gs1encoders/syntax/lint_yymmd0.c
 gs1encoders/syntax/lint_yymmdd.c
 gs1encoders/syntax/lint_yymmddhh.c
+gs1encoders/syntax/lint_yyyymmd0.c
+gs1encoders/syntax/lint_yyyymmdd.c
 gs1encoders/syntax/lint_zero.c
 )
 
