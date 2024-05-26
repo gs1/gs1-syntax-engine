@@ -359,6 +359,9 @@ docs:
 	cp docstmp/nav_f.png ../../docs
 	cp docstmp/nav_g.png ../../docs
 	cp docstmp/nav_h.png ../../docs
+	cp docstmp/tab_a.png ../../docs
+	cp docstmp/tab_b.png ../../docs
+	cp docstmp/tab_s.png ../../docs
 	cp docstmp/tabs.css ../../docs
 	(cd ../.. && docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make -C src/c-lib wasm)
 	cp ../js-wasm/example.html ../../docs/demo
