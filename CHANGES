@@ -1,3 +1,24 @@
+UNRELEASED
+
+* Update to Syntax Dictionary release 2024-XX-XX
+* New SemVar versioning scheme, required to maintain parity with npmjs el al.
+* Core: Permit GS1 DL URIs with an uppercase scheme.
+* Core: Support added for new "?" flag in Syntax Dictionary to denote AIs permitted as GS1 DL URI data attributes.
+* Core: New validation toggle to permit unknown AIs to be GS1 DL URI data attributes, to support close application and to enable gracefully degradation if Syntax Dictionary is out of date.
+* Core: Name shared library to have .dylib extension on MacOS.
+* Core: Build process updated to ease use of cross-compilers, such as MinGW for building Windows DLLs within MSVC.
+* Core: Expose typedefs for symbologies and validations enums.
+* Wrappers: Update API to use symbologies typedef instead of plain int.
+* Java: Build process for example app amended to treat warnings as errors.
+* Java: The use of a deprecated API call by the example app was fixed.
+* Java: The JNI library now staticly links the Syntax Engine in order to ease distribution.
+* Java: Add support for MacOS.
+* JS: Support for publishing assets to npmjs.
+* JS: Build process updated to support recent Emscripten version that do not generate a .mem file with "jsonly" builds.
+* JS: Getters of boolean parameters now return true/false rather than 1/0.
+* Android: Freshen dependencies and use a recent cmake.
+
+
 2023-12-11
 
 * Core: New DIGSIG_SERIAL_KEY validation function to ensure that keys include a serial component when used with AI (8030).
