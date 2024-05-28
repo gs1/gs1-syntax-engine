@@ -154,6 +154,7 @@ while (<>) {
     (my $aimin, my $aimax) = $ais =~ /^(\d+)-(\d+)$/;
 
     my $fnc1 = $flags =~ /\*/ ? 'NO_FNC1' : 'DO_FNC1';
+    my $dlDataAttr = $flags =~ /\?/ ? 'DL_DATA_ATTR' : 'NO_DATA_ATTR';
 
     $specstr = sprintf("%-100s", $specstr);
 
@@ -166,7 +167,7 @@ while (<>) {
 
     for ($aimin..$aimax) {
         $_ = sprintf('%-6s', "\"$_\"");
-        print "\tAI_ENTRY( $_, $fnc1,$specstr$keyvals$title ),\n";
+        print "\tAI_ENTRY( $_, $fnc1, $dlDataAttr,$specstr$keyvals$title ),\n";
     }
 
 }

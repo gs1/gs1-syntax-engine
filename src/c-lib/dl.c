@@ -650,8 +650,8 @@ add_query_param_to_ai_data:
 		goto out;
 	}
 
-	// Validate that any attributes in the query params do not instead
-	// belong within path info
+	// Validate that attributes in the query params are valid and do not
+	// instead belong within path info
 	if (numPathAIs < MAX_AIS) {
 		int i;
 		for (i = 0; i < ctx->numAIs; i++) {
@@ -664,6 +664,15 @@ add_query_param_to_ai_data:
 				continue;
 
 			assert(ai->aiEntry);
+
+			// Check that the AI is a permitted DL URI data attribute
+			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
+			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+				ctx->errFlag = true;
+				ret = false;
+				goto out;
+			}
 
 			// Trial the AI at each non-initial position of the
 			// path info to see if it results in a valid
@@ -859,6 +868,19 @@ again:
 		    ai->aiEntry->fnc1 != emitFixed) {
 			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 			int n;
+
+			/*
+			 *  Check that the AI is permitted as a data attribute
+			 *
+			 */
+			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
+			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+				ctx->errFlag = true;
+				*ctx->outStr = '\0';
+				return NULL;
+			}
+
 			URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
 			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
 			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
@@ -1227,8 +1249,8 @@ void test_dl_parseDLuri(void) {
 
 	// This is fine because we chose an alternate key qualifier
 	test_parseDLuri(ctx, true,
-		"https://id.gs1.org/01/09520123456788/10/ABC123?235=XYZ",
-		"^010952012345678810ABC123^235XYZ");
+		"https://id.gs1.org/01/09520123456788/235/XYZ?10=ABC123",
+		"^0109520123456788235XYZ^10ABC123");
 
 	// Examples with unknown AIs, not permitted
 	test_parseDLuri(ctx, false,
@@ -1239,11 +1261,16 @@ void test_dl_parseDLuri(void) {
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 
-	// Examples with unknown AIs, permitted
+	// Examples with unknown AIs
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
+	test_parseDLuri(ctx, false,								// Unknown AIs are not permitted data attributes
+		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
+		"");
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);	// ... unless when explicitly permitted
 	test_parseDLuri(ctx, true,
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"^010952012345678899XYZ^89ABC123");
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
 	gs1_encoder_free(ctx);
@@ -1529,7 +1556,26 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(8017)795260646688514634(99)000001(253)9526064000028000001", "https://example.com/8017/795260646688514634?99=000001&253=9526064000028000001");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?99=000001&8017=795260646688514634");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(98)ABC(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?98=ABC&99=000001&8017=795260646688514634");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&22=ABC&10=DEF&21=GHI&95=INT");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(10)DEF(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&10=DEF&95=INT");
+
+	/*
+	 * AI data containing invalid DL URI data attributes
+	 *
+	 */
+	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(99)000001(8200)http://example.com(95)INT","");			// (8200) is invalid as a data attribute
+	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(235)TPX9526064(99)000001(22)ABC(95)INT","");			// (235) used as qualifier for (01), therefore (22) is invalid as a data attribute
+	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(99)000001(235)TPX9526064(95)INT","");		// (22)+(10) are qualifiers for (01), therefore (235) is invalid as a data attribute
+
+	/*
+	 * AI data containing unknown AIs
+	 *
+	 */
+	gs1_encoder_setPermitUnknownAIs(ctx, true);
+	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");	// Unknown AIs not permitted as DL URI data attributes...
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);				// ... unless when explicitly permitted
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
+	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
 	gs1_encoder_free(ctx);
 

@@ -1038,6 +1038,7 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[1], "(89) ABC123") == 0);
 	TEST_CHECK(strcmp(hri[2], "(88) COMPOSITE") == 0);
 
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333?89=TESTING&99=ABC%2d123&88=XYZ"));
 	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 4);
 	TEST_ASSERT(hri != NULL);
@@ -1046,6 +1047,7 @@ void test_api_getHRI(void) {
 	TEST_CHECK(strcmp(hri[1], "(89) TESTING") == 0);
 	TEST_CHECK(strcmp(hri[2], "(99) ABC-123") == 0);
 	TEST_CHECK(strcmp(hri[3], "(88) XYZ") == 0);
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 
 	// HRI from linear-only, raw AI data, with unknown AI with known length 3
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^236ABC123"));

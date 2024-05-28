@@ -67,6 +67,7 @@ struct aiComponent {
 struct aiEntry {
 	char ai[MAX_AI_LEN+1];			// AI itself
 	bool fnc1;				// FNC1 required as a separator
+	uint8_t dlDataAttr;			// Permitted as a GS1 DL URI data attribute
 	struct aiComponent parts[MAX_PARTS];	// Format specification components
 	char* attrs;				// Key-value pair attributes, e.g. req, ex, etc.
 	char* title;				// Data title
@@ -108,30 +109,35 @@ struct validationEntry {
 #define DO_FNC1 true
 #define NO_FNC1 false
 
+#define NO_DATA_ATTR 0
+#define DL_DATA_ATTR 1
+#define XX_DATA_ATTR 2		// For unknown AIs, depends on gs1_encoder_vUNKNOWN_AI_DL_ATTR
+
 #define MAN false
 #define OPT true
 
 
-#define AI_VA(a, f, c1,mn1,mx1,o1,l00,l01, c2,mn2,mx2,o2,l10,l11, c3,mn3,mx3,o3,l20,l21, c4,mn4,mx4,o4,l30,l31, c5,mn5,mx5,o5,l40,l41, k, t) {	\
-		.ai = a,															\
-		.fnc1 = f,															\
-		.parts = {															\
-			{ .cset = cset_##c1, .min = mn1, .max = mx1, .opt = o1, .linters = { gs1_lint_##l00, gs1_lint_##l01, NULL } },		\
-			{ .cset = cset_##c2, .min = mn2, .max = mx2, .opt = o2, .linters = { gs1_lint_##l10, gs1_lint_##l11, NULL } },		\
-			{ .cset = cset_##c3, .min = mn3, .max = mx3, .opt = o3, .linters = { gs1_lint_##l20, gs1_lint_##l21, NULL } },		\
-			{ .cset = cset_##c4, .min = mn4, .max = mx4, .opt = o4, .linters = { gs1_lint_##l30, gs1_lint_##l31, NULL } },		\
-			{ .cset = cset_##c5, .min = mn5, .max = mx5, .opt = o5, .linters = { gs1_lint_##l40, gs1_lint_##l41, NULL } },		\
-			{ .cset = 0,         .min = 0,   .max = 0,   .opt = 0,   .linters = { NULL,       NULL,       NULL } },			\
-		},																\
-		.attrs = k,															\
-		.title = t,															\
+#define AI_VA(a, f, d, c1,mn1,mx1,o1,l00,l01, c2,mn2,mx2,o2,l10,l11, c3,mn3,mx3,o3,l20,l21, c4,mn4,mx4,o4,l30,l31, c5,mn5,mx5,o5,l40,l41, k, t) {	\
+		.ai = a,																\
+		.fnc1 = f,																\
+		.dlDataAttr = d,															\
+		.parts = {																\
+			{ .cset = cset_##c1, .min = mn1, .max = mx1, .opt = o1, .linters = { gs1_lint_##l00, gs1_lint_##l01, NULL } },			\
+			{ .cset = cset_##c2, .min = mn2, .max = mx2, .opt = o2, .linters = { gs1_lint_##l10, gs1_lint_##l11, NULL } },			\
+			{ .cset = cset_##c3, .min = mn3, .max = mx3, .opt = o3, .linters = { gs1_lint_##l20, gs1_lint_##l21, NULL } },			\
+			{ .cset = cset_##c4, .min = mn4, .max = mx4, .opt = o4, .linters = { gs1_lint_##l30, gs1_lint_##l31, NULL } },			\
+			{ .cset = cset_##c5, .min = mn5, .max = mx5, .opt = o5, .linters = { gs1_lint_##l40, gs1_lint_##l41, NULL } },			\
+			{ .cset = 0,         .min = 0,   .max = 0,   .opt = 0,   .linters = { NULL,       NULL,       NULL } },				\
+		},																	\
+		.attrs = k,																\
+		.title = t,																\
 	}
 #define PASS_ON(...) __VA_ARGS__
 #define AI_ENTRY(...) PASS_ON(AI_VA(__VA_ARGS__))
 #define cset_0 0
 #define gs1_lint__ NULL
 #define __ 0,0,0,0,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,key */
-#define AI_ENTRY_TERMINATOR AI_ENTRY( "", 0, __, __, __, __, __, "", "" )
+#define AI_ENTRY_TERMINATOR AI_ENTRY( "", 0, 0, __, __, __, __, __, "", "" )
 
 
 // Write to unbracketed AI dataStr checking for overflow
