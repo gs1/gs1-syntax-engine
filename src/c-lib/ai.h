@@ -41,62 +41,65 @@
  * One more that last entry since we NULL terminate.
  *
  */
-#define MAX_PARTS 6	/* AI (8001) = N4 N5 N3 N1 N1 */
-#define MAX_LINTERS 3
+#define MAX_PARTS (5 + 1)		/* Currently AI (8001) = N4 N5 N3 N1 N1 */
+#define MAX_LINTERS (2 + 1)		/* Many AIs have, e.g. csum,key         */
 
 
 typedef enum {
 	cset_none = 0,
-	cset_X,
-	cset_N,
-	cset_Y,
-	cset_Z,
+	cset_X,					// CSET 82
+	cset_N,					// Numeric
+	cset_Y,					// CSET 39
+	cset_Z,					// URI-safe base64
 } cset_t;
 
 
 // A single AI may consist of multiple concatenated components
 struct aiComponent {
-	cset_t cset;
-	uint8_t min;
-	uint8_t max;
-	bool opt;
-	gs1_linter_t linters[MAX_LINTERS];
+	cset_t cset;				// CSET table
+	uint8_t min;				// Minimum length. Currently 0 for optional, 1 for mandatory
+	uint8_t max;				// Maximum length
+	bool opt;				// Optional final component
+	gs1_linter_t linters[MAX_LINTERS];	// Linter functions applied to component
 };
 
 
 struct aiEntry {
-	char ai[MAX_AI_LEN+1];
-	bool fnc1;
-	struct aiComponent parts[MAX_PARTS];
-	char* attrs;
-	char* title;
+	char ai[MAX_AI_LEN+1];			// AI itself
+	bool fnc1;				// FNC1 required as a separator
+	struct aiComponent parts[MAX_PARTS];	// Format specification components
+	char* attrs;				// Key-value pair attributes, e.g. req, ex, etc.
+	char* title;				// Data title
 };
 
 
 typedef enum {
 	aiValue_undef = 0,
-	aiValue_aival,		// Extracted AI value pair
-	aiValue_ccsep,		// Separater between linear and composite component AIs
-	alValue_dlign,		// An ignored (non-numeric) query parameter of a DL URI (stored undecoded in aiValue.value)
+	aiValue_aival,				// Extracted AI value pair
+	aiValue_ccsep,				// Separater between linear and composite component AIs
+	alValue_dlign,				// An ignored (non-numeric) query parameter of a DL URI (stored undecoded in aiValue.value)
 } aiValueKind_t;
 
 struct aiValue {
-	const struct aiEntry *aiEntry;	// Entry in AI table; may be an "unknown" placeholder entry
-	const char *ai;			// Start of the AI in the underlying buffer
-	uint8_t ailen;			// Length of the AI
-	const char *value;		// Start of the AI value in the underlying buffer
-	uint8_t vallen;			// Length of the AI value
-	aiValueKind_t kind;		// Kind of AI value
-	uint8_t dlPathOrder;		// Denotes the position in a DL URI path component
+	const struct aiEntry *aiEntry;		// Entry in AI table; may be an "unknown" placeholder entry
+	const char *ai;				// Start of the AI in the underlying buffer
+	uint8_t ailen;				// Length of the AI
+	const char *value;			// Start of the AI value in the underlying buffer
+	uint8_t vallen;				// Length of the AI value
+	aiValueKind_t kind;			// Kind of AI value
+	uint8_t dlPathOrder;			// Denotes the position in a DL URI path component
 };
 
+
+// Features such as validation functions, some of which can be toggled
 typedef bool (*gs1_encoder_validation_func_t)(gs1_encoder *ctx);
 
 struct validationEntry {
-	bool locked;
-	bool enabled;
-	gs1_encoder_validation_func_t fn;
+	bool locked;				// Feature cannot be enabled/disabled via the API
+	bool enabled;				// Feature is enabled
+	gs1_encoder_validation_func_t fn;	// Optional validation function for the feature
 };
+
 
 /*
  * Syntactic sugar for initialising an aiEntry
