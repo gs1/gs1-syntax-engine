@@ -136,7 +136,7 @@ GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                  <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a111897e9846a97c2d3e446d2815b4410"><div class="ttname"><a href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:334</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:335</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3f3190f20a24e00c66fb409fd4f33e17"><div class="ttname"><a href="gs1encoders_8h.html#a3f3190f20a24e00c66fb409fd4f33e17">gs1_encoder_getErrMarkup</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getErrMarkup(gs1_encoder *ctx)</div><div class="ttdoc">Read the error markup generated when parsing AI data fails due to a linting failure.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3fe65a09fa62afe033b6697970778e25"><div class="ttname"><a href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a></div><div class="ttdeci">GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char ***hri)</div><div class="ttdoc">Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...</div></div>
 <div class="ttc" id="ags1encoders_8h_html_abdce5a9347ff7cbbd153b1a13e3273dd"><div class="ttname"><a href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...</div></div>
@@ -237,7 +237,8 @@ Enumerations</h2></td></tr>
 , <b>gs1_encoder_vREPEATED_AIS</b>
 , <b>gs1_encoder_vDIGSIG_SERIAL_KEY</b>
 , <br />
-&#160;&#160;<b>gs1_encoder_vNUMVALIDATIONS</b>
+&#160;&#160;<b>gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR</b>
+, <b>gs1_encoder_vNUMVALIDATIONS</b>
 <br />
  }</td></tr>
 <tr class="separator:a11a47c2b410ffcc87a332c973cce85c9"><td class="memSeparator" colspan="2">&#160;</td></tr>

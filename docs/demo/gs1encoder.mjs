@@ -491,10 +491,11 @@ GS1encoder.symbology = symbology;
 
 /** @ignore */
 const validation = {
-    MutexAIs: 0,         ///< Mutually exclusive AIs
-    RequisiteAIs: 1,     ///< Mandatory associations between AIs
-    RepeatedAIs: 2,      ///< Repeated AIs having same value
-    NUMVALIDATIONS: 3,   ///< Value is the number of validations
+    MutexAIs: 0,            ///< Mutually exclusive AIs
+    RequisiteAIs: 1,        ///< Mandatory associations between AIs
+    RepeatedAIs: 2,         ///< Repeated AIs having same value
+    UnknownAInotDLattr: 3,  ///< Unknown AIs not permitted as GS1 DL URI data attributes
+    NUMVALIDATIONS: 4,      ///< Value is the number of validations
 };
 
 GS1encoder.validation = validation;
