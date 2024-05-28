@@ -112,10 +112,13 @@ class GS1Encoder {
         /// Repeated AIs having same value
         RepeatedAIs,
 
+        /// Unknown AIs not permitted as GS1 DL URI data attributes
+        UnknownAInotDLattr,
+
         /// Value is the number of valudations
         NUMVALIDATIONS
     };
-    
+
     /**
      * An opaque pointer used by the native code to represent an
      * "instance" of the library. It is hidden behind the object

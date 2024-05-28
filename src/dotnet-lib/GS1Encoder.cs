@@ -102,6 +102,8 @@ namespace GS1.Encoders
             RequisiteAIs,
             /// <summary>Repeated AIs having same value</summary>
             RepeatedAIs,
+            /// <summary>Unknown AIs not permitted as GS1 DL URI data attributes</summary>
+            UnknownAInotDLattr,
             /// <summary>Value is the number of validations</summary>
             NUMVALIDATIONS,
         };

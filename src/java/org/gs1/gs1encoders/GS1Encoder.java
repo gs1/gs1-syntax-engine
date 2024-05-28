@@ -191,6 +191,11 @@ public class GS1Encoder {
             RepeatedAIs,
 
             /**
+             * Unknown AIs not permitted as GS1 DL URI data attributes
+             */
+            UnknownAInotDLattr,
+
+            /**
              * Value is the number of validations
              */
             NUMVALIDATIONS
