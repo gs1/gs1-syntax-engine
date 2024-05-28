@@ -289,10 +289,10 @@ typedef enum gs1_encoder_symbologies gs1_encoder_symbologies_t;
 enum gs1_encoder_validations {
 	// Exported as API. Not to be re-ordered.
 	gs1_encoder_vMUTEX_AIS = 0,
-	gs1_encoder_vREQUISITE_AIS,	///< **Default: Enabled**. Validates that the input satisfies the mandatory associations for each AI.
+	gs1_encoder_vREQUISITE_AIS,		///< **Default: Enabled**. Validates that the input satisfies the mandatory associations for each AI.
 	gs1_encoder_vREPEATED_AIS,
 	gs1_encoder_vDIGSIG_SERIAL_KEY,
-	gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR,
+	gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR,	///< **Default: Enabled**. Unknown AIs will not be accepted as GS1 DL URI data attributes.
 	gs1_encoder_vNUMVALIDATIONS,
 };
 
@@ -470,6 +470,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *     * Ensure that the AIs extracted from the path info form a valid primary
  *       key to key-qualifier association.
  *     * Ensure that the query parameter structure is correct allowing for AI extraction.
+ *     * Ensure that the AIs extracted from the query parameters are valid GS1 DL URI data attributes.
  *   * Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):
  *     * For each component of each AI, as defined by the Syntax Dictionary:
  *       * Validate that its length is within limits.

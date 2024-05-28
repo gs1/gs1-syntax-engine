@@ -237,7 +237,7 @@ Enumerations</h2></td></tr>
 , <b>gs1_encoder_vREPEATED_AIS</b>
 , <b>gs1_encoder_vDIGSIG_SERIAL_KEY</b>
 , <br />
-&#160;&#160;<b>gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR</b>
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9af6292f33663a28b8221c2827a542fa47">gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR</a>
 , <b>gs1_encoder_vNUMVALIDATIONS</b>
 <br />
  }</td></tr>
@@ -435,6 +435,8 @@ The library is thread-safe provided that each thread operates on its own instanc
 <p>Optional AI validation procedures that may be applied to detect invalid inputs when AI data is provided using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>. </p><dl class="section note"><dt>Note</dt><dd>Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described. </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" name="a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"></a>gs1_encoder_vREQUISITE_AIS&#160;</td><td class="fielddoc"><p><b>Default: Enabled</b>. Validates that the input satisfies the mandatory associations for each AI. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a11a47c2b410ffcc87a332c973cce85c9af6292f33663a28b8221c2827a542fa47" name="a11a47c2b410ffcc87a332c973cce85c9af6292f33663a28b8221c2827a542fa47"></a>gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR&#160;</td><td class="fielddoc"><p><b>Default: Enabled</b>. Unknown AIs will not be accepted as GS1 DL URI data attributes. </p>
 </td></tr>
 </table>
 
@@ -859,6 +861,7 @@ Data validation checks</h3>
 <li>For each extracted AI, validate that the data corresponds to a known AI, unless disabled using <a class="el" href="gs1encoders_8h.html#a2bc832a4d200f75f9caca7a873098096" title="Enable or disable &quot;permit unknown AIs&quot; mode for parsing of bracketed AI element strings and GS1 Digit...">gs1_encoder_setPermitUnknownAIs()</a>, and that the overall length is within limits.</li>
 <li>Ensure that the AIs extracted from the path info form a valid primary key to key-qualifier association.</li>
 <li>Ensure that the query parameter structure is correct allowing for AI extraction.</li>
+<li>Ensure that the AIs extracted from the query parameters are valid GS1 DL URI data attributes.</li>
 </ul>
 </li>
 <li>Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):<ul>
