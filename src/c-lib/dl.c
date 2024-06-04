@@ -665,6 +665,19 @@ add_query_param_to_ai_data:
 
 			assert(ai->aiEntry);
 
+			// Forbid duplicate AIs
+			for (j = 0; j < i; j++) {
+				const struct aiValue* ai2 = &ctx->aiData[j];
+				if (ai2->kind == aiValue_aival &&
+				    ai2->ailen == ai->ailen &&
+				    memcmp(ai2->ai, ai->ai, ai2->ailen) == 0) {
+					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is duplicated", ai->ailen, ai->ai);
+					ctx->errFlag = true;
+					ret = false;
+					goto out;
+				}
+			}
+
 			// Check that the AI is a permitted DL URI data attribute
 			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
@@ -867,7 +880,24 @@ again:
 		    ai->kind == aiValue_aival &&
 		    ai->aiEntry->fnc1 != emitFixed) {
 			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-			int n;
+			int j, n;
+			bool skip = false;
+
+			/*
+			 *  Skip duplicate AIs that we have already processed
+			 *
+			 */
+			for (j = 0; j < i; j++) {
+				const struct aiValue* ai2 = &ctx->aiData[j];
+				if (ai2->kind != aiValue_aival ||
+				    ai2->aiEntry->fnc1 == emitFixed ||
+				    ai2->ailen != ai->ailen ||
+				    memcmp(ai2->ai, ai->ai, ai2->ailen) != 0)
+					continue;
+				skip = true;
+				break;
+			}
+			if (skip) continue;
 
 			/*
 			 *  Check that the AI is permitted as a data attribute
@@ -1252,6 +1282,19 @@ void test_dl_parseDLuri(void) {
 		"https://id.gs1.org/01/09520123456788/235/XYZ?10=ABC123",
 		"^0109520123456788235XYZ^10ABC123");
 
+	// Forbid duplicate AIs
+	test_parseDLuri(ctx, false,
+		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&01=09520123456788",
+		"");
+
+	test_parseDLuri(ctx, false,
+		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&10=ABC123",
+		"");
+
+	test_parseDLuri(ctx, false,
+		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&99=XYZ789",
+		"");
+
 	// Examples with unknown AIs, not permitted
 	test_parseDLuri(ctx, false,
 		"https://example.com/01/09520123456788/89/ABC123?99=XYZ",
@@ -1557,6 +1600,16 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?99=000001&8017=795260646688514634");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(98)ABC(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?98=ABC&99=000001&8017=795260646688514634");
 	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(10)DEF(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&10=DEF&95=INT");
+
+	/*
+	 * Duplicate AIs in element data
+	 *
+	 */
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(01)12312312312326(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(10)ABC123(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(10)ABC123(99)XYZ789(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(ctx, true, "https://example.com", "(8010)0200(3133)333333(3300)000000(99)57(3133)333333(3300)000000(01)04065093955756(10)0(3133)333333(3300)000000(01)04065093955756","https://example.com/8010/0200?3133=333333&3300=000000&01=04065093955756&99=57&10=0");
+
 
 	/*
 	 * AI data containing invalid DL URI data attributes

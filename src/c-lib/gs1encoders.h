@@ -471,6 +471,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *       key to key-qualifier association.
  *     * Ensure that the query parameter structure is correct allowing for AI extraction.
  *     * Ensure that the AIs extracted from the query parameters are valid GS1 DL URI data attributes.
+ *     * Ensure that there are no duplicate AIs within any part of the URI structure.
  *   * Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):
  *     * For each component of each AI, as defined by the Syntax Dictionary:
  *       * Validate that its length is within limits.
