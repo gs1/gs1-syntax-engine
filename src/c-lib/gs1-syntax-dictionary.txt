@@ -1,7 +1,7 @@
 # GS1 Application Identifier Syntax Dictionary
 # --------------------------------------------
 #
-# Release: UNSET
+# Release: 2024-06-10
 #
 # This is the GS1 Application Identifier format "Syntax Dictionary".
 #
