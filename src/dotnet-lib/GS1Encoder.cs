@@ -7,7 +7,7 @@ namespace GS1.Encoders
     /// <summary>
     /// Wrapper class for accessing the GS1 Syntax Engine native library from C#.
     ///
-    /// Copyright (c) 2021-2023 GS1 AISBL.
+    /// Copyright (c) 2021-2024 GS1 AISBL.
     ///
     /// Licensed under the Apache License, Version 2.0 (the "License");
     /// you may not use this file except in compliance with the License.

@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	printf("\nGS1 Syntax Engine Console Demo (Built " RELEASE "):");
-	printf("\n\nCopyright (c) 2020-2022 GS1 AISBL. License: Apache-2.0");
+	printf("\n\nCopyright (c) 2020-2024 GS1 AISBL. License: Apache-2.0");
 
 	while (userInt(ctx));
 

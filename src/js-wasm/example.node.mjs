@@ -12,7 +12,7 @@
  *      https://gs1.github.io/gs1-syntax-engine/
  *
  *
- *  Copyright (c) 2022 GS1 AISBL.
+ *  Copyright (c) 2022-2024 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
