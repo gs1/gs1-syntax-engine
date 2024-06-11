@@ -66,7 +66,8 @@ Build and publish the npm package:
 make -C src/c-lib clean-wasm
 docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk make -C src/c-lib wasm
 cd src/js-wasm
-node --experimental-vm-modules /usr/local/bin/jest
+npm install
+npm test
 npm pack
 npm publish
 ```
