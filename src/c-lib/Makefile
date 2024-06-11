@@ -185,7 +185,7 @@ OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test wasm clean-wasm fuzzer docs copyright
+.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test wasm clean-wasm fuzzer docs copyright setversion
 
 default: lib app-static
 all: lib app app-static
@@ -373,6 +373,10 @@ docs:
 
 copyright:
 	git ls-files -z .. | xargs -0 -I{} sed -i --follow-symlinks -e "s/Copyright (c) \([[:digit:]]\{4\}\)\(-[[:digit:]]\{4\}\)\{0,1\} GS1 AISBL/Copyright (c) \1-$$(date +'%Y') GS1 AISBL/" {}
+
+setversion:
+	(cd ../js-wasm && npm version --allow-same-version $(VERSION))
+	sed -i 's/name="Implementation-Version" value="[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+"/name="Implementation-Version" value="$(VERSION)"/' ../java/build.xml
 
 
 -include $(DEPS)
