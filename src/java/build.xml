@@ -96,7 +96,7 @@ limitations under the License.
     <manifest>
         <attribute name="Implementation-Vendor" value="GS1 AISBL"/>
         <attribute name="Implementation-Title" value="GS1 Encoders Library"/>
-        <attribute name="Implementation-Version" value="1.0.0"/>
+        <attribute name="Implementation-Version" value="1.1.0"/>
       </manifest>
     </jar>
   </target>
