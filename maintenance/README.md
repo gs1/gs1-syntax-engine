@@ -50,6 +50,8 @@ git push origin "$VERSION"
 git push gs1 "$VERSION"
 ```
 
+Manually update the release notes.
+
 
 Align node.js and Java package versions with project version.
 
