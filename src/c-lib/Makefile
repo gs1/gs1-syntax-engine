@@ -17,10 +17,12 @@
 # limitations under the License.
 #
 
-MAJOR := 1
-MINOR := 0
-PATCH := 0
-VERSION := $(MAJOR).$(MINOR).$(PATCH)
+
+VERSION := $(shell egrep -m1 '^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$(dollar)' ../../CHANGES)
+
+MAJOR = $(word 1,$(subst ., ,$(VERSION)))
+MINOR = $(word 2,$(subst ., ,$(VERSION)))
+PATCH = $(word 3,$(subst ., ,$(VERSION)))
 
 NAME = gs1encoders
 
