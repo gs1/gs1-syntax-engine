@@ -1,6 +1,6 @@
-UNRELEASED
+1.1.0
 
-* Update to Syntax Dictionary release 2024-XX-XX
+* Update to Syntax Dictionary release 2024-06-10
 * New SemVar versioning scheme, required to maintain parity with npmjs el al.
 * Core: Permit GS1 DL URIs with an uppercase scheme.
 * Core: Support added for new "?" flag in Syntax Dictionary to denote AIs permitted as GS1 DL URI data attributes.
