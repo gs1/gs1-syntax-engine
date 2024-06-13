@@ -806,11 +806,14 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		numQualifiers = 0;
 		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL)
 			for (i = 0; i < ctx->numAIs; i++) {
-				if (ctx->aiData[i].kind == aiValue_aival) {
-					assert(ctx->aiData[i].aiEntry);
-					if (strcmp(ctx->aiData[i].aiEntry->ai, token) == 0)
-						numQualifiers++;
-				}
+
+				if (ctx->aiData[i].kind != aiValue_aival)
+					continue;
+
+				assert(ctx->aiData[i].aiEntry);
+				if (strcmp(ctx->aiData[i].aiEntry->ai, token) == 0)
+					numQualifiers++;
+
 			}
 		if (numQualifiers > maxQualifiers) {
 			maxQualifiers = numQualifiers;
@@ -828,11 +831,14 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	strcpy(tmp, ctx->dlKeyQualifiers[bestKeyEntry]);
 	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr))
 		for (j = 0; j < ctx->numAIs; j++) {
-			if (ctx->aiData[j].kind == aiValue_aival) {
-				assert(ctx->aiData[j].aiEntry);
-				if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0)
-					ctx->aiData[j].dlPathOrder = (uint8_t)i;
-			}
+
+			if (ctx->aiData[j].kind != aiValue_aival)
+				continue;
+
+			assert(ctx->aiData[j].aiEntry);
+			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0)
+				ctx->aiData[j].dlPathOrder = (uint8_t)i;
+
 		}
 	numQualifiers = i;
 
@@ -854,16 +860,20 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	for (i = 0; i < numQualifiers; i++) {
 		for (j = 0; j < ctx->numAIs; j++) {
+
+			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+			int n;
 			const struct aiValue* const ai = &ctx->aiData[j];
-			if (ai->kind == aiValue_aival && ai->dlPathOrder == i) {
-				char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-				int n;
-				URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-				n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
-				assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-				p += n;
-				break;
-			}
+
+			if (ai->kind != aiValue_aival || ai->dlPathOrder != i)
+				continue;
+
+			URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
+			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
+			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
+			p += n;
+			break;
+
 		}
 	}
 	p += snprintf(p, 2, "?");
@@ -875,47 +885,54 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	emitFixed = true;
 again:
 	for (i = 0; i < ctx->numAIs; i++) {
+
+		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+		int j, n;
+		bool skip = false;
 		const struct aiValue* ai = &ctx->aiData[i];
-		if (ai->dlPathOrder == DL_PATH_ORDER_ATTRIBUTE &&
-		    ai->kind == aiValue_aival &&
-		    ai->aiEntry->fnc1 != emitFixed) {
-			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-			int j, n;
-			bool skip = false;
 
-			/*
-			 *  Skip duplicate AIs that we have already processed
-			 *
-			 */
-			for (j = 0; j < i; j++) {
-				const struct aiValue* ai2 = &ctx->aiData[j];
-				if (ai2->kind != aiValue_aival ||
-				    ai2->aiEntry->fnc1 == emitFixed ||
-				    ai2->ailen != ai->ailen ||
-				    memcmp(ai2->ai, ai->ai, ai2->ailen) != 0)
-					continue;
-				skip = true;
-				break;
-			}
-			if (skip) continue;
+		if (ai->kind != aiValue_aival ||
+		    ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE ||
+		    ai->aiEntry->fnc1 == emitFixed)
+			continue;
 
-			/*
-			 *  Check that the AI is permitted as a data attribute
-			 *
-			 */
-			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
-			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
-				ctx->errFlag = true;
-				*ctx->outStr = '\0';
-				return NULL;
-			}
+		/*
+		 *  Skip duplicate AIs that we have already processed
+		 *
+		 */
+		for (j = 0; j < i; j++) {
 
-			URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
-			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-			p += n;
+			const struct aiValue* ai2 = &ctx->aiData[j];
+
+			if (ai2->kind != aiValue_aival ||
+			    ai2->aiEntry->fnc1 == emitFixed ||
+			    ai2->ailen != ai->ailen ||
+			    memcmp(ai2->ai, ai->ai, ai2->ailen) != 0)
+				continue;
+
+			skip = true;
+			break;
+
 		}
+		if (skip) continue;
+
+		/*
+		 *  Check that the AI is permitted as a data attribute
+		 *
+		 */
+		if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
+		    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+			ctx->errFlag = true;
+			*ctx->outStr = '\0';
+			return NULL;
+		}
+
+		URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
+		n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
+		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
+		p += n;
+
 	}
 	if (emitFixed) {
 		emitFixed = false;
