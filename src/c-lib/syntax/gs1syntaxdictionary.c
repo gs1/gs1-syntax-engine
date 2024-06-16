@@ -103,7 +103,7 @@ gs1_linter_t gs1_linter_from_name(const char* const name) {
  */
 #ifdef GS1_LINTER_ERR_STR_EN
 
-const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
+GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
 	"No issues were detected by the linter.",
 	"A non-digit character was found where a digit is expected.",
 	"A non-CSET 82 character was found where a CSET 82 character is expected.",
