@@ -62,7 +62,7 @@ limitations under the License.
 
   <target name="cc">
     <exec executable="cc" failonerror="true">
-      <arg line="-fPIC -O2 -g -Werror" />
+      <arg line="-fPIC -O2 -g -Werror -fvisibility=hidden" />
       <arg line="-I${clib}" />
       <arg line="-I${java.home}/../include" />
       <arg line="-I${java.home}/../include/${os.family}" />
