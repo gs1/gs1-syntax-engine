@@ -569,11 +569,13 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY_TERMINATOR
 	} },
 
-#
-# TODO: Add functionality to the entry parser, with tests, to prevent specifications that would result in ambiguous processing:
-#
-#  - Ensure variable length component is the last component.
-#  - Ensure a mandatory component does not follow an optional compoment.
+/*
+ *  TODO: Add functionality to the entry parser, with tests, to prevent specifications that would result in ambiguous processing:
+ *
+ *  - Ensure variable length component is the last component.
+ *  - Ensure a mandatory component does not follow an optional compoment.
+ *
+ */
 
 };
 
