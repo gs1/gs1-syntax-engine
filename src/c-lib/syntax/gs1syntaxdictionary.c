@@ -35,6 +35,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
 	{ .name = "csum",		.fn = gs1_lint_csum },
 	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
+	{ .name = "hasnondigit",	.fn = gs1_lint_hasnondigit },
 	{ .name = "hhmm",		.fn = gs1_lint_hhmm },
 	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
 	{ .name = "iban",		.fn = gs1_lint_iban },
@@ -217,6 +218,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"A valid ISO/IEC 5218 biological sex code required.",
 	"The data must have the format \"<pos>/<end>\".",
 	"The position number must not exceed the end number.",
+	"A non-digit character is required.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

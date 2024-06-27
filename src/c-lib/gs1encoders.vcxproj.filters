@@ -57,6 +57,9 @@
     <ClCompile Include="syntax\lint_csumalpha.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_hasnondigit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_hhmm.c">
       <Filter>Source Files</Filter>
     </ClCompile>

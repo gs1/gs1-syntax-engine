@@ -180,6 +180,7 @@
     <ClCompile Include="syntax\lint_csetnumeric.c" />
     <ClCompile Include="syntax\lint_csum.c" />
     <ClCompile Include="syntax\lint_csumalpha.c" />
+    <ClCompile Include="syntax\lint_hasnondigit.c" />
     <ClCompile Include="syntax\lint_hhmm.c" />
     <ClCompile Include="syntax\lint_hyphen.c" />
     <ClCompile Include="syntax\lint_iban.c" />

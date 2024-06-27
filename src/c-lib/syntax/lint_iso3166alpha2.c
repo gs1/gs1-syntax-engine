@@ -26,9 +26,9 @@
  *
  */
 
-
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "gs1syntaxdictionary.h"
 
@@ -49,8 +49,6 @@
  * Used to validate that an AI component is an ISO 3166 "alpha-2" country
  * code.
  *
- * @note The default lookup function provided by this linter is a binary search
- *       over a static list this is maintained in this file.
  * @note To enable this linter to hook into an alternative ISO 3166 "alpha-2"
  *       lookup function (provided by the user) the
  *       GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP_H macro may be set to the name of a
@@ -94,53 +92,42 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 	 *  https://isotc.iso.org/livelink/livelink?func=ll&objId=16944257&objAction=browse&viewType=1
 	 *
 	 */
-	static const char iso3166alpha2[][3] = {
-		"AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR", "AS", "AT", "AU", "AW", "AX", "AZ",
-		"BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ", "BR", "BS", "BT", "BV", "BW", "BY", "BZ",
-		"CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR", "CU", "CV", "CW", "CX", "CY", "CZ",
-		"DE", "DJ", "DK", "DM", "DO", "DZ",
-		"EC", "EE", "EG", "EH", "ER", "ES", "ET",
-		"FI", "FJ", "FK", "FM", "FO", "FR",
-		"GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY",
-		"HK", "HM", "HN", "HR", "HT", "HU",
-		"ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP",
-		"KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KY", "KZ",
-		"LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY",
-		"MA", "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ",
-		"NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU", "NZ",
-		"OM",
-		"PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY",
-		"QA",
-		"RE", "RO", "RS", "RU", "RW",
-		"SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SX", "SY", "SZ",
-		"TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ",
-		"UA", "UG", "UM", "US", "UY", "UZ",
-		"VA", "VC", "VE", "VG", "VI", "VN", "VU",
-		"WF", "WS",
-		"YE", "YT",
-		"ZA", "ZM", "ZW",
+	static const uint64_t iso3166alpha2[] = {
+#if __STDC_VERSION__ >= 202311L
+		0b0001111010011010111110110111011111110111101111011011101101111011,  // AA-CL: AD-AG AI AL-AM AO AQ-AU AW-AX AZ-BB BD-BJ BL-BO BQ-BT BV-BW BY-CA CC-CD CF-CH CI CK-CL
+		0b1110010011111100001000011010100000000001001010110000000001110000,  // CM-EX: CM-CO CR CU-CZ DE DJ DK DM DO DZ EC EE EG-EH ER-ET
+		0b0000000000111010100100000000110111111001110111111010100000000000,  // EY-HJ: FI-FJ FK FM FO FR GA-GB GD-GI GL-GN GP-GU GW GY
+		0b1011000101100000000110000001111011110000000000100000001011000000,  // HK-JV: HK HM-HN HR HT-HU ID-IE IL-IO IQ-IT JE JM JO-JP
+		0b0000000010111000110101000010111110000010100000011111001010111111,  // JW-MH: KE KG-KI KM-KN KP KR KW KY-KZ LA-LC LI LK LR-LV LY MA MC-MH
+		0b0011111111111111111010111010010011010010000100000000000010000000,  // MI-OT: MK-NA NC NE-NG NI NL NO-NP NR NU NZ OM
+		0b0000001000111100111100011100101010000000000000000000000000000010,  // OU-RF: PA PE-PH PK-PN PR-PT PW PY QA RE
+		0b0000000010001010100011111011111111100111010111001101110111111001,  // RG-TR: RO RS RU RW SA-SE SG-SO SR-ST SV SX-SZ TC-TD TF-TH TJ-TO TR
+		0b0101100110000010000010000010000011101010101000010000001000000000,  // TS-WD: TT TV-TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU
+		0b0100000000000010000000000000000000000000000000000000100000000000,  // WE-YP: WF WS YE
+		0b0001000000100000000000100000000010000000000000000000000000000000,  // YQ-ZZ: YT ZA ZM ZW
+#else
+		/*
+		 *  Fallback for compilers lacking binary literal support.
+		 *
+		 *  Generated from the above data with:
+		 *
+		 *     for (size_t i = 0; i < sizeof(iso3166alpha2) / sizeof(iso3166alpha2[0]); i++) { printf("%lx ", iso3166alpha2[i]); };
+		 *
+		 */
+		0x1e9afb77f7bdbb7b, 0xe4fc21a8012b0070, 0x003a900df9dfa800, 0xb160181ef00202c0,
+		0x00b8d42f8281f2bf, 0x3fffeba4d2100080, 0x023cf1ca80000002, 0x008a8fbfe75cddf9,
+		0x59820820eaa10200, 0x4002000000000800, 0x1020020080000000
 	};
+#endif
 
-	/*
-	 *  Binary search over the above list.
-	 *
-	 */
 /// \cond
-#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc) do {				\
-	size_t s = 0;								\
-	size_t e = sizeof(iso3166alpha2) / sizeof(iso3166alpha2[0]);		\
-	while (s < e) {								\
-		const size_t m = s + (e - s) / 2;				\
-		const int cmp = strcmp(iso3166alpha2[m], cc);			\
-		if (cmp < 0)							\
-			s = m + 1;						\
-		else if (cmp > 0)						\
-			e = m;							\
-		else {								\
-			valid = 1;						\
-			break;							\
-		}								\
-	}									\
+#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc) do {						\
+	if (strlen(cc) == 2 && cc[0] >= 'A' && cc[0] <= 'Z' && cc[1] >= 'A' && cc[1] <= 'Z') {	\
+		int v = (cc[0] - 'A') * 26 + cc[1] - 'A';					\
+		assert(v <= 676);	/* Satisfy analyzer */					\
+		if (iso3166alpha2[v/64] & (0x8000000000000000 >> (v%64)))			\
+			valid = 1;								\
+	}											\
 } while (0)
 /// \endcond
 

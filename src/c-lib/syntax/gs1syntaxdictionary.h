@@ -56,6 +56,15 @@
 #endif
 
 
+#if defined(__GNUC__) || defined(__clang__)
+#  define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#  define DEPRECATED __declspec(deprecated)
+#else
+#  define DEPRECATED
+#endif
+
+
 /**
  * @brief Linter return codes other than #GS1_LINTER_OK indicate an error
  * condition.
@@ -178,6 +187,7 @@ typedef enum
 	GS1_LINTER_INVALID_BIOLOGICAL_SEX_CODE,				///< A valid ISO/IEC 5218 biological sex code required.
 	GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,			///< The data must have the format "<pos>/<end>".
 	GS1_LINTER_POSITION_EXCEEDS_END,				///< The position number must not exceed the end number.
+	GS1_LINTER_REQUIRES_NON_DIGIT_CHARACTER,			///< A non-digit character is required
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -213,6 +223,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset82(const char *data, size_
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csetnumeric(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char *data, size_t *err_pos, size_t *err_len);

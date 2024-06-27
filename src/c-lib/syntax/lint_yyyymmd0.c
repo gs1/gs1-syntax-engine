@@ -56,22 +56,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 
 /// \cond
 #define XX(d) ( (data[d] - '0') * 10 + (data[d+1] - '0') )
+#define YY ( XX(0) * 100 + XX(2) )
 #define MM XX(4)
 #define DD XX(6)
 /// \endcond
 
-	static const int daysinmonth[] =
-		{ 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	static const unsigned char daysinmonth[] =
+		{ 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	size_t len, pos;
-	int yyyy, maxdd;
+	unsigned char maxdd;
 
 	assert(data);
 
 	len = strlen(data);
 
 	/*
-	 * Data must be six characters.
+	 * Data must be eight characters.
 	 *
 	 */
 	if (len != 8) {
@@ -100,19 +101,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 		return GS1_LINTER_ILLEGAL_MONTH;
 	}
 
-	yyyy = (data[0] - '0') * 1000 + (data[1] - '0') * 100 +
-	       (data[2] - '0') *   10 + (data[3] - '0');
-
 	/*
-	 * Validate the day, accounting for leap years, and permitting "00".
+	 * Validate the day, accounting for leap years
 	 *
 	 */
-	maxdd = daysinmonth[MM - 1];		/* Based at 0 */
-	if (maxdd == -1)			/* February; account for leap years */
-		maxdd = ((yyyy % 4 == 0 && yyyy % 100 != 0) ||
-			 yyyy % 400 == 0) ? 29 : 28;
+	if (MM == 2) {		/* February; account for leap years */
+		maxdd = ((YY % 4 == 0 && YY % 100 != 0) || YY % 400 == 0) ? 29 : 28;
+	} else {
+		maxdd = daysinmonth[MM - 1];		/* Based at 0 */
+	}
 
-	if (DD > maxdd) {
+	if (DD > maxdd) {	/* Permit "00" */
 		if (err_pos) *err_pos = 6;
 		if (err_len) *err_len = 2;
 		return GS1_LINTER_ILLEGAL_DAY;
