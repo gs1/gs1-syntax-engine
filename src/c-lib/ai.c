@@ -1395,6 +1395,24 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(ctx, true,  "^7230123");					// Shortest
 	test_processAIdata(ctx, false, "^723012");					// Too short
 
+	test_processAIdata(ctx, false, "^423");						// List of 3-digit ISO-3166 codes
+	test_processAIdata(ctx, false, "^4235");
+	test_processAIdata(ctx, false, "^42352");
+	test_processAIdata(ctx, true,  "^423528");
+	test_processAIdata(ctx, false, "^4235285");
+	test_processAIdata(ctx, false, "^42352852");
+	test_processAIdata(ctx, true,  "^423528528");
+	test_processAIdata(ctx, false, "^4235285285");
+	test_processAIdata(ctx, false, "^42352852852");
+	test_processAIdata(ctx, true,  "^423528528528");
+	test_processAIdata(ctx, false, "^4235285285285");
+	test_processAIdata(ctx, false, "^42352852852852");
+	test_processAIdata(ctx, true,  "^423528528528528");
+	test_processAIdata(ctx, false, "^4235285285285285");
+	test_processAIdata(ctx, false, "^42352852852852852");
+	test_processAIdata(ctx, true,  "^423528528528528528");
+	test_processAIdata(ctx, false,  "^4235285285285285285");			// Too long
+
 	// Unlike parsed data input, we cannot vivify unknown AIs when
 	// extracting AI data from a raw string
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
