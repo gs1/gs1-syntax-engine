@@ -57,6 +57,7 @@
 		F7A662AC2A50A95200638051 /* lint_longitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662A92A50A95200638051 /* lint_longitude.c */; };
 		F7A662AD2A50A95200638051 /* lint_latitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AA2A50A95200638051 /* lint_latitude.c */; };
 		F7A662AE2A50A95200638051 /* lint_cset64.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AB2A50A95200638051 /* lint_cset64.c */; };
+		F7F7CD792C2DE11C00C6460C /* lint_hasnondigit.c in Sources */ = {isa = PBXBuildFile; fileRef = F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -126,6 +127,7 @@
 		F7A662AA2A50A95200638051 /* lint_latitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_latitude.c; sourceTree = "<group>"; };
 		F7A662AB2A50A95200638051 /* lint_cset64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset64.c; sourceTree = "<group>"; };
 		F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GS1-Encoders-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hasnondigit.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +228,7 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */,
 				F76F56962C03D8F400A58C2E /* lint_iso5218.c */,
 				F76F56972C03D8F400A58C2E /* lint_posinseqslash.c */,
 				F76F56982C03D8F400A58C2E /* lint_yyyymmd0.c */,
@@ -420,6 +423,7 @@
 				F79827752909D35500F00DDA /* lint_couponcode.c in Sources */,
 				F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */,
 				F79827802909D35500F00DDA /* lint_iban.c in Sources */,
+				F7F7CD792C2DE11C00C6460C /* lint_hasnondigit.c in Sources */,
 				F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */,
 				F79827612909D35500F00DDA /* ai.c in Sources */,
 				F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */,
