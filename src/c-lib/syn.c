@@ -230,8 +230,19 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	}
 	if (numparts == 0)
 		error("AI is missing components");
-	for (part = numparts; part < MAX_PARTS; part++)
-		processComponent(ctx, "_0", &(*entry)->parts[part]);
+
+	// Sanity checks over the components to avoid specifications that are ambiguous
+	for (part = 0; part < MAX_PARTS; part++) {
+		struct aiComponent *p = &(*entry)->parts[part];
+		if (part >= numparts) {		// Fillers for parts
+			processComponent(ctx, "_0", p);
+			continue;
+		}
+		if (part < numparts-1 && p->min != p->max)
+			error("Only the final compoment may have variable length");
+		if (part > 0 && p->opt == MAN && (p-1)->opt == OPT)
+			error("A madatory component cannot follow optional components");
+	}
 
 	// Read the key/value attributes until the title delimiter
 	p = buf;
@@ -568,15 +579,12 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_, __, __, __, __, "req=999", ""),
 		AI_ENTRY_TERMINATOR
 	} },
-
-/*
- *  TODO: Add functionality to the entry parser, with tests, to prevent specifications that would result in ambiguous processing:
- *
- *  - Ensure variable length component is the last component.
- *  - Ensure a mandatory component does not follow an optional compoment.
- *
- */
-
+	{ false, "90  ?  N..5 X..30", {				/* Bespoke test for non-final, variable-length component */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  ?  [N5] X5", {				/* Bespoke test mandatory component follows optional component */
+		AI_ENTRY_TERMINATOR
+	} },
 };
 
 void test_syn_parseSyntaxDictionaryEntry(void) {
