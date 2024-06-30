@@ -154,7 +154,7 @@ static bool userInt(gs1_encoder* const ctx) {
 	return true;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char* const argv[]) {
 
 	gs1_encoder* ctx;
 
