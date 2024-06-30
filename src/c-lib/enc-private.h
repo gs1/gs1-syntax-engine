@@ -38,7 +38,16 @@
 #define strdup _strdup
 #endif
 
-#define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
+#if defined(__GNUC__) || defined(__clang__)
+#define __ATTR_CONST __attribute__ ((__const__))
+#define __ATTR_PURE __attribute__ ((__pure__))
+#elif _MSC_VER
+#define __ATTR_CONST __declspec(noalias)
+#define __ATTR_PURE
+#else
+#define __ATTR_CONST
+#define __ATTR_PURE
+#endif
 
 #if defined(__clang__)
 #  define DIAG_PUSH _Pragma("clang diagnostic push")
@@ -54,6 +63,7 @@
 #  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
 #endif
 
+#define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
 
 #include "ai.h"

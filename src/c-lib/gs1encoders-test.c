@@ -24,14 +24,20 @@
  *  Don't perform code analysis of third-party code that is only used for testing.
  *
  */
-#if defined(_MSC_VER)
-#include <CodeAnalysis/warnings.h>
-#pragma warning(push)
-#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+#elif defined(_MSC_VER)
+#  include <CodeAnalysis/warnings.h>
+#  pragma warning(push)
+#  pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
 #endif
 #include "acutest.h"
-#if defined(_MSC_VER)
-#pragma warning(pop)
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#  pragma warning(pop)
 #endif
 
 #include <stddef.h>

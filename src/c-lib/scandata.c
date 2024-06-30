@@ -88,7 +88,7 @@ static const struct symIdEntry symIdTable[] = {
 #define CC_SYM_ID "]e0"
 
 
-static const char* lookupSymId(const gs1_encoder* const ctx) {
+static const __ATTR_PURE char* lookupSymId(const gs1_encoder* const ctx) {
 
 	size_t i;
 	const char *symId = NULL;

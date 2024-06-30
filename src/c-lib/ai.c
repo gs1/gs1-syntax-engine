@@ -102,7 +102,7 @@ static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 	return true;
 }
 
-static inline uint8_t aiLengthByPrefix(const gs1_encoder* const ctx, const char *ai) {
+static inline __ATTR_PURE uint8_t aiLengthByPrefix(const gs1_encoder* const ctx, const char *ai) {
 	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
 	return ctx->aiLengthByPrefix[(ai[0] - '0') * 10 + (ai[1] - '0')];
 }
@@ -200,7 +200,7 @@ static const uint8_t fixedAIprefixLengths[100] = {
 	VL, VL, VL, VL, VL, VL, VL, VL, VL, VL,
 };
 
-static inline uint8_t valLengthByPrefix(const char* const ai) {
+static inline __ATTR_PURE uint8_t valLengthByPrefix(const char* const ai) {
 	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
 	return fixedAIprefixLengths[(ai[0] - '0') * 10 + (ai[1] - '0')];
 }
@@ -411,13 +411,13 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
  * Return the overall minimum and maximum lengths for an AI, by summing the components.
  *
  */
-static inline size_t aiEntryMinLength(const struct aiEntry* const entry) {
+static inline __ATTR_PURE size_t aiEntryMinLength(const struct aiEntry* const entry) {
 	const struct aiComponent *part;
 	size_t l;
 	for (part = entry->parts, l = 0; part->cset; l+= (part->opt == MAN ? part->min : 0), part++);
 	return l;
 }
-static inline size_t aiEntryMaxLength(const struct aiEntry* const entry) {
+static inline __ATTR_PURE size_t aiEntryMaxLength(const struct aiEntry* const entry) {
 	const struct aiComponent *part;
 	size_t l;
 	for (part = entry->parts, l = 0; part->cset; l+= part->max, part++);

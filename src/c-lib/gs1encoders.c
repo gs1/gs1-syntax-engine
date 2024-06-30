@@ -42,12 +42,12 @@ static inline void reset_error(gs1_encoder* const ctx) {
 }
 
 
-size_t gs1_encoder_instanceSize(void) {
+__ATTR_CONST size_t gs1_encoder_instanceSize(void) {
 	return sizeof(struct gs1_encoder);
 }
 
 
-int gs1_encoder_getMaxDataStrLength(void) {
+__ATTR_CONST int gs1_encoder_getMaxDataStrLength(void) {
 	return MAX_DATA;
 }
 
@@ -109,7 +109,7 @@ void gs1_encoder_free(gs1_encoder* const ctx) {
 }
 
 
-char* gs1_encoder_getVersion(void) {
+__ATTR_CONST char* gs1_encoder_getVersion(void) {
 	return __DATE__;
 }
 
@@ -582,14 +582,14 @@ void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const bu
 }
 
 
-char* gs1_encoder_getErrMsg(gs1_encoder* const ctx) {
+__ATTR_PURE char* gs1_encoder_getErrMsg(gs1_encoder* const ctx) {
 	assert(ctx);
 	assert((!ctx->errFlag) ^ *ctx->errMsg);
 	return ctx->errMsg;
 }
 
 
-char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
+__ATTR_PURE char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
 	assert(ctx);
 	return ctx->linterErrMarkup;
 }
@@ -600,7 +600,7 @@ char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
  *
  */
 
-bool gs1_allDigits(const uint8_t* const str, size_t len) {
+__ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 	size_t i;
 
