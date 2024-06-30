@@ -78,8 +78,8 @@ gs1_linter_t gs1_linter_from_name(const char* const name) {
 
 	while (s < e) {
 
-		size_t m = s + (e - s) / 2;
-		int cmp = strcmp(name_function_map[m].name, name);
+		const size_t m = s + (e - s) / 2;
+		const int cmp = strcmp(name_function_map[m].name, name);
 
 		if (cmp == 0)
 			return name_function_map[m].fn;

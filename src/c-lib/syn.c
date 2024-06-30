@@ -430,7 +430,7 @@ bool gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
 
 }
 
-void gs1_freeSyntaxDictionaryEntries(gs1_encoder* const ctx, struct aiEntry *sd) {
+void gs1_freeSyntaxDictionaryEntries(const gs1_encoder* const ctx, struct aiEntry *sd) {
 
 	(void)ctx;
 

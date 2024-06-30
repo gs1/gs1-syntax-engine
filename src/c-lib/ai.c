@@ -102,7 +102,7 @@ static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 	return true;
 }
 
-static inline uint8_t aiLengthByPrefix(gs1_encoder* const ctx, const char *ai) {
+static inline uint8_t aiLengthByPrefix(const gs1_encoder* const ctx, const char *ai) {
 	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
 	return ctx->aiLengthByPrefix[(ai[0] - '0') * 10 + (ai[1] - '0')];
 }
@@ -241,7 +241,7 @@ static const struct aiEntry unknownAI4fixed6 =
  * an AI in the table that matches a prefix of the given data.
  *
  */
-const struct aiEntry* gs1_lookupAIentry(gs1_encoder* const ctx, const char *p, size_t ailen) {
+const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *p, size_t ailen) {
 
 	size_t aiLenByPrefix;
 	uint8_t valLenByPrefix;
@@ -670,7 +670,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
  *  itself when matching by a self-referencing pattern.
  *
  */
-static bool aiExists(gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, char* const matchedAI) {
+static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, char* const matchedAI) {
 
 	int i;
 	const size_t prefixlen = strspn(ai, "0123456789");

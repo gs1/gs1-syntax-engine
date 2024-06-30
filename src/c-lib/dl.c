@@ -247,7 +247,7 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][M
 	 *
 	 */
 	for (i = 0 ; i < len; i++) {
-		int n = snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
+		const int n = snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
 		assert(n >= 1 && n < (int)(sizeof(aiseq) - (size_t)(p - aiseq)));
 		p += n;
 	}
@@ -259,8 +259,8 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][M
 	 *
 	 */
 	while (s < e) {
-		size_t m = s + (e - s) / 2;
-		int cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
+		const size_t m = s + (e - s) / 2;
+		const int cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
 		if (cmp == 0)
 			return (int)m;
 		if (cmp < 0)
