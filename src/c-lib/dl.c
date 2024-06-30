@@ -747,7 +747,7 @@ fail:
  */
 char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
-	int i, j, maxQualifiers, numQualifiers;
+	int i, maxQualifiers, numQualifiers;
 	const char *key = NULL;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
@@ -829,7 +829,8 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	strcpy(tmp, ctx->dlKeyQualifiers[bestKeyEntry]);
-	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr))
+	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr)) {
+		int j;
 		for (j = 0; j < ctx->numAIs; j++) {
 
 			if (ctx->aiData[j].kind != aiValue_aival)
@@ -840,6 +841,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 				ctx->aiData[j].dlPathOrder = (uint8_t)i;
 
 		}
+	}
 	numQualifiers = i;
 
 	/*
@@ -859,6 +861,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	for (i = 0; i < numQualifiers; i++) {
+		int j;
 		for (j = 0; j < ctx->numAIs; j++) {
 
 			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything

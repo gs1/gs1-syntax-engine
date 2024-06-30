@@ -136,7 +136,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	const struct aiEntry *lastEntry;
 	const char *token, *flags = "";
 	char *saveptr = NULL;
-	char *p, *q;
+	char *p;
 	size_t len;
 	char rangeEnd;
 	int numparts, part, linter;
@@ -233,14 +233,14 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 	// Sanity checks over the components to avoid specifications that are ambiguous
 	for (part = 0; part < MAX_PARTS; part++) {
-		struct aiComponent *p = &(*entry)->parts[part];
+		struct aiComponent* const c = &(*entry)->parts[part];
 		if (part >= numparts) {		// Fillers for parts
-			processComponent(ctx, "_0", p);
+			processComponent(ctx, "_0", c);
 			continue;
 		}
-		if (part < numparts-1 && p->min != p->max)
+		if (part < numparts-1 && c->min != c->max)
 			error("Only the final compoment may have variable length");
-		if (part > 0 && p->opt == MAN && (p-1)->opt == OPT)
+		if (part > 0 && c->opt == MAN && (c-1)->opt == OPT)
 			error("A madatory component cannot follow optional components");
 	}
 
@@ -249,6 +249,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	while (token && strcmp(token, "#") != 0) {
 
 		int n;
+		char *q;
 
 		if ((q = strchr(token, '=')) != NULL) {		// e.g. dlpkey=1,2,3
 
