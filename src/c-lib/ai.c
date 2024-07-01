@@ -244,7 +244,6 @@ static const struct aiEntry unknownAI4fixed6 =
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *p, size_t ailen) {
 
 	size_t aiLenByPrefix;
-	uint8_t valLenByPrefix;
 	size_t s = 0, e = ctx->aiTableEntries;
 
 	assert(ailen <= strlen(p));
@@ -299,17 +298,22 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 		return NULL;
 
 	// Return unknownAI indicator for corresponding AI length
-	valLenByPrefix = valLengthByPrefix(p);
-
-	if      (aiLenByPrefix == 2 && valLenByPrefix == VL) return &unknownAI2;
-	else if (aiLenByPrefix == 2 && valLenByPrefix ==  2) return &unknownAI2fixed2;
-	else if (aiLenByPrefix == 2 && valLenByPrefix == 14) return &unknownAI2fixed14;
-	else if (aiLenByPrefix == 2 && valLenByPrefix == 16) return &unknownAI2fixed16;
-	else if (aiLenByPrefix == 2 && valLenByPrefix == 18) return &unknownAI2fixed18;
-	else if (aiLenByPrefix == 3 && valLenByPrefix == VL) return &unknownAI3;
-	else if (aiLenByPrefix == 3 && valLenByPrefix == 13) return &unknownAI3fixed13;
-	else if (aiLenByPrefix == 4 && valLenByPrefix == VL) return &unknownAI4;
-	else if (aiLenByPrefix == 4 && valLenByPrefix ==  6) return &unknownAI4fixed6;
+	if (aiLenByPrefix == 2) {
+		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		if (valLenByPrefix == VL) return &unknownAI2;
+		if (valLenByPrefix ==  2) return &unknownAI2fixed2;
+		if (valLenByPrefix == 14) return &unknownAI2fixed14;
+		if (valLenByPrefix == 16) return &unknownAI2fixed16;
+		if (valLenByPrefix == 18) return &unknownAI2fixed18;
+	} else if (aiLenByPrefix == 3) {
+		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		if (valLenByPrefix == VL) return &unknownAI3;
+		if (valLenByPrefix == 13) return &unknownAI3fixed13;
+	} else if (aiLenByPrefix == 4) {
+		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		if (valLenByPrefix == VL) return &unknownAI4;
+		if (valLenByPrefix ==  6) return &unknownAI4fixed6;
+	}
 
 	return &unknownAI;	// Unknown AI length
 
