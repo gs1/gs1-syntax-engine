@@ -262,10 +262,10 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 	 *
 	 */
 	while (s < e) {
-		size_t m = s + (e - s) / 2;
+		const size_t m = s + (e - s) / 2;
 		const struct aiEntry *entry = &ctx->aiTable[m];
-		size_t entrylen = strlen(entry->ai);
-		int cmp = strncmp(entry->ai, p, entrylen);
+		const size_t entrylen = strlen(entry->ai);
+		const int cmp = strncmp(entry->ai, p, entrylen);
 		if (cmp == 0) {
 			if (ailen != 0 && entrylen != ailen)
 				return NULL;	// Prefix match, but incorrect length
