@@ -673,8 +673,12 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
  *  Ignore AI can be set to the current AI to avoid matching triggering on
  *  itself when matching by a self-referencing pattern.
  *
+ *  Note: Given the typically small number of AIs and template matching
+ *  requirement, there is little to be gained by maintaining a more advanced
+ *  data structure versus the current approach of simply walking the AIs.
+ *
  */
-static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, char* const matchedAI) {
+static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
 
 	int i;
 	const size_t prefixlen = strspn(ai, "0123456789");
@@ -690,12 +694,13 @@ static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const c
 			continue;
 
 		if (matchedAI)
-			strncpy(matchedAI, ai2->ai, strlen(ai));
-
+			*matchedAI = ai2;
 		return true;
 
 	}
 
+	if (matchedAI)
+		*matchedAI = NULL;
 	return false;
 
 }
@@ -737,13 +742,15 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 			for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 
-				char matchedAI[MAX_AI_LEN+1] = { 0 };
+				const struct aiValue *matchedAI;
 
-				if (aiExists(ctx, token, ai->ai, matchedAI)) {
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%s)", ai->ailen, ai->ai, matchedAI);
-					ctx->errFlag = true;
-					return false;
-				}
+				if (!aiExists(ctx, token, ai->ai, &matchedAI))
+					continue;
+
+				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%.*s)",
+					 ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
+				ctx->errFlag = true;
+				return false;
 
 			}
 
