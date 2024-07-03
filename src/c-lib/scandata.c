@@ -524,6 +524,8 @@ fail:
 	*ctx->dataStr = '\0';
 	ctx->sym = gs1_encoder_sNONE;
 	ctx->errFlag = true;
+	if (*ctx->errMsg == '\0')
+		strcpy(ctx->errMsg, "Failed to process scan data");
 
 	return false;
 
