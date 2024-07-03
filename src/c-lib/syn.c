@@ -38,7 +38,6 @@
 
 #define error(...) do {							\
 	snprintf(ctx->errMsg, sizeof(ctx->errMsg), __VA_ARGS__);	\
-	ctx->errFlag = true;						\
 	goto fail;							\
 } while(0)
 
@@ -367,7 +366,6 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	sd = (struct aiEntry*)malloc(cap * sizeof(struct aiEntry));
 	if (!sd) {
 		strcpy(ctx->errMsg, "Failed to allocate AI table");
-		ctx->errFlag = true;
 		goto fail;
 	}
 	sd[0].ai[0] = '\0';
@@ -375,7 +373,6 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	fp = fopen(fname, "r");
 	if (fp == NULL) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot read file %s", fname);
-		ctx->errFlag = true;
 		goto fail;
 	}
 

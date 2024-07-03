@@ -35,7 +35,6 @@
 
 static inline void reset_error(gs1_encoder* const ctx) {
 	assert(ctx);
-	ctx->errFlag = false;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -80,7 +79,6 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.numDLkeyQualifiers = 0,
 		.numAIs = 0,
 		.dataStr = { 0 },
-		.errFlag = false,
 		.errMsg = { 0 },
 		.linterErr = GS1_LINTER_OK,
 		.linterErrMarkup = { 0 }
@@ -124,7 +122,6 @@ bool gs1_encoder_setSym(gs1_encoder* const ctx, const gs1_encoder_symbologies_t 
 	reset_error(ctx);
 	if (sym < gs1_encoder_sNONE || sym >= gs1_encoder_sNUMSYMS) {
 		strcpy(ctx->errMsg, "Unknown symbology");
-		ctx->errFlag = true;
 		return false;
 	}
 	ctx->sym = sym;
@@ -195,12 +192,10 @@ bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_
 	reset_error(ctx);
 	if ((signed int)validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {  // Cast satisfies "unsigned enum < 0" checks
 		strcpy(ctx->errMsg, "Unknown validation");
-		ctx->errFlag = true;
 		return false;
 	}
 	if (ctx->validationTable[validation].locked) {
 		strcpy(ctx->errMsg, "This validation cannont be amended");
-		ctx->errFlag = true;
 		return false;
 	}
 	ctx->validationTable[validation].enabled = enabled;
@@ -236,7 +231,6 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	if (strlen(dataStr) > MAX_DATA) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Maximum data length is %d characters", MAX_DATA);
-		ctx->errFlag = true;
 		return false;
 	}
 	if (ctx->dataStr != dataStr)					// File input is via ctx->dataStr
@@ -261,7 +255,6 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 		if (ctx->numAIs >= MAX_AIS) {
 			strcpy(ctx->errMsg, "Too many AIs");
-			ctx->errFlag = true;
 			goto fail;
 		}
 
@@ -314,7 +307,6 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 
 		if (ctx->numAIs >= MAX_AIS) {
 			strcpy(ctx->errMsg, "Too many AIs");
-			ctx->errFlag = true;
 			goto fail;
 		}
 
@@ -584,7 +576,6 @@ void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const bu
 
 __ATTR_PURE char* gs1_encoder_getErrMsg(gs1_encoder* const ctx) {
 	assert(ctx);
-	assert((!ctx->errFlag) ^ *ctx->errMsg);
 	return ctx->errMsg;
 }
 

@@ -89,7 +89,6 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		char **reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
 		if (!reallocDLkeyQualifiers) {
 			strcpy(ctx->errMsg, "Failed to reallocate memory for key-qualifiers");
-			ctx->errFlag = true;
 			return false;
 		}
 		*dlKeyQualifiers = reallocDLkeyQualifiers;
@@ -147,7 +146,6 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	char **dlKeyQualifiers = malloc(cap * sizeof(char *));
 	if (!dlKeyQualifiers) {
 		strcpy(ctx->errMsg, "Failed to allocate memory for key-qualifiers");
-		ctx->errFlag = true;
 		return false;
 	}
 
@@ -360,7 +358,6 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	*dataStr = '\0';
 	*ctx->errMsg = '\0';
-	ctx->errFlag = false;
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
@@ -645,7 +642,6 @@ add_query_param_to_ai_data:
 	// key-qualifier association
 	if (!isValidDLpathAIseq(ctx, (const char(*)[MAX_AI_LEN+1])pathAIseq, numPathAIs)) {
 		strcpy(ctx->errMsg, "The AIs in the path are not a valid key-qualifier sequence for the key");
-		ctx->errFlag = true;
 		ret = false;
 		goto out;
 	}
@@ -672,7 +668,6 @@ add_query_param_to_ai_data:
 				    ai2->ailen == ai->ailen &&
 				    memcmp(ai2->ai, ai->ai, ai2->ailen) == 0) {
 					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is duplicated", ai->ailen, ai->ai);
-					ctx->errFlag = true;
 					ret = false;
 					goto out;
 				}
@@ -682,7 +677,6 @@ add_query_param_to_ai_data:
 			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
-				ctx->errFlag = true;
 				ret = false;
 				goto out;
 			}
@@ -698,7 +692,6 @@ add_query_param_to_ai_data:
 
 				if (getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
 					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%s) from query params should be in the path info", seq[j]);
-					ctx->errFlag = true;
 					ret = false;
 					goto out;
 				}
@@ -730,7 +723,6 @@ fail:
 
 	if (*ctx->errMsg == '\0')
 		strcpy(ctx->errMsg, "Failed to parse DL data");
-	ctx->errFlag = true;
 
 	DEBUG_PRINT("Parsing DL data failed: %s\n", ctx->errMsg);
 
@@ -784,7 +776,6 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 	if (keyEntry == -1) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot create a DL URI without a primary key AI");
-		ctx->errFlag = true;
 		return NULL;
 	}
 
@@ -926,7 +917,6 @@ again:
 		if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 		    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
-			ctx->errFlag = true;
 			*ctx->outStr = '\0';
 			return NULL;
 		}

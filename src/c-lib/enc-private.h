@@ -78,7 +78,6 @@ struct gs1_encoder {
 	bool permitZeroSuppressedGTINinDLuris;	// Whether to permit a path component GTIN value to be in GTIN-{8,12,13} format
 	bool includeDataTitlesInHRI;		// Whether to include the Data Titles in HRI string output
 
-	bool errFlag;
 	char errMsg[512];
 	gs1_lint_err_t linterErr;		// Error returned by a linter
 	char linterErrMarkup[512];

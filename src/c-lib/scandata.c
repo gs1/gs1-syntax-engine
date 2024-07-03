@@ -191,13 +191,11 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", length - 1);
 		else
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", length);
-		ctx->errFlag = true;
 		return false;
 	}
 
 	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
 		strcpy(ctx->errMsg, "Primary data must be all digits");
-		ctx->errFlag = true;
 		return false;
 	}
 
@@ -208,7 +206,6 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 
 	if (!validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
 		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
-		ctx->errFlag = true;
 		return false;
 	}
 
@@ -312,7 +309,6 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (ctx->sym == gs1_encoder_sDataBarLimited) {
 			if (atof((char*)primaryStr) > 19999999999999.) {
 				strcpy(ctx->errMsg, "Primary data item value is too large");
-				ctx->errFlag = true;
 				goto fail;
 			}
 		}
@@ -411,7 +407,6 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	ctx->numAIs = 0;
 
 	*ctx->errMsg = '\0';
-	ctx->errFlag = false;
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
@@ -523,7 +518,6 @@ fail:
 
 	*ctx->dataStr = '\0';
 	ctx->sym = gs1_encoder_sNONE;
-	ctx->errFlag = true;
 	if (*ctx->errMsg == '\0')
 		strcpy(ctx->errMsg, "Failed to process scan data");
 

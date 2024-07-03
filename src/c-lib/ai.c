@@ -93,7 +93,6 @@ static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 		uint8_t length = (uint8_t)strlen(e->ai);
 		if (ctx->aiLengthByPrefix[prefix] != 0 && ctx->aiLengthByPrefix[prefix] != length) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI table is broken: AIs beginning '%c%c' have different lengths", e->ai[0], e->ai[1]);
-			ctx->errFlag = true;
 			return false;
 		}
 		ctx->aiLengthByPrefix[prefix] = length;
@@ -339,7 +338,6 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 	if (p == r) {
 		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is empty", (int)strlen(entry->ai), ai);
-		ctx->errFlag = true;
 		return 0;
 	}
 
@@ -362,7 +360,6 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 		if (complen < part->min) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too short", (int)strlen(entry->ai), ai);
-			ctx->errFlag = true;
 			return 0;
 		}
 
@@ -395,7 +392,6 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 					(int)errpos, start,
 					(int)errlen, start + errpos,
 					(int)(strlen(compval) - errpos - errlen), start + errpos + errlen);
-				ctx->errFlag = true;
 				return 0;
 			}
 			l = (l == &linter) ? &(part->linters[0]) : l+1;
@@ -476,7 +472,6 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 
 	*dataStr = '\0';
 	*ctx->errMsg = '\0';
-	ctx->errFlag = false;
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
@@ -554,7 +549,6 @@ fail:
 
 	if (*ctx->errMsg == '\0')
 		strcpy(ctx->errMsg, "Failed to parse AI data");
-	ctx->errFlag = true;
 
 	DEBUG_PRINT("Parsing AI data failed: %s\n", ctx->errMsg);
 
@@ -576,7 +570,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 	assert(dataStr);
 
 	*ctx->errMsg = '\0';
-	ctx->errFlag = false;
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
@@ -585,14 +578,12 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 	// Ensure FNC1 in first
 	if (!*p || *p++ != '^') {
 		strcpy(ctx->errMsg, "Missing FNC1 in first position");
-		ctx->errFlag = true;
 		return false;
 	}
 
 	// Must have some AI data
 	if (!*p) {
 		strcpy(ctx->errMsg, "The AI data is empty");
-		ctx->errFlag = true;
 		return false;
 	}
 
@@ -613,7 +604,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL ||
 		    (extractAIs && entry == &unknownAI)) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "No known AI is a prefix of: %.4s...", p);
-			ctx->errFlag = true;
 			return false;
 		}
 
@@ -633,7 +623,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		if (extractAIs) {
 			if (ctx->numAIs >= MAX_AIS) {
 				strcpy(ctx->errMsg, "Too many AIs");
-				ctx->errFlag = true;
 				return false;
 			}
 			ctx->aiData[ctx->numAIs++] = (struct aiValue) {
@@ -651,7 +640,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		p += vallen;
 		if (entry->fnc1 && *p != '^' && *p != '\0') {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too long", (int)strlen(entry->ai), ai);
-			ctx->errFlag = true;
 			return false;
 		}
 
@@ -749,7 +737,6 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%.*s)",
 					 ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
-				ctx->errFlag = true;
 				return false;
 
 			}
@@ -818,7 +805,6 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 			if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
-				ctx->errFlag = true;
 				return false;
 			}
 
@@ -862,7 +848,6 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 			if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
 			   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
 				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Multiple instances of AI (%.*s) have different values", ai->ailen, ai->ai);
-				ctx->errFlag = true;
 				return false;
 			}
 
@@ -903,7 +888,6 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 
 		if (ai->vallen == aiEntryMinLength(ai->aiEntry)) {
 			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Serial component must be present for AI (%.*s) when used with AI (8030)", ai->ailen, ai->ai);
-			ctx->errFlag = true;
 			return false;
 		}
 
