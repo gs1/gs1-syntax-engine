@@ -359,7 +359,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 			continue;
 
 		if (complen < part->min) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too short", (int)strlen(entry->ai), ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data has incorrect length", (int)strlen(entry->ai), ai);
 			return 0;
 		}
 
