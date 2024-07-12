@@ -60,6 +60,9 @@
     <ClCompile Include="syntax\lint_hasnondigit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_hh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_hhmm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,6 +105,9 @@
     <ClCompile Include="syntax\lint_mediatype.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_mm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_mmoptss.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -118,6 +124,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_posinseqslash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint_ss.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_winding.c">

@@ -1208,7 +1208,12 @@ void test_ai_linters(void) {
 //		GS1_LINTER_DATE_WITH_HOUR_TOO_LONG			Parse-time length checks prevent this
 //		GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT			Parse-time length checks prevent this
 //		GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG			Parse-time length checks prevent this
-		{ "(8008)20122515300",					GS1_LINTER_MMSS_INVALID_LENGTH },
+//		GS1_LINTER_HOUR_TOO_SHORT				Parse-time length checks prevent this
+//		GS1_LINTER_HOUR_TOO_LONG				Parse-time length checks prevent this
+//		GS1_LINTER_MINUTE_TOO_SHORT				Parse-time length checks prevent this
+//		GS1_LINTER_MINUTE_TOO_LONG				Parse-time length checks prevent this
+//		GS1_LINTER_SECOND_TOO_SHORT				Parse-time length checks prevent this
+//		GS1_LINTER_SECOND_TOO_LONG				Parse-time length checks prevent this
 		{ "(4326)201300",					GS1_LINTER_ILLEGAL_MONTH },
 		{ "(4326)201200",					GS1_LINTER_ILLEGAL_DAY },
 		{ "(4324)2012252400",					GS1_LINTER_ILLEGAL_HOUR },

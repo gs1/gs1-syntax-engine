@@ -53,7 +53,9 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len, pos;
+	size_t len;
+	gs1_lint_err_t ret;
+	char buf[3] = { 0 };
 
 	assert(data);
 
@@ -69,34 +71,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char* const data, s
 		return len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG;
 	}
 
-	/*
-	 * Data must consist of all digits.
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	memcpy(buf, data, 2);
+	ret = gs1_lint_hh(buf, err_pos, err_len);
 
-	/*
-	 * Validate the hour.
-	 *
-	 */
-	if ((data[0] - '0') * 10 + (data[1] - '0') > 23) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_HOUR;
-	}
+	assert(ret == GS1_LINTER_OK ||
+	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
+	       ret == GS1_LINTER_ILLEGAL_HOUR);
 
-	/*
-	 * Validate the minute.
-	 *
-	 */
-	if ((data[2] - '0') * 10 + (data[3] - '0') > 59) {
-		if (err_pos) *err_pos = 2;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_MINUTE;
+	if (ret != GS1_LINTER_OK)
+		return ret;
+
+	memcpy(buf, data+2, 2);
+	ret = gs1_lint_mm(buf, err_pos, err_len);
+
+	assert(ret == GS1_LINTER_OK ||
+	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
+	       ret == GS1_LINTER_ILLEGAL_MINUTE);
+
+	if (ret != GS1_LINTER_OK) {
+		*err_pos += 2;
+		return ret;
 	}
 
 	return GS1_LINTER_OK;

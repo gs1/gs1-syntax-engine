@@ -104,11 +104,12 @@ typedef enum
 	GS1_LINTER_INCORRECT_IBAN_CHECKSUM,				///< The IBAN is invalid since the check characters are incorrect.
 	GS1_LINTER_DATE_TOO_SHORT,					///< The date is too short for YYMMDD format.
 	GS1_LINTER_DATE_TOO_LONG,					///< The date is too long for YYMMDD format.
-	GS1_LINTER_DATE_WITH_HOUR_TOO_SHORT,				///< The date with hour is too short for YYMMDDHH format.
+	GS1_LINTER_UNUSED_2,
+	GS1_LINTER_UNUSED_3,
 	GS1_LINTER_DATE_WITH_HOUR_TOO_LONG,				///< The date with hour is too long for YYMMDDHH format.
 	GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT,				///< The hour with minute is too short for HHMM format.
 	GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,				///< The hour with minute is too long for HHMM format.
-	GS1_LINTER_MMSS_INVALID_LENGTH,					///< The minutes with optional seconds has an incorrect length for either MMSS or MM format.
+	GS1_LINTER_UNUSED_4,
 	GS1_LINTER_ILLEGAL_MONTH,					///< The date contains an illegal month of the year.
 	GS1_LINTER_ILLEGAL_DAY,						///< The date contains an illegal day of the month.
 	GS1_LINTER_ILLEGAL_HOUR,					///< The time contains an illegal hour.
@@ -188,6 +189,12 @@ typedef enum
 	GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,			///< The data must have the format "<pos>/<end>".
 	GS1_LINTER_POSITION_EXCEEDS_END,				///< The position number must not exceed the end number.
 	GS1_LINTER_REQUIRES_NON_DIGIT_CHARACTER,			///< A non-digit character is required
+	GS1_LINTER_HOUR_TOO_SHORT,					///< The hour is too short for HH format.
+	GS1_LINTER_HOUR_TOO_LONG,					///< The hour is too long for HH format.
+	GS1_LINTER_MINUTE_TOO_SHORT,					///< The minute is too short for MM format.
+	GS1_LINTER_MINUTE_TOO_LONG,					///< The minute is too long for MM format.
+	GS1_LINTER_SECOND_TOO_SHORT,					///< The second is too short for SS format.
+	GS1_LINTER_SECOND_TOO_LONG,					///< The second is too long for SS format.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -224,6 +231,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csetnumeric(const char *data, 
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char *data, size_t *err_pos, size_t *err_len);
@@ -238,12 +246,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char *data, size_t *
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mm(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nonzero(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_ss(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_winding(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char *data, size_t *err_pos, size_t *err_len);

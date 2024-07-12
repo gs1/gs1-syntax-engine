@@ -36,6 +36,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "csum",		.fn = gs1_lint_csum },
 	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
 	{ .name = "hasnondigit",	.fn = gs1_lint_hasnondigit },
+	{ .name = "hh",			.fn = gs1_lint_hh },
 	{ .name = "hhmm",		.fn = gs1_lint_hhmm },
 	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
 	{ .name = "iban",		.fn = gs1_lint_iban },
@@ -50,12 +51,14 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "latitude",		.fn = gs1_lint_latitude },
 	{ .name = "longitude",		.fn = gs1_lint_longitude },
 	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
+	{ .name = "mm",			.fn = gs1_lint_mm },
 	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
 	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
 	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
 	{ .name = "pcenc",		.fn = gs1_lint_pcenc },
 	{ .name = "pieceoftotal",	.fn = gs1_lint_pieceoftotal },
 	{ .name = "posinseqslash",	.fn = gs1_lint_posinseqslash },
+	{ .name = "ss",			.fn = gs1_lint_ss },
 	{ .name = "winding",		.fn = gs1_lint_winding },
 	{ .name = "yesno",		.fn = gs1_lint_yesno },
 	{ .name = "yymmd0",		.fn = gs1_lint_yymmd0 },
@@ -135,11 +138,11 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The IBAN is invalid since the check characters are incorrect.",
 	"The date is too short.",
 	"The date is too long.",
-	"The date with hour is too short for YYMMDDHH format.",
-	"The date with hour is too long for YYMMDDHH format.",
+	"",	// Unused
+	"",	// Unused
 	"The hour with minute is too short for HHMM format.",
 	"The hour with minute is too long for HHMM format.",
-	"The minutes with optional seconds has an incorrect length for either MMSS or MM format.",
+	"",	// Unused
 	"The date contains an illegal month of the year.",
 	"The date contains an illegal day of the month.",
 	"The time contains an illegal hour.",
@@ -219,6 +222,12 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The data must have the format \"<pos>/<end>\".",
 	"The position number must not exceed the end number.",
 	"A non-digit character is required.",
+	"The hour is too short for HH format.",
+	"The hour is too long for HH format.",
+	"The minute is too short for MM format.",
+	"The minute is too long for MM format.",
+	"The second is too short for SS format.",
+	"The second is too long for SS format.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */
