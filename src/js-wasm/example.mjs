@@ -109,7 +109,7 @@ function process_clicked() {
 			gs1encoder.aiDataStr = data;
 		} else if (data.startsWith(']')) {
 			document.getElementById("syntax").value = "Barcode scan data with AIM symbology identifier";
-			gs1encoder.scanData = data.replace("{GS}", "\u001d");
+			gs1encoder.scanData = data.replace(/{GS}/g, "\u001d");
 		} else if (data.startsWith('^')) {
 			document.getElementById("syntax").value = "Unbracketed AI element string";
 			gs1encoder.dataStr = data;

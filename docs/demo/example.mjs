@@ -2,7 +2,7 @@
  *  Event-driven functions for example HTML app. which uses the JavaScript
  *  wrapper around the WASM build of the GS1 Syntax Engine.
  *
- *  Copyright (c) 2022-2023 GS1 AISBL.
+ *  Copyright (c) 2022-2024 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ function process_clicked() {
 			gs1encoder.aiDataStr = data;
 		} else if (data.startsWith(']')) {
 			document.getElementById("syntax").value = "Barcode scan data with AIM symbology identifier";
-			gs1encoder.scanData = data.replace("{GS}", "\u001d");
+			gs1encoder.scanData = data.replace(/{GS}/g, "\u001d");
 		} else if (data.startsWith('^')) {
 			document.getElementById("syntax").value = "Unbracketed AI element string";
 			gs1encoder.dataStr = data;
