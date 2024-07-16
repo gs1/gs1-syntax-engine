@@ -240,18 +240,18 @@ static const struct aiEntry unknownAI4fixed6 =
  * an AI in the table that matches a prefix of the given data.
  *
  */
-const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *p, size_t ailen) {
+const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
 	size_t s = 0, e = ctx->aiTableEntries;
 
-	assert(ailen <= strlen(p));
+	assert(ailen == 0 || ailen <= strlen(ai));
 
 	if (ailen != 0 && (ailen < MIN_AI_LEN || ailen > MAX_AI_LEN))	// Even for unknown AIs
 		return NULL;
 
 	// Don't attempt to find a non-digit AI
-	if (!gs1_allDigits((uint8_t *)p, ailen != 0 ? ailen : MIN_AI_LEN))
+	if (!gs1_allDigits((uint8_t *)ai, ailen != 0 ? ailen : MIN_AI_LEN))
 		return NULL;
 
 	/*
@@ -261,15 +261,15 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 	 */
 	while (s < e) {
 		const size_t m = s + (e - s) / 2;
-		const struct aiEntry *entry = &ctx->aiTable[m];
+		const struct aiEntry* const entry = &ctx->aiTable[m];
 		const size_t entrylen = strlen(entry->ai);
-		const int cmp = strncmp(entry->ai, p, entrylen);
+		const int cmp = strncmp(entry->ai, ai, entrylen);
 		if (cmp == 0) {
 			if (ailen != 0 && entrylen != ailen)
 				return NULL;	// Prefix match, but incorrect length
 			return entry;		// Found
 		}
-		if (ailen != 0 && strncmp(p, entry->ai, ailen) == 0)
+		if (ailen != 0 && strncmp(ai, entry->ai, ailen) == 0)
 			return NULL;	// Don't vivify an AI that is a prefix of a known AI
 		if (cmp < 0)
 			s = m + 1;
@@ -288,28 +288,28 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 	 * Otherwise we return NULL ("not found") to indicate an error.
 	 *
 	 */
-	aiLenByPrefix = aiLengthByPrefix(ctx, p);
+	aiLenByPrefix = aiLengthByPrefix(ctx, ai);
 	if (ailen != 0 && aiLenByPrefix != 0 && aiLenByPrefix != ailen)
 		return NULL;
 
 	// Don't vivify a non-digit AI
-	if (aiLenByPrefix != 0 && !gs1_allDigits((uint8_t *)p, aiLenByPrefix))
+	if (aiLenByPrefix != 0 && !gs1_allDigits((uint8_t *)ai, aiLenByPrefix))
 		return NULL;
 
 	// Return unknownAI indicator for corresponding AI length
 	if (aiLenByPrefix == 2) {
-		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		uint8_t valLenByPrefix = valLengthByPrefix(ai);
 		if (valLenByPrefix == VL) return &unknownAI2;
 		if (valLenByPrefix ==  2) return &unknownAI2fixed2;
 		if (valLenByPrefix == 14) return &unknownAI2fixed14;
 		if (valLenByPrefix == 16) return &unknownAI2fixed16;
 		if (valLenByPrefix == 18) return &unknownAI2fixed18;
 	} else if (aiLenByPrefix == 3) {
-		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		uint8_t valLenByPrefix = valLengthByPrefix(ai);
 		if (valLenByPrefix == VL) return &unknownAI3;
 		if (valLenByPrefix == 13) return &unknownAI3fixed13;
 	} else if (aiLenByPrefix == 4) {
-		uint8_t valLenByPrefix = valLengthByPrefix(p);
+		uint8_t valLenByPrefix = valLengthByPrefix(ai);
 		if (valLenByPrefix == VL) return &unknownAI4;
 		if (valLenByPrefix ==  6) return &unknownAI4fixed6;
 	}
