@@ -42,9 +42,15 @@ async function init() {
 
 	document.title = "GS1 Syntax Engine HTML demo | Library release: " + gs1encoder.version;
 
-	document.getElementById("data").value = "https://example.com/01/12312312312333/10/ABC123?99=TESTING";
+	var dataParam = new URL(document.location.toString()).searchParams.get('data');
+
+	document.getElementById("data").value = dataParam ??
+		"https://example.com/01/12312312312333/10/ABC123?99=TESTING";
 
 	load_data_values();
+
+	if (dataParam)
+		process_clicked();
 
 }
 
