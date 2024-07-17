@@ -368,6 +368,7 @@ docs:
 	cp docstmp/tab_s.png ../../docs
 	cp docstmp/tabs.css ../../docs
 	(cd ../.. && docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make -C src/c-lib wasm JSONLY=yes)
+	mkdir -p ../../docs/demo
 	cp ../js-wasm/example.html ../../docs/demo
 	cp ../js-wasm/example.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
