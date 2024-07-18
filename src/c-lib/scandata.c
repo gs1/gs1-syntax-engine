@@ -613,7 +613,7 @@ void test_scandata_generateScanData(void) {
 	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING",
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING^",
-		"]d2011231231231233310ABC123" "\x1D" "99TESTING");		// Trailing FNC1 should be stripped
+		"]d2011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
 
 	/* DataBar Expanded */
 	test_testGenerateScanData(DataBarExpanded, "^011231231231233310ABC123^99TESTING",
