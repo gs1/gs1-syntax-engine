@@ -1,3 +1,11 @@
+UNRELEASED
+
+* Update to Syntax Dictionary release XXXX-XX-XX
+* JS: The browser example app was amended to replace all instances of "{GS}", not just the first.
+* Core: The scandata processor was amended to not strip terminal GS characters.
+* Core: The GS1 DL URI processor was fixed to not truncate AI values derived from URI components that contain percent-encoded null characters.
+
+
 1.1.0
 
 * Update to Syntax Dictionary release 2024-06-10
