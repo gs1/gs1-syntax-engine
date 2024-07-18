@@ -293,6 +293,8 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 		if (i < inlen - 2 && in[i] == '%' && isxdigit(in[i+1]) && isxdigit(in[i+2])) {
 			const char hex[] = { in[i+1], in[i+2], '\0' };
 			out[j] = (char)strtoul(hex, NULL, 16);
+			if (out[j] == 0)	// Illegal null
+				return 0;
 			i += 2;
 		} else if (is_query_component && in[i] == '+')
 			out[j] = ' ';
@@ -476,7 +478,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info too long", (int)ailen, ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info contains illegal null character", (int)ailen, ai);
 			goto fail;
 		}
 
@@ -578,7 +580,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params too long", (int)strlen(entry->ai), ai);
+			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params contains illegal null character", (int)strlen(entry->ai), ai);
 			goto fail;
 		}
 
@@ -1372,9 +1374,8 @@ void test_dl_URIunescape(void) {
 	test_URIunescape("A%g4B", "A%g4B", "A%g4B");			// Non hex digit
 	test_URIunescape("A%G4B", "A%G4B", "A%G4B");			// Non hex digit
 
-	// Check that \0 is sane, although we are only working with strings
-	TEST_CHECK(URIunescape(out, MAX_AI_VALUE_LEN, "A%00B", 5, false) == 3);
-	TEST_CHECK(memcmp(out, "A" "\x00" "B", 4) == 0);
+	// Check that \0 is trapped as an illegal character
+	TEST_CHECK(URIunescape(out, MAX_AI_VALUE_LEN, "A%00B", 5, false) == 0);
 
 	// Truncated input
 	TEST_CHECK(URIunescape(out, MAX_AI_VALUE_LEN, "ABCD", 2, false) == 2);
