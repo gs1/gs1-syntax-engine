@@ -57,17 +57,16 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	memcpy(in, buf, len);
 	in[len] = '\0';
 
-
 	/*
 	 *  Pour random data in, then progress inputs that result in a valid DL
 	 *  URI
 	 *
 	 */
 	if (!gs1_encoder_setDataStr(ctx, in))
-		return 0;
+		return -1;
 
 	if ((out = gs1_encoder_getDLuri(ctx, NULL)) == NULL)
-		return 0;
+		return -1;
 	strcpy(outDL1, out);
 
 	/*
