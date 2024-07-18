@@ -239,8 +239,10 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// DM: "]d1" for plain data; "]d2" for GS1 data
 
 		// If plain data then put original faux CC delimiter back
-		if (*ctx->dataStr != '^' && cc)
+		if (*ctx->dataStr != '^' && cc) {
 			*--cc = '|';
+			cc = NULL;
+		}
 
 		strcat(ctx->outStr, "]");
 		strncat(ctx->outStr, lookupSymId(ctx), 2);
