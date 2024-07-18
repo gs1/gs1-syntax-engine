@@ -141,9 +141,6 @@ static void scancat(char* const out, const char* const in) {
 		while (*++p)
 			*q++ = (*p == '^') ? '\x1D' : *p;	// Convert encoded FNC1 to GS
 
-		if (*(p - 1) == '^')				// Strip any trailing FNC1
-			q--;
-
 	}
 	else {
 

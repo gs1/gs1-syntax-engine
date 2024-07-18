@@ -53,10 +53,6 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	memcpy(in, buf, len);
 	in[len] = '\0';
 
-	// Strip trailing GS characters from the input
-	while (strlen(in) > 0 && in[strlen(in)-1] == 0x1D)
-		in[strlen(in)-1] = '\0';
-
 	memcpy(pristine, in, len);
 
 	if (!gs1_encoder_setScanData(ctx, in))
