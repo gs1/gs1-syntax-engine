@@ -50,6 +50,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	char outDL1[MAX_DATA+1];
 	char outDL2[MAX_DATA+1];
 	const char *out;
+	char **qp;
 
 	if (len > MAX_DATA)
 		return 0;
@@ -90,6 +91,8 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		printf("\nIN:  %s\nOUT: %s\n", outDL1, outDL2);
 		abort();
 	}
+
+	gs1_encoder_getDLignoredQueryParams(ctx, &qp);
 
 	return 0;
 
