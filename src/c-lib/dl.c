@@ -948,13 +948,13 @@ again:
 #include "acutest.h"
 
 
-static void test_parseDLuri(gs1_encoder* const ctx, bool should_succeed, const char* const dlData, const char* const expect) {
+static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, const int line, bool should_succeed, const char* const dlData, const char* const expect) {
 
 	char in[256];
 	char out[256];
 	char casename[256];
 
-	snprintf(casename, sizeof(casename), "%s => %s", dlData, expect);
+	snprintf(casename, sizeof(casename), "%s:%d: %s => %s", file, line, dlData, expect);
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
@@ -970,7 +970,6 @@ static void test_parseDLuri(gs1_encoder* const ctx, bool should_succeed, const c
 
 }
 
-
 /*
  *  Convert a DL URI to a regular AI string "^..."
  *
@@ -981,50 +980,54 @@ void test_dl_parseDLuri(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
-	test_parseDLuri(ctx, false, "", "");
-	test_parseDLuri(ctx, false, "ftp://", "");
-	test_parseDLuri(ctx, false, "http://", "");
-	test_parseDLuri(ctx, false, "http:///", "");				// No domain
-	test_parseDLuri(ctx, false, "http://a", "");				// No path info
-	test_parseDLuri(ctx, false, "http://a/", "");				// Pathelogical minimal domain but no AI info
-	test_parseDLuri(ctx, false, "http://a/b", "");				// No path info
-	test_parseDLuri(ctx, false, "http://a/b/", "");				// Pathelogical minimal domain but no AI info
+#define test_parseDLuri(s, d, e) do {					\
+	do_test_parseDLuri(ctx, __FILE__, __LINE__, s, d, e);		\
+} while (0)
 
-	test_parseDLuri(ctx, true,					// http
+	test_parseDLuri(false, "", "");
+	test_parseDLuri(false, "ftp://", "");
+	test_parseDLuri(false, "http://", "");
+	test_parseDLuri(false, "http:///", "");				// No domain
+	test_parseDLuri(false, "http://a", "");				// No path info
+	test_parseDLuri(false, "http://a/", "");				// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/b", "");				// No path info
+	test_parseDLuri(false, "http://a/b/", "");				// Pathelogical minimal domain but no AI info
+
+	test_parseDLuri(true,					// http
 		"http://a/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,					// HTTP
+	test_parseDLuri(true,					// HTTP
 		"HTTP://a/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,					// https
+	test_parseDLuri(true,					// https
 		"https://a/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,					// HTTPS
+	test_parseDLuri(true,					// HTTPS
 		"HTTPS://a/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, false, "HtTp://a/b/00/006141411234567890", "");	// Mixed-case scheme forbidden
+	test_parseDLuri(false, "HtTp://a/b/00/006141411234567890", "");	// Mixed-case scheme forbidden
 
-	test_parseDLuri(ctx, false,					// No domain
+	test_parseDLuri(false,					// No domain
 		"https://00/006141411234567890",
 		"");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/stem/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/more/stem/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,					// Fake AI in stem, stop at rightmost key
+	test_parseDLuri(true,					// Fake AI in stem, stop at rightmost key
 		"https://a/00/faux/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333",
 		"^0112312312312333");
 
@@ -1034,149 +1037,149 @@ void test_dl_parseDLuri(void) {
 	 *
 	 */
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,					// GTIN-13 -> GTIN-14
+	test_parseDLuri(true,					// GTIN-13 -> GTIN-14
 		"https://a/01/2112345678900",
 		"^0102112345678900");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/2112345678900",
 		"");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,					// GTIN-12 -> GTIN-14
+	test_parseDLuri(true,					// GTIN-12 -> GTIN-14
 		"https://a/01/416000336108",
 		"^0100416000336108");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/416000336108",
 		"");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,					// GTIN-8 -> GTIN-14
+	test_parseDLuri(true,					// GTIN-8 -> GTIN-14
 		"https://a/01/02345673",
 		"^0100000002345673");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/02345673",
 		"");
 
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333/22/TEST/10/ABC/21/XYZ",
 		"^011231231231233322TEST^10ABC^21XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333/235/TEST",
 		"^0112312312312333235TEST");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/253/1231231231232",
 		"^2531231231231232");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/253/1231231231232TEST5678901234567",
 		"^2531231231231232TEST5678901234567");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/253/1231231231232TEST56789012345678", "");	// Too long N13 X0..17
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/8018/123456789012345675/8019/123",
 		"^8018123456789012345675^8019123");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/stem/00/006141411234567890/", ""); 		// Can't end in slash
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/stem/00/006141411234567890?",
 		"^00006141411234567890"); 				// Empty query params
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/stem/00/006141411234567890?99=ABC",		// Query params; no FNC1 req after pathinfo
 		 "^0000614141123456789099ABC");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/stem/401/12345678?99=ABC",			// Query params; FNC1 req after pathinfo
 		 "^40112345678^99ABC");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/12312312312333?99=", ""); 		// Empty AI value in query parameter
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/12312312312333?99=ABC&999=faux", "");	// Non-AI, numeric-only query param
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?&&&99=ABC&&&&&&98=XYZ&&&",	// Extraneous query param separators
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?99=ABC&unknown=666&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?unknown=666&99=ABC&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ&unknown=666",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?unknown1=555&99=ABC&unknown2=666&98=XYZ&unknown3=777",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?99=ABC&singleton&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?singleton&99=ABC&98=XYZ",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?99=ABC&98=XYZ&singleton",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?singleton1&99=ABC&singleton2&98=XYZ&singleton3",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333?singleton1&unknown1=555&99=ABC&singleton2&unknown2=6666&98=XYZ&unknown3=777&singleton3",
 		"^011231231231233399ABC^98XYZ");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ%2f987",	// Percent escaped values
 		"^011231231231233322ABC-123^99ABC^98XYZ/987");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://a/01/12312312312333/22/ABC+123?99=ABC&98=XYZ%2f987",	// "+" means "+" in path info
 		"^011231231231233322ABC+123^99ABC^98XYZ/987");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ+987",	// "+" means " " in path info
 		"");
 
-	test_parseDLuri(ctx, true,					// Empty fragment after path info
+	test_parseDLuri(true,					// Empty fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(ctx, true,					// Ignore fragment after path info
+	test_parseDLuri(true,					// Ignore fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#fragment",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(ctx, true,					// Empty fragment after query info
+	test_parseDLuri(true,					// Empty fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#",
 		"^0000614141123456789099ABC");
 
-	test_parseDLuri(ctx, true,					// Ignore fragment after query info
+	test_parseDLuri(true,					// Ignore fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#fragment",
 		"^0000614141123456789099ABC");
 
@@ -1186,156 +1189,162 @@ void test_dl_parseDLuri(void) {
 	 *
 	 */
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788",
 		"^0109520123456788");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://brand.example.com/01/9520123456788",
 		"^0109520123456788");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://brand.example.com/some-extra/pathinfo/01/9520123456788",
 		"^0109520123456788");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788/22/2A",
 		"^0109520123456788222A");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788/10/ABC123",
 		"^010952012345678810ABC123");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788/21/12345",
 		"^01095201234567882112345");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788/10/ABC1/21/12345?17=180426",
 		"^010952012345678810ABC1^2112345^17180426");
 	// Specification sorts (17) before (10) and (21):
 	//   "^01095201234567881718042610ABC1^2112345"
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788?3103=000195",
 		"^01095201234567883103000195");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/01/09520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/01/09520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/9520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788?3103=000195&3922=0299&17=201225",
 		"^0109520123456788310300019539220299^17201225");
 
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/9520123456788?17=201225&3103=000195&3922=0299",
 		"^010952012345678817201225310300019539220299");
 	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788?17=201225&3103=000195&3922=0299",
 		"^010952012345678817201225310300019539220299");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/00/952012345678912345",
 		"^00952012345678912345");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/00/952012345678912345?02=09520123456788&37=25&10=ABC123",
 		"^0095201234567891234502095201234567883725^10ABC123");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/414/9520123456788",
 		"^4149520123456788");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/414/9520123456788/254/32a%2Fb",
 		"^414952012345678825432a/b");
 
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/8004/9520614141234567?01=9520123456788",
 		"^80049520614141234567^0109520123456788");
 
 	// AI in query params that should be in the path info
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://example.com/01/09520123456788?10=ABC123",
 		"");
 
 	// This is fine because we chose an alternate key qualifier
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://id.gs1.org/01/09520123456788/235/XYZ?10=ABC123",
 		"^0109520123456788235XYZ^10ABC123");
 
 	// Forbid duplicate AIs
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&01=09520123456788",
 		"");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&10=ABC123",
 		"");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://id.gs1.org/01/09520123456788/10/ABC123?99=XYZ789&99=XYZ789",
 		"");
 
 	// Examples with unknown AIs, not permitted
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://example.com/01/09520123456788/89/ABC123?99=XYZ",
 		"");
 
-	test_parseDLuri(ctx, false,
+	test_parseDLuri(false,
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 
 	// Examples with unknown AIs
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_parseDLuri(ctx, false,								// Unknown AIs are not permitted data attributes
+	test_parseDLuri(false,								// Unknown AIs are not permitted data attributes
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);	// ... unless when explicitly permitted
-	test_parseDLuri(ctx, true,
+	test_parseDLuri(true,
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"^010952012345678899XYZ^89ABC123");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
+
+#undef test_parseDLuri
 
 	gs1_encoder_free(ctx);
 
 }
 
 
-static void test_URIunescape(const char* const in, const char* const expect_path, const char* const expect_query) {
+static void do_test_URIunescape(const char* const file, const int line, const char* const in, const char* const expect_path, const char* const expect_query) {
 
 	char out[MAX_AI_VALUE_LEN+1];
+	char casename[256];
+
+	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
+	TEST_CASE(casename);
 
 	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
@@ -1351,6 +1360,10 @@ static void test_URIunescape(const char* const in, const char* const expect_path
 void test_dl_URIunescape(void) {
 
 	char out[MAX_AI_VALUE_LEN+1];
+
+#define test_URIunescape(i, p, q) do {				\
+	do_test_URIunescape(__FILE__, __LINE__, i, p, q);	\
+} while (0)
 
 	test_URIunescape("", "", "");
 	test_URIunescape("test", "test", "test");
@@ -1391,12 +1404,18 @@ void test_dl_URIunescape(void) {
 	TEST_CHECK(URIunescape(out, 0, "ABCD", 4, false) == 0);
 	TEST_CHECK(memcmp(out, "", 1) == 0);				// Includes \0
 
+#undef test_URIunescape
+
 }
 
 
-static void test_URIescape(const char* const in, const char* const expect_path, const char* const expect_query) {
+static void do_test_URIescape(const char* const file, const int line, const char* const in, const char* const expect_path, const char* const expect_query) {
 
 	char out[MAX_AI_VALUE_LEN*3+1];
+	char casename[256];
+
+	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
+	TEST_CASE(casename);
 
 	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
@@ -1411,6 +1430,10 @@ static void test_URIescape(const char* const in, const char* const expect_path, 
 void test_dl_URIescape(void) {
 
 	char out[MAX_AI_VALUE_LEN*3+1];
+
+#define test_URIescape(i, p, q) do {				\
+	do_test_URIescape(__FILE__, __LINE__, i, p, q);		\
+} while (0)
 
 	// Reserved characters that do not need escaping
 	test_URIescape("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -1452,6 +1475,8 @@ void test_dl_URIescape(void) {
 
 	TEST_CHECK(URIescape(out, 0, "A!B", 3, false) == 0);
 	TEST_CHECK(memcmp(out, "", 1) == 0);			// Includes \0
+
+#undef test_URIescape
 
 }
 
@@ -1536,14 +1561,19 @@ void test_dl_testValidateDLpathAIseq(void) {
 	};
 
 	size_t i;
-	int num;
 
 	gs1_encoder* ctx;
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(seq); i++) {
-		for (num = 0; *seq[i][num]; num++);
+		int num;
+		char casename[256] = { 0 };
+		for (num = 0; *seq[i][num]; num++) {
+			strcat(casename, seq[i][num]);
+			strcat(casename, " ");
+		}
+		TEST_CASE(casename);
 		TEST_CHECK(isValidDLpathAIseq(ctx, seq[i], num));
 	}
 
@@ -1552,7 +1582,7 @@ void test_dl_testValidateDLpathAIseq(void) {
 }
 
 
-static void test_testGenerateDLuri(gs1_encoder* const ctx, const bool should_succeed, const char* const stem, const char* const aiData, const char* const expect) {
+static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const file, const int line, const bool should_succeed, const char* const stem, const char* const aiData, const char* const expect) {
 
 	char out[256];
 	char casename[256];
@@ -1560,6 +1590,7 @@ static void test_testGenerateDLuri(gs1_encoder* const ctx, const bool should_suc
 	bool ret;
 
 	strcpy(casename, aiData);
+	snprintf(casename, sizeof(casename), "%s:%d: %s", file, line, aiData);
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
@@ -1590,56 +1621,62 @@ void test_dl_generateDLuri(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
-	test_testGenerateDLuri(ctx, true, NULL, "(01)12312312312326(21)abc123", "https://id.gs1.org/01/12312312312326/21/abc123");	// Canonical
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(21)abc123", "https://example.com/01/12312312312326/21/abc123");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI?95=INT");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(21)XYZ(01)12312312312333(10)ABC123(99)XYZ", "https://example.com/01/12312312312333/10/ABC123/21/XYZ?99=XYZ");
+#define test_testGenerateDLuri(s, t, d, e) do {					\
+	do_test_testGenerateDLuri(ctx, __FILE__, __LINE__, s, t, d, e);		\
+} while (0)
+
+	test_testGenerateDLuri(true, NULL, "(01)12312312312326(21)abc123", "https://id.gs1.org/01/12312312312326/21/abc123");	// Canonical
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(21)abc123", "https://example.com/01/12312312312326/21/abc123");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI?95=INT");
+	test_testGenerateDLuri(true, "https://example.com", "(21)XYZ(01)12312312312333(10)ABC123(99)XYZ", "https://example.com/01/12312312312333/10/ABC123/21/XYZ?99=XYZ");
 
 	/*
 	 * "+" represents space in query info but not path components
 	 *
 	 */
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312333(10)ABC+123(99)XYZ+QWERTY", "https://example.com/01/12312312312333/10/ABC%2B123?99=XYZ%2BQWERTY");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312333(10)ABC+123(99)XYZ+QWERTY", "https://example.com/01/12312312312333/10/ABC%2B123?99=XYZ%2BQWERTY");
 
 	/*
 	 * Multiple candidate primary keys; first should be chosen and
 	 * subsequent ones relegated to attributes.
 	 *
 	 */
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(8017)795260646688514634(99)000001(253)9526064000028000001", "https://example.com/8017/795260646688514634?99=000001&253=9526064000028000001");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?99=000001&8017=795260646688514634");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(98)ABC(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?98=ABC&99=000001&8017=795260646688514634");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(10)DEF(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&10=DEF&95=INT");
+	test_testGenerateDLuri(true, "https://example.com", "(8017)795260646688514634(99)000001(253)9526064000028000001", "https://example.com/8017/795260646688514634?99=000001&253=9526064000028000001");
+	test_testGenerateDLuri(true, "https://example.com", "(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?99=000001&8017=795260646688514634");
+	test_testGenerateDLuri(true, "https://example.com", "(98)ABC(253)9526064000028000001(99)000001(8017)795260646688514634", "https://example.com/253/9526064000028000001?98=ABC&99=000001&8017=795260646688514634");
+	test_testGenerateDLuri(true, "https://example.com", "(253)9526064000028000001(99)000001(01)12312312312326(10)DEF(95)INT", "https://example.com/253/9526064000028000001?01=12312312312326&99=000001&10=DEF&95=INT");
 
 	/*
 	 * Duplicate AIs in element data
 	 *
 	 */
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(01)12312312312326(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(10)ABC123(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(10)ABC123(99)XYZ789(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(8010)0200(3133)333333(3300)000000(99)57(3133)333333(3300)000000(01)04065093955756(10)0(3133)333333(3300)000000(01)04065093955756","https://example.com/8010/0200?3133=333333&3300=000000&01=04065093955756&99=57&10=0");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(01)12312312312326(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(10)ABC123(10)ABC123(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(10)ABC123(99)XYZ789(99)XYZ789", "https://example.com/01/12312312312326/10/ABC123?99=XYZ789");
+	test_testGenerateDLuri(true, "https://example.com", "(8010)0200(3133)333333(3300)000000(99)57(3133)333333(3300)000000(01)04065093955756(10)0(3133)333333(3300)000000(01)04065093955756","https://example.com/8010/0200?3133=333333&3300=000000&01=04065093955756&99=57&10=0");
 
 
 	/*
 	 * AI data containing invalid DL URI data attributes
 	 *
 	 */
-	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(99)000001(8200)http://example.com(95)INT","");			// (8200) is invalid as a data attribute
-	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(235)TPX9526064(99)000001(22)ABC(95)INT","");			// (235) used as qualifier for (01), therefore (22) is invalid as a data attribute
-	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(99)000001(235)TPX9526064(95)INT","");		// (22)+(10) are qualifiers for (01), therefore (235) is invalid as a data attribute
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(8200)http://example.com(95)INT","");			// (8200) is invalid as a data attribute
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(235)TPX9526064(99)000001(22)ABC(95)INT","");			// (235) used as qualifier for (01), therefore (22) is invalid as a data attribute
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(99)000001(235)TPX9526064(95)INT","");		// (22)+(10) are qualifiers for (01), therefore (235) is invalid as a data attribute
 
 	/*
 	 * AI data containing unknown AIs
 	 *
 	 */
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_testGenerateDLuri(ctx, false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");	// Unknown AIs not permitted as DL URI data attributes...
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");	// Unknown AIs not permitted as DL URI data attributes...
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);				// ... unless when explicitly permitted
-	test_testGenerateDLuri(ctx, true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
+	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
+
+#undef test_testGenerateDLuri
 
 	gs1_encoder_free(ctx);
 

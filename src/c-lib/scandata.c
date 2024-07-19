@@ -562,12 +562,12 @@ void test_scandata_validateParity(void) {
 }
 
 
-static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const name, const gs1_encoder_symbologies_t sym, const char* const dataStr, const char* const expect) {
+static void do_test_testGenerateScanData(gs1_encoder* const ctx, const char* const file, const int line, const char* const name, const gs1_encoder_symbologies_t sym, const char* const dataStr, const char* const expect) {
 
 	char *out;
 	char casename[256];
 
-	snprintf(casename, sizeof(casename), "%s: %s", name, dataStr);
+	snprintf(casename, sizeof(casename), "%s:%d: %s: %s", file, line, name, dataStr);
 	TEST_CASE(casename);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, sym));
@@ -592,8 +592,8 @@ void test_scandata_generateScanData(void) {
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 
-#define test_testGenerateScanData(n, d, e) do {					\
-	do_test_testGenerateScanData(ctx, #n, gs1_encoder_s##n, d, e);			\
+#define test_testGenerateScanData(n, d, e) do {							\
+	do_test_testGenerateScanData(ctx, __FILE__, __LINE__, #n, gs1_encoder_s##n, d, e);	\
 } while (0)
 
 	test_testGenerateScanData(NONE, "", NULL);
@@ -677,12 +677,12 @@ void test_scandata_generateScanData(void) {
 }
 
 
-static void do_test_testProcessScanData(gs1_encoder* const ctx, const bool should_succeed, const char* const scanData,
+static void do_test_testProcessScanData(gs1_encoder* const ctx, const char* const file, const int line, const bool should_succeed, const char* const scanData,
 		const char* const expectSymName, const gs1_encoder_symbologies_t expectSym, const char* const expectDataStr) {
 
 	char casename[256];
 
-	snprintf(casename, sizeof(casename), "%s", scanData);
+	snprintf(casename, sizeof(casename), "%s:%d: %s", file, line, scanData);
 	TEST_CASE(casename);
 
 	TEST_CHECK(gs1_processScanData(ctx, scanData) ^ (!should_succeed));
@@ -702,8 +702,8 @@ void test_scandata_processScanData(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);											// Satisfy analyzer
 
-#define test_testProcessScanData(ss, sd, s, d) do {				\
-	do_test_testProcessScanData(ctx, ss, sd, #s, gs1_encoder_s##s, d);	\
+#define test_testProcessScanData(ss, sd, s, d) do {							\
+	do_test_testProcessScanData(ctx, __FILE__, __LINE__, ss, sd, #s, gs1_encoder_s##s, d);		\
 } while (0)
 
 	test_testProcessScanData(false, "", NONE, "");			// No data
