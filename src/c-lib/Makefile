@@ -174,12 +174,12 @@ TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
 
 FUZZER_PREFIX = $(NAME)-fuzzer-
-FUZZER_SRCS = gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-dl.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-syn.c
+FUZZER_SRCS = gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-data.c gs1encoders-fuzzer-dl.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-syn.c
 FUZZER_OBJS = $(addprefix $(BUILD_DIR)/, $(FUZZER_SRCS:.c=.o))
-FUZZER_BINS = $(BUILD_DIR)/$(FUZZER_PREFIX)ais $(BUILD_DIR)/$(FUZZER_PREFIX)dl $(BUILD_DIR)/$(FUZZER_PREFIX)scandata $(BUILD_DIR)/$(FUZZER_PREFIX)syn
+FUZZER_BINS = $(BUILD_DIR)/$(FUZZER_PREFIX)ais $(BUILD_DIR)/$(FUZZER_PREFIX)data $(BUILD_DIR)/$(FUZZER_PREFIX)dl $(BUILD_DIR)/$(FUZZER_PREFIX)scandata $(BUILD_DIR)/$(FUZZER_PREFIX)syn
 
 FUZZER_CORPUS_PREFIX = corpus-
-FUZZER_CORPUSES = $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)dl/ $(FUZZER_CORPUS_PREFIX)scandata/ $(FUZZER_CORPUS_PREFIX)syn/
+FUZZER_CORPUSES = $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)data/ $(FUZZER_CORPUS_PREFIX)dl/ $(FUZZER_CORPUS_PREFIX)scandata/ $(FUZZER_CORPUS_PREFIX)syn/
 
 ALL_SRCS = $(wildcard *.c) $(wildcard syntax/*.c)
 SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(LINTER_TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
@@ -278,6 +278,11 @@ $(FUZZER_CORPUS_PREFIX)ais/:
 $(BUILD_DIR)/$(FUZZER_PREFIX)ais: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o
 	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)ais
 
+$(FUZZER_CORPUS_PREFIX)data/:
+	mkdir -p $@
+
+$(BUILD_DIR)/$(FUZZER_PREFIX)data: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)data.o
+	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)data.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)data
 
 $(FUZZER_CORPUS_PREFIX)dl/:
 	mkdir -p $@
