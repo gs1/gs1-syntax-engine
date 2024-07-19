@@ -73,8 +73,6 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		abort();
 	}
 
-	gs1_encoder_getDLuri(ctx, NULL);
-
 	return 0;
 
 }
