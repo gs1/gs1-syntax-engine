@@ -117,8 +117,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 		0x1e9afb77f7bdbb7b, 0xe4fc21a8012b0070, 0x003a900df9dfa800, 0xb160181ef00202c0,
 		0x00b8d42f8281f2bf, 0x3fffeba4d2100080, 0x023cf1ca80000002, 0x008a8fbfe75cddf9,
 		0x59820820eaa10200, 0x4002000000000800, 0x1020020080000000
-	};
 #endif
+	};
 
 /// \cond
 #define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc) do {						\
