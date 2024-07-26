@@ -525,62 +525,62 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	{ true,  "#",				{ AI_ENTRY_TERMINATOR } },
 	{ true,  "# ",				{ AI_ENTRY_TERMINATOR } },
 	{ true,  "# COMMENT",			{ AI_ENTRY_TERMINATOR } },
-	{ true, "90  ?  X..30  # INTERNAL", {
-		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_, __, __, __, __, "", "INTERNAL"),
+	{ true, "90  ?  X..30  # INTERNAL", {						/* Single AI */
+		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "91-99  ?  X..90  # INTERNAL", {
-		AI_ENTRY("91", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("92", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("93", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("94", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("95", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("96", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("97", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("98", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
-		AI_ENTRY("99", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_, __, __, __, __, "", "INTERNAL"),
+	{ true, "91-99  ?  X..90  # INTERNAL", {					/* Range of AIs */
+		AI_ENTRY("91", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("92", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("93", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("94", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("95", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("96", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("97", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("98", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
+		AI_ENTRY("99", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8010  ?  Y..30,key  dlpkey=8011  # CPID", {
-		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,key,_, __, __, __, __, "dlpkey=8011", "CPID"),
+	{ true, "8010  ?  Y..30,key  dlpkey=8011  # CPID", {				/* CSET 32 */
+		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,key,_,_, __, __, __, __, "dlpkey=8011", "CPID"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "253  ?  N13,csum,key [X..17]  dlpkey  # GDTI", {
-		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,key, X,1,17,OPT,_,_, __, __, __, "dlpkey", "GDTI"),
+	{ true, "253  ?  N13,csum,key [X..17]  dlpkey  # GDTI", {			/* Optional component */
+		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,key,_, X,1,17,OPT,_,_,_, __, __, __, "dlpkey", "GDTI"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "7007  ?  N6,yymmdd [N..6],yymmdd  req=01,02  # HARVEST DATE", {
-		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_, N,1,6,MAN,yymmdd,_, __, __, __, "req=01,02", "HARVEST DATE"),
-		AI_ENTRY_TERMINATOR
-	} },
-	{ true, "8111  ?  N4  req=255  # POINTS", {
-		AI_ENTRY("8111", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,_,_, __, __, __, __, "req=255", "POINTS"),
+	{ true, "7007  ?  N6,yymmdd [N..6],yymmdd  req=01,02  # HARVEST DATE", {	/* Requisites */
+		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_,_, N,1,6,MAN,yymmdd,_,_, __, __, __, "req=01,02", "HARVEST DATE"),
 		AI_ENTRY_TERMINATOR
 	} },
 	{ true, "01  *?  N14,csum,key  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required */
-		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,key, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
+		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,key,_, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8200  X..70  req=01  # PRODUCT URL", {		/* Not GS1 DL URI data attr */
-		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
+	{ true, "8200  X..70  req=01  # PRODUCT URL", {					/* Not GS1 DL URI data attr */
+		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8001  ?  N4,nonzero N5,nonzero N3,nonzero N1,winding N1  req=01  # DIMENSIONS", {
-		AI_ENTRY("8001", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,nonzero,_, N,5,5,MAN,nonzero,_, N,3,3,MAN,nonzero,_, N,1,1,MAN,winding,_, N,1,1,MAN,_,_, "req=01", "DIMENSIONS"),
+	{ true, "8001  ?  N4,nonzero N5,nonzero N3,nonzero N1,winding N1  req=01  # DIMENSIONS", {	/* Max components */
+		AI_ENTRY("8001", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,nonzero,_,_, N,5,5,MAN,nonzero,_,_, N,3,3,MAN,nonzero,_,_, N,1,1,MAN,winding,_,_, N,1,1,MAN,_,_,_, "req=01", "DIMENSIONS"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8110  ?  X..70,couponcode", {			/* No attrs and no title */
-		AI_ENTRY("8110", DO_FNC1, DL_DATA_ATTR, X,1,70,MAN,couponcode,_, __, __, __, __, "", ""),
+	{ true, "8014  X..25,csumalpha,key,hasnondigit  req=01  # MUDI", {		/* Max linters */
+		AI_ENTRY("8014", DO_FNC1, NO_DATA_ATTR, X,1,25,MAN,csumalpha,key,hasnondigit, __, __, __, __, "req=01", "MUDI"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "90  ?  X..30  req=999", {			/* Bespoke test for attrs and no title */
-		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_, __, __, __, __, "req=999", ""),
+	{ true, "8110  ?  X..70,couponcode", {						/* No attrs and no title */
+		AI_ENTRY("8110", DO_FNC1, DL_DATA_ATTR, X,1,70,MAN,couponcode,_,_, __, __, __, __, "", ""),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ false, "90  ?  N..5 X..30", {				/* Bespoke test for non-final, variable-length component */
+	{ true, "90  ?  X..30  req=999", {						/* Bespoke test for attrs and no title */
+		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_,_, __, __, __, __, "req=999", ""),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ false, "90  ?  [N5] X5", {				/* Bespoke test mandatory component follows optional component */
+	{ false, "90  ?  N..5 X..30", {							/* Bespoke test for non-final, variable-length component */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  ?  [N5] X5", {							/* Bespoke test mandatory component follows optional component */
 		AI_ENTRY_TERMINATOR
 	} },
 };

@@ -41,8 +41,8 @@
  * One more that last entry since we NULL terminate.
  *
  */
-#define MAX_PARTS (5 + 1)		/* Currently AI (8001) = N4 N5 N3 N1 N1 */
-#define MAX_LINTERS (2 + 1)		/* Many AIs have, e.g. csum,key         */
+#define MAX_PARTS (5 + 1)		/* Currently AI (8001) = N4 N5 N3 N1 N1            */
+#define MAX_LINTERS (3 + 1)		/* Currently AI (8014) = csumalpha,key,hasnondigit */
 
 
 typedef enum {
@@ -117,26 +117,26 @@ struct validationEntry {
 #define OPT true
 
 
-#define AI_VA(a, f, d, c1,mn1,mx1,o1,l00,l01, c2,mn2,mx2,o2,l10,l11, c3,mn3,mx3,o3,l20,l21, c4,mn4,mx4,o4,l30,l31, c5,mn5,mx5,o5,l40,l41, k, t) {	\
-		.ai = a,																\
-		.fnc1 = f,																\
-		.dlDataAttr = d,															\
-		.parts = {																\
-			{ .cset = cset_##c1, .min = mn1, .max = mx1, .opt = o1, .linters = { gs1_lint_##l00, gs1_lint_##l01, NULL } },			\
-			{ .cset = cset_##c2, .min = mn2, .max = mx2, .opt = o2, .linters = { gs1_lint_##l10, gs1_lint_##l11, NULL } },			\
-			{ .cset = cset_##c3, .min = mn3, .max = mx3, .opt = o3, .linters = { gs1_lint_##l20, gs1_lint_##l21, NULL } },			\
-			{ .cset = cset_##c4, .min = mn4, .max = mx4, .opt = o4, .linters = { gs1_lint_##l30, gs1_lint_##l31, NULL } },			\
-			{ .cset = cset_##c5, .min = mn5, .max = mx5, .opt = o5, .linters = { gs1_lint_##l40, gs1_lint_##l41, NULL } },			\
-			{ .cset = 0,         .min = 0,   .max = 0,   .opt = 0,   .linters = { NULL,       NULL,       NULL } },				\
-		},																	\
-		.attrs = k,																\
-		.title = t,																\
+#define AI_VA(a, f, d, c1,mn1,mx1,o1,l00,l01,l02, c2,mn2,mx2,o2,l10,l11,l12, c3,mn3,mx3,o3,l20,l21,l22, c4,mn4,mx4,o4,l30,l31,l32, c5,mn5,mx5,o5,l40,l41,l42, k, t) {	\
+		.ai = a,																		\
+		.fnc1 = f,																		\
+		.dlDataAttr = d,																	\
+		.parts = {																		\
+			{ .cset = cset_##c1, .min = mn1, .max = mx1, .opt = o1, .linters = { gs1_lint_##l00, gs1_lint_##l01, gs1_lint_##l02, NULL } },			\
+			{ .cset = cset_##c2, .min = mn2, .max = mx2, .opt = o2, .linters = { gs1_lint_##l10, gs1_lint_##l11, gs1_lint_##l12, NULL } },			\
+			{ .cset = cset_##c3, .min = mn3, .max = mx3, .opt = o3, .linters = { gs1_lint_##l20, gs1_lint_##l21, gs1_lint_##l22, NULL } },			\
+			{ .cset = cset_##c4, .min = mn4, .max = mx4, .opt = o4, .linters = { gs1_lint_##l30, gs1_lint_##l31, gs1_lint_##l32, NULL } },			\
+			{ .cset = cset_##c5, .min = mn5, .max = mx5, .opt = o5, .linters = { gs1_lint_##l40, gs1_lint_##l41, gs1_lint_##l42, NULL } },			\
+			{ .cset = 0,         .min = 0,   .max = 0,   .opt = 0,   .linters = { NULL,       NULL,       NULL } },						\
+		},																			\
+		.attrs = k,																		\
+		.title = t,																		\
 	}
 #define PASS_ON(...) __VA_ARGS__
 #define AI_ENTRY(...) PASS_ON(AI_VA(__VA_ARGS__))
 #define cset_0 0
 #define gs1_lint__ NULL
-#define __ 0,0,0,0,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,key */
+#define __ 0,0,0,0,_,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,key */
 #define AI_ENTRY_TERMINATOR AI_ENTRY( "", 0, 0, __, __, __, __, __, "", "" )
 
 

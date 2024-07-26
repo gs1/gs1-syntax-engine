@@ -211,25 +211,25 @@ static inline __ATTR_PURE uint8_t valLengthByPrefix(const char* const ai) {
  *
  */
 static const struct aiEntry unknownAI =
-	AI_ENTRY( ""    , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,  __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( ""    , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI2 =
-	AI_ENTRY( "XX"  , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,  __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XX"  , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI3 =
-	AI_ENTRY( "XXX" , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,  __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XXX" , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI4 =
-	AI_ENTRY( "XXXX", DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,  __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XXXX", DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI2fixed2 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,2,2,MAN,_,_,   __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,2,2,MAN,_,_,_,   __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI2fixed14 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,14,14,MAN,_,_, __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,14,14,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI2fixed16 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,16,16,MAN,_,_, __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,16,16,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI2fixed18 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,18,18,MAN,_,_, __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,18,18,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI3fixed13 =
-	AI_ENTRY( "XXX" , NO_FNC1, XX_DATA_ATTR, X,13,13,MAN,_,_, __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XXX" , NO_FNC1, XX_DATA_ATTR, X,13,13,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI4fixed6 =
-	AI_ENTRY( "XXXX", NO_FNC1, XX_DATA_ATTR, X,6,6,MAN,_,_,   __, __, __, __, "", "UNKNOWN" );
+	AI_ENTRY( "XXXX", NO_FNC1, XX_DATA_ATTR, X,6,6,MAN,_,_,_,   __, __, __, __, "", "UNKNOWN" );
 
 
 /*

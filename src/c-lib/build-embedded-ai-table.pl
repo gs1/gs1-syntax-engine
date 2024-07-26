@@ -11,7 +11,7 @@ use strict;
 
 
 use constant NUM_PARTS => 5;
-use constant NUM_LINTERS => 2;
+use constant NUM_LINTERS => 3;
 
 
 my $ai_rx = qr/
