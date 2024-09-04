@@ -101,14 +101,17 @@ void test_lint_pcenc(void)
 	UNIT_TEST_PASS(gs1_lint_pcenc, "A");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHI");
 
-	UNIT_TEST_PASS(gs1_lint_pcenc, "%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%00");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%FF");
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%Ff");
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%fF");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%ff");
+
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%fg", GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%fg*");
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%gf", GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%gf*");
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%g",  GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%g*");
 
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%00");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%FF");

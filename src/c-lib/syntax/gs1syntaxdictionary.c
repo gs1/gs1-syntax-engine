@@ -107,7 +107,7 @@ gs1_linter_t gs1_linter_from_name(const char* const name) {
  */
 #ifdef GS1_LINTER_ERR_STR_EN
 
-GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
+GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"No issues were detected by the linter.",
 	"A non-digit character was found where a digit is expected.",
 	"A non-CSET 82 character was found where a CSET 82 character is expected.",
@@ -140,6 +140,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The date is too long.",
 	"",	// Unused
 	"",	// Unused
+	"The date with hour is too long for YYMMDDHH format.",
 	"The hour with minute is too short for HHMM format.",
 	"The hour with minute is too long for HHMM format.",
 	"",	// Unused
@@ -255,5 +256,13 @@ void test_gs1_linter_from_name(void)
 	TEST_CHECK(gs1_linter_from_name("key") == gs1_lint_key);
 	TEST_CHECK(gs1_linter_from_name("dummy") == NULL);
 }
+
+
+#ifdef GS1_LINTER_ERR_STR_EN
+void test_gs1_linter_err_str_en_size(void)
+{
+	TEST_CHECK(sizeof(gs1_lint_err_str)/sizeof(gs1_lint_err_str[0]) == __GS1_LINTER_NUM_ERRS);
+}
+#endif
 
 #endif  /* UNIT_TESTS */

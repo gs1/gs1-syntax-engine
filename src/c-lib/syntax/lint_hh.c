@@ -102,6 +102,28 @@ void test_lint_hh(void)
 {
 
 	UNIT_TEST_PASS(gs1_lint_hh, "00");
+	UNIT_TEST_PASS(gs1_lint_hh, "01");
+	UNIT_TEST_PASS(gs1_lint_hh, "02");
+	UNIT_TEST_PASS(gs1_lint_hh, "03");
+	UNIT_TEST_PASS(gs1_lint_hh, "04");
+	UNIT_TEST_PASS(gs1_lint_hh, "05");
+	UNIT_TEST_PASS(gs1_lint_hh, "06");
+	UNIT_TEST_PASS(gs1_lint_hh, "07");
+	UNIT_TEST_PASS(gs1_lint_hh, "08");
+	UNIT_TEST_PASS(gs1_lint_hh, "09");
+	UNIT_TEST_PASS(gs1_lint_hh, "10");
+	UNIT_TEST_PASS(gs1_lint_hh, "11");
+	UNIT_TEST_PASS(gs1_lint_hh, "12");
+	UNIT_TEST_PASS(gs1_lint_hh, "13");
+	UNIT_TEST_PASS(gs1_lint_hh, "14");
+	UNIT_TEST_PASS(gs1_lint_hh, "15");
+	UNIT_TEST_PASS(gs1_lint_hh, "16");
+	UNIT_TEST_PASS(gs1_lint_hh, "17");
+	UNIT_TEST_PASS(gs1_lint_hh, "18");
+	UNIT_TEST_PASS(gs1_lint_hh, "19");
+	UNIT_TEST_PASS(gs1_lint_hh, "20");
+	UNIT_TEST_PASS(gs1_lint_hh, "21");
+	UNIT_TEST_PASS(gs1_lint_hh, "22");
 	UNIT_TEST_PASS(gs1_lint_hh, "23");
 	UNIT_TEST_FAIL(gs1_lint_hh, "24",  GS1_LINTER_ILLEGAL_HOUR, "*24*");
 

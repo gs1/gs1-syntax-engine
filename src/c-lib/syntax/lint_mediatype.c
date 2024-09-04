@@ -31,6 +31,8 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
+#include <ctype.h>
 
 #include "gs1syntaxdictionary.h"
 
@@ -50,8 +52,6 @@
 /**
  * Used to validate that an AI component is a valid AIDC media type.
  *
- * @note The default lookup function provided by this linter is a binary search
- *       over a static list this is maintained in this file.
  * @note To enable this linter to hook into an alternative AIDC media type
  *       lookup function (provided by the user) the
  *       GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP_H macro may be set to the name of a
@@ -93,36 +93,39 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	 *  Updates to the AIDC media type list shall be announced by GSCN
 	 *
 	 */
-	static const char mediatypes[][3] = {
-		/* 00		Not used */
-		"01", "02", "03", "04", "05", "06", "07", "08", "09", "10",	/* ICCBBA assignments */
-		/* 11-29	Reserved for future assignment by ICCBBA */
-		/* 30-59	Reserved for future assignment by GS1 */
-		/* 60-79	Reserved for future assignment by ICCBBA or GS1 */
-		"80", "81", "82", "83", "84", "85", "86", "87", "88", "89",	/* ICCBBA local / national use */
-		"90", "91", "92", "93", "94", "95", "96", "97", "98", "99",	/* ICCBBA local / national use */
+	static const uint8_t mediatypes[] = {
+#if __STDC_VERSION__ >= 202311L
+		0b01111111, 0b11100000,		// 00-10: ICCBBA assignments
+						// 11-15: Reserved for future assignment by ICCBBA
+		0b00000000, 0b00000000,		// 16-29: Reserved for future assignment by ICCBBA
+						// 30-31: Reserved for future assignment by GS1
+		0b00000000, 0b00000000,		// 32-47: Reserved for future assignment by GS1
+		0b00000000, 0b00000000,		// 48-59: Reserved for future assignment by GS1
+						// 60-63: Reserved for future assignment by ICCBBA or GS1
+		0b00000000, 0b00000000,		// 64-79: Reserved for future assignment by ICCBBA or GS1
+		0b11111111, 0b11111111,		// 80-95: ICCBBA local / national use
+		0b11110000,			// 96-99: ICCBBA local / national use
+#else
+		/*
+		 *  Fallback for compilers lacking binary literal support.
+		 *
+		 *  Generated from the above data with:
+		 *
+		 *     for (size_t i = 0; i < sizeof(mediatypes) / sizeof(mediatypes[0]); i++) { printf("0x%02x, ", mediatypes[i]); };
+		 *
+		 */
+		0x7f, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf0,
+#endif
 	};
 
-	/*
-	 *  Binary search over the above list.
-	 *
-	 */
 /// \cond
-#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc) do {				\
-	size_t s = 0;							\
-	size_t e = sizeof(mediatypes) / sizeof(mediatypes[0]);		\
-	while (s < e) {							\
-		const size_t m = s + (e - s) / 2;			\
-		const int cmp = strcmp(mediatypes[m], cc);		\
-		if (cmp < 0)						\
-			s = m + 1;					\
-		else if (cmp > 0)					\
-			e = m;						\
-		else {							\
-			valid = 1;					\
-			break;						\
-		}							\
-	}								\
+#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc) do {					\
+	if (strlen(cc) == 2 && isdigit(cc[0]) && isdigit(cc[1])) {		\
+		int v = (cc[0] - '0') * 10 + (cc[1] - '0');			\
+		assert(v <= 99);		/* Satisfy analyzer */		\
+		if (mediatypes[v/8] & (0x80 >> (v%8)))				\
+			valid = 1;						\
+	}									\
 } while (0)
 /// \endcond
 
@@ -160,7 +163,6 @@ void test_lint_mediatype(void)
 
 	UNIT_TEST_FAIL(gs1_lint_mediatype, "", GS1_LINTER_INVALID_MEDIA_TYPE, "**");
 	UNIT_TEST_FAIL(gs1_lint_mediatype, "0", GS1_LINTER_INVALID_MEDIA_TYPE, "*0*");
-	UNIT_TEST_FAIL(gs1_lint_mediatype, "00", GS1_LINTER_INVALID_MEDIA_TYPE, "*00*");
 	UNIT_TEST_FAIL(gs1_lint_mediatype, "000", GS1_LINTER_INVALID_MEDIA_TYPE, "*000*");
 	UNIT_TEST_FAIL(gs1_lint_mediatype, "_01", GS1_LINTER_INVALID_MEDIA_TYPE, "*_01*");
 	UNIT_TEST_FAIL(gs1_lint_mediatype, "01_", GS1_LINTER_INVALID_MEDIA_TYPE, "*01_*");
