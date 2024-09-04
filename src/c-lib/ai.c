@@ -344,7 +344,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 	for (part = entry->parts; part->cset; part++) {
 
 		char compval[MAX_AI_VALUE_LEN+1];
-		gs1_linter_t linter;
+		gs1_linter_t cset_linter;
 		const gs1_linter_t *l;
 
 		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
@@ -369,14 +369,14 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 		 *
 		 */
 		switch (part->cset) {
-			case cset_N: linter = gs1_lint_csetnumeric; break;
-			case cset_X: linter = gs1_lint_cset82; break;
-			case cset_Y: linter = gs1_lint_cset39; break;
-			case cset_Z: linter = gs1_lint_cset64; break;
-			default: linter = NULL; break;
+			case cset_N: cset_linter = gs1_lint_csetnumeric; break;
+			case cset_X: cset_linter = gs1_lint_cset82; break;
+			case cset_Y: cset_linter = gs1_lint_cset39; break;
+			case cset_Z: cset_linter = gs1_lint_cset64; break;
+			default: cset_linter = NULL; break;
 		}
-		assert(linter);
-		l = &linter;
+		assert(cset_linter);
+		l = &cset_linter;
 		do {
 
 			gs1_lint_err_t err;
@@ -394,7 +394,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 					(int)(strlen(compval) - errpos - errlen), start + errpos + errlen);
 				return 0;
 			}
-			l = (l == &linter) ? &(part->linters[0]) : l+1;
+			l = (l == &cset_linter) ? &(part->linters[0]) : l+1;
 
 		} while (*l);
 
