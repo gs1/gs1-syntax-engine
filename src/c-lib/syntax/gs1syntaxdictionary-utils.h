@@ -28,7 +28,12 @@
 #define GS1_SYNTAXDICTIONARY_UTILS_H
 
 #include "gs1syntaxdictionary.h"
+
+#include <assert.h>
 #include <limits.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 /**
@@ -80,7 +85,7 @@ do {								\
 do {									\
 	int w = CHAR_BIT * sizeof(field[0]);				\
 	assert((size_t)(bit/w) < sizeof(field) / sizeof(field[0]));	\
-	if (field[bit/w] & (1ull << (w-1) >> (bit%w)))			\
+	if (field[bit/w] & (UINT64_C(1) << (w-1) >> (bit%w)))		\
 		valid = 1;						\
 } while (0)
 
