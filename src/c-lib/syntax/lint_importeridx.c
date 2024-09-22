@@ -34,6 +34,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -73,24 +74,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char* const 
 	 * Data must be a single character.
 	 *
 	 */
-	if (len != 1) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_IMPORTER_IDX_MUST_BE_ONE_CHARACTER;
-	}
+	if (len != 1)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_IMPORTER_IDX_MUST_BE_ONE_CHARACTER,
+			0,
+			len
+		);
 
 	/*
 	 * Any character outside of the valid Importer Index character list is
 	 * illegal.
 	 *
 	 */
-	if (strspn(data, importeridx) != len) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER;
-	}
+	if (strspn(data, importeridx) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER,
+			0,
+			1
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

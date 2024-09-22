@@ -32,6 +32,7 @@
 #include <ctype.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /*
@@ -133,9 +134,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 #define GS1_LINTER_ISO4217_LOOKUP(cc) do {						\
 	if (strlen(cc) == 3 && isdigit(cc[0]) && isdigit(cc[1]) && isdigit(cc[2])) {	\
 		int v = (cc[0] - '0') * 100 + (cc[1] - '0') * 10 + cc[2] - '0';		\
-		assert(v <= 999);	/* Satisfy analyzer */				\
-		if (iso4217[v/64] & (0x8000000000000000 >> (v%64)))			\
-			valid = 1;							\
+		GS1_LINTER_BITFIELD_LOOKUP(v, iso4217);					\
 	}										\
 } while (0)
 /// \endcond
@@ -152,15 +151,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 	 */
 	GS1_LINTER_ISO4217_LOOKUP(data);
 	if (valid)
-		return GS1_LINTER_OK;
+		GS1_LINTER_RETURN_OK;
 
 	/*
 	 * If not valid then indicate an error.
 	 *
 	 */
-	if (err_pos) *err_pos = 0;
-	if (err_len) *err_len = strlen(data);
-	return GS1_LINTER_NOT_ISO4217;
+	GS1_LINTER_RETURN_ERROR(
+		GS1_LINTER_NOT_ISO4217,
+		0,
+		strlen(data)
+	);
 
 }
 

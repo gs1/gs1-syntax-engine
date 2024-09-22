@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -52,23 +53,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char* const data,
 
 	len = strlen(data);
 
-	if (*data == '\0') {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 0;
-		return GS1_LINTER_NOT_HYPHEN;
-	}
+	if (*data == '\0')
+		GS1_LINTER_RETURN_ERROR(GS1_LINTER_NOT_HYPHEN, 0, 0);
 
 	/*
 	 * Data must not contain a non-hyphen character
 	 *
 	 */
-	if (strspn(data, "-") != len) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_NOT_HYPHEN;
-	}
+	if (strspn(data, "-") != len)
+		GS1_LINTER_RETURN_ERROR(GS1_LINTER_NOT_HYPHEN, 0, len);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

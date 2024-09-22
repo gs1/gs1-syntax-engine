@@ -31,6 +31,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -71,21 +72,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * Data must be a non-zero, even number of characters.
 	 *
 	 */
-	if (len == 0 || len % 2 != 0) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL;
-	}
+	if (len == 0 || len % 2 != 0)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL,
+			0,
+			len
+		);
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Determine whether either the piece number or total piece count is
@@ -104,23 +107,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * Neither piece nor total may be zero.
 	 *
 	 */
-	if (pieceiszero || totaliszero) {
-		if (err_pos) *err_pos = pieceiszero ? 0 : len / 2;
-		if (err_len) *err_len = len / 2;
-		return pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES;
-	}
+	if (pieceiszero || totaliszero)
+		GS1_LINTER_RETURN_ERROR(
+			pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES,
+			pieceiszero ? 0 : len / 2,
+			len / 2
+		);
 
 	/*
 	 * The piece number must not exceed the total piece count.
 	 *
 	 */
-	if (compare == 1) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL;
-	}
+	if (compare == 1)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL,
+			0,
+			len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

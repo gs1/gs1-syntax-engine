@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -68,31 +69,34 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 	 *
 	 */
 	pos = strspn(data, "0123456789");
-	if (pos == 0 || pos >= len - 1 || data[pos] != '/' || strspn(data + pos + 1, "0123456789") != len - pos - 1) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED;
-	}
+	if (pos == 0 || pos >= len - 1 || data[pos] != '/' || strspn(data + pos + 1, "0123456789") != len - pos - 1)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+			0,
+			len
+		);
 
 	/*
 	 * Ensure position number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (P(0) == '0') {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = pos;
-		return GS1_LINTER_ILLEGAL_ZERO_PREFIX;
-	}
+	if (P(0) == '0')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
+			0,
+			pos
+		);
 
 	/*
 	 * Ensure end number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (E(0) == '0') {
-		if (err_pos) *err_pos = pos + 1;
-		if (err_len) *err_len = len - pos - 1;
-		return GS1_LINTER_ILLEGAL_ZERO_PREFIX;
-	}
+	if (E(0) == '0')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
+			pos + 1,
+			len - pos - 1
+		);
 
 	/*
 	 * Determine whether the position exceeds the end.
@@ -104,19 +108,21 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 		for (i = 0; i < pos && !compare; i++)
 			if (P(i) != E(i))
 				compare = P(i) < E(i) ? -1 : 1;
-		if (compare == 1) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = len;
-			return GS1_LINTER_POSITION_EXCEEDS_END;
-		}
-	} else if (pos > len - pos - 1) {
+		if (compare == 1)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_POSITION_EXCEEDS_END,
+				0,
+				len
+			);
+	} else if (pos > len - pos - 1)
 		/* Non-zero prefix, so a length check is sufficient. */
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_POSITION_EXCEEDS_END;
-	}
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_EXCEEDS_END,
+			0,
+			len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

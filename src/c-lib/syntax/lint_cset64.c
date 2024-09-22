@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -77,23 +78,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data,
 	     len > 0 && data[len-1] == '=';
 	     pads++, len--);
 
-	if (pads > 2 || (pads > 0 && (len + pads) % 3 != 0)) {
-		if (err_pos) *err_pos = len;
-		if (err_len) *err_len = pads;
-		return GS1_LINTER_INVALID_CSET64_PADDING;
-	}
+	if (pads > 2 || (pads > 0 && (len + pads) % 3 != 0))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_CSET64_PADDING,
+			len,
+			pads
+		);
 
 	/*
 	 * In what remains, any character outside of CSET 64 is illegal.
 	 *
 	 */
-	if ((pos = strspn(data, cset64)) < len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_CSET64_CHARACTER;
-	}
+	if ((pos = strspn(data, cset64)) < len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_CSET64_CHARACTER,
+			pos,
+			1
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

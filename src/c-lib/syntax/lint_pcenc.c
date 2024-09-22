@@ -32,6 +32,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -68,24 +69,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, 
 	 */
 	while (p != q && (p = strchr(p, '%')) != NULL) {
 
-		if (q - p < 3) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = (size_t)(q - p);
-			return GS1_LINTER_INVALID_PERCENT_SEQUENCE;
-		}
+		if (q - p < 3)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+				(size_t)(p - data),
+				(size_t)(q - p)
+			);
 
 		memcpy(pct, p + 1, 2);
-		if (strspn(pct, "0123456789ABCDEFabcdef") != 2) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 3;
-			return GS1_LINTER_INVALID_PERCENT_SEQUENCE;
-		}
+		if (strspn(pct, "0123456789ABCDEFabcdef") != 2)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+				(size_t)(p - data),
+				3
+			);
 
 		p += 3;
 
 	}
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

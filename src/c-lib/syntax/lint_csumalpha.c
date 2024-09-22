@@ -35,6 +35,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -114,42 +115,46 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * Data must include at least the check character pair.
 	 *
 	 */
-	if (len < 2) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR;
-	}
+	if (len < 2)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR,
+			0,
+			len
+		);
 
 	/*
 	 * Constrain the length of the data to the number of primes that we
 	 * have.
 	 *
 	 */
-	if (len > sizeof(primes) / sizeof(primes[0])) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION;
-	}
+	if (len > sizeof(primes) / sizeof(primes[0]))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
+			0,
+			len
+		);
 
 	/*
 	 * Ensure that the data characters are in CSET 82
 	 *
 	 */
-	if ((pos = strspn(data, cset82)) < len - 2) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_CSET82_CHARACTER;
-	}
+	if ((pos = strspn(data, cset82)) < len - 2)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_CSET82_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Ensure that the check characters are in CSET 32
 	 *
 	 */
-	if ((pos = strspn(&data[len - 2], cset32)) != 2) {
-		if (err_pos) *err_pos = len - 2 + pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_CSET32_CHARACTER;
-	}
+	if ((pos = strspn(&data[len - 2], cset32)) != 2)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_CSET32_CHARACTER,
+			len - 2 + pos,
+			1
+		);
 
 	/*
 	 * Sum of data-character values weighted by increasing prime values,
@@ -171,13 +176,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 		sum += (unsigned int)(strchr(cset82, data[i]) - cset82) * *p--;
 	sum %= 1021;
 
-	if (data[i] != cset32[sum >> 5] || data[i+1] != cset32[sum & 31]) {
-		if (err_pos) *err_pos = len - 2;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_INCORRECT_CHECK_PAIR;
-	}
+	if (data[i] != cset32[sum >> 5] || data[i+1] != cset32[sum & 31])
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INCORRECT_CHECK_PAIR,
+			len - 2,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

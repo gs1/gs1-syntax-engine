@@ -162,6 +162,7 @@
     <ClInclude Include="syn.h" />
     <ClInclude Include="syntax\acutest.h" />
     <ClInclude Include="syntax\gs1syntaxdictionary.h" />
+    <ClInclude Include="syntax\gs1syntaxdictionary-utils.h" />
     <ClInclude Include="syntax\unittest.h" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +201,7 @@
     <ClCompile Include="syntax\lint_mmoptss.c" />
     <ClCompile Include="syntax\lint_nonzero.c" />
     <ClCompile Include="syntax\lint_nozeroprefix.c" />
+    <ClCompile Include="syntax\lint_packagetype.c" />
     <ClCompile Include="syntax\lint_pcenc.c" />
     <ClCompile Include="syntax\lint_pieceoftotal.c" />
     <ClCompile Include="syntax\lint_posinseqslash.c" />

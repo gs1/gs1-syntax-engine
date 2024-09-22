@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -65,11 +66,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char* const data, s
 	 * Data must be four characters.
 	 *
 	 */
-	if (len != 4) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG;
-	}
+	if (len != 4)
+		GS1_LINTER_RETURN_ERROR(
+			len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,
+			0,
+			len
+		);
 
 	memcpy(buf, data, 2);
 	ret = gs1_lint_hh(buf, err_pos, err_len);
@@ -79,7 +81,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char* const data, s
 	       ret == GS1_LINTER_ILLEGAL_HOUR);
 
 	if (ret != GS1_LINTER_OK)
-		return ret;
+		GS1_LINTER_RETURN_ERROR(ret, *err_pos, *err_len);
 
 	memcpy(buf, data+2, 2);
 	ret = gs1_lint_mm(buf, err_pos, err_len);
@@ -88,12 +90,10 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char* const data, s
 	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
 	       ret == GS1_LINTER_ILLEGAL_MINUTE);
 
-	if (ret != GS1_LINTER_OK) {
-		*err_pos += 2;
-		return ret;
-	}
+	if (ret != GS1_LINTER_OK)
+		GS1_LINTER_RETURN_ERROR(ret, *err_pos + 2, *err_len);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -68,21 +69,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	 * Data must include at least the check digit.
 	 *
 	 */
-	if (*data == '\0') {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 0;
-		return GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT;
-	}
+	if (*data == '\0')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT,
+			0,
+			0
+		);
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Calculate the sum of the numeric values of the data, excluding the
@@ -101,13 +104,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	}
 	parity = (10 - parity % 10) % 10;
 
-	if (parity + '0' != *p) {
-		if (err_pos) *err_pos = len - 1;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INCORRECT_CHECK_DIGIT;
-	}
+	if (parity + '0' != *p)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INCORRECT_CHECK_DIGIT,
+			len - 1,
+			1
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

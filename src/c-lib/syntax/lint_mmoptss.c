@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -47,5 +48,5 @@ GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_mmoptss(const char*
 	(void)data;
 	(void)err_pos;
 	(void)err_len;
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 }

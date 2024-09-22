@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -62,15 +63,20 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmdd(const char* const dat
 	       ret == GS1_LINTER_ILLEGAL_DAY);
 
 	if (ret != GS1_LINTER_OK)
-		return ret;
+		GS1_LINTER_RETURN_ERROR(
+			ret,
+			*err_pos,
+			*err_len
+		);
 
-	if (data[6] == '0' && data[7] == '0') {
-		if (err_pos) *err_pos = 6;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_DAY;
-	}
+	if (data[6] == '0' && data[7] == '0')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_DAY,
+			6,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

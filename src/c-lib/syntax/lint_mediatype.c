@@ -35,6 +35,7 @@
 #include <ctype.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /*
@@ -95,7 +96,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	 */
 	static const uint8_t mediatypes[] = {
 #if __STDC_VERSION__ >= 202311L
-		0b01111111, 0b11100000,		// 00-10: ICCBBA assignments
+		0b01111111, 0b11100000,		// 00:    Not used
+						// 01-10: ICCBBA assignments
 						// 11-15: Reserved for future assignment by ICCBBA
 		0b00000000, 0b00000000,		// 16-29: Reserved for future assignment by ICCBBA
 						// 30-31: Reserved for future assignment by GS1
@@ -122,9 +124,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 #define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc) do {					\
 	if (strlen(cc) == 2 && isdigit(cc[0]) && isdigit(cc[1])) {		\
 		int v = (cc[0] - '0') * 10 + (cc[1] - '0');			\
-		assert(v <= 99);		/* Satisfy analyzer */		\
-		if (mediatypes[v/8] & (0x80 >> (v%8)))				\
-			valid = 1;						\
+		GS1_LINTER_BITFIELD_LOOKUP(v, mediatypes);			\
 	}									\
 } while (0)
 /// \endcond
@@ -141,15 +141,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	 */
 	GS1_LINTER_MEDIA_TYPE_LOOKUP(data);
 	if (valid)
-		return GS1_LINTER_OK;
+		GS1_LINTER_RETURN_OK;
 
 	/*
 	 * If not valid then indicate an error.
 	 *
 	 */
-	if (err_pos) *err_pos = 0;
-	if (err_len) *err_len = strlen(data);
-	return GS1_LINTER_INVALID_MEDIA_TYPE;
+	GS1_LINTER_RETURN_ERROR(
+		GS1_LINTER_INVALID_MEDIA_TYPE,
+		0,
+		strlen(data)
+	);
 
 }
 

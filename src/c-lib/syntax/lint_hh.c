@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -63,33 +64,36 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char* const data, siz
 	 * Data must be two characters.
 	 *
 	 */
-	if (len != 2) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return len < 2 ? GS1_LINTER_HOUR_TOO_SHORT : GS1_LINTER_HOUR_TOO_LONG;
-	}
+	if (len != 2)
+		GS1_LINTER_RETURN_ERROR(
+			len < 2 ? GS1_LINTER_HOUR_TOO_SHORT : GS1_LINTER_HOUR_TOO_LONG,
+			0,
+			len
+		);
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Validate the minute.
 	 *
 	 */
-	if ((data[0] - '0') * 10 + (data[1] - '0') > 23) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_HOUR;
-	}
+	if ((data[0] - '0') * 10 + (data[1] - '0') > 23)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_HOUR,
+			0,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

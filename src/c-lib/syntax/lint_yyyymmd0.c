@@ -31,6 +31,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -75,31 +76,34 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 	 * Data must be eight characters.
 	 *
 	 */
-	if (len != 8) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return len < 8 ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG;
-	}
+	if (len != 8)
+		GS1_LINTER_RETURN_ERROR(
+			len < 8 ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
+			0,
+			len
+		);
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Validate that the month is 01 to 12.
 	 *
 	 */
-	if (MM < 1 || MM > 12) {
-		if (err_pos) *err_pos = 4;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_MONTH;
-	}
+	if (MM < 1 || MM > 12)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_MONTH,
+			4,
+			2
+		);
 
 	/*
 	 * Validate the day, accounting for leap years
@@ -111,13 +115,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 		maxdd = daysinmonth[MM - 1];		/* Based at 0 */
 	}
 
-	if (DD > maxdd) {	/* Permit "00" */
-		if (err_pos) *err_pos = 6;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_DAY;
-	}
+	if (DD > maxdd)		/* Permit "00" */
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_DAY,
+			6,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

@@ -34,6 +34,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -82,11 +83,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != strlen(data)) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != strlen(data))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	p = data;
 	q = data + strlen(data);
@@ -98,17 +100,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * Valid Format IDs are "0" and "1".
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_FORMAT_CODE;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_FORMAT_CODE,
+			0,
+			(size_t)(q - data)
+		);
 
-	if (*p != '0' && *p != '1') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_FORMAT_CODE;
-	}
+	if (*p != '0' && *p != '1')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_FORMAT_CODE,
+			(size_t)(p - data),
+			1
+		);
 
 
 	/*
@@ -116,23 +120,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * following Funder ID has the corresponding length (plus 6).
 	 *
 	 */
-	if (++p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_FUNDER_VLI;
-	}
-	if (*p > '6') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_FUNDER_LENGTH;
-	}
+	if (++p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_FUNDER_VLI,
+			0,
+			(size_t)(q - data)
+		);
+	if (*p > '6')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_FUNDER_LENGTH,
+			(size_t)(p - data),
+			1
+		);
 	vli = *p - '0' + 6;
 
-	if (q - ++p < vli) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_FUNDER;
-	}
+	if (q - ++p < vli)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_FUNDER,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += vli;
 
@@ -141,11 +148,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * Validate the existence of the six digit Offer Code.
 	 *
 	 */
-	if (q - p < 6) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_OFFER_CODE;
-	}
+	if (q - p < 6)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_OFFER_CODE,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += 6;
 
@@ -155,18 +163,20 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * corresponding length (plus 6).
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_SERIAL_NUMBER_VLI;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_SERIAL_NUMBER_VLI,
+			0,
+			(size_t)(q - data)
+		);
 	vli = *p - '0' + 6;
 
-	if (q - ++p < vli) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER;
-	}
+	if (q - ++p < vli)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += vli;
 
@@ -175,13 +185,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponposoffer(const char* con
 	 * Report any excess data that follows the Serial Number.
 	 *
 	 */
-	if (p != q) {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = (size_t)(q - p);
-		return GS1_LINTER_COUPON_EXCESS_DATA;
-	}
+	if (p != q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_EXCESS_DATA,
+			(size_t)(p - data),
+			(size_t)(q - p)
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

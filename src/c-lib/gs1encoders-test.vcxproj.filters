@@ -45,6 +45,9 @@
     <ClInclude Include="syntax\gs1syntaxdictionary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="syntax\gs1syntaxdictionary-utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="syntax\unittest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -153,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_nozeroprefix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint_packagetype.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_pcenc.c">

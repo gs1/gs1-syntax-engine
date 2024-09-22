@@ -35,6 +35,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -197,11 +198,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != strlen(data)) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != strlen(data))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	p = data;
 	q = data + strlen(data);
@@ -214,23 +216,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Valid GCP VLIs are "0" to "6".
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_GCP_VLI;
-	}
-	if (*p > '6') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_GCP_LENGTH;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_GCP_VLI,
+			0,
+			(size_t)(q - data)
+		);
+	if (*p > '6')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_GCP_LENGTH,
+			(size_t)(p - data),
+			1
+		);
 	vli = *p - '0' + 6;
 
-	if (q - ++p < vli) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_GCP;
-	}
+	if (q - ++p < vli)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_GCP,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	/*
 	 * Validate the GCP with the "key" linter.
@@ -243,11 +248,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		ret == GS1_LINTER_INVALID_GCP_PREFIX ||
 		ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-	if (ret != GS1_LINTER_OK) {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = (size_t)vli;
-		return ret;
-	}
+	if (ret != GS1_LINTER_OK)
+		GS1_LINTER_RETURN_ERROR(
+			ret,
+			(size_t)(p - data),
+			(size_t)vli
+		);
 
 	p += vli;
 
@@ -256,11 +262,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Validate the existence of the six digit Offer Code.
 	 *
 	 */
-	if (q - p < 6) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_OFFER_CODE;
-	}
+	if (q - p < 6)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_OFFER_CODE,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += 6;
 
@@ -272,23 +279,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Valid Save Value VLIs are "1" to "5".
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_SAVE_VALUE_VLI;
-	}
-	if (*p < '1' || *p > '5') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_SAVE_VALUE_LENGTH;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_SAVE_VALUE_VLI,
+			0,
+			(size_t)(q - data)
+		);
+	if (*p < '1' || *p > '5')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_SAVE_VALUE_LENGTH,
+			(size_t)(p - data),
+			1
+		);
 	vli = *p - '0';
 
-	if (q - ++p < vli) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_SAVE_VALUE;
-	}
+	if (q - ++p < vli)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_SAVE_VALUE,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += vli;
 
@@ -300,23 +310,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Valid 1st Purchase Requirement VLIs are "1" to "5".
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_VLI;
-	}
-	if (*p < '1' || *p > '5') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_LENGTH;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_VLI,
+			0,
+			(size_t)(q - data)
+		);
+	if (*p < '1' || *p > '5')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_LENGTH,
+			(size_t)(p - data),
+			1
+		);
 	vli = *p - '0';
 
-	if (q - ++p < vli) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_REQUIREMENT;
-	}
+	if (q - ++p < vli)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_REQUIREMENT,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += vli;
 
@@ -328,28 +341,31 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * "9".
 	 *
 	 */
-	if (p == q) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = (size_t)(q - data);
-		return GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_CODE;
-	}
+	if (p == q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_CODE,
+			0,
+			(size_t)(q - data)
+		);
 
-	if (*p > '4' && *p != '9') {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_CODE;
-	}
+	if (*p > '4' && *p != '9')
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_CODE,
+			(size_t)(p - data),
+			1
+		);
 
 
 	/*
 	 * Validate the existence of the three-digit 1st Purchase Family Code.
 	 *
 	 */
-	if (q - ++p < 3) {
-		if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-		if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-		return GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_FAMILY_CODE;
-	}
+	if (q - ++p < 3)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_FAMILY_CODE,
+			(p == q) ? 0                  : (size_t)(p - data),
+			(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+		);
 
 	p += 3;
 
@@ -370,17 +386,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "3".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_ADDITIONAL_PURCHASE_RULES_CODE;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_ADDITIONAL_PURCHASE_RULES_CODE,
+				0,
+				(size_t)(q - data)
+			);
 
-		if (*p > '3') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_ADDITIONAL_PURCHASE_RULES_CODE;
-		}
+		if (*p > '3')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_ADDITIONAL_PURCHASE_RULES_CODE,
+				(size_t)(p - data),
+				1
+			);
 
 
 		/*
@@ -391,23 +409,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "5".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_REQUIREMENT_VLI;
-		}
-		if (*p < '1' || *p > '5') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_REQUIREMENT_LENGTH;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_REQUIREMENT_VLI,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p < '1' || *p > '5')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_REQUIREMENT_LENGTH,
+				(size_t)(p - data),
+				1
+			);
 		vli = *p - '0';
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_REQUIREMENT;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_REQUIREMENT,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		p += vli;
 
@@ -419,17 +440,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "4" and "9".
 		 *
 		 */
-		if (p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_REQUIREMENT_CODE;
-		}
+		if (p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_REQUIREMENT_CODE,
+				0,
+				(size_t)(q - data)
+			);
 
-		if (*p > '4' && *p != '9') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_REQUIREMENT_CODE;
-		}
+		if (*p > '4' && *p != '9')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_REQUIREMENT_CODE,
+				(size_t)(p - data),
+				1
+			);
 
 
 		/*
@@ -437,11 +460,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Family Code.
 		 *
 		 */
-		if (q - ++p < 3) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_FAMILY_CODE;
-		}
+		if (q - ++p < 3)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_FAMILY_CODE,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		p += 3;
 
@@ -454,23 +478,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "9".
 		 *
 		 */
-		if (p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_GCP_VLI;
-		}
-		if (*p > '6' && *p != '9') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_GCP_LENGTH;
-		}
+		if (p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_2ND_PURCHASE_GCP_VLI,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p > '6' && *p != '9')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_2ND_PURCHASE_GCP_LENGTH,
+				(size_t)(p - data),
+				1
+			);
 		vli = (*p != '9') ? *p - '0' + 6 : 0;
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_GCP;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_2ND_PURCHASE_GCP,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		/*
 		 * Validate the GCP with the "key" linter.
@@ -483,11 +510,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
 			ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-		if (ret != GS1_LINTER_OK) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = (size_t)vli;
-			return ret;
-		}
+		if (ret != GS1_LINTER_OK)
+			GS1_LINTER_RETURN_ERROR(
+				ret,
+				(size_t)(p - data),
+				(size_t)vli
+			);
 
 		p += vli;
 
@@ -511,23 +539,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "5".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_REQUIREMENT_VLI;
-		}
-		if (*p < '1' || *p > '5') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_REQUIREMENT_LENGTH;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_REQUIREMENT_VLI,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p < '1' || *p > '5')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_REQUIREMENT_LENGTH,
+				(size_t)(p - data),
+				1
+			);
 		vli = *p - '0';
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_REQUIREMENT;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_REQUIREMENT,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		p += vli;
 
@@ -539,17 +570,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "4" and "9".
 		 *
 		 */
-		if (p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_REQUIREMENT_CODE;
-		}
+		if (p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_REQUIREMENT_CODE,
+				0,
+				(size_t)(q - data)
+			);
 
-		if (*p > '4' && *p != '9') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_REQUIREMENT_CODE;
-		}
+		if (*p > '4' && *p != '9')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_REQUIREMENT_CODE,
+				(size_t)(p - data),
+				1
+			);
 
 
 		/*
@@ -557,11 +590,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Family Code.
 		 *
 		 */
-		if (q - ++p < 3) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_FAMILY_CODE;
-		}
+		if (q - ++p < 3)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_FAMILY_CODE,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		p += 3;
 
@@ -574,23 +608,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * "9".
 		 *
 		 */
-		if (p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_GCP_VLI;
-		}
-		if (*p > '6' && *p != '9') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_GCP_LENGTH;
-		}
+		if (p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_3RD_PURCHASE_GCP_VLI,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p > '6' && *p != '9')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_3RD_PURCHASE_GCP_LENGTH,
+				(size_t)(p - data),
+				1
+			);
 		vli = (*p != '9') ? *p - '0' + 6 : 0;
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_GCP;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_3RD_PURCHASE_GCP,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		/*
 		 * Validate the GCP with the "key" linter.
@@ -603,11 +640,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
 			ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-		if (ret != GS1_LINTER_OK) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = (size_t)vli;
-			return ret;
-		}
+		if (ret != GS1_LINTER_OK)
+			GS1_LINTER_RETURN_ERROR(
+				ret,
+				(size_t)(p - data),
+				(size_t)vli
+			);
 
 		p += vli;
 
@@ -627,11 +665,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate that the expiration date is in YYMMDD format.
 		 *
 		 */
-		if (q - ++p < 6) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TOO_SHORT_FOR_EXPIRATION_DATE;
-		}
+		if (q - ++p < 6)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TOO_SHORT_FOR_EXPIRATION_DATE,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		memcpy(expiry_date, p, 6);
 		ret = gs1_lint_yymmdd(expiry_date, err_pos, err_len);
@@ -643,11 +682,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		       ret == GS1_LINTER_ILLEGAL_MONTH ||
 		       ret == GS1_LINTER_ILLEGAL_DAY);
 
-		if (ret != GS1_LINTER_OK) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 6;
-			return GS1_LINTER_COUPON_INVALID_EXIPIRATION_DATE;
-		}
+		if (ret != GS1_LINTER_OK)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_EXIPIRATION_DATE,
+				(size_t)(p - data),
+				6
+			);
 
 		p += 6;
 
@@ -671,11 +711,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate that the start date is in YYMMDD format.
 		 *
 		 */
-		if (q - ++p < 6) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TOO_SHORT_FOR_START_DATE;
-		}
+		if (q - ++p < 6)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TOO_SHORT_FOR_START_DATE,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		memcpy(start_date, p, 6);
 		ret = gs1_lint_yymmdd(start_date, err_pos, err_len);
@@ -687,22 +728,24 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		       ret == GS1_LINTER_ILLEGAL_MONTH ||
 		       ret == GS1_LINTER_ILLEGAL_DAY);
 
-		if (ret != GS1_LINTER_OK) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 6;
-			return GS1_LINTER_COUPON_INVALID_START_DATE;
-		}
+		if (ret != GS1_LINTER_OK)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_START_DATE,
+				(size_t)(p - data),
+				6
+			);
 
 		/*
 		 * If an expiration date has been set, then ensure that it does
 		 * not preceed the start date.
 		 *
 		 */
-		if (expiry_set && strcmp(start_date, expiry_date) > 0) {
-			if (err_pos) *err_pos = (size_t)(p - data - 8);
-			if (err_len) *err_len = 14;
-			return GS1_LINTER_COUPON_EXPIRATION_BEFORE_START;
-		}
+		if (expiry_set && strcmp(start_date, expiry_date) > 0)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_EXPIRATION_BEFORE_START,
+				(size_t)(p - data - 8),
+				14
+			);
 
 		p += 6;
 
@@ -723,18 +766,20 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * length (plus 6).
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_SERIAL_NUMBER_VLI;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_SERIAL_NUMBER_VLI,
+				0,
+				(size_t)(q - data)
+			);
 		vli = *p - '0' + 6;
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_SERIAL_NUMBER,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		p += vli;
 
@@ -757,23 +802,26 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for the Retailer GCP/GLN VLI are "1" to "7".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_RETAILER_GCP_OR_GLN_VLI;
-		}
-		if (*p < '1' || *p > '7') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_RETAILER_GCP_OR_GLN_LENGTH;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_RETAILER_GCP_OR_GLN_VLI,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p < '1' || *p > '7')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_RETAILER_GCP_OR_GLN_LENGTH,
+				(size_t)(p - data),
+				1
+			);
 		vli = *p - '0' + 6;
 
-		if (q - ++p < vli) {
-			if (err_pos) *err_pos = (p == q) ? 0                  : (size_t)(p - data);
-			if (err_len) *err_len = (p == q) ? (size_t)(q - data) : (size_t)(q - p);
-			return GS1_LINTER_COUPON_TRUNCATED_RETAILER_GCP_OR_GLN;
-		}
+		if (q - ++p < vli)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_TRUNCATED_RETAILER_GCP_OR_GLN,
+				(p == q) ? 0                  : (size_t)(p - data),
+				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
+			);
 
 		/*
 		 * Validate the GCP/GLN with the "key" linter.
@@ -786,11 +834,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
 			ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-		if (ret != GS1_LINTER_OK) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = (size_t)vli;
-			return ret;
-		}
+		if (ret != GS1_LINTER_OK)
+			GS1_LINTER_RETURN_ERROR(
+				ret,
+				(size_t)(p - data),
+				(size_t)vli
+			);
 
 		p += vli;
 
@@ -813,16 +862,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * to "6".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_SAVE_VALUE_CODE;
-		}
-		if (*p != '0' && *p != '1' && *p != '2' && *p != '5' && *p != '6') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_SAVE_VALUE_CODE;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_SAVE_VALUE_CODE,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p != '0' && *p != '1' && *p != '2' && *p != '5' && *p != '6')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_SAVE_VALUE_CODE,
+				(size_t)(p - data),
+				1
+			);
 
 
 		/*
@@ -831,16 +882,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for Save Value Applies to Item are "0" to "2".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_SAVE_VALUE_APPLIES_TO_ITEM;
-		}
-		if (*p > '2') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_SAVE_VALUE_APPLIES_TO_ITEM;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_SAVE_VALUE_APPLIES_TO_ITEM,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p > '2')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_SAVE_VALUE_APPLIES_TO_ITEM,
+				(size_t)(p - data),
+				1
+			);
 
 
 		/*
@@ -848,11 +901,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Flag.
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_STORE_COUPON_FLAG;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_STORE_COUPON_FLAG,
+				0,
+				(size_t)(q - data)
+			);
 
 
 		/*
@@ -861,16 +915,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Valid values for the Don't Multiply Flag are "0" and "1".
 		 *
 		 */
-		if (++p == q) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = (size_t)(q - data);
-			return GS1_LINTER_COUPON_MISSING_DONT_MULTIPLY_FLAG;
-		}
-		if (*p != '0' && *p != '1') {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_COUPON_INVALID_DONT_MULTIPLY_FLAG;
-		}
+		if (++p == q)
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_MISSING_DONT_MULTIPLY_FLAG,
+				0,
+				(size_t)(q - data)
+			);
+		if (*p != '0' && *p != '1')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_COUPON_INVALID_DONT_MULTIPLY_FLAG,
+				(size_t)(p - data),
+				1
+			);
 
 		p++;
 
@@ -880,13 +936,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Report excess data that has not been handled as an optional field.
 	 *
 	 */
-	if (p != q) {
-		if (err_pos) *err_pos = (size_t)(p - data);
-		if (err_len) *err_len = (size_t)(q - p);
-		return GS1_LINTER_COUPON_EXCESS_DATA;
-	}
+	if (p != q)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_COUPON_EXCESS_DATA,
+			(size_t)(p - data),
+			(size_t)(q - p)
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

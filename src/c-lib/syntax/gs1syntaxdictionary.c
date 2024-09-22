@@ -55,6 +55,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
 	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
 	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
+	{ .name = "packagetype",	.fn = gs1_lint_packagetype },
 	{ .name = "pcenc",		.fn = gs1_lint_pcenc },
 	{ .name = "pieceoftotal",	.fn = gs1_lint_pieceoftotal },
 	{ .name = "posinseqslash",	.fn = gs1_lint_posinseqslash },
@@ -229,6 +230,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The minute is too long for MM format.",
 	"The second is too short for SS format.",
 	"The second is too long for SS format.",
+	"A valid PackageTypeCode is required.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

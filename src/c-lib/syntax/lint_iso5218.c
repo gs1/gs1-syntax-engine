@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -58,13 +59,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso5218(const char* const data
 	 *
 	 */
 	if (strcmp(data, "0") != 0 && strcmp(data, "1") != 0 &&
-	    strcmp(data, "2") != 0 && strcmp(data, "9") != 0) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = strlen(data);
-		return GS1_LINTER_INVALID_BIOLOGICAL_SEX_CODE;
-	}
+	    strcmp(data, "2") != 0 && strcmp(data, "9") != 0)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_BIOLOGICAL_SEX_CODE,
+			0,
+			strlen(data)
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

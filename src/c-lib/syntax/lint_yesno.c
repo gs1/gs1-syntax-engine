@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -53,13 +54,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char* const data, 
 	 * The data must be either "0" or "1".
 	 *
 	 */
-	if (strcmp(data, "0") != 0 && strcmp(data, "1") != 0) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = strlen(data);
-		return GS1_LINTER_NOT_ZERO_OR_ONE;
-	}
+	if (strcmp(data, "0") != 0 && strcmp(data, "1") != 0)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NOT_ZERO_OR_ONE,
+			0,
+			strlen(data)
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

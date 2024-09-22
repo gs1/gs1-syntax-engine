@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -57,13 +58,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char* const 
 	 * Data must not be all numeric
 	 *
 	 */
-	if (strspn(data, "0123456789") == len) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_REQUIRES_NON_DIGIT_CHARACTER;
-	}
+	if (strspn(data, "0123456789") == len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_REQUIRES_NON_DIGIT_CHARACTER,
+			0,
+			len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

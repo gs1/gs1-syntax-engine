@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
@@ -58,23 +59,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nonzero(const char* const data
 	 * Data must be all numeric
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if ((pos = strspn(data, "0123456789")) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 * Data must contain a non-zero digit
 	 *
 	 */
-	if (strspn(data, "0") >= len) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_ILLEGAL_ZERO_VALUE;
-	}
+	if (strspn(data, "0") >= len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_ZERO_VALUE,
+			0,
+			len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

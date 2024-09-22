@@ -13,6 +13,7 @@
 		F706EB602C41A559002F77E3 /* lint_ss.c in Sources */ = {isa = PBXBuildFile; fileRef = F706EB5D2C41A559002F77E3 /* lint_ss.c */; };
 		F72D9196293AB3F300809E9B /* BarcodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */; };
 		F72E912B2A94E29C00C746FC /* lint_hyphen.c in Sources */ = {isa = PBXBuildFile; fileRef = F72E912A2A94E29C00C746FC /* lint_hyphen.c */; };
+		F731A39F2CA04ACB0000794F /* lint_packagetype.c in Sources */ = {isa = PBXBuildFile; fileRef = F731A39E2CA04ACB0000794F /* lint_packagetype.c */; };
 		F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */; };
 		F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73EC9AD2909D225008E17F4 /* ContentView.swift */; };
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
@@ -72,6 +73,8 @@
 		F706EB5D2C41A559002F77E3 /* lint_ss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_ss.c; sourceTree = "<group>"; };
 		F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodeScannerView.swift; sourceTree = "<group>"; };
 		F72E912A2A94E29C00C746FC /* lint_hyphen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hyphen.c; sourceTree = "<group>"; };
+		F731A39E2CA04ACB0000794F /* lint_packagetype.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint_packagetype.c; sourceTree = "<group>"; };
+		F731A3A02CA04AD80000794F /* gs1syntaxdictionary-utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gs1syntaxdictionary-utils.h"; sourceTree = "<group>"; };
 		F73EC9A82909D225008E17F4 /* GS1 Encoders App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS1 Encoders App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F73EC9AB2909D225008E17F4 /* GS1_Encoders_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1_Encoders_AppApp.swift; sourceTree = "<group>"; };
 		F73EC9AD2909D225008E17F4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -234,6 +237,8 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F731A3A02CA04AD80000794F /* gs1syntaxdictionary-utils.h */,
+				F731A39E2CA04ACB0000794F /* lint_packagetype.c */,
 				F706EB5B2C41A559002F77E3 /* lint_hh.c */,
 				F706EB5C2C41A559002F77E3 /* lint_mm.c */,
 				F706EB5D2C41A559002F77E3 /* lint_ss.c */,
@@ -435,6 +440,7 @@
 				F79827752909D35500F00DDA /* lint_couponcode.c in Sources */,
 				F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */,
 				F79827802909D35500F00DDA /* lint_iban.c in Sources */,
+				F731A39F2CA04ACB0000794F /* lint_packagetype.c in Sources */,
 				F7F7CD792C2DE11C00C6460C /* lint_hasnondigit.c in Sources */,
 				F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */,
 				F79827612909D35500F00DDA /* ai.c in Sources */,

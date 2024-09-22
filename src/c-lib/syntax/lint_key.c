@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /*
@@ -105,11 +106,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, si
 	 * The current minimum GCP length is defined by GCP_MIN_LENGTH.
 	 *
 	 */
-	if (len < GCP_MIN_LENGTH) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = len;
-			return GS1_LINTER_TOO_SHORT_FOR_KEY;
-	}
+	if (len < GCP_MIN_LENGTH)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_KEY,
+			0,
+			len
+		);
 
 	/*
 	 * Any character within the minimum-length GCP prefix that is outside
@@ -117,11 +119,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, si
 	 *
 	 */
 	for (i = 0; i < GCP_MIN_LENGTH; i++) {
-		if (data[i] < '0' || data[i] > '9') {
-			if (err_pos) *err_pos = i;
-			if (err_len) *err_len = 1;
-			return GS1_LINTER_INVALID_GCP_PREFIX;
-		}
+		if (data[i] < '0' || data[i] > '9')
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INVALID_GCP_PREFIX,
+				i,
+				1
+			);
 	}
 
 	/*
@@ -133,13 +136,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, si
 	int valid = 0, offline = 0;
 	GS1_LINTER_CUSTOM_GCP_LOOKUP(data);
 	if (offline)
-		return GS1_LINTER_GCP_DATASOURCE_OFFLINE;
+		GS1_LINTER_RETURN_ERROR(GS1_LINTER_GCP_DATASOURCE_OFFLINE, 0, 0);
 	else if (!valid)
-		return GS1_LINTER_INVALID_GCP_PREFIX;
+		GS1_LINTER_RETURN_ERROR(GS1_LINTER_INVALID_GCP_PREFIX, 0, 0);
 }
 #endif
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

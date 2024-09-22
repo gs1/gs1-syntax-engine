@@ -32,6 +32,7 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 #ifndef IBAN_MIN_LENGTH
@@ -75,21 +76,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 
 	len = strlen(data);
 
-	if (len <= IBAN_MIN_LENGTH) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_IBAN_TOO_SHORT;
-	}
+	if (len <= IBAN_MIN_LENGTH)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_IBAN_TOO_SHORT,
+			0,
+			len
+		);
 
 	/*
 	 * Any character outside of the set of valid IBAN characters is illegal.
 	 *
 	 */
-	if ((pos = strspn(data, csetiban)) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_IBAN_CHARACTER;
-	}
+	if ((pos = strspn(data, csetiban)) != len)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_IBAN_CHARACTER,
+			pos,
+			1
+		);
 
 	/*
 	 *  The first two characters must be an ISO 3166 alpha-2 country code.
@@ -99,11 +102,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 	ret = gs1_lint_iso3166alpha2(cc, err_pos, err_len);
 	assert(ret == GS1_LINTER_OK || ret == GS1_LINTER_NOT_ISO3166_ALPHA2);
 
-	if (ret == GS1_LINTER_NOT_ISO3166_ALPHA2) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_IBAN_COUNTRY_CODE;
-	}
+	if (ret == GS1_LINTER_NOT_ISO3166_ALPHA2)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_IBAN_COUNTRY_CODE,
+			0,
+			2
+		);
 
 	/*
 	 * Compute the IBAN checksum as the sum of digits, with characters
@@ -134,13 +138,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 	 * Sum (mod 97) is 1 for correctly formatted IBANs.
 	 *
 	 */
-	if (csum != 1) {
-		if (err_pos) *err_pos = 2;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_INCORRECT_IBAN_CHECKSUM;
-	}
+	if (csum != 1)
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INCORRECT_IBAN_CHECKSUM,
+			2,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 
