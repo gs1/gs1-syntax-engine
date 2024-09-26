@@ -356,7 +356,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 
 	const uint16_t cap = AI_TABLE_CAPACITY;
 	FILE *fp = NULL;
-	char buf[MAX_SD_ENTRY_LEN];
+	char buf[MAX_SD_ENTRY_LEN + 2];		// fgets includes "\n\0"
 	char errbuf[sizeof(ctx->errMsg)];
 	size_t linenum;
 
@@ -379,6 +379,14 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	pos = sd;
 	linenum = 1;
 	while (fgets(buf, sizeof(buf), fp)) {
+		if (buf[strlen(buf)-1] != '\n' && !feof(fp)) {
+			int s = snprintf(errbuf, sizeof(errbuf),
+					 "Syntax Dictionary line %d: Exceeds implementation limit of %d characters",
+					 (int)linenum, MAX_SD_ENTRY_LEN);
+			if (s < (int)sizeof(errbuf))
+				memcpy(ctx->errMsg, errbuf, sizeof(errbuf));
+			goto fail;
+		}
 		buf[strcspn(buf, "\r\n")] = 0;		/* Chop linefeed and newline */
 		if (parseSyntaxDictionaryEntry(ctx, buf, sd, &pos, cap) < 0) {
 			int s = snprintf(errbuf, sizeof(errbuf), "Syntax Dictionary line %d: %s", (int)linenum, ctx->errMsg);
