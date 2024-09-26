@@ -379,7 +379,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	pos = sd;
 	linenum = 1;
 	while (fgets(buf, sizeof(buf), fp)) {
-		buf[strcspn(buf, "\n")] = 0;		/* Chop newline */
+		buf[strcspn(buf, "\r\n")] = 0;		/* Chop linefeed and newline */
 		if (parseSyntaxDictionaryEntry(ctx, buf, sd, &pos, cap) < 0) {
 			int s = snprintf(errbuf, sizeof(errbuf), "Syntax Dictionary line %d: %s", (int)linenum, ctx->errMsg);
 			if (s < (int)sizeof(errbuf))
