@@ -1,15 +1,15 @@
-GS1 Syntax Engine
-=================
+GS1 Barcode Syntax Engine
+=========================
 
-The GS1 Syntax Engine is a library that supports the processing of
+The GS1 Barcode Syntax Engine ("Syntax Engine") is a library that supports the processing of
 GS1 syntax data, including Application Identifier element strings and GS1
 Digital Link URIs. It includes a native C library together with bindings
 for C# .NET, Java and Swift, that is intended to be integrated into a wide
 variety of platforms.
 
 The project also serves as a reference implementation of a framework for
-processing the [GS1 Syntax Dictionary](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-dictionary/)
-and [Linters](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-tests/).
+processing the [GS1 Barcode Syntax Dictionary](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-dictionary/)
+and [GS1 Barcode Syntax Tests](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-tests/).
 
 This project includes:
 
