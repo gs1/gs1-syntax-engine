@@ -1,5 +1,5 @@
 /**
- *  JavaScript wrapper for the GS1 Syntax Engine compiled as a WASM by
+ *  JavaScript wrapper for the GS1 Barcode Syntax Engine compiled as a WASM by
  *  Emscripten.
  *
  *  Copyright (c) 2022-2024 GS1 AISBL.
@@ -37,7 +37,7 @@ import createGS1encoderModule from './gs1encoder-wasm.mjs';
 /**
  *  <pre>
  *
- *  This class implements a wrapper around the GS1 Syntax Engine WASM build
+ *  This class implements a wrapper around the GS1 Barcode Syntax Engine WASM build
  *  that presents its functionality in the form of a typical JavaScript object
  *  interface.
  *
@@ -143,7 +143,7 @@ export class GS1encoder {
 
         this.ctx = this.api.gs1_encoder_init(null);
         if (this.ctx === null)
-            throw new GS1encoderGeneralException("Failed to initalise GS1 Syntax Engine");
+            throw new GS1encoderGeneralException("Failed to initalise GS1 Barcode Syntax Engine");
 
     }
 
