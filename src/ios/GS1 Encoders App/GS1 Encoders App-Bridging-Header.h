@@ -1,6 +1,6 @@
 /*
- * "Bridging header" for exporting the functions of the GS1 Syntax Engine
- * native library to Swift
+ * "Bridging header" for exporting the functions of the GS1 Barcode Syntax
+ * Engine native library to Swift
  *
  * Copyright (c) 2022-2024 GS1 AISBL.
  *

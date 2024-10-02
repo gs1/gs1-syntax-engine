@@ -20,7 +20,7 @@ limitations under the License.
 <project name="gs1encoders" default="all" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <description>
-    Java binding for GS1 Syntax Engine.
+    Java binding for GS1 Barcode Syntax Engine.
   </description>
 
   <condition property="no_strip" value="true">

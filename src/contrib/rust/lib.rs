@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
  * This is a contributed example that shows how a Rust language binding might
  * be developed.

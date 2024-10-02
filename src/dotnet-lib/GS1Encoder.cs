@@ -5,7 +5,7 @@ namespace GS1.Encoders
 {
 
     /// <summary>
-    /// Wrapper class for accessing the GS1 Syntax Engine native library from C#.
+    /// Wrapper class for accessing the GS1 Barcode Syntax Engine native library from C#.
     ///
     /// Copyright (c) 2021-2024 GS1 AISBL.
     ///
@@ -23,7 +23,7 @@ namespace GS1.Encoders
     /// limitations under the License.
     ///
     ///
-    /// This class implements a P/Invoke wrapper around the GS1 Syntax Engine
+    /// This class implements a P/Invoke wrapper around the GS1 Barcode Syntax Engine
     /// native C library that presents its functionality in the form of a
     /// typical C# object interface.
     ///
@@ -109,7 +109,7 @@ namespace GS1.Encoders
         };
 
         /// <summary>
-        /// The expected name of the GS1 Syntax Engine dynamic-link library
+        /// The expected name of the GS1 Barcode Syntax Engine dynamic-link library
         /// </summary>
         private const String gs1_dll = "gs1encoders.dll";
 
@@ -126,7 +126,7 @@ namespace GS1.Encoders
         private readonly IntPtr ctx;
 
         /*
-         *  Functions imported from the native GS1 Syntax Engine dynamic-link library
+         *  Functions imported from the native GS1 Barcode Syntax Engine dynamic-link library
          *
          */
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init", CallingConvention = CallingConvention.Cdecl)]

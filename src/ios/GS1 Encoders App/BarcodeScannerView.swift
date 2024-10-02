@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Engine example iOS app
+ * GS1 Barcode Syntax Engine example iOS app
  *
  * Copyright (c) 2022-2024 GS1 AISBL.
  *

@@ -1,6 +1,6 @@
 /*
  *  Basic node.js example for using the JavaScript wrapper around the WASM
- *  build of the GS1 Syntax Engine.
+ *  build of the GS1 Barcode Syntax Engine.
  *
  *  Requirements:
  *

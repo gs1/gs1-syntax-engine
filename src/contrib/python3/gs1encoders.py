@@ -1,5 +1,5 @@
 #
-#  GS1 Syntax Engine
+#  GS1 Barcode Syntax Engine
 #
 #  This is a contributed example that shows how a Python 3 language binding might
 #  be developed.

@@ -1,5 +1,5 @@
 /**
- *  Basic tests for the JavaScript wrapper for the GS1 Syntax Engine compiled
+ *  Basic tests for the JavaScript wrapper for the GS1 Barcode Syntax Engine compiled
  *  as a WASM by Emscripten.
  *
  *  Copyright (c) 2024 GS1 AISBL.

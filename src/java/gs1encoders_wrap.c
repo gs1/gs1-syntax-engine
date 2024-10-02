@@ -1,6 +1,6 @@
 /*
- * JNI interface for accessing the GS1 Syntax Engine native library from Java
- * using the org.gs1.gs1encoders.GS1Encoder wrapper class.
+ * JNI interface for accessing the GS1 Barcode Syntax Engine native library
+ * from Java using the org.gs1.gs1encoders.GS1Encoder wrapper class.
  *
  * Copyright (c) 2022-2024 GS1 AISBL.
  *

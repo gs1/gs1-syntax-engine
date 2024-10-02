@@ -1,9 +1,9 @@
 package org.gs1.gs1encoders;
 
 /**
- * Wrapper class for accessing the GS1 Syntax Engine native library from Java.
+ * Wrapper class for accessing the GS1 Barcode Syntax Engine native library from Java.
  *
- * This class implements a wrapper around the JNI interface to the GS1 Syntax
+ * This class implements a wrapper around the JNI interface to the GS1 Barcode Syntax
  * Engine native C library that presents its functionality in the form of a
  * typical Java object interface.
  *

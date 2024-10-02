@@ -1,5 +1,5 @@
 /**
- * GS1 Syntax Engine example user of the Java binding
+ * GS1 Barcode Syntax Engine example user of the Java binding
  *
  * @author Copyright (c) 2022-2024 GS1 AISBL.
  *

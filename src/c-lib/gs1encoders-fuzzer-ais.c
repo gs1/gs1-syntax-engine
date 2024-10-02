@@ -1,5 +1,5 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
  * @author Copyright (c) 2021-2024 GS1 AISBL.
  *

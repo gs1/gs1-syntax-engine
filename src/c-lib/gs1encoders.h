@@ -1,5 +1,5 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
  * @file gs1encoders.h
  * @author GS1 AISBL
@@ -27,7 +27,7 @@
  * Overview
  * --------
  *
- * The GS1 Syntax Engine provides routines that support the processing of GS1
+ * The GS1 Barcode Syntax Engine provides routines that support the processing of GS1
  * syntax data, including Application Identifier element strings and GS1
  * Digital Link URIs, whether these are provided in raw or human-friendly
  * format or as normalised scan data received from barcode readers.

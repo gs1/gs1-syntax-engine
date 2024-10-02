@@ -1,6 +1,6 @@
 /*
  *  Event-driven functions for example HTML app. which uses the JavaScript
- *  wrapper around the WASM build of the GS1 Syntax Engine.
+ *  wrapper around the WASM build of the GS1 Barcode Syntax Engine.
  *
  *  Copyright (c) 2022-2024 GS1 AISBL.
  *
@@ -40,7 +40,7 @@ async function init() {
 	gs1encoder = new GS1encoder();
 	await gs1encoder.init();
 
-	document.title = "GS1 Syntax Engine HTML demo | Library release: " + gs1encoder.version;
+	document.title = "GS1 Barcode Syntax Engine HTML demo | Library release: " + gs1encoder.version;
 
 	var dataParam = new URL(document.location.toString()).searchParams.get('data');
 

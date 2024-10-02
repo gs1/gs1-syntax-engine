@@ -1,7 +1,7 @@
 gs1encoder
 ==========
 
-JavaScript wrapper library for the GS1 Syntax Engine compiled as a WASM by
+JavaScript wrapper library for the GS1 Barcode Syntax Engine compiled as a WASM by
 Emscripten.
 
 This JS library is provided as an ESM and therefore requires a modern Node.js engine.

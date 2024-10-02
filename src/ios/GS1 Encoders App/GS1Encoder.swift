@@ -1,6 +1,6 @@
 /*
- * Wrapper class for accessing the functions exported by the GS1 Syntax Engine
- * native library (via the "bridging header") from Swift
+ * Wrapper class for accessing the functions exported by the GS1 Barcode Syntax
+ * Engine native library (via the "bridging header") from Swift
  *
  * Copyright (c) 2022-2024 GS1 AISBL.
  *
@@ -29,7 +29,7 @@
 
 import Foundation
 
-/// A Swift wrapper around the GS1 Syntax Engine native library
+/// A Swift wrapper around the GS1 Barcode Syntax Engine native library
 class GS1Encoder {
 
     /**
@@ -531,8 +531,8 @@ class GS1Encoder {
 }
 
 /*
- * Custom error classes for the wrapper for accessing the GS1 Syntax Engine
- * native library from Swift.
+ * Custom error classes for the wrapper for accessing the GS1 Barcode Syntax
+ * Engine native library from Swift.
  */
 enum GS1EncoderError: Error {
     case generalError(msg: String)

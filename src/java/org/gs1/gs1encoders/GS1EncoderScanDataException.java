@@ -1,7 +1,7 @@
 package org.gs1.gs1encoders;
 
 /**
- * Custom error class for the wrapper for accessing the GS1 Syntax Engine
+ * Custom error class for the wrapper for accessing the GS1 Barcode Syntax Engine
  * native library from Java.
  *
  * @author Copyright (c) 2022-2024 GS1 AISBL.

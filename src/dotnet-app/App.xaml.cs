@@ -40,7 +40,7 @@ namespace GS1.EncodersApp
 
             MainWindow mw = new MainWindow
             {
-                Title = "GS1 Syntax Engine GUI demo | Library release: " + gs1Encoder.Version
+                Title = "GS1 Barcode Syntax Engine GUI demo | Library release: " + gs1Encoder.Version
             };
             mw.Show();
 

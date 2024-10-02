@@ -1,5 +1,5 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
  * @author Copyright (c) 2000-2024 GS1 AISBL.
  *
@@ -176,7 +176,7 @@ int main(int argc, const char* const argv[]) {
 		goto out;
 	}
 
-	printf("\nGS1 Syntax Engine Console Demo (Built " RELEASE "):");
+	printf("\nGS1 Barcode Syntax Engine Console Demo (Built " RELEASE "):");
 	printf("\n\nCopyright (c) 2020-2024 GS1 AISBL. License: Apache-2.0");
 
 	while (userInt(ctx));
