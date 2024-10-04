@@ -68,7 +68,7 @@ jobs:
 
   ci-msvc:
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
 
@@ -299,7 +299,7 @@ jobs:
     needs:
       - ci-msvc
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
 
