@@ -475,10 +475,10 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *     * Ensure that the AIs extracted from the query parameters are valid GS1 DL URI data attributes.
  *     * Ensure that there are no duplicate AIs within any part of the URI structure.
  *   * Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):
- *     * For each component of each AI, as defined by the Syntax Dictionary:
- *       * Validate that its length is within limits.
+ *     * For each component of each AI, as defined by the GS1 Barcode Syntax Dictionary:
+ *       * Validate that its length is within the specified limits.
  *       * Validate that it conforms to the specified character set.
- *       * Apply each of the Linters in turn.
+ *       * Apply each of the specified GS1 Barcode Syntax Tests ("linters") in turn.
  *     * Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via gs1_encoder_setValidationEnabled()), for example:
  *       * Ensure that repeated AIs have the same value.
  *       * Ensure that mutually-exclusive AIs are not present.
