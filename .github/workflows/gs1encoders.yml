@@ -319,11 +319,11 @@ jobs:
         7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
 
     - name: Store Windows development libs
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: windows-libs
         path: src/c-lib/build/library/Win32/Release/gs1encoders-windows-libs.zip
+        retention-days: 1
 
     - name: ZIP console application
       working-directory: src/c-lib/build/console-app/Win32/Release
@@ -331,11 +331,11 @@ jobs:
         7z a gs1encoders-windows-console-app.zip gs1encoders-app.exe gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
 
     - name: Store Windows console app
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: windows-console-app
         path: src/c-lib/build/console-app/Win32/Release/gs1encoders-windows-console-app.zip
+        retention-days: 1
 
     - name: ZIP GUI application
       working-directory: src/dotnet-app/bin/Release\net8.0-windows\win-x86\publish
@@ -343,11 +343,11 @@ jobs:
         7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet-app.exe ../../gs1encoders.dll ../../../../../../c-lib/gs1-syntax-dictionary.txt
 
     - name: Store Windows GUI app
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: windows-gui-app
         path: src/dotnet-app/bin/Release/net8.0-windows/win-x86/publish/gs1encoders-windows-gui-app.zip
+        retention-days: 1
 
 
   build-release-linux:
@@ -371,11 +371,11 @@ jobs:
         tar cvzf gs1encoders-linux-app.tgz gs1encoders-static.bin gs1-syntax-dictionary.txt
 
     - name: Store Linux build
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: linux-app
         path: src/c-lib/build/gs1encoders-linux-app.tgz
+        retention-days: 1
 
   build-release-wasm:
 
@@ -397,11 +397,11 @@ jobs:
         tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store WASM build
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: wasm-app
         path: src/js-wasm/gs1encoders-wasm-app.tgz
+        retention-days: 1
 
 
   build-release-jsonly:
@@ -424,11 +424,11 @@ jobs:
         tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
 
     - name: Store JSONLY build
-      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: jsonly-app
         path: src/js-wasm/gs1encoders-jsonly-app.tgz
+        retention-days: 1
 
 
   #
