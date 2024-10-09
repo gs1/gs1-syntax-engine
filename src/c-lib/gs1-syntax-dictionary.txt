@@ -1,13 +1,13 @@
-# GS1 Application Identifier Syntax Dictionary
-# --------------------------------------------
+# GS1 Barcode Syntax Dictionary
+# -----------------------------
 #
 # Release: UNSET
 #
-# This is the GS1 Application Identifier format "Syntax Dictionary".
+# This is the GS1 Barcode Syntax Dictionary.
 #
-# Together with a set of reference "Linter" procedures, it provides a
-# harmonised framework that can be used by encoders and decoders of GS1 AI
-# formatted data to process such data.
+# Together with a set of GS1 Barcode Syntax Tests ("Linter" routines), it
+# provides a harmonised framework that can be used by encoders and decoders of
+# AI-formatted data to process such data.
 #
 # Each entry in this file provides a description for one or a range of AIs of
 # not only the data type, length and title of the AI and whether an FNC1
@@ -19,10 +19,10 @@
 # Specifications, however the data field definition is further decomposed into
 # meaningful components that can be individually reported or validated.
 #
-# Together with a set of Linter procedures this Syntax Dictionary can be used
-# either directly by application code or by a project's build system to
-# generate code to perform a deep validation of any message consisting of GS1
-# Application Identifier element strings.
+# Together with a set of Linter procedures this resource can be used either
+# directly by application code or by a project's build system to generate code
+# to perform a deep validation of any message consisting of GS1 Application
+# Identifier element strings.
 #
 # It was originally conceived as a collaboration between the BWIPP and Zint
 # projects and is now maintained by GS1 AISBL.
@@ -247,8 +247,8 @@
 4321        ?  N1,yesno                         req=00                                           # DANGEROUS GOODS
 4322        ?  N1,yesno                         req=00                                           # AUTH TO LEAVE
 4323        ?  N1,yesno                         req=00                                           # SIG REQUIRED
-4324        ?  N6,yymmd0 N4,hhmm                req=00                                           # NOT BEF DEL DT
-4325        ?  N6,yymmd0 N4,hhmm                req=00                                           # NOT AFT DEL DT
+4324        ?  N6,yymmd0 N4,hhmi                req=00                                           # NOT BEF DEL DT
+4325        ?  N6,yymmd0 N4,hhmi                req=00                                           # NOT AFT DEL DT
 4326        ?  N6,yymmdd                        req=00                                           # REL DATE
 4330        ?  N6 [X1],hyphen                   req=00 ex=4331                                   # MAX TEMP F.
 4331        ?  N6 [X1],hyphen                   req=00 ex=4330                                   # MAX TEMP C.
@@ -256,7 +256,7 @@
 4333        ?  N6 [X1],hyphen                   req=00 ex=4332                                   # MIN TEMP C.
 7001        ?  N13                              req=01,02,8006,8026                              # NSN
 7002        ?  X..30                            req=01,02                                        # MEAT CUT
-7003        ?  N6,yymmdd N4,hhmm                req=01,02                                        # EXPIRY TIME
+7003        ?  N6,yymmdd N4,hhmi                req=01,02                                        # EXPIRY TIME
 7004        ?  N..4                             req=01 req=10                                    # ACTIVE POTENCY
 7005        ?  X..12                            req=01,02                                        # CATCH AREA
 7006        ?  N6,yymmdd                        req=01,02                                        # FIRST FREEZE DATE
@@ -264,7 +264,7 @@
 7008        ?  X..3                             req=01,02                                        # AQUATIC SPECIES
 7009        ?  X..10                            req=01,02                                        # FISHING GEAR TYPE
 7010        ?  X..2                             req=01,02                                        # PROD METHOD
-7011        ?  N6,yymmdd [N4],hhmm              req=01,02                                        # TEST BY DATE
+7011        ?  N6,yymmdd [N4],hhmi              req=01,02                                        # TEST BY DATE
 7020        ?  X..20                            req=01,8006 req=416                              # REFURB LOT
 7021        ?  X..20                            req=01,8006                                      # FUNC STAT
 7022        ?  X..20                            req=7021                                         # REV STAT
@@ -302,7 +302,7 @@
 7241        ?  N2,mediatype                     req=8017,8018                                    # AIDC MEDIA TYPE
 7242        ?  X..25                            req=8017,8018                                    # VCN
 7250           N8,yyyymmdd                      req=8018 ex=7251                                 # DOB
-7251           N8,yyyymmdd N4,hhmm              req=8018 ex=7250                                 # DOB TIME
+7251           N8,yyyymmdd N4,hhmi              req=8018 ex=7250                                 # DOB TIME
 7252           N1,iso5218                       req=8018                                         # BIO SEX
 7253           X..40,pcenc                      req=8017,8018 ex=7256,7259                       # FAMILY NAME
 7254           X..40,pcenc                      req=8017,8018 ex=7256,7259                       # GIVEN NAME
@@ -318,7 +318,7 @@
 8005        ?  N6                               req=01,02                                        # PRICE PER UNIT
 8006        ?  N14,csum N4,pieceoftotal         ex=01,37 dlpkey=22,10,21                         # ITIP
 8007        ?  X..34,iban                       req=415                                          # IBAN
-8008        ?  N6,yymmdd N2,hh [N2],mm [N2],ss  req=01,02                                        # PROD TIME
+8008        ?  N6,yymmdd N2,hh [N2],mi [N2],ss  req=01,02                                        # PROD TIME
 8009        ?  X..50                            req=00,01                                        # OPTSEN
 8010        ?  Y..30,key                        dlpkey=8011                                      # CPID
 8011           N..12,nozeroprefix               req=8010                                         # CPID SERIAL

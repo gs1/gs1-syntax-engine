@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,29 +24,7 @@
  */
 
 
-#include <stdio.h>
-
 #include "gs1syntaxdictionary.h"
 #include "gs1syntaxdictionary-utils.h"
 
-
-/**
- * Not used.
- *
- * @deprecated Function retained for API compatibility purposes only. Not
- * longer referenced by the Syntax Dictionary.
- *
- * @param [in] data Not used.
- * @param [out] err_pos Not used.
- * @param [out] err_len Not used.
- *
- * @return #GS1_LINTER_OK
- *
- */
-GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_mmoptss(const char* const data, size_t* const err_pos, size_t* const err_len)
-{
-	(void)data;
-	(void)err_pos;
-	(void)err_len;
-	GS1_LINTER_RETURN_OK;
-}
+GS1_LINTER_STUB(gs1_lint_mmoptss)

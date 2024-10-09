@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,22 +37,23 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
 	{ .name = "hasnondigit",	.fn = gs1_lint_hasnondigit },
 	{ .name = "hh",			.fn = gs1_lint_hh },
-	{ .name = "hhmm",		.fn = gs1_lint_hhmm },
+	{ .name = "hhmi",		.fn = gs1_lint_hhmi },
+	{ .name = "hhmm",		.fn = gs1_lint_hhmm },		// Stub
 	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
 	{ .name = "iban",		.fn = gs1_lint_iban },
 	{ .name = "importeridx",	.fn = gs1_lint_importeridx },
 	{ .name = "iso3166",		.fn = gs1_lint_iso3166 },
 	{ .name = "iso3166999",		.fn = gs1_lint_iso3166999 },
 	{ .name = "iso3166alpha2",	.fn = gs1_lint_iso3166alpha2 },
-	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },
+	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },	// Stub
 	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
 	{ .name = "iso5218",		.fn = gs1_lint_iso5218 },
 	{ .name = "key",		.fn = gs1_lint_key },
 	{ .name = "latitude",		.fn = gs1_lint_latitude },
 	{ .name = "longitude",		.fn = gs1_lint_longitude },
 	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
-	{ .name = "mm",			.fn = gs1_lint_mm },
-	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
+	{ .name = "mi",			.fn = gs1_lint_mi },
+	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },	// Stub
 	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
 	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
 	{ .name = "packagetype",	.fn = gs1_lint_packagetype },
@@ -64,7 +65,7 @@ const struct name_function_s name_function_map[] = {
 	{ .name = "yesno",		.fn = gs1_lint_yesno },
 	{ .name = "yymmd0",		.fn = gs1_lint_yymmd0 },
 	{ .name = "yymmdd",		.fn = gs1_lint_yymmdd },
-	{ .name = "yymmddhh",		.fn = gs1_lint_yymmddhh },
+	{ .name = "yymmddhh",		.fn = gs1_lint_yymmddhh },	// Stub
 	{ .name = "yyyymmd0",		.fn = gs1_lint_yyyymmd0 },
 	{ .name = "yyyymmdd",		.fn = gs1_lint_yyyymmdd },
 	{ .name = "zero",		.fn = gs1_lint_zero },
@@ -141,9 +142,9 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The date is too long.",
 	"",	// Unused
 	"",	// Unused
-	"The date with hour is too long for YYMMDDHH format.",
-	"The hour with minute is too short for HHMM format.",
-	"The hour with minute is too long for HHMM format.",
+	"",	// Unused
+	"The hour with minute is too short for HHMI format.",
+	"The hour with minute is too long for HHMI format.",
 	"",	// Unused
 	"The date contains an illegal month of the year.",
 	"The date contains an illegal day of the month.",
@@ -226,8 +227,8 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"A non-digit character is required.",
 	"The hour is too short for HH format.",
 	"The hour is too long for HH format.",
-	"The minute is too short for MM format.",
-	"The minute is too long for MM format.",
+	"The minute is too short for MI format.",
+	"The minute is too long for MI format.",
 	"The second is too short for SS format.",
 	"The second is too long for SS format.",
 	"A valid PackageTypeCode is required.",

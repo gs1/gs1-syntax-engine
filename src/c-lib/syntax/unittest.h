@@ -1,5 +1,5 @@
 /**
- * GS1 Syntax Dictionary
+ * GS1 Barcode Syntax Dictionary
  *
  * @author Copyright (c) 2022-2024 GS1 AISBL.
  *

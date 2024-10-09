@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  * @file gs1syntaxdictionary.h
  *
  * @brief This header contains the declarations for the reference linter
- * functions of type ::gs1_linter_t referred to in the [GS1 Syntax
+ * functions of type ::gs1_linter_t referred to in the [GS1 Barcode Syntax
  * Dictionary](https://ref.gs1.org/tools/gs1-barcode-syntax-resource/syntax-dictionary/),
  * as well as the list of all possible return codes with a description of the
  * indicated error conditions.
@@ -106,9 +106,9 @@ typedef enum
 	GS1_LINTER_DATE_TOO_LONG,					///< The date is too long for YYMMDD format.
 	GS1_LINTER_UNUSED_2,
 	GS1_LINTER_UNUSED_3,
-	GS1_LINTER_DATE_WITH_HOUR_TOO_LONG,				///< The date with hour is too long for YYMMDDHH format.
-	GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT,				///< The hour with minute is too short for HHMM format.
-	GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,				///< The hour with minute is too long for HHMM format.
+	GS1_LINTER_UNUSED_5,
+	GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT,				///< The hour with minute is too short for HHMI format.
+	GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,				///< The hour with minute is too long for HHMI format.
 	GS1_LINTER_UNUSED_4,
 	GS1_LINTER_ILLEGAL_MONTH,					///< The date contains an illegal month of the year.
 	GS1_LINTER_ILLEGAL_DAY,						///< The date contains an illegal day of the month.
@@ -191,8 +191,8 @@ typedef enum
 	GS1_LINTER_REQUIRES_NON_DIGIT_CHARACTER,			///< A non-digit character is required
 	GS1_LINTER_HOUR_TOO_SHORT,					///< The hour is too short for HH format.
 	GS1_LINTER_HOUR_TOO_LONG,					///< The hour is too long for HH format.
-	GS1_LINTER_MINUTE_TOO_SHORT,					///< The minute is too short for MM format.
-	GS1_LINTER_MINUTE_TOO_LONG,					///< The minute is too long for MM format.
+	GS1_LINTER_MINUTE_TOO_SHORT,					///< The minute is too short for MI format.
+	GS1_LINTER_MINUTE_TOO_LONG,					///< The minute is too long for MI format.
 	GS1_LINTER_SECOND_TOO_SHORT,					///< The second is too short for SS format.
 	GS1_LINTER_SECOND_TOO_LONG,					///< The second is too long for SS format.
 	GS1_LINTER_INVALID_PACKAGE_TYPE,				///< A valid PackageTypeCode is required.
@@ -233,22 +233,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char *data, size_t 
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len);	// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso5218(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mm(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mi(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nonzero(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_packagetype(const char *data, size_t *err_pos, size_t *err_len);
@@ -260,7 +261,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_winding(const char *data, size
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmdd(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmddhh(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmddhh(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmdd(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char *data, size_t *err_pos, size_t *err_len);

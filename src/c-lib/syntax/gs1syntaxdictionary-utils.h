@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,5 +118,25 @@ do {								\
 		}						\
 	}							\
 } while (0)
+
+
+/**
+ * @brief Generates a stub function to replace legacy linters.
+ *
+ * The generated stub function is retained for API compatibility purposes only
+ * and is no longer referenced by the Syntax Dictionary.
+ *
+ */
+#define GS1_LINTER_STUB(linter)					\
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t linter(	\
+				const char* const data,		\
+				size_t* const err_pos,		\
+				size_t* const err_len)		\
+{								\
+	(void)data;						\
+	(void)err_pos;						\
+	(void)err_len;						\
+	GS1_LINTER_RETURN_OK;					\
+}
 
 #endif  /* GS1_SYNTAXDICTIONARY_UTILS_H */
