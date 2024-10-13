@@ -36,6 +36,21 @@
 #include <string.h>
 
 
+#if defined(__clang__)
+#  define DIAG_PUSH _Pragma("clang diagnostic push")
+#  define DIAG_POP _Pragma("clang diagnostic pop")
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#elif defined(__GNUC__)
+#  define DIAG_PUSH _Pragma("GCC diagnostic push")
+#  define DIAG_POP _Pragma("GCC diagnostic pop")
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#elif defined(_MSC_VER)
+#  define DIAG_PUSH __pragma(warning(push))
+#  define DIAG_POP __pragma(warning(pop))
+#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
+#endif
+
+
 /**
  * @brief Return from a linter indicating that no problem was detected with the
  * given data.
@@ -118,25 +133,5 @@ do {								\
 		}						\
 	}							\
 } while (0)
-
-
-/**
- * @brief Generates a stub function to replace legacy linters.
- *
- * The generated stub function is retained for API compatibility purposes only
- * and is no longer referenced by the Syntax Dictionary.
- *
- */
-#define GS1_LINTER_STUB(linter)					\
-GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t linter(	\
-				const char* const data,		\
-				size_t* const err_pos,		\
-				size_t* const err_len)		\
-{								\
-	(void)data;						\
-	(void)err_pos;						\
-	(void)err_len;						\
-	GS1_LINTER_RETURN_OK;					\
-}
 
 #endif  /* GS1_SYNTAXDICTIONARY_UTILS_H */

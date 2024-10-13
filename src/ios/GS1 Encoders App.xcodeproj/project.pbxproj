@@ -28,13 +28,11 @@
 		F79827662909D35500F00DDA /* scandata.c in Sources */ = {isa = PBXBuildFile; fileRef = F798272A2909D35400F00DDA /* scandata.c */; };
 		F798276D2909D35500F00DDA /* dl.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827342909D35400F00DDA /* dl.c */; };
 		F79827702909D35500F00DDA /* gs1encoders.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827372909D35400F00DDA /* gs1encoders.c */; };
-		F79827732909D35500F00DDA /* lint_iso3166list.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273B2909D35400F00DDA /* lint_iso3166list.c */; };
 		F79827742909D35500F00DDA /* lint_winding.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273C2909D35400F00DDA /* lint_winding.c */; };
 		F79827752909D35500F00DDA /* lint_couponcode.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273D2909D35400F00DDA /* lint_couponcode.c */; };
 		F79827762909D35500F00DDA /* lint_csum.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273E2909D35400F00DDA /* lint_csum.c */; };
 		F79827772909D35500F00DDA /* lint_iso4217.c in Sources */ = {isa = PBXBuildFile; fileRef = F798273F2909D35400F00DDA /* lint_iso4217.c */; };
 		F79827782909D35500F00DDA /* lint_cset39.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827402909D35400F00DDA /* lint_cset39.c */; };
-		F79827792909D35500F00DDA /* lint_yymmddhh.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827412909D35400F00DDA /* lint_yymmddhh.c */; };
 		F798277A2909D35500F00DDA /* lint_zero.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827422909D35400F00DDA /* lint_zero.c */; };
 		F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827442909D35400F00DDA /* lint_csetnumeric.c */; };
 		F798277C2909D35500F00DDA /* lint_iso3166.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827462909D35400F00DDA /* lint_iso3166.c */; };
@@ -44,7 +42,6 @@
 		F79827802909D35500F00DDA /* lint_iban.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274B2909D35400F00DDA /* lint_iban.c */; };
 		F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */; };
 		F79827822909D35500F00DDA /* lint_couponposoffer.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274D2909D35400F00DDA /* lint_couponposoffer.c */; };
-		F79827832909D35500F00DDA /* lint_hhmm.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274E2909D35400F00DDA /* lint_hhmm.c */; };
 		F79827842909D35500F00DDA /* lint_nonzero.c in Sources */ = {isa = PBXBuildFile; fileRef = F798274F2909D35400F00DDA /* lint_nonzero.c */; };
 		F79827852909D35500F00DDA /* lint_key.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827502909D35400F00DDA /* lint_key.c */; };
 		F79827862909D35500F00DDA /* lint_csumalpha.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827512909D35400F00DDA /* lint_csumalpha.c */; };
@@ -52,7 +49,6 @@
 		F79827882909D35500F00DDA /* lint_yymmdd.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827532909D35400F00DDA /* lint_yymmdd.c */; };
 		F79827892909D35500F00DDA /* lint_yesno.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827542909D35400F00DDA /* lint_yesno.c */; };
 		F798278A2909D35500F00DDA /* lint_pieceoftotal.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827552909D35400F00DDA /* lint_pieceoftotal.c */; };
-		F798278B2909D35500F00DDA /* lint_mmoptss.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827562909D35400F00DDA /* lint_mmoptss.c */; };
 		F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827572909D35400F00DDA /* lint_iso3166999.c */; };
 		F798278D2909D35500F00DDA /* gs1syntaxdictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827582909D35400F00DDA /* gs1syntaxdictionary.c */; };
 		F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */ = {isa = PBXBuildFile; fileRef = F79827592909D35400F00DDA /* lint_yymmd0.c */; };
@@ -62,6 +58,7 @@
 		F7A662AC2A50A95200638051 /* lint_longitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662A92A50A95200638051 /* lint_longitude.c */; };
 		F7A662AD2A50A95200638051 /* lint_latitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AA2A50A95200638051 /* lint_latitude.c */; };
 		F7A662AE2A50A95200638051 /* lint_cset64.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AB2A50A95200638051 /* lint_cset64.c */; };
+		F7CAA00B2CBC58E00066147A /* lint__stubs.c in Sources */ = {isa = PBXBuildFile; fileRef = F7CAA00A2CBC58E00066147A /* lint__stubs.c */; };
 		F7F7CD792C2DE11C00C6460C /* lint_hasnondigit.c in Sources */ = {isa = PBXBuildFile; fileRef = F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */; };
 /* End PBXBuildFile section */
 
@@ -100,13 +97,11 @@
 		F79827322909D35400F00DDA /* scandata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scandata.h; sourceTree = "<group>"; };
 		F79827342909D35400F00DDA /* dl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dl.c; sourceTree = "<group>"; };
 		F79827372909D35400F00DDA /* gs1encoders.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gs1encoders.c; sourceTree = "<group>"; };
-		F798273B2909D35400F00DDA /* lint_iso3166list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166list.c; sourceTree = "<group>"; };
 		F798273C2909D35400F00DDA /* lint_winding.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_winding.c; sourceTree = "<group>"; };
 		F798273D2909D35400F00DDA /* lint_couponcode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_couponcode.c; sourceTree = "<group>"; };
 		F798273E2909D35400F00DDA /* lint_csum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csum.c; sourceTree = "<group>"; };
 		F798273F2909D35400F00DDA /* lint_iso4217.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso4217.c; sourceTree = "<group>"; };
 		F79827402909D35400F00DDA /* lint_cset39.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset39.c; sourceTree = "<group>"; };
-		F79827412909D35400F00DDA /* lint_yymmddhh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmddhh.c; sourceTree = "<group>"; };
 		F79827422909D35400F00DDA /* lint_zero.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_zero.c; sourceTree = "<group>"; };
 		F79827432909D35400F00DDA /* acutest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acutest.h; sourceTree = "<group>"; };
 		F79827442909D35400F00DDA /* lint_csetnumeric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csetnumeric.c; sourceTree = "<group>"; };
@@ -118,7 +113,6 @@
 		F798274B2909D35400F00DDA /* lint_iban.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iban.c; sourceTree = "<group>"; };
 		F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166alpha2.c; sourceTree = "<group>"; };
 		F798274D2909D35400F00DDA /* lint_couponposoffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_couponposoffer.c; sourceTree = "<group>"; };
-		F798274E2909D35400F00DDA /* lint_hhmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hhmm.c; sourceTree = "<group>"; };
 		F798274F2909D35400F00DDA /* lint_nonzero.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_nonzero.c; sourceTree = "<group>"; };
 		F79827502909D35400F00DDA /* lint_key.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_key.c; sourceTree = "<group>"; };
 		F79827512909D35400F00DDA /* lint_csumalpha.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_csumalpha.c; sourceTree = "<group>"; };
@@ -126,7 +120,6 @@
 		F79827532909D35400F00DDA /* lint_yymmdd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmdd.c; sourceTree = "<group>"; };
 		F79827542909D35400F00DDA /* lint_yesno.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yesno.c; sourceTree = "<group>"; };
 		F79827552909D35400F00DDA /* lint_pieceoftotal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_pieceoftotal.c; sourceTree = "<group>"; };
-		F79827562909D35400F00DDA /* lint_mmoptss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_mmoptss.c; sourceTree = "<group>"; };
 		F79827572909D35400F00DDA /* lint_iso3166999.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso3166999.c; sourceTree = "<group>"; };
 		F79827582909D35400F00DDA /* gs1syntaxdictionary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gs1syntaxdictionary.c; sourceTree = "<group>"; };
 		F79827592909D35400F00DDA /* lint_yymmd0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_yymmd0.c; sourceTree = "<group>"; };
@@ -138,6 +131,7 @@
 		F7A662AA2A50A95200638051 /* lint_latitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_latitude.c; sourceTree = "<group>"; };
 		F7A662AB2A50A95200638051 /* lint_cset64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset64.c; sourceTree = "<group>"; };
 		F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GS1-Encoders-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		F7CAA00A2CBC58E00066147A /* lint__stubs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint__stubs.c; sourceTree = "<group>"; };
 		F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hasnondigit.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -239,6 +233,7 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F7CAA00A2CBC58E00066147A /* lint__stubs.c */,
 				F754C8492CB6A7FA00ACC93D /* lint_hhmi.c */,
 				F754C8472CB6A7EB00ACC93D /* lint_mi.c */,
 				F731A3A02CA04AD80000794F /* gs1syntaxdictionary-utils.h */,
@@ -265,16 +260,13 @@
 				F79827442909D35400F00DDA /* lint_csetnumeric.c */,
 				F798273E2909D35400F00DDA /* lint_csum.c */,
 				F79827512909D35400F00DDA /* lint_csumalpha.c */,
-				F798274E2909D35400F00DDA /* lint_hhmm.c */,
 				F798274B2909D35400F00DDA /* lint_iban.c */,
 				F79827482909D35400F00DDA /* lint_importeridx.c */,
 				F79827462909D35400F00DDA /* lint_iso3166.c */,
 				F798274C2909D35400F00DDA /* lint_iso3166alpha2.c */,
-				F798273B2909D35400F00DDA /* lint_iso3166list.c */,
 				F798273F2909D35400F00DDA /* lint_iso4217.c */,
 				F79827572909D35400F00DDA /* lint_iso3166999.c */,
 				F79827502909D35400F00DDA /* lint_key.c */,
-				F79827562909D35400F00DDA /* lint_mmoptss.c */,
 				F798274F2909D35400F00DDA /* lint_nonzero.c */,
 				F79827522909D35400F00DDA /* lint_nozeroprefix.c */,
 				F79827492909D35400F00DDA /* lint_pcenc.c */,
@@ -283,7 +275,6 @@
 				F79827542909D35400F00DDA /* lint_yesno.c */,
 				F79827592909D35400F00DDA /* lint_yymmd0.c */,
 				F79827532909D35400F00DDA /* lint_yymmdd.c */,
-				F79827412909D35400F00DDA /* lint_yymmddhh.c */,
 				F79827422909D35400F00DDA /* lint_zero.c */,
 			);
 			path = syntax;
@@ -414,10 +405,8 @@
 				F79827882909D35500F00DDA /* lint_yymmdd.c in Sources */,
 				F76F569B2C03D8F400A58C2E /* lint_posinseqslash.c in Sources */,
 				F798278A2909D35500F00DDA /* lint_pieceoftotal.c in Sources */,
-				F79827792909D35500F00DDA /* lint_yymmddhh.c in Sources */,
 				F79827842909D35500F00DDA /* lint_nonzero.c in Sources */,
 				F76F569D2C03D8F400A58C2E /* lint_yyyymmdd.c in Sources */,
-				F79827732909D35500F00DDA /* lint_iso3166list.c in Sources */,
 				F798277A2909D35500F00DDA /* lint_zero.c in Sources */,
 				F79827862909D35500F00DDA /* lint_csumalpha.c in Sources */,
 				F73EC9AE2909D225008E17F4 /* ContentView.swift in Sources */,
@@ -426,7 +415,6 @@
 				F73EC9AC2909D225008E17F4 /* GS1_Encoders_AppApp.swift in Sources */,
 				F798277E2909D35500F00DDA /* lint_pcenc.c in Sources */,
 				F79827852909D35500F00DDA /* lint_key.c in Sources */,
-				F798278B2909D35500F00DDA /* lint_mmoptss.c in Sources */,
 				F79827772909D35500F00DDA /* lint_iso4217.c in Sources */,
 				F72E912B2A94E29C00C746FC /* lint_hyphen.c in Sources */,
 				F798277B2909D35500F00DDA /* lint_csetnumeric.c in Sources */,
@@ -440,6 +428,7 @@
 				F7A662AD2A50A95200638051 /* lint_latitude.c in Sources */,
 				F706EB5E2C41A559002F77E3 /* lint_hh.c in Sources */,
 				F798277C2909D35500F00DDA /* lint_iso3166.c in Sources */,
+				F7CAA00B2CBC58E00066147A /* lint__stubs.c in Sources */,
 				F79827752909D35500F00DDA /* lint_couponcode.c in Sources */,
 				F79827872909D35500F00DDA /* lint_nozeroprefix.c in Sources */,
 				F79827802909D35500F00DDA /* lint_iban.c in Sources */,
@@ -449,7 +438,6 @@
 				F79827612909D35500F00DDA /* ai.c in Sources */,
 				F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */,
 				F798278D2909D35500F00DDA /* gs1syntaxdictionary.c in Sources */,
-				F79827832909D35500F00DDA /* lint_hhmm.c in Sources */,
 				F798277F2909D35500F00DDA /* lint_cset82.c in Sources */,
 				F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */,
 				F754C84A2CB6A7FA00ACC93D /* lint_hhmi.c in Sources */,

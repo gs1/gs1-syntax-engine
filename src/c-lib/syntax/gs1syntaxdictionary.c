@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 struct name_function_s {
@@ -26,51 +27,74 @@ struct name_function_s {
 	gs1_linter_t fn;
 };
 
+
+#define ENT(x) { .name = #x, .fn = gs1_lint_##x }
+#define DEP(x)					\
+DIAG_PUSH					\
+DIAG_DISABLE_DEPRECATED_DECLARATIONS		\
+ENT(x)						\
+DIAG_POP
+
+/* GCC has flaky support for pragmas within expressions */
+#if defined(__GNUC__) && !defined(__clang__)
+  #undef DEP
+  #define DEP(x) ENT(x)
+  DIAG_PUSH
+  DIAG_DISABLE_DEPRECATED_DECLARATIONS
+#endif
+
 const struct name_function_s name_function_map[] = {
-	{ .name = "couponcode",		.fn = gs1_lint_couponcode },
-	{ .name = "couponposoffer",	.fn = gs1_lint_couponposoffer },
-	{ .name = "cset39",		.fn = gs1_lint_cset39 },
-	{ .name = "cset64",		.fn = gs1_lint_cset64 },
-	{ .name = "cset82",		.fn = gs1_lint_cset82 },
-	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
-	{ .name = "csum",		.fn = gs1_lint_csum },
-	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
-	{ .name = "hasnondigit",	.fn = gs1_lint_hasnondigit },
-	{ .name = "hh",			.fn = gs1_lint_hh },
-	{ .name = "hhmi",		.fn = gs1_lint_hhmi },
-	{ .name = "hhmm",		.fn = gs1_lint_hhmm },		// Stub
-	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
-	{ .name = "iban",		.fn = gs1_lint_iban },
-	{ .name = "importeridx",	.fn = gs1_lint_importeridx },
-	{ .name = "iso3166",		.fn = gs1_lint_iso3166 },
-	{ .name = "iso3166999",		.fn = gs1_lint_iso3166999 },
-	{ .name = "iso3166alpha2",	.fn = gs1_lint_iso3166alpha2 },
-	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },	// Stub
-	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
-	{ .name = "iso5218",		.fn = gs1_lint_iso5218 },
-	{ .name = "key",		.fn = gs1_lint_key },
-	{ .name = "latitude",		.fn = gs1_lint_latitude },
-	{ .name = "longitude",		.fn = gs1_lint_longitude },
-	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
-	{ .name = "mi",			.fn = gs1_lint_mi },
-	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },	// Stub
-	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
-	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
-	{ .name = "packagetype",	.fn = gs1_lint_packagetype },
-	{ .name = "pcenc",		.fn = gs1_lint_pcenc },
-	{ .name = "pieceoftotal",	.fn = gs1_lint_pieceoftotal },
-	{ .name = "posinseqslash",	.fn = gs1_lint_posinseqslash },
-	{ .name = "ss",			.fn = gs1_lint_ss },
-	{ .name = "winding",		.fn = gs1_lint_winding },
-	{ .name = "yesno",		.fn = gs1_lint_yesno },
-	{ .name = "yymmd0",		.fn = gs1_lint_yymmd0 },
-	{ .name = "yymmdd",		.fn = gs1_lint_yymmdd },
-	{ .name = "yymmddhh",		.fn = gs1_lint_yymmddhh },	// Stub
-	{ .name = "yyyymmd0",		.fn = gs1_lint_yyyymmd0 },
-	{ .name = "yyyymmdd",		.fn = gs1_lint_yyyymmdd },
-	{ .name = "zero",		.fn = gs1_lint_zero },
+	ENT(couponcode),
+	ENT(couponposoffer),
+	ENT(cset39),
+	ENT(cset64),
+	ENT(cset82),
+	ENT(csetnumeric),
+	ENT(csum),
+	ENT(csumalpha),
+	ENT(hasnondigit),
+	ENT(hh),
+	ENT(hhmi),
+	DEP(hhmm),
+	ENT(hyphen),
+	ENT(iban),
+	ENT(importeridx),
+	ENT(iso3166),
+	ENT(iso3166999),
+	ENT(iso3166alpha2),
+	DEP(iso3166list),
+	ENT(iso4217),
+	ENT(iso5218),
+	ENT(key),
+	ENT(latitude),
+	ENT(longitude),
+	ENT(mediatype),
+	ENT(mi),
+	DEP(mmoptss),
+	ENT(nonzero),
+	ENT(nozeroprefix),
+	ENT(packagetype),
+	ENT(pcenc),
+	ENT(pieceoftotal),
+	ENT(posinseqslash),
+	ENT(ss),
+	ENT(winding),
+	ENT(yesno),
+	ENT(yymmd0),
+	ENT(yymmdd),
+	DEP(yymmddhh),
+	ENT(yyyymmd0),
+	ENT(yyyymmdd),
+	ENT(zero),
 };
 
+/* Flaky GCC */
+#if defined(__GNUC__) && !defined(__clang__)
+  DIAG_POP
+#endif
+
+#undef ENT
+#undef DEP
 
 
 /*

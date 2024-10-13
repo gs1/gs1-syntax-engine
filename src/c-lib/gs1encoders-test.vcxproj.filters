@@ -107,9 +107,6 @@
     <ClCompile Include="syntax\lint_hhmi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_hhmm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="syntax\lint_hyphen.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_iso3166alpha2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syntax\lint_iso3166list.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_iso4217.c">
@@ -150,9 +144,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_mi.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syntax\lint_mmoptss.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_nonzero.c">
@@ -188,9 +179,6 @@
     <ClCompile Include="syntax\lint_yymmdd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_yymmddhh.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="syntax\lint_yyyymmd0.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_zero.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint__stubs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

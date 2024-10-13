@@ -153,14 +153,12 @@
     <ClCompile Include="syntax\lint_hasnondigit.c" />
     <ClCompile Include="syntax\lint_hh.c" />
     <ClCompile Include="syntax\lint_hhmi.c" />
-    <ClCompile Include="syntax\lint_hhmm.c" />
     <ClCompile Include="syntax\lint_hyphen.c" />
     <ClCompile Include="syntax\lint_iban.c" />
     <ClCompile Include="syntax\lint_importeridx.c" />
     <ClCompile Include="syntax\lint_iso3166.c" />
     <ClCompile Include="syntax\lint_iso3166999.c" />
     <ClCompile Include="syntax\lint_iso3166alpha2.c" />
-    <ClCompile Include="syntax\lint_iso3166list.c" />
     <ClCompile Include="syntax\lint_iso4217.c" />
     <ClCompile Include="syntax\lint_iso5218.c" />
     <ClCompile Include="syntax\lint_key.c" />
@@ -168,7 +166,6 @@
     <ClCompile Include="syntax\lint_longitude.c" />
     <ClCompile Include="syntax\lint_mediatype.c" />
     <ClCompile Include="syntax\lint_mi.c" />
-    <ClCompile Include="syntax\lint_mmoptss.c" />
     <ClCompile Include="syntax\lint_nonzero.c" />
     <ClCompile Include="syntax\lint_nozeroprefix.c" />
     <ClCompile Include="syntax\lint_packagetype.c" />
@@ -180,10 +177,10 @@
     <ClCompile Include="syntax\lint_yesno.c" />
     <ClCompile Include="syntax\lint_yymmd0.c" />
     <ClCompile Include="syntax\lint_yymmdd.c" />
-    <ClCompile Include="syntax\lint_yymmddhh.c" />
     <ClCompile Include="syntax\lint_yyyymmd0.c" />
     <ClCompile Include="syntax\lint_yyyymmdd.c" />
     <ClCompile Include="syntax\lint_zero.c" />
+    <ClCompile Include="syntax\lint__stubs.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ai.h" />

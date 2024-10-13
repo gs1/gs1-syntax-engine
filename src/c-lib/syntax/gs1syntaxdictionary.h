@@ -234,14 +234,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, si
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len);	// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso5218(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char *data, size_t *err_pos, size_t *err_len);
@@ -249,7 +247,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, siz
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mi(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nonzero(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_packagetype(const char *data, size_t *err_pos, size_t *err_len);
@@ -261,10 +258,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_winding(const char *data, size
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yesno(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmdd(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmddhh(const char *data, size_t *err_pos, size_t *err_len);		// Stub
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmdd(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char *data, size_t *err_pos, size_t *err_len);
+
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_yymmddhh(const char *data, size_t *err_pos, size_t *err_len);
 
 GS1_SYNTAX_DICTIONARY_API gs1_linter_t gs1_linter_from_name(const char *name);
 
