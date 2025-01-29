@@ -39,6 +39,12 @@
     <ClInclude Include="syn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tr_EN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="syntax\acutest.h">
       <Filter>Header Files</Filter>
     </ClInclude>

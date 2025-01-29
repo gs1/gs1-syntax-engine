@@ -78,6 +78,7 @@
 		F73EC9AF2909D226008E17F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F7478BFB29CB222E00080607 /* lint_mediatype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_mediatype.c; sourceTree = "<group>"; };
+		F74F27992D4BAC8A0083274E /* tr_EN.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tr_EN.h; sourceTree = "<group>"; };
 		F754C8472CB6A7EB00ACC93D /* lint_mi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint_mi.c; sourceTree = "<group>"; };
 		F754C8492CB6A7FA00ACC93D /* lint_hhmi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint_hhmi.c; sourceTree = "<group>"; };
 		F76F56962C03D8F400A58C2E /* lint_iso5218.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_iso5218.c; sourceTree = "<group>"; };
@@ -132,6 +133,7 @@
 		F7A662AB2A50A95200638051 /* lint_cset64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset64.c; sourceTree = "<group>"; };
 		F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GS1-Encoders-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		F7CAA00A2CBC58E00066147A /* lint__stubs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint__stubs.c; sourceTree = "<group>"; };
+		F7D37A6B2D4B075600CC9155 /* tr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tr.h; sourceTree = "<group>"; };
 		F7F7CD782C2DE11C00C6460C /* lint_hasnondigit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_hasnondigit.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -209,6 +211,8 @@
 		F798271B2909D35400F00DDA /* c-lib */ = {
 			isa = PBXGroup;
 			children = (
+				F74F27992D4BAC8A0083274E /* tr_EN.h */,
+				F7D37A6B2D4B075600CC9155 /* tr.h */,
 				F798271D2909D35400F00DDA /* debug.h */,
 				F79827202909D35400F00DDA /* ai.c */,
 				F79827212909D35400F00DDA /* enc-private.h */,

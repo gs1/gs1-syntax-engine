@@ -29,6 +29,7 @@
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "dl.h"
+#include "tr.h"
 
 
 typedef enum {
@@ -185,14 +186,14 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 
 	if (strlen(dataStr) != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
 		if (ctx->addCheckDigit)
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", length - 1);
+			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS_WITHOUT_CHECK_DIGIT, length - 1);
 		else
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", length);
+			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS, length);
 		return false;
 	}
 
 	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
+		SET_ERR(PRIMARY_DATA_MUST_BE_ALL_DIGITS);
 		return false;
 	}
 
@@ -202,7 +203,7 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 		strcat(primaryStr, "-");
 
 	if (!validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
+		SET_ERR(PRIMARY_DATA_CHECK_DIGIT_IS_INCORRECT);
 		return false;
 	}
 
@@ -307,7 +308,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// GS1 DataBar Limited is restricted to low-valued inputs
 		if (ctx->sym == gs1_encoder_sDataBarLimited) {
 			if (atof((char*)primaryStr) > 19999999999999.) {
-				strcpy(ctx->errMsg, "Primary data item value is too large");
+				SET_ERR(PRIMARY_DATA_IS_TOO_LARGE);
 				goto fail;
 			}
 		}
@@ -405,19 +406,20 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	*ctx->dataStr = '\0';
 	ctx->numAIs = 0;
 
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
 	if (*scanData != ']' || strlen(scanData) < 3) {
-		strcpy(ctx->errMsg, "Missing symbology identifier");
+		SET_ERR(MISSING_SYMBOLOGY_IDENTIFIER);
 		goto fail;
 	}
 
 	lookupSymAndModeBySymId(scanData + 1, &sym, &aiMode);
 
 	if (sym == gs1_encoder_sNONE) {
-		strcpy(ctx->errMsg, "Unsupported symbology identifier");
+		SET_ERR(UNSUPPORTED_SYMBOLOGY_IDENTIFIER);
 		goto fail;
 	}
 
@@ -431,7 +433,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		const char *cc = NULL;
 
 		if (strlen(scanData) < primaryLen) {
-			strcpy(ctx->errMsg, "Primary scan data is too short");
+			SET_ERR(PRIMARY_SCAN_DATA_IS_TOO_SHORT);
 			goto fail;
 		}
 
@@ -439,7 +441,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		    strncmp(scanData + primaryLen, "|" CC_SYM_ID, sizeof(CC_SYM_ID)) == 0) {
 			cc = scanData + primaryLen + sizeof(CC_SYM_ID);
 		} else if (strlen(scanData) > primaryLen) {
-			strcpy(ctx->errMsg, "Primary message is too long");
+			SET_ERR(PRIMARY_MESSAGE_IS_TOO_LONG);
 			goto fail;
 		}
 
@@ -447,12 +449,12 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		strncat(p, scanData, primaryLen);
 
 		if (!gs1_allDigits((uint8_t*)p, 0)) {
-			strcpy(ctx->errMsg, "Primary message number only contain digits");
+			SET_ERR(PRIMARY_MESSAGE_MAY_ONLY_CONTAIN_DIGITS);
 			goto fail;
 		}
 
 		if (!validateParity((uint8_t*)p)) {
-			strcpy(ctx->errMsg, "Primary message check digit is incorrect");
+			SET_ERR(PRIMARY_MESSAGE_CHECK_DIGIT_IS_INCORRECT);
 			goto fail;
 		}
 
@@ -474,7 +476,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 		// Forbid data "^" characters at this stage so we don't conflate with FNC1
 		if (strchr(scanData, '^') != NULL) {
-			strcpy(ctx->errMsg, "Scan data contains illegal ^ character");
+			SET_ERR(SCAN_DATA_CONTAINS_ILLEGAL_CARAT);
 			goto fail;
 		}
 
@@ -518,7 +520,7 @@ fail:
 	*ctx->dataStr = '\0';
 	ctx->sym = gs1_encoder_sNONE;
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to process scan data");
+		SET_ERR(FAILED_TO_PROCESS_SCAN_DATA);
 
 	return false;
 

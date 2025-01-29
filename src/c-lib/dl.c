@@ -1,7 +1,7 @@
 /**
  * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "enc-private.h"
 #include "debug.h"
 #include "dl.h"
+#include "tr.h"
 
 
 #define CANONICAL_DL_STEM "https://id.gs1.org"
@@ -88,7 +89,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	if (*pos + req >= *cap) {
 		char **reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
 		if (!reallocDLkeyQualifiers) {
-			strcpy(ctx->errMsg, "Failed to reallocate memory for key-qualifiers");
+			SET_ERR(FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS);
 			return false;
 		}
 		*dlKeyQualifiers = reallocDLkeyQualifiers;
@@ -145,7 +146,7 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 
 	char **dlKeyQualifiers = malloc(cap * sizeof(char *));
 	if (!dlKeyQualifiers) {
-		strcpy(ctx->errMsg, "Failed to allocate memory for key-qualifiers");
+		SET_ERR(FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS);
 		return false;
 	}
 
@@ -359,6 +360,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	assert(dlData);
 
 	*dataStr = '\0';
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -368,7 +370,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	p = dlData;
 
 	if (strspn(p, uriCharacters) != strlen(p)) {
-		strcpy(ctx->errMsg, "URI contains illegal characters");
+		SET_ERR(URI_CONTAINS_ILLEGAL_CHARACTERS);
 		goto fail;
 	}
 
@@ -381,14 +383,14 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	else if (strlen(p) >= 7 && strncmp(p, "HTTP://", 7) == 0)
 		p += 7;
 	else {
-		strcpy(ctx->errMsg, "Scheme must be http:// or HTTP:// or https:// or HTTPS://");
+		SET_ERR(URI_CONTAINS_ILLEGAL_SCHEME);
 		goto fail;
 	}
 
 	DEBUG_PRINT("  Scheme %.*s\n", (int)(p-dlData-3), dlData);
 
 	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
-		strcpy(ctx->errMsg, "URI must contain a domain and path info");
+		SET_ERR(URI_MISSING_DOMAIN_AND_PATH_INFO);
 		goto fail;
 	}
 
@@ -439,7 +441,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	}
 
 	if (!dp) {
-		strcpy(ctx->errMsg, "No GS1 DL keys found in path info");
+		SET_ERR(NO_GS1_DL_KEYS_FOUND_IN_PATH_INFO);
 		goto fail;
 	}
 
@@ -472,13 +474,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			p = r + strlen(r);
 
 		if (p == r) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value path element is empty", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_PATH_ELEMENT_IS_EMPTY, (int)strlen(entry->ai), ai);
 			goto fail;
 		}
 
 		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info contains illegal null character", (int)ailen, ai);
+			SET_ERR_V(DECODED_AI_FROM_DL_PATH_INFO_CONTAINS_ILLEGAL_NULL, (int)ailen, ai);
 			goto fail;
 		}
 
@@ -510,7 +512,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		// Update the AI data
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
@@ -561,7 +563,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		ai = p;
 		ailen = (size_t)(e-p);
 		if (gs1_allDigits((uint8_t*)p, ailen) && (entry = gs1_lookupAIentry(ctx, p, ailen)) == NULL) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Unknown AI (%.*s) in query parameters", (int)ailen, p);
+			SET_ERR_V(UNKNOWN_AI_IN_QUERY_PARAMS, (int)ailen, p);
 			goto fail;
 		}
 
@@ -574,13 +576,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		if (r == ++e) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value query element is empty", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_QUERY_ELEMENT_IN_EMPTY, (int)strlen(entry->ai), ai);
 			goto fail;
 		}
 
 		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params contains illegal null character", (int)strlen(entry->ai), ai);
+			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)strlen(entry->ai), ai);
 			goto fail;
 		}
 
@@ -615,7 +617,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 add_query_param_to_ai_data:
 
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
@@ -643,7 +645,7 @@ add_query_param_to_ai_data:
 	// Validate that the AI sequence in the path info is a valid
 	// key-qualifier association
 	if (!isValidDLpathAIseq(ctx, (const char(*)[MAX_AI_LEN+1])pathAIseq, numPathAIs)) {
-		strcpy(ctx->errMsg, "The AIs in the path are not a valid key-qualifier sequence for the key");
+		SET_ERR(INVALID_KEY_QUALIFIER_SEQUENCE);
 		ret = false;
 		goto out;
 	}
@@ -669,7 +671,7 @@ add_query_param_to_ai_data:
 				if (ai2->kind == aiValue_aival &&
 				    ai2->ailen == ai->ailen &&
 				    memcmp(ai2->ai, ai->ai, ai2->ailen) == 0) {
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is duplicated", ai->ailen, ai->ai);
+					SET_ERR_V(DUPLICATE_AI, ai->ailen, ai->ai);
 					ret = false;
 					goto out;
 				}
@@ -678,7 +680,7 @@ add_query_param_to_ai_data:
 			// Check that the AI is a permitted DL URI data attribute
 			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+				SET_ERR_V(AI_IS_NOT_VALID_DATA_ATTRIBUTE, ai->ailen, ai->ai);
 				ret = false;
 				goto out;
 			}
@@ -693,7 +695,7 @@ add_query_param_to_ai_data:
 				memcpy(&seq[j+1], &pathAIseq[j], (size_t)(numPathAIs-j) * sizeof(seq[0]));
 
 				if (getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%s) from query params should be in the path info", seq[j]);
+					SET_ERR_V(AI_SHOULD_BE_IN_PATH_INFO, seq[j]);
 					ret = false;
 					goto out;
 				}
@@ -724,7 +726,7 @@ out:
 fail:
 
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to parse DL data");
+		SET_ERR(DL_URI_PARSE_FAILED);
 
 	DEBUG_PRINT("Parsing DL data failed: %s\n", ctx->errMsg);
 
@@ -777,7 +779,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	}
 
 	if (keyEntry == -1) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot create a DL URI without a primary key AI");
+		SET_ERR(CANNOT_CREATE_DL_URI_WITHOUT_PRIMARY_KEY_AI);
 		return NULL;
 	}
 
@@ -918,7 +920,7 @@ again:
 		 */
 		if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 		    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+			SET_ERR_V(AI_IS_NOT_VALID_DATA_ATTRIBUTE, ai->ailen, ai->ai);
 			*ctx->outStr = '\0';
 			return NULL;
 		}

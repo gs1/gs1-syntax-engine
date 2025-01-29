@@ -31,10 +31,12 @@
 #include "dl.h"
 #include "scandata.h"
 #include "syn.h"
+#include "tr.h"
 
 
 static inline void reset_error(gs1_encoder* const ctx) {
 	assert(ctx);
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -121,7 +123,7 @@ bool gs1_encoder_setSym(gs1_encoder* const ctx, const gs1_encoder_symbologies_t 
 	assert(ctx);
 	reset_error(ctx);
 	if (sym < gs1_encoder_sNONE || sym >= gs1_encoder_sNUMSYMS) {
-		strcpy(ctx->errMsg, "Unknown symbology");
+		SET_ERR(UNKNOWN_SYMBOLOGY);
 		return false;
 	}
 	ctx->sym = sym;
@@ -191,11 +193,11 @@ bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_
 	assert(ctx);
 	reset_error(ctx);
 	if ((signed int)validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {  // Cast satisfies "unsigned enum < 0" checks
-		strcpy(ctx->errMsg, "Unknown validation");
+		SET_ERR(UNKNOWN_VALIDATION);
 		return false;
 	}
 	if (ctx->validationTable[validation].locked) {
-		strcpy(ctx->errMsg, "This validation cannont be amended");
+		SET_ERR(VALIDATION_CANNOT_BE_AMENDED);
 		return false;
 	}
 	ctx->validationTable[validation].enabled = enabled;
@@ -230,7 +232,7 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 	reset_error(ctx);
 
 	if (strlen(dataStr) > MAX_DATA) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Maximum data length is %d characters", MAX_DATA);
+		SET_ERR_V(DATA_TOO_LONG, MAX_DATA);
 		return false;
 	}
 	if (ctx->dataStr != dataStr)					// File input is via ctx->dataStr
@@ -254,7 +256,7 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 			goto fail;
 
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
@@ -306,7 +308,7 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 			goto fail;
 
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 

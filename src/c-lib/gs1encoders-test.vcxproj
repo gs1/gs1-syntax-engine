@@ -160,6 +160,8 @@
     <ClInclude Include="gs1encoders.h" />
     <ClInclude Include="scandata.h" />
     <ClInclude Include="syn.h" />
+    <ClInclude Include="tr.h" />
+    <ClInclude Include="tr_EN.h" />
     <ClInclude Include="syntax\acutest.h" />
     <ClInclude Include="syntax\gs1syntaxdictionary.h" />
     <ClInclude Include="syntax\gs1syntaxdictionary-utils.h" />
