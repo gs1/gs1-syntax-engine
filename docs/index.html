@@ -866,10 +866,10 @@ Data validation checks</h3>
 </ul>
 </li>
 <li>Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):<ul>
-<li>For each component of each AI, as defined by the Syntax Dictionary:<ul>
-<li>Validate that its length is within limits.</li>
+<li>For each component of each AI, as defined by the GS1 Barcode Syntax Dictionary:<ul>
+<li>Validate that its length is within the specified limits.</li>
 <li>Validate that it conforms to the specified character set.</li>
-<li>Apply each of the Linters in turn.</li>
+<li>Apply each of the specified GS1 Barcode Syntax Tests ("linters") in turn.</li>
 </ul>
 </li>
 <li>Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via <a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a>), for example:<ul>

@@ -1,6 +1,6 @@
 {
   "name": "gs1encoder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Emscripten build and JavaScript wrappers for the GS1 Barcode Syntax Engine library",
   "keywords": [
     "digital-link",
