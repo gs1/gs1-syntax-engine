@@ -1,9 +1,11 @@
-UNRELEASED
+1.2.0
 
-* Update to Syntax Dictionary release XXXX-XX-XX
+* Update to Syntax Dictionary release 2025-01-30
 * JS: The browser example app was amended to replace all instances of "{GS}", not just the first.
 * Core: The scandata processor was amended to not strip terminal GS characters.
 * Core: The GS1 DL URI processor was fixed to not truncate AI values derived from URI components that contain percent-encoded null characters.
+* Core: The Syntax Dictionary parser was amended to be tollerant of DOS-style line endings.
+* Core: A new error message translations framework was adopted. No user-visible changes for a regular build.
 
 
 1.1.0
