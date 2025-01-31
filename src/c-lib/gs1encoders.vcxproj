@@ -162,6 +162,7 @@
     <ClCompile Include="syntax\lint_iso4217.c" />
     <ClCompile Include="syntax\lint_iso5218.c" />
     <ClCompile Include="syntax\lint_key.c" />
+    <ClCompile Include="syntax\lint_keyoff1.c" />
     <ClCompile Include="syntax\lint_latitude.c" />
     <ClCompile Include="syntax\lint_longitude.c" />
     <ClCompile Include="syntax\lint_mediatype.c" />

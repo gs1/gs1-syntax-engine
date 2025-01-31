@@ -82,15 +82,20 @@
  *         source is unavailable and this should result in the linting failing.
  *         [IMPLEMENTATION SPECIFIC]
  *
+ * @note When GCP lookup service is provided by the user, it will be called
+ *       with strings whose prefix may be one of (1) a regular GCP, (2) a UPC
+ *       Company Code normalised to a regular GCP (by prefixing "0"), or (3) a
+ *       GS1-8 Prefix normalised to a regular GCP by prefixing "00000".
  * @note The choice of whether or not to assign `offline = 1` in order to
- * return #GS1_LINTER_GCP_DATASOURCE_OFFLINE when a user-provided GCP lookup
- * service is unavailable is implementation specific. It depends on whether the
- * desired behaviour is to fail open (return #GS1_LINTER_OK) or to fail closed
- * (return #GS1_LINTER_GCP_DATASOURCE_OFFLINE). In the case that it is
- * desirable to fail open then in addition to assigning `offline = 0` it is
- * necessary to assign `valid = 1` to avoid returning
- * #GS1_LINTER_INVALID_GCP_PREFIX, which would be misleading in the event of
- * service outage.
+ *       return #GS1_LINTER_GCP_DATASOURCE_OFFLINE when a user-provided GCP
+ *       lookup service is unavailable is implementation specific. It depends
+ *       on whether the desired behaviour is to fail open (return
+ *       #GS1_LINTER_OK) or to fail closed (return
+ *       #GS1_LINTER_GCP_DATASOURCE_OFFLINE). In the case that it is desirable
+ *       to fail open then in addition to assigning `offline = 0` it is
+ *       necessary to assign `valid = 1` to avoid returning
+ *       #GS1_LINTER_INVALID_GCP_PREFIX, which would be misleading in the event
+ *       of service outage.
  *
  */
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, size_t* const err_pos, size_t* const err_len)

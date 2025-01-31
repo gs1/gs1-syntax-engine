@@ -55,6 +55,7 @@
 		F79827902909D35500F00DDA /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = F798275B2909D35400F00DDA /* syn.c */; };
 		F79827912909D35500F00DDA /* gs1-syntax-dictionary.txt in Resources */ = {isa = PBXBuildFile; fileRef = F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */; };
 		F79827DD2909E3AE00F00DDA /* GS1Encoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */; };
+		F7A4673F2D4C7B5400A72510 /* lint_keyoff1.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A4673E2D4C7B5400A72510 /* lint_keyoff1.c */; };
 		F7A662AC2A50A95200638051 /* lint_longitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662A92A50A95200638051 /* lint_longitude.c */; };
 		F7A662AD2A50A95200638051 /* lint_latitude.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AA2A50A95200638051 /* lint_latitude.c */; };
 		F7A662AE2A50A95200638051 /* lint_cset64.c in Sources */ = {isa = PBXBuildFile; fileRef = F7A662AB2A50A95200638051 /* lint_cset64.c */; };
@@ -128,6 +129,7 @@
 		F798275C2909D35400F00DDA /* gs1-syntax-dictionary.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "gs1-syntax-dictionary.txt"; sourceTree = "<group>"; };
 		F79827DB2909DC2600F00DDA /* GS1 Encoders App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GS1 Encoders App-Bridging-Header.h"; sourceTree = "<group>"; };
 		F79827DC2909E3AE00F00DDA /* GS1Encoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS1Encoder.swift; sourceTree = "<group>"; };
+		F7A4673E2D4C7B5400A72510 /* lint_keyoff1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = lint_keyoff1.c; sourceTree = "<group>"; };
 		F7A662A92A50A95200638051 /* lint_longitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_longitude.c; sourceTree = "<group>"; };
 		F7A662AA2A50A95200638051 /* lint_latitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_latitude.c; sourceTree = "<group>"; };
 		F7A662AB2A50A95200638051 /* lint_cset64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lint_cset64.c; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 		F79827392909D35400F00DDA /* syntax */ = {
 			isa = PBXGroup;
 			children = (
+				F7A4673E2D4C7B5400A72510 /* lint_keyoff1.c */,
 				F7CAA00A2CBC58E00066147A /* lint__stubs.c */,
 				F754C8492CB6A7FA00ACC93D /* lint_hhmi.c */,
 				F754C8472CB6A7EB00ACC93D /* lint_mi.c */,
@@ -441,6 +444,7 @@
 				F79827812909D35500F00DDA /* lint_iso3166alpha2.c in Sources */,
 				F79827612909D35500F00DDA /* ai.c in Sources */,
 				F798278C2909D35500F00DDA /* lint_iso3166999.c in Sources */,
+				F7A4673F2D4C7B5400A72510 /* lint_keyoff1.c in Sources */,
 				F798278D2909D35500F00DDA /* gs1syntaxdictionary.c in Sources */,
 				F798277F2909D35500F00DDA /* lint_cset82.c in Sources */,
 				F798278E2909D35500F00DDA /* lint_yymmd0.c in Sources */,

@@ -1,5 +1,5 @@
 /*
- * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ const struct name_function_s name_function_map[] = {
 	ENT(iso4217),
 	ENT(iso5218),
 	ENT(key),
+	ENT(keyoff1),
 	ENT(latitude),
 	ENT(longitude),
 	ENT(mediatype),

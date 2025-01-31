@@ -93,6 +93,9 @@
     <ClCompile Include="syntax\lint_key.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_keyoff1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_latitude.c">
       <Filter>Source Files</Filter>
     </ClCompile>
