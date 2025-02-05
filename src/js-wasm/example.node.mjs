@@ -5,7 +5,7 @@
  *  Requirements:
  *
  *    - Compile with emsdk >= 3.1.28 for correct ES6 module support
- *    - Run with Node.js >= v17.0.0 for stable ES6 module support and readline/promises
+ *    - Run with Node.js >= v18 for stable ES6 module support and readline/promises
  *
  *  The API reference for the native C library is available here:
  *
