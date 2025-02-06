@@ -120,7 +120,7 @@ http.createServer(function(req, res) {
         }
 
     } catch (err) {
-        res.writeHead(400, {'Content-Type': 'text/plain'});
+        res.writeHead(422, {'Content-Type': 'text/plain'});
         res.write(err.message + "\n");
         var markup = gs1encoder.errMarkup;
         if (markup)
