@@ -1,3 +1,9 @@
+X.X.X
+
+* Core: Support was added for DotCode and GS1 DotCode scandata.
+* JS: Added an example node.js web service application to transform GS1 data, which may be useful in the event that the library or its bindings cannot be integrated directly.
+
+
 1.2.0
 
 * Update to Syntax Dictionary release 2025-01-30
