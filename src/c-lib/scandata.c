@@ -1,7 +1,7 @@
 /**
  * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,8 @@ static const struct symIdEntry symIdTable[] = {
 	SYM( "d2", AI,     gs1_encoder_sDM                 ),
 	SYM( "Q1", NON_AI, gs1_encoder_sQR                 ),
 	SYM( "Q3", AI,     gs1_encoder_sQR                 ),
+	SYM( "J0", NON_AI, gs1_encoder_sDotCode            ),
+	SYM( "J1", AI,     gs1_encoder_sDotCode            ),
 };
 
 #undef SYM
@@ -232,9 +234,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	case gs1_encoder_sQR:
 	case gs1_encoder_sDM:
+	case gs1_encoder_sDotCode:
 
-		// QR: "]Q1" for plain data; "]Q3" for GS1 data
-		// DM: "]d1" for plain data; "]d2" for GS1 data
+		// QR:      "]Q1" for plain data; "]Q3" for GS1 data
+		// DM:      "]d1" for plain data; "]d2" for GS1 data
+		// DotCode: "]J0" for plain data; "]J1" for GS1 data
 
 		// If plain data then put original faux CC delimiter back
 		if (*ctx->dataStr != '^' && cc) {
@@ -607,6 +611,8 @@ void test_scandata_generateScanData(void) {
 	test_testGenerateScanData(QR, "\\\\^TESTING", "]Q1\\^TESTING");		// Escaped data "\^" characters
 	test_testGenerateScanData(QR, "^011231231231233310ABC123^99TESTING",
 		"]Q3011231231231233310ABC123" "\x1D" "99TESTING");
+	test_testGenerateScanData(QR, "^011231231231233310ABC123^99TESTING^",
+		"]Q3011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
 
 	/* DM */
 	test_testGenerateScanData(DM, "TESTING", "]d1TESTING");
@@ -616,6 +622,15 @@ void test_scandata_generateScanData(void) {
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING^",
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
+
+	/* DotCode */
+	test_testGenerateScanData(DotCode, "TESTING", "]J0TESTING");
+	test_testGenerateScanData(DotCode, "\\^TESTING", "]J0^TESTING");	// Escaped data "^" character
+	test_testGenerateScanData(DotCode, "\\\\^TESTING", "]J0\\^TESTING");	// Escaped data "\^" characters
+	test_testGenerateScanData(DotCode, "^011231231231233310ABC123^99TESTING",
+		"]J1011231231231233310ABC123" "\x1D" "99TESTING");
+	test_testGenerateScanData(DotCode, "^011231231231233310ABC123^99TESTING^",
+		"]J1011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
 
 	/* DataBar Expanded */
 	test_testGenerateScanData(DataBarExpanded, "^011231231231233310ABC123^99TESTING",
@@ -758,17 +773,20 @@ void test_scandata_processScanData(void) {
 		DM, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
-	/* DM with GS1 Digital Link URI (uppercase scheme) */
-	*ctx->dlAIbuffer = '\0';
-	test_testProcessScanData(true, "]d1HTTPS://example.com/01/12312312312333?99=TEST",
-		DM, "HTTPS://example.com/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+	/* DotCode */
+	test_testProcessScanData(true, "]J0", DotCode, "");
+	test_testProcessScanData(true, "]J0TESTING", DotCode, "TESTING");
+	test_testProcessScanData(true, "]J0^TESTING", DotCode, "\\^TESTING");
+	test_testProcessScanData(true, "]J0\\^TESTING", DotCode, "\\\\^TESTING");
+	test_testProcessScanData(false, "]J1", NONE, "");		// Empty GS1 data
+	test_testProcessScanData(true, "]J1011231231231233310ABC123" "\x1D" "99TESTING",
+		DotCode, "^011231231231233310ABC123^99TESTING");
 
-	/* DM with GS1 Digital Link URI (forbidden mixed-case scheme) */
+	/* DotCode with GS1 Digital Link URI - carrier is suitable, but no active applications support this */
 	*ctx->dlAIbuffer = '\0';
-	test_testProcessScanData(true, "]d1HtTps://example.com/01/12312312312333?99=TEST",
-		DM, "HtTps://example.com/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "") == 0);	// Check AI extraction
+	test_testProcessScanData(true, "]J0https://example.com/01/12312312312333?99=TEST",
+		DotCode, "https://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
 	/* DataBar Expanded, shared with all DataBar family and UCC-128 Composite */
 	test_testProcessScanData(false, "]e0", NONE, "");		// Empty GS1 data

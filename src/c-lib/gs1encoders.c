@@ -1,7 +1,7 @@
 /**
  * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -688,31 +688,48 @@ void test_api_sym(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
 	assert(ctx);
 
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarTruncated));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarStacked));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarStackedOmni));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarLimited));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sUPCA));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sUPCE));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN8));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCC));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDM));
+	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNONE - 1));     // Too small
 
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sNONE));          // First
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
-	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS - 1));   // Last
-	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNUMSYMS - 1);
-	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNONE - 1));     // Too small
-	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS));      // Too big
+
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarOmni);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarTruncated));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarTruncated);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarStacked));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarStacked);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarStackedOmni));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarStackedOmni);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarLimited));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarLimited);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
 	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sUPCA));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sUPCA);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sUPCE));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sUPCE);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sEAN13);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sEAN8));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sEAN8);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCA);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCC));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sGS1_128_CCC);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sQR));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sQR);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDM));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDM);
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sDotCode));
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDotCode);
 
-	TEST_CHECK(gs1_encoder_sNUMSYMS == 14);  // Remember to add new symbologies
+	TEST_CHECK(gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS - 1));   // Last
+	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNUMSYMS - 1);
+
+	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS));      // Too big
+
+	TEST_CHECK(gs1_encoder_sNUMSYMS == 15);  // Remember to change when adding new symbologies
 
 	gs1_encoder_free(ctx);
 
@@ -771,7 +788,7 @@ void test_api_permitZeroSuppressedGTINinDLuris(void) {
 	TEST_CHECK(gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true));		// Set
 	TEST_CHECK(gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));
 
-	TEST_CHECK(gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false));		// Reset
+	TEST_CHECK(gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false));	// Reset
 	TEST_CHECK(!gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));
 
 	gs1_encoder_free(ctx);

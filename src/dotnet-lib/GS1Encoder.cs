@@ -7,7 +7,7 @@ namespace GS1.Encoders
     /// <summary>
     /// Wrapper class for accessing the GS1 Barcode Syntax Engine native library from C#.
     ///
-    /// Copyright (c) 2021-2024 GS1 AISBL.
+    /// Copyright (c) 2021-2025 GS1 AISBL.
     ///
     /// Licensed under the Apache License, Version 2.0 (the "License");
     /// you may not use this file except in compliance with the License.
@@ -81,6 +81,8 @@ namespace GS1.Encoders
             QR,
             /// <summary>(GS1) Data Matrix</summary>
             DM,
+            /// <summary>(GS1) DotCode</summary>
+            DotCode,
             /// <summary>Value is the number of symbologies</summary>
             NUMSYMS,
         };

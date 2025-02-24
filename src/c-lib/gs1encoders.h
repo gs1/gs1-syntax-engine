@@ -4,7 +4,7 @@
  * @file gs1encoders.h
  * @author GS1 AISBL
  *
- * \copyright Copyright (c) 2000-2024 GS1 AISBL.
+ * \copyright Copyright (c) 2000-2025 GS1 AISBL.
  *
  * @licenseblock{License}
  *
@@ -94,8 +94,9 @@
  * indicating whether the function was successful and write an error message
  * that can be accessed with gs1_encoder_getErrMsg() in the event of failure.
  * Production code should check the output of the functions and where relevant
- * do something appropriate with the error message such as render it to the
- * user.
+ * do something appropriate which might include rendering the error message to
+ * the user. Error message string are provided in the English language in a
+ * single file that can be replaced at compile time.
  *
  * Refer to the example console application (`gs1encoders-app.c`) for a
  * comprehensive example of how to use this library.
@@ -166,11 +167,28 @@
  * \endcode
  *
  * \note
- * In the barcode message data `^` represents the FNC1 character. Barcode image
- * encoder libraries will have differing conventions for how to input FNC1
- * characters, including whether it is necessary to be explicit about the FNC1
- * character in the first position. The message data output by this library may
- * need to be post-processed to align to the requirements of whatever symbol
+ * The barcode message data read and emitted by this library uses a harmonised
+ * format that does not concern itself with internal encoding quirks of various
+ * symbologies. In the harmonised barcode message data:
+ * \note
+ *   - A leading `^` always indicates GS1 Application Identifier syntax data,
+ *   i.e. a notional FNC1 in first character position. (This is even true for
+ *   DotCode in whose *internal encoding* the literal FNC1 non-data character
+ *   may have an inverted meaning for certain messages depending upon their
+ *   regular data content.)
+ *   - A `^` at any other position represents a notional FNC1 non-data
+ *   Application Identifier separator character. (This is even the case for QR
+ *   Code in whose *internal encoding* a `%` character or `{GS}` character
+ *   takes on the AI separator role typically assigned to the FNC1 non-data
+ *   character, depending upon the effectuve encodation mode.)
+ * \note
+ * Additionally, barcode image encoder libraries have differing conventions for
+ * how to input FNC1 characters, extending to whether it is necessary to be
+ * explicit about the notional FNC1 character in the first position when
+ * specifying a GS1 Application Identifier syntax symbol.
+ * \note
+ * Consequently, the barcode message data emitted by this library may need to
+ * be post-processed to align to the specific requirements of whatever symbol
  * generation library is in use.
  *
  *
@@ -276,6 +294,7 @@ enum gs1_encoder_symbologies {
 	gs1_encoder_sGS1_128_CCC,		///< GS1-128 with CC-C
 	gs1_encoder_sQR,			///< (GS1) QR Code
 	gs1_encoder_sDM,			///< (GS1) Data Matrix
+	gs1_encoder_sDotCode,			///< (GS1) DotCode
 	gs1_encoder_sNUMSYMS,
 };
 
@@ -869,8 +888,9 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char *dataS
  * conflating them with the start of the next AI.
  *
  * For symbologies that support a composite component (all except
- * ::gs1_encoder_sDM and ::gs1_encoder_sQR), the data for the linear and 2D
- * components can be separated by a "|" character, for example:
+ * ::gs1_encoder_sDM, ::gs1_encoder_sQR and ::gs1_encoder_sDotCode), the data
+ * for the linear and 2D components can be separated by a "|" character, for
+ * example:
  *
  * \code
  * (01)12345678901231|(10)ABC123(11)210630
@@ -1036,6 +1056,8 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * ::gs1_encoder_sQR          | ^01123123123123338200http://example.com        | ]Q301123123123123338200http://example.com
  * ::gs1_encoder_sDM          | https://example.com/gtin/09506000134352/lot/A1 | ]d1https://example.com/gtin/09506000134352/lot/A1
  * ::gs1_encoder_sDM          | ^011231231231233310ABC123^99TESTING            | ]d2011231231231233310ABC123{GS}99TESTING
+ * ::gs1_encoder_sDotCode     | https://example.com/gtin/09506000134352/lot/A1 | ]J0https://example.com/gtin/09506000134352/lot/A1
+ * ::gs1_encoder_sDotCode     | ^011231231231233310ABC123^99TESTING            | ]J1011231231231233310ABC123{GS}99TESTING
  *
  * The output will be prefixed with the appropriate AIM symbology identifier.
  *

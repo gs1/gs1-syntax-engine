@@ -2,7 +2,7 @@
  *  JavaScript wrapper for the GS1 Barcode Syntax Engine compiled as a WASM by
  *  Emscripten.
  *
- *  Copyright (c) 2022-2024 GS1 AISBL.
+ *  Copyright (c) 2022-2025 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -483,7 +483,8 @@ const symbology = {
     GS1_128_CCC: 11,        ///< GS1-128 with CC-C
     QR: 12,                 ///< (GS1) QR Code
     DM: 13,                 ///< (GS1) Data Matrix
-    NUMSYMS: 14,
+    DotCode: 14,            ///< (GS1) DotCode
+    NUMSYMS: 15,
 };
 
 GS1encoder.symbology = symbology;

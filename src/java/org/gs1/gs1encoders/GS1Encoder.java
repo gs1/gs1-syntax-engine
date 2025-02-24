@@ -16,7 +16,7 @@ package org.gs1.gs1encoders;
  *
  * https://gs1.github.io/gs1-syntax-engine/
  *
- * @author Copyright (c) 2022-2024 GS1 AISBL.
+ * @author Copyright (c) 2022-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,11 @@ public class GS1Encoder {
              * (GS1) Data Matrix
              */
             DM,
+
+            /**
+             * (GS1) DotCode
+             */
+            DotCode,
 
             /**
              * Value is the number of symbologies

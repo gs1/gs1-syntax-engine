@@ -2,7 +2,7 @@
  * Wrapper class for accessing the functions exported by the GS1 Barcode Syntax
  * Engine native library (via the "bridging header") from Swift
  *
- * Copyright (c) 2022-2024 GS1 AISBL.
+ * Copyright (c) 2022-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,9 @@ class GS1Encoder {
 
         /// (GS1) Data Matrix
         DM,
+
+        /// (GS1) DotCode
+        DotCode,
 
         /// Value is the number of symbologies
         NUMSYMS
