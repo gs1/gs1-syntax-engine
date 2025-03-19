@@ -26,7 +26,7 @@
  *
  *    $ curl -i 'http://127.0.0.1:3030/aiDataStr?input=(02)12312312312319(99)ASDFEE&includeDataTitlesInHRI'
  *
- *    HTTP/1.1 400 Bad Request
+ *    HTTP/1.1 422 Bad Request
  *    Content-Type: text/plain
  *    ...
  *    Required AIs for AI (02) are not satisfied: 37
