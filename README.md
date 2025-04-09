@@ -194,7 +194,7 @@ Node.js console application, is provided in two flavours:
 
 Each of these flavours includes the JavaScript wrapper (providing the user API)
 and HTML / JS / Node.js implementation files. They are compatible with all modern
-web browsers and Node.js 17 or later.
+web browsers and any maintained release of Node.js.
 
 The most recent version can be
 [downloaded from here](https://github.com/gs1/gs1-syntax-engine/releases/latest).
