@@ -963,9 +963,10 @@ static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, c
 	strcpy(in, dlData);
 	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ (!should_succeed));
 	TEST_MSG("Err: %s", ctx->errMsg);
-	if (should_succeed)
+	if (should_succeed) {
 		TEST_CHECK(strcmp(out, expect) == 0);
-	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+		TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+	}
 
 	TEST_CHECK(strcmp(dlData, in) == 0);
 	TEST_MSG("Input data was erroneously clobbered: %s", in);
