@@ -54,6 +54,13 @@ static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
 
 
 /*
+ *  Characters from uriCharacters that are illegal within a domain name
+ *
+ */
+static const char *badDomainCharacters = "_~?#@!$&'()*+,;=%";
+
+
+/*
  *  Load the list of valid DL key-qualifier associations from the attrs of the
  *  AI table entries.
  *
@@ -391,6 +398,11 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
 		SET_ERR(URI_MISSING_DOMAIN_AND_PATH_INFO);
+		goto fail;
+	}
+
+	if ((int)strcspn(p, badDomainCharacters) < r-p) {
+		SET_ERR(DOMAIN_CONTAINS_ILLEGAL_CHARACTERS);
 		goto fail;
 	}
 
@@ -992,9 +1004,9 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(false, "http://", "");
 	test_parseDLuri(false, "http:///", "");				// No domain
 	test_parseDLuri(false, "http://a", "");				// No path info
-	test_parseDLuri(false, "http://a/", "");				// Pathelogical minimal domain but no AI info
-	test_parseDLuri(false, "http://a/b", "");				// No path info
-	test_parseDLuri(false, "http://a/b/", "");				// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/", "");			// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/b", "");			// No path info
+	test_parseDLuri(false, "http://a/b/", "");			// Pathelogical minimal domain but no AI info
 
 	test_parseDLuri(true,					// http
 		"http://a/00/006141411234567890",
@@ -1019,6 +1031,65 @@ void test_dl_parseDLuri(void) {
 		"");
 
 	test_parseDLuri(true,
+		"https://a/01/12312312312333",
+		"^0112312312312333");
+
+	/*
+	 *  To prevent ossification, we don't strictly validate the form of the
+	 *  domain (IPv4/6, ports, etc.), only the characterset
+	 *
+	 */
+
+	test_parseDLuri(true,					// Puny code
+		"https://xn--fsq.xn--0zwm56d/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Explicit FQDN
+		"https://a./01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Port specified
+		"https://a:65535/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// IPv4
+		"https://192.0.2.1/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in decimal form!
+		"https://3232235777/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in octal form!
+		"https://0300.0250.01.01/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in octal form!
+		"https://0xC0.0xA8.0x01.0x01/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,
+		"https://[2001:db8::1]/01/12312312312333",	// IPv6
+		"^0112312312312333");
+
+	test_parseDLuri(false,
+		"https://[fe80::1%25lo]/01/12312312312333",	// IPv6 zone identifiers not useful
+		"");
+
+	test_parseDLuri(false,					// Bad character in domain
+		"https://$a/006141411234567890",
+		"");
+
+	test_parseDLuri(false,					// Bad character in domain
+		"https://a$/006141411234567890",
+		"");
+
+	/*
+	 * Custom stem
+	 *
+	 */
+
+	test_parseDLuri(true,
 		"https://a/stem/00/006141411234567890",
 		"^00006141411234567890");
 
@@ -1029,10 +1100,6 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(true,					// Fake AI in stem, stop at rightmost key
 		"https://a/00/faux/00/006141411234567890",
 		"^00006141411234567890");
-
-	test_parseDLuri(true,
-		"https://a/01/12312312312333",
-		"^0112312312312333");
 
 
 	/*

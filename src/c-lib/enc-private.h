@@ -163,6 +163,7 @@ typedef enum {
 	gs1_encoder_eCANNOT_READ_FILE,
 	gs1_encoder_eSYNTAX_DICTIONARY_LINE_EXCEEDS_IMPL,
 	gs1_encoder_eSYNTAX_DICTIONARY_LINE_ERROR,
+	gs1_encoder_eDOMAIN_CONTAINS_ILLEGAL_CHARACTERS,
 	__GS1_ENCODERS_NUM_ERRS
 } gs1_encoder_err_t;
 

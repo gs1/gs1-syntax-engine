@@ -118,5 +118,6 @@
 #define TR_EN_CANNOT_READ_FILE "Cannot read file %s"
 #define TR_EN_SYNTAX_DICTIONARY_LINE_EXCEEDS_IMPL "Syntax Dictionary line %d: Exceeds implementation limit of %d characters"
 #define TR_EN_SYNTAX_DICTIONARY_LINE_ERROR "Syntax Dictionary line %d: %.*s"
+#define TR_EN_DOMAIN_CONTAINS_ILLEGAL_CHARACTERS "Domain contains illegal characters"
 
 #endif  /* TR_EN_H */
