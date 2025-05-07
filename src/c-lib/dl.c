@@ -94,7 +94,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 */
 	for (i = 0, req = 1; i < num; i++, req *= 2);
 	if (*pos + req >= *cap) {
-		char **reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
+		char **reallocDLkeyQualifiers = GS1_ENCODERS_REALLOC(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
 		if (!reallocDLkeyQualifiers) {
 			SET_ERR(FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS);
 			return false;
@@ -209,8 +209,8 @@ fail:
 	 *
 	 */
 	for (i--; i >= 0; i--)
-		free(dlKeyQualifiers[i]);
-	free(dlKeyQualifiers);
+		GS1_ENCODERS_FREE(dlKeyQualifiers[i]);
+	GS1_ENCODERS_FREE(dlKeyQualifiers);
 
 	return false;
 
@@ -227,9 +227,9 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
 		return;
 
 	for (i = 0; i < ctx->numDLkeyQualifiers; i++)
-		free(ctx->dlKeyQualifiers[i]);
+		GS1_ENCODERS_FREE(ctx->dlKeyQualifiers[i]);
 
-	free(ctx->dlKeyQualifiers);
+	GS1_ENCODERS_FREE(ctx->dlKeyQualifiers);
 	ctx->dlKeyQualifiers = NULL;
 
 }

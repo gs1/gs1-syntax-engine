@@ -347,9 +347,9 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 fail:
 	*(*entry)->ai = '\0';
-	free((*entry)->title);
+	GS1_ENCODERS_FREE((*entry)->title);
 	(*entry)->title = NULL;
-	free((*entry)->attrs);
+	GS1_ENCODERS_FREE((*entry)->attrs);
 	(*entry)->attrs = NULL;
 	return -1;
 
@@ -365,7 +365,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	struct aiEntry *sd;
 	struct aiEntry *pos;
 
-	sd = (struct aiEntry*)malloc(cap * sizeof(struct aiEntry));
+	sd = (struct aiEntry*)GS1_ENCODERS_MALLOC(cap * sizeof(struct aiEntry));
 	if (!sd)
 		error(FAILED_TO_ALLOCATE_AI_TABLE);
 	sd[0].ai[0] = '\0';
@@ -398,7 +398,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 fail:
 	if (fp) fclose(fp);
 	gs1_freeSyntaxDictionaryEntries(ctx, sd);
-	free(sd);
+	GS1_ENCODERS_FREE(sd);
 	return NULL;
 
 }
@@ -441,9 +441,9 @@ void gs1_freeSyntaxDictionaryEntries(const gs1_encoder* const ctx, struct aiEntr
 
 	while (*sd->ai) {
 		*sd->ai = '\0';
-		free(sd->attrs);
+		GS1_ENCODERS_FREE(sd->attrs);
 		sd->attrs = NULL;
-		free(sd->title);
+		GS1_ENCODERS_FREE(sd->title);
 		sd->title = NULL;
 		sd++;
 	}
@@ -466,7 +466,7 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 
 	TEST_CASE(sdEntry);
 
-	TEST_ASSERT((out = calloc(cap, sizeof(struct aiEntry))) != NULL);
+	TEST_ASSERT((out = GS1_ENCODERS_CALLOC(cap, sizeof(struct aiEntry))) != NULL);
 	assert(out);
 
 	*out->ai = '\0';
@@ -514,7 +514,7 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 
 out:
 	gs1_freeSyntaxDictionaryEntries(ctx, out);
-	free(out);
+	GS1_ENCODERS_FREE(out);
 
 }
 

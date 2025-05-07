@@ -59,7 +59,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 
 	if (!mem) {  // No storage provided so allocate our own
 #ifndef NOMALLOC
-		ctx = malloc(sizeof(gs1_encoder));
+		ctx = GS1_ENCODERS_MALLOC(sizeof(gs1_encoder));
 #endif
 		if (ctx == NULL) return NULL;
 	} else {  // Use the provided storage
@@ -100,7 +100,7 @@ void gs1_encoder_free(gs1_encoder* const ctx) {
 
 	if (ctx->aiTable && ctx->aiTableIsDynamic) {
 		gs1_freeSyntaxDictionaryEntries(ctx, ctx->aiTable);
-		free(ctx->aiTable);
+		GS1_ENCODERS_FREE(ctx->aiTable);
 	}
 
 	gs1_freeDLkeyQualifiers(ctx);
@@ -664,11 +664,11 @@ void test_api_init(void) {
 #ifndef __clang_analyzer__
 // Analyzer fails to derive that ctx->localAlloc will be set and incorrectly reports a double free
 	TEST_ASSERT((mem = gs1_encoder_instanceSize()) > 0);
-	TEST_ASSERT((heap = malloc(mem)) != NULL);
+	TEST_ASSERT((heap = GS1_ENCODERS_MALLOC(mem)) != NULL);
 	TEST_ASSERT((ctx = gs1_encoder_init(heap)) == heap);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
 	gs1_encoder_free(ctx);
-	free(heap);
+	GS1_ENCODERS_FREE(heap);
 #endif
 
 	// We allocate at compile-time and pass it in

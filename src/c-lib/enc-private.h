@@ -62,6 +62,26 @@
 #  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
 #endif
 
+
+#ifdef GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H
+#define xstr(s) str(s)
+#define str(s) #s
+#include xstr(GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H)
+#endif
+
+#ifdef GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H
+#define GS1_ENCODERS_MALLOC(sz) GS1_ENCODERS_CUSTOM_MALLOC(sz)
+#define GS1_ENCODERS_CALLOC(nm, sz) GS1_ENCODERS_CUSTOM_CALLOC(nm, sz)
+#define GS1_ENCODERS_REALLOC(p, sz) GS1_ENCODERS_CUSTOM_REALLOC(p, sz)
+#define GS1_ENCODERS_FREE(p) GS1_ENCODERS_CUSTOM_FREE(p)
+#else
+#define GS1_ENCODERS_MALLOC(sz) malloc(sz)
+#define GS1_ENCODERS_CALLOC(nm, sz) calloc(nm, sz)
+#define GS1_ENCODERS_REALLOC(p, sz) realloc(p, sz)
+#define GS1_ENCODERS_FREE(p) free(p)
+#endif
+
+
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
 

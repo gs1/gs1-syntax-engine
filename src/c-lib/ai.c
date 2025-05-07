@@ -121,7 +121,7 @@ redo:
 	 *
 	 */
 	if (ctx->aiTable && ctx->aiTableIsDynamic)
-		free(ctx->aiTable);
+		GS1_ENCODERS_FREE(ctx->aiTable);
 
 	/*
 	 *  Set the given AI table and populate the various additional
