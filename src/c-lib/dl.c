@@ -116,7 +116,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *
 	 */
 	strncat(buf, key, MAX_AI_ATTR_LEN);
-	*addedQualifiers = strdup(buf);
+	*addedQualifiers = gs1_strdup_alloc(buf);
 	if (!*addedQualifiers)
 		return false;
 	(*pos)++;
@@ -130,7 +130,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 
 		for (k = 0; k < j; k++) {
 			snprintf(buf, sizeof(buf), "%s %s", addedQualifiers[k], token);
-			addedQualifiers[k + j] = strdup(buf);
+			addedQualifiers[k + j] = gs1_strdup_alloc(buf);
 			if (!addedQualifiers[k + j])
 				return false;
 			(*pos)++;

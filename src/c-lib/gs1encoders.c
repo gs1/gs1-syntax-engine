@@ -105,7 +105,7 @@ void gs1_encoder_free(gs1_encoder* const ctx) {
 
 	gs1_freeDLkeyQualifiers(ctx);
 	if (ctx->localAlloc)
-		free(ctx);
+		GS1_ENCODERS_FREE(ctx);
 }
 
 
@@ -607,6 +607,19 @@ __ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
 			return false;
 	}
 	return true;
+
+}
+
+
+char* gs1_strdup_alloc(const char *s) {
+
+	size_t len = strlen(s) + 1;
+	void *d = GS1_ENCODERS_MALLOC(len);
+
+	if (!d)
+		return NULL;
+
+	return memcpy(d, s, len);
 
 }
 

@@ -289,7 +289,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	}
 	if (p != buf)
 		*(p-1) = '\0';			// Chop final space
-	(*entry)->attrs = strdup(buf);
+	(*entry)->attrs = gs1_strdup_alloc(buf);
 	if (!(*entry)->attrs)
 		error(FAILED_TO_ALLOCATE_MEMORY_FOR_ATTRS);
 
@@ -300,12 +300,12 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		if (strspn(token, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890#()-+,./²³ ") != strlen(token))
 			error(TITLE_CONTAINS_ILLEGAL_CHARACTERS);
 
-		(*entry)->title = strdup(token);
+		(*entry)->title = gs1_strdup_alloc(token);
 		if (!(*entry)->title)
 			error(FAILED_TO_ALLOCATE_MEMORY_FOR_TITLE);
 
 	} else {
-		(*entry)->title = strdup("");
+		(*entry)->title = gs1_strdup_alloc("");
 		if (!(*entry)->title)
 			error(FAILED_TO_ALLOCATE_MEMORY_FOR_TITLE);
 	}
@@ -328,10 +328,10 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 			for (linter = 0; linter < MAX_LINTERS; linter++)
 				(*entry)->parts[part].linters[linter] = lastEntry->parts[part].linters[linter];
 		}
-		(*entry)->attrs = strdup(lastEntry->attrs);
+		(*entry)->attrs = gs1_strdup_alloc(lastEntry->attrs);
 		if (!(*entry)->attrs)
 			error(FAILED_TO_ALLOCATE_MEMORY_FOR_ATTRS);
-		(*entry)->title = strdup(lastEntry->title);
+		(*entry)->title = gs1_strdup_alloc(lastEntry->title);
 		if (!(*entry)->title)
 			error(FAILED_TO_ALLOCATE_MEMORY_FOR_TITLE);
 

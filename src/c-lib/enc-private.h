@@ -35,7 +35,6 @@
 
 #ifdef _MSC_VER
 #define strtok_r strtok_s
-#define strdup _strdup
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -213,6 +212,8 @@ struct gs1_encoder {
  *
  */
 bool gs1_allDigits(const uint8_t *str, size_t len);
+
+char* gs1_strdup_alloc(const char *s);
 
 
 #ifdef UNIT_TESTS
