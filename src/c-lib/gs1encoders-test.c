@@ -79,7 +79,9 @@ TEST_LIST = {
      * syn.c
      *
      */
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
     { "syn_parseSyntaxDictionaryEntry", test_syn_parseSyntaxDictionaryEntry },
+#endif
 
 
     /*

@@ -18,6 +18,7 @@
  *
  */
 
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -47,6 +48,8 @@
 	goto fail;				\
 } while(0)
 
+
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
 
 static int processComponent(gs1_encoder* const ctx, char* const component, struct aiComponent* const part) {
 
@@ -407,7 +410,7 @@ fail:
 #undef error_v
 
 
-bool gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
 
 	struct aiEntry *sd;
 
@@ -422,14 +425,7 @@ bool gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
 		printf("*** %s\n", ctx->errMsg);
 	}
 
-	/*
-	 *  If parsing failed then we will be calling gs1_setAItable with NULL
-	 *  which will load the embedded AI table.
-	 *
-	 */
-	gs1_setAItable(ctx, sd);
-
-	return true;
+	return sd;
 
 }
 
@@ -607,3 +603,5 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 
 #endif  /* UNIT_TESTS */
 
+
+#endif  /* EXCLUDE_SYNTAX_DICTIONARY_LOADER */

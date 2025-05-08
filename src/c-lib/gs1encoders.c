@@ -56,6 +56,7 @@ __ATTR_CONST int gs1_encoder_getMaxDataStrLength(void) {
 gs1_encoder* gs1_encoder_init(void* const mem) {
 
 	gs1_encoder *ctx = NULL;
+	struct aiEntry *sd = NULL;
 
 	if (!mem) {  // No storage provided so allocate our own
 #ifndef NOMALLOC
@@ -86,7 +87,18 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.linterErrMarkup = { 0 }
 	}), sizeof(struct gs1_encoder));
 
-	gs1_loadSyntaxDictionary(ctx, NULL);
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+	sd = gs1_loadSyntaxDictionary(ctx, NULL);
+#endif
+
+	/*
+	 *  If parsing failed or EXCLUDE_SYNTAX_DICTIONARY_LOADER is defined
+	 *  then we will be calling gs1_setAItable with NULL which will load
+	 *  the embedded AI table, if it is available
+	 *
+	 */
+	gs1_setAItable(ctx, sd);
+
 	gs1_loadValidationTable(ctx);
 
 	return ctx;
@@ -98,10 +110,12 @@ void gs1_encoder_free(gs1_encoder* const ctx) {
 	assert(ctx);
 	reset_error(ctx);
 
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
 	if (ctx->aiTable && ctx->aiTableIsDynamic) {
 		gs1_freeSyntaxDictionaryEntries(ctx, ctx->aiTable);
 		GS1_ENCODERS_FREE(ctx->aiTable);
 	}
+#endif
 
 	gs1_freeDLkeyQualifiers(ctx);
 	if (ctx->localAlloc)

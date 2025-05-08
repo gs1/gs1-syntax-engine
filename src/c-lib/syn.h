@@ -21,16 +21,19 @@
 #ifndef SYN_H
 #define SYN_H
 
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "gs1encoders.h"
 
 
+
 struct aiEntry;
 
 
-bool gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname);
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname);
 void gs1_freeSyntaxDictionaryEntries(const gs1_encoder *ctx, struct aiEntry *sd);
 
 // Exposed for fuzzing
@@ -41,7 +44,9 @@ int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct 
 
 void test_syn_parseSyntaxDictionaryEntry(void);
 
-#endif
+#endif  /* UNIT_TESTS */
 
+
+#endif  /* EXCLUDE_SYNTAX_DICTIONARY_LOADER */
 
 #endif  /* SYN_H */
