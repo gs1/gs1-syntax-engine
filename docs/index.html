@@ -136,7 +136,7 @@ GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                  <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a111897e9846a97c2d3e446d2815b4410"><div class="ttname"><a href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:356</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:435</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3f3190f20a24e00c66fb409fd4f33e17"><div class="ttname"><a href="gs1encoders_8h.html#a3f3190f20a24e00c66fb409fd4f33e17">gs1_encoder_getErrMarkup</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getErrMarkup(gs1_encoder *ctx)</div><div class="ttdoc">Read the error markup generated when parsing AI data fails due to a linting failure.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_a3fe65a09fa62afe033b6697970778e25"><div class="ttname"><a href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a></div><div class="ttdeci">GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char ***hri)</div><div class="ttdoc">Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...</div></div>
 <div class="ttc" id="ags1encoders_8h_html_abdce5a9347ff7cbbd153b1a13e3273dd"><div class="ttname"><a href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...</div></div>
@@ -195,12 +195,59 @@ Barcode scan data processing</h3>
 <div class="line"><span class="comment">// description of gs1_encoder_setScanData()</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);</div>
-<div class="ttc" id="ags1encoders_8h_html_a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"><div class="ttname"><a href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a></div><div class="ttdeci">@ gs1_encoder_vREQUISITE_AIS</div><div class="ttdoc">Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:313</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"><div class="ttname"><a href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a></div><div class="ttdeci">@ gs1_encoder_vREQUISITE_AIS</div><div class="ttdoc">Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:392</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ac137de565a438241f6e8b80598cef464"><div class="ttname"><a href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder *ctx, const char *scanData)</div><div class="ttdoc">Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is required that AIM Symbology Identifiers are enabled on the barcode reader.</dd>
 <dd>
-It is assumed the scanned barcode message "survives the channel" intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement. </dd></dl>
-</div><table class="memberdecls">
+It is assumed the scanned barcode message "survives the channel" intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement.</dd></dl>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Compile-Time Configuration Macros</h2>
+<p>The following macros may be defined at compile time to enable or disable optional features:</p>
+<p><code>GS1_ENCODERS_ERR_LANG=&lt;LANG&gt;</code> : Used to specify alternative translation strings for error messages. Create a new header file named <code>tr_&lt;LANG&gt;.h</code> based on the existing <code>tr_EN.h</code> file.</p>
+<p><code>EXCLUDE_EMBEDDED_AI_TABLE</code> : Excludes the embedding a table of AI properties in order to reduce the size of the library. The table of AI definitions must be populated by parsing from the GS1 Syntax Dictionary instead, without falling back to the embedded instance.</p>
+<p><code>EXCLUDE_SYNTAX_DICTIONARY_LOADER</code> : Excludes functions for populating the table of AIs by parsing the GS1 Syntax Dictionary. The AI definitions must be embedded for the library to function, i.e. this option is mutually exclusive of <code>EXCLUDE_EMBEDDED_AI_TABLE</code>.</p>
+<p><code>GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=&lt;CUSTOM_HEADER.h&gt;</code> : Points to a file that declares alternative heap management routines via the <code>GS1_ENCODERS_CUSTOM_MALLOC</code>, <code>GS1_ENCODERS_CUSTOM_CALLOC</code>, <code>GS1_ENCODERS_CUSTOM_REALLOC</code> and <code>GS1_ENCODERS_CUSTOM_FREE</code> macros. See below for implementation details.</p>
+<h3><a class="anchor" id="autotoc_md6"></a>
+Custom heap management routines example</h3>
+<p>Define <code>GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=my_alloc.h</code>.</p>
+<p>Example declarations in <code>my_alloc.h</code>:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define GS1_ENCODERS_CUSTOM_MALLOC(sz) my_malloc(sz)</span></div>
+<div class="line"><span class="preprocessor">#define GS1_ENCODERS_CUSTOM_CALLOC(nm, sz) my_calloc(nm, sz)</span></div>
+<div class="line"><span class="preprocessor">#define GS1_ENCODERS_CUSTOM_REALLOC(p, sz) my_realloc(p, sz)</span></div>
+<div class="line"><span class="preprocessor">#define GS1_ENCODERS_CUSTOM_FREE(p) my_free(p)</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span>* my_malloc(<span class="keywordtype">size_t</span> s);</div>
+<div class="line"><span class="keywordtype">void</span>* my_calloc(<span class="keywordtype">size_t</span> nm, <span class="keywordtype">size_t</span> sz);</div>
+<div class="line"><span class="keywordtype">void</span>* my_realloc(<span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> sz);</div>
+<div class="line"><span class="keywordtype">void</span> my_free(<span class="keywordtype">void</span> *p);</div>
+</div><!-- fragment --><p>Example implementation:</p>
+<div class="fragment"><div class="line">...</div>
+<div class="line"> </div>
+<div class="line">void* my_malloc(<span class="keywordtype">size_t</span> s) {</div>
+<div class="line">        <span class="keywordtype">void</span>* p = malloc(s);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;*** MALLOC %zu =&gt; %p\n&quot;</span>, s, p);</div>
+<div class="line">        <span class="keywordflow">return</span> p;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span>* my_calloc(<span class="keywordtype">size_t</span> nm, <span class="keywordtype">size_t</span> sz) {</div>
+<div class="line">        <span class="keywordtype">void</span>* p = calloc(nm, sz);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;*** CALLOC %zu %zu =&gt; %p\n&quot;</span>, nm, sz, p);</div>
+<div class="line">        <span class="keywordflow">return</span> p;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span>* my_realloc(<span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> sz) {</div>
+<div class="line">        <span class="keywordtype">void</span>* q = realloc(p, sz);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;*** REALLOC %p %zu =&gt; %p\n&quot;</span>, p, sz, q);</div>
+<div class="line">        <span class="keywordflow">return</span> q;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span> my_free(<span class="keywordtype">void</span> *p) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;*** FREE %p\n&quot;</span>, p);</div>
+<div class="line">        free(p);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line">...</div>
+</div><!-- fragment --> </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a144e851913c5a265ef16602d35386773" id="r_a144e851913c5a265ef16602d35386773"><td class="memItemLeft" align="right" valign="top"><a id="a144e851913c5a265ef16602d35386773" name="a144e851913c5a265ef16602d35386773"></a>
@@ -853,7 +900,7 @@ The returned pointer should be checked for NULL which indicates that invalid inp
 <p>Read an error message generated by the library. </p>
 <p>When any of the setter functions of this library return false (indicating an error), a human-friendly error message is generated which can be read using this function.</p>
 <dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after any subsequent library function calls.</dd></dl>
-<h3><a class="anchor" id="autotoc_md5"></a>
+<h3><a class="anchor" id="autotoc_md7"></a>
 Data validation checks</h3>
 <p>The library may return a single error message for each data operation. When setting message data with <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a> it may be useful to understand the order in which data validation checks are performed.</p>
 <p>In general, the data input is validated by applying checks in the following outline sequence:</p>
@@ -1153,7 +1200,7 @@ Data validation checks</h3>
 <div class="line">printf(<span class="stringliteral">&quot;Scan data: %s\n&quot;</span>, <a class="code hl_function" href="gs1encoders_8h.html#a543a637c593d86379e8916ece470ac21">gs1_encoder_getScanData</a>(ctx)); <span class="comment">// Print the scan data that a reader should return</span></div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html_a543a637c593d86379e8916ece470ac21"><div class="ttname"><a href="gs1encoders_8h.html#a543a637c593d86379e8916ece470ac21">gs1_encoder_getScanData</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getScanData(gs1_encoder *ctx)</div><div class="ttdoc">Returns the string that should be returned by scanners when reading a symbol that is an instance of t...</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a></div><div class="ttdeci">@ gs1_encoder_sDataBarExpanded</div><div class="ttdoc">GS1 DataBar Expanded (Stacked)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:288</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a></div><div class="ttdeci">@ gs1_encoder_sDataBarExpanded</div><div class="ttdoc">GS1 DataBar Expanded (Stacked)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:367</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ac0dde3809298ee931ebfcfd7bec442d2"><div class="ttname"><a href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, gs1_encoder_symbologies_t sym)</div><div class="ttdoc">Set the symbology type.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a> </dd>

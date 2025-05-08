@@ -235,6 +235,84 @@
  * represented by GS characters (ASCII 29). If this is not the case then the
  * scanned data should be pre-processed to meet this requirement.
  *
+ *
+ * Compile-Time Configuration Macros
+ * ---------------------------------
+ *
+ * The following macros may be defined at compile time to enable or disable
+ * optional features:
+ *
+ * `GS1_ENCODERS_ERR_LANG=<LANG>`
+ * :  Used to specify alternative translation strings for error messages.
+ *    Create a new header file named `tr_<LANG>.h` based on the existing
+ *    `tr_EN.h` file.
+ *
+ * `EXCLUDE_EMBEDDED_AI_TABLE`
+ * :  Excludes the embedding a table of AI properties in order to reduce the
+ *    size of the library. The table of AI definitions must be populated by
+ *    parsing from the GS1 Syntax Dictionary instead, without falling back to
+ *    the embedded instance.
+ *
+ * `EXCLUDE_SYNTAX_DICTIONARY_LOADER`
+ * :  Excludes functions for populating the table of AIs by parsing the GS1
+ *    Syntax Dictionary. The AI definitions must be embedded for the library to
+ *    function, i.e. this option is mutually exclusive of
+ *    `EXCLUDE_EMBEDDED_AI_TABLE`.
+ *
+ * `GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=<CUSTOM_HEADER.h>`
+ * :  Points to a file that declares alternative heap management routines via
+ *    the `GS1_ENCODERS_CUSTOM_MALLOC`, `GS1_ENCODERS_CUSTOM_CALLOC`,
+ *    `GS1_ENCODERS_CUSTOM_REALLOC` and `GS1_ENCODERS_CUSTOM_FREE` macros. See
+ *    below for implementation details.
+ *
+ * ### Custom heap management routines example
+ *
+ * Define `GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=my_alloc.h`.
+ *
+ * Example declarations in `my_alloc.h`:
+ *
+ * \code
+ * #define GS1_ENCODERS_CUSTOM_MALLOC(sz) my_malloc(sz)
+ * #define GS1_ENCODERS_CUSTOM_CALLOC(nm, sz) my_calloc(nm, sz)
+ * #define GS1_ENCODERS_CUSTOM_REALLOC(p, sz) my_realloc(p, sz)
+ * #define GS1_ENCODERS_CUSTOM_FREE(p) my_free(p)
+ *
+ * void* my_malloc(size_t s);
+ * void* my_calloc(size_t nm, size_t sz);
+ * void* my_realloc(void *p, size_t sz);
+ * void my_free(void *p);
+ * \endcode
+ *
+ * Example implementation:
+ *
+ * \code
+ * ...
+ *
+ * void* my_malloc(size_t s) {
+ *         void* p = malloc(s);
+ *         printf("*** MALLOC %zu => %p\n", s, p);
+ *         return p;
+ * }
+ *
+ * void* my_calloc(size_t nm, size_t sz) {
+ *         void* p = calloc(nm, sz);
+ *         printf("*** CALLOC %zu %zu => %p\n", nm, sz, p);
+ *         return p;
+ * }
+ *
+ * void* my_realloc(void *p, size_t sz) {
+ *         void* q = realloc(p, sz);
+ *         printf("*** REALLOC %p %zu => %p\n", p, sz, q);
+ *         return q;
+ * }
+ *
+ * void my_free(void *p) {
+ *         printf("*** FREE %p\n", p);
+ *         free(p);
+ * }
+ *
+ * ...
+ * \endcode
  */
 
 
