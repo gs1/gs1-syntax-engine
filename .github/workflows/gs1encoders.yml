@@ -190,6 +190,23 @@ jobs:
         make -C src/c-lib -j `nproc` libstatic
         ant -f src/java/build.xml test
 
+  ci-java-macos:
+
+    runs-on: macos-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Java CI
+      run: |
+        make -C src/c-lib -j `sysctl -n hw.logicalcpu` libstatic
+        ant -f src/java/build.xml test
 
   ci-java-windows:
 
@@ -475,6 +492,7 @@ jobs:
       - ci-macos
       - ci-scan-build
       - ci-java-linux
+      - ci-java-macos
       - ci-java-windows
       - ci-wasm
       - ci-jsonly
