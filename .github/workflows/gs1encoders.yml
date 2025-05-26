@@ -172,7 +172,7 @@ jobs:
             -i gs1syntaxdictionary-fuzzer-linters.c \
             --suppress=missingIncludeSystem .
 
-  ci-java:
+  ci-java-linux:
 
     runs-on: ubuntu-latest
 
@@ -189,6 +189,33 @@ jobs:
       run: |
         make -C src/c-lib -j `nproc` libstatic
         ant -f src/java/build.xml test
+
+
+  ci-java-windows:
+
+    runs-on: windows-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Add JDK to PATH
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Java CI build C lib
+      run: |
+        msbuild /p:Configuration=debug /p:Platform="x64" /warnaserror src\gs1encoders.sln /target:gs1encoders
+
+    - name: Java CI build JNI lib and test
+      shell: cmd
+      run: |
+        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" && ant -f src/java/build.xml test
 
   ci-wasm:
 
@@ -447,7 +474,8 @@ jobs:
       - ci-msvc
       - ci-macos
       - ci-scan-build
-      - ci-java
+      - ci-java-linux
+      - ci-java-windows
       - ci-wasm
       - ci-jsonly
       - ci-ios-app
