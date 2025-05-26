@@ -28,7 +28,7 @@
     <os family="windows"/>
   </condition>
   <condition property="os.family" value="linux">
-    <os family="unix"/>
+    <os family="unix" name="Linux"/>
   </condition>
 
   <!-- ========== Compiler selection ========== -->
@@ -58,12 +58,12 @@
     <os family="mac"/>
   </condition>
   <condition property="jnilink" value="libgs1encoders.so">
-    <os family="unix"/>
+    <os family="unix" name="Linux"/>
   </condition>
 
   <!-- ========== Strip Settings ========== -->
   <condition property="should.strip" value="true">
-    <os family="unix"/>
+    <os family="unix" name="Linux"/>
   </condition>
 
   <!-- ========== Linker flags for Unix ========== -->
@@ -140,7 +140,7 @@
   <target name="copydll" unless="jnilink">
     <copy file="${dlldir}/gs1encoders.dll" todir="${src}"/>
   </target>
-  
+
   <target name="jni" depends="strip,symlink,copydll" if="jnilink"/>
 
   <target name="compile" depends="init">
