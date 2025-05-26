@@ -39,7 +39,7 @@ typedef enum {
 
 
 struct symIdEntry {
-	char symId[2];
+	char symId[3];
 	aiMode_t aiMode;
 	gs1_encoder_symbologies_t sym;
 };
