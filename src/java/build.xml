@@ -1,43 +1,53 @@
+<?xml version="1.0"?>
 <!--
+  Copyright (c) 2022-2025 GS1 AISBL.
 
-Copyright (c) 2022-2025 GS1 AISBL.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 
 <project name="gs1encoders" default="all" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
-  <description>
-    Java binding for GS1 Barcode Syntax Engine.
-  </description>
+  <description>Java binding for GS1 Barcode Syntax Engine.</description>
 
-  <condition property="no_strip" value="true">
-    <or>
-      <os family="windows"/>
-      <os family="mac"/>
-    </or>
+  <!-- ========== Platform Detection ========== -->
+  <condition property="os.family" value="darwin">
+    <os family="mac"/>
+  </condition>
+  <condition property="os.family" value="win32">
+    <os family="windows"/>
+  </condition>
+  <condition property="os.family" value="linux">
+    <os family="unix"/>
   </condition>
 
+  <!-- ========== Compiler selection ========== -->
+  <condition property="is.compiler.cl" value="true">
+    <os family="windows"/>
+  </condition>
+  <condition property="is.compiler.cc" value="true">
+    <not>
+      <isset property="is.compiler.cl"/>
+    </not>
+  </condition>
+
+  <!-- ========== JNI Library Naming ========== -->
   <condition property="jnilib" value="libgs1encodersjni.dylib">
     <os family="mac"/>
   </condition>
-
   <condition property="jnilib" value="gs1encodersjni.dll">
     <os family="windows"/>
   </condition>
-
   <condition property="jnilib" value="libgs1encodersjni.so">
     <not>
       <isset property="jnilib"/>
@@ -47,53 +57,39 @@ limitations under the License.
   <condition property="jnilink" value="libgs1encoders.dylib">
     <os family="mac"/>
   </condition>
-
   <condition property="jnilink" value="libgs1encoders.so">
     <os family="unix"/>
   </condition>
 
-  <condition property="is.compiler.cl" value="true">
-    <os family="windows"/>
+  <!-- ========== Strip Settings ========== -->
+  <condition property="should.strip" value="true">
+    <os family="unix"/>
   </condition>
 
-  <condition property="is.compiler.cc" value="true">
-    <not>
-      <isset property="is.compiler.cl"/>
-    </not>
-  </condition>
-
-  <condition property="os.family" value="darwin">
-    <os family="mac"/>
-  </condition>
-
-  <condition property="os.family" value="win32">
-    <os family="windows"/>
-  </condition>
-
-  <condition property="os.family" value="linux">
-    <not>
-      <isset property="os.family"/>
-    </not>
-  </condition>
-
+  <!-- ========== Linker flags for Unix ========== -->
   <condition property="ldargs" value="" else="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--no-as-needed">
     <os family="mac"/>
   </condition>
-
   <condition property="ldwholearchive" value="" else="-Wl,--whole-archive">
     <os family="mac"/>
   </condition>
-
   <condition property="ldnowholearchive" value="" else="-Wl,--no-whole-archive">
     <os family="mac"/>
   </condition>
 
+  <!-- ========== Properties ========== -->
   <property name="src" location="."/>
   <property name="build" location="build"/>
   <property name="classes" location="${build}/classes"/>
   <property name="jar" location="libgs1encoders.jar"/>
   <property name="wrapfile" location="gs1encoders_wrap.c"/>
   <property name="clib" location="../c-lib"/>
+
+
+  <!-- For Windows builds -->
+  <property name="platform" value="x64" />
+  <property name="configuration" value="Debug" />
+  <property name="dlldir" value="${clib}/build/library/${platform}/${configuration}/"/>
 
   <target name="init">
     <tstamp/>
@@ -116,10 +112,6 @@ limitations under the License.
     </exec>
   </target>
 
-  <!-- For Windows builds, set these appropriately and ensure that the version of cl.exe in the PATH is for the right architecture. -->
-  <property name="platform" value="x64" />
-  <property name="configuration" value="Debug" />
-
   <target name="cc-cl" if="is.compiler.cl">
     <exec executable="cl.exe" failonerror="true">
       <arg line="/LD /MD /O2 /EHsc" />
@@ -127,7 +119,13 @@ limitations under the License.
       <arg line="'-I${java.home}/include'" />
       <arg line="'-I${java.home}/include/${os.family}'" />
       <arg line="/Fe:${jnilib}" />
-      <arg line="${clib}/build/library/${platform}/${configuration}/gs1encoders.lib ${wrapfile}" />
+      <arg line="${dlldir}/gs1encoders.lib ${wrapfile}" />
+    </exec>
+  </target>
+
+  <target name="strip" depends="cc-cc,cc-cl" if="should.strip">
+    <exec executable="strip" failonerror="true">
+      <arg line="${jnilib}" />
     </exec>
   </target>
 
@@ -139,15 +137,13 @@ limitations under the License.
     </exec>
   </target>
 
-  <target name="strip" depends="cc-cc,cc-cl">
-    <exec executable="strip" failonerror="true" unless:set="no_strip">
-      <arg line="${jnilib}" />
-    </exec>
+  <target name="copydll" unless="jnilink">
+    <copy file="${dlldir}/gs1encoders.dll" todir="${src}"/>
   </target>
+  
+  <target name="jni" depends="strip,symlink,copydll" if="jnilink"/>
 
-  <target name="jni" depends="strip,symlink" />
-
-  <target name="compile" depends="init" description="compile the source">
+  <target name="compile" depends="init">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
       <compilerarg value="-Werror"/>
       <exclude name="*"/>
@@ -185,6 +181,10 @@ limitations under the License.
     <delete file="${jar}"/>
     <delete file="${jnilib}"/>
     <delete file="${jnilink}"/>
+    <delete file="${src}/gs1encoders.dll"/>
+    <delete file="${src}/gs1encodersjni.exp"/>
+    <delete file="${src}/gs1encodersjni.lib"/>
+    <delete file="${src}/gs1encoders_wrap.obj"/>
     <delete file="${src}/Example.class"/>
   </target>
 
