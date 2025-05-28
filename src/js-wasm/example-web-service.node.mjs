@@ -53,6 +53,91 @@
 
 "use strict";
 
+
+// ----- Service installation on Windows -------
+
+/*
+ *  To install as a service on Windows:
+ *
+ *      npm install -g node-windows
+ *      npm link node-windows
+ *      node example-web-service.node.mjs /installservice
+ *
+ *  To uninstall the service:
+ *
+ *      node example-web-service.node.mjs /uninstallservice
+ *
+ */
+
+import { argv } from 'process';
+
+if (argv.includes('/installservice') || argv.includes('/uninstallservice')) {
+
+    const { Service } = await import('node-windows');
+    const path = await import('path');
+    const scriptPath = path.resolve(process.argv[1]);
+
+    const svc = new Service({
+        name: 'GS1 Barcode Syntax Engine',
+        description: 'GS1 Barcode Syntax Engine HTTP API demo service.',
+        script: scriptPath
+    });
+
+    if (argv.includes('/installservice')) {
+
+        await new Promise((resolve, reject) => {
+            svc.on('install', () => {
+                console.log('Service installed.');
+                resolve();
+            });
+            svc.on('alreadyinstalled', () => {
+                console.log('Service already installed.');
+                resolve();
+            });
+            svc.on('error', err => {
+                console.error('Error installing service:', err);
+                reject(err);
+            });
+            svc.install();
+        });
+
+        await new Promise((resolve, reject) => {
+            svc.on('start', () => {
+                console.log('Service started.');
+                resolve();
+            });
+            svc.on('error', err => {
+                console.error('Error starting service:', err);
+                reject(err);
+            });
+            svc.start();
+        });
+
+    }
+
+    if (argv.includes('/uninstallservice')) {
+
+        await new Promise((resolve, reject) => {
+            svc.on('uninstall', () => {
+                console.log('Service uninstalled.');
+                resolve();
+            });
+            svc.on('error', (err) => {
+                console.error('Error uninstalling service:', err);
+            reject(err);
+            });
+            svc.uninstall();
+        });
+
+    }
+
+     process.exit();
+
+}
+
+
+// ------ Main processing -------
+
 import { GS1encoder } from "./gs1encoder.mjs";
 
 var gs1encoder = new GS1encoder();
