@@ -142,7 +142,7 @@ fail:
 int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
 	const struct aiEntry *lastEntry;
-	const char *token, *flags = "";
+	const char *token;
 	char *saveptr = NULL;
 	char *p;
 	size_t len;
@@ -166,6 +166,8 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	*(*entry)->ai = '\0';
 	(*entry)->attrs = NULL;
 	(*entry)->title = NULL;
+	(*entry)->fnc1 = DO_FNC1;
+	(*entry)->dlDataAttr = NO_DATA_ATTR;
 
 	// Initial token should be an AI or an AI range
 	len = strlen(token);
@@ -210,19 +212,29 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	if (!token)
 		error(TRUNCATED_AFTER_AI);
 
-	// Check if we have exclusively flag characters
-	if (strspn(token, "*?!\"$%&'()+,-./:;<=>@[\\]^_`{|}~") == strlen(token)) {
-		flags = token;
+	/*
+	 *  There may be multiple whilespace-separated, tokenised flags. If the
+	 *  token has exclusively flag characters then process as such.
+	 *
+	 */
+	while (strspn(token, "*?!\"$%&'()+,-./:;<=>@[\\]^_`{|}~") == strlen(token)) {
+
+		// '*' => no FNC1 indicator flag
+		if (strchr(token, '*'))
+			(*entry)->fnc1 = NO_FNC1;
+
+		// '!' => designated GS1 identification key indicator flag
+		// Note: There is no action for this at the moment
+
+		// '?' => permit GS1 DL URI data attribute indicator flag
+		if (strchr(token, '?'))
+			(*entry)->dlDataAttr = DL_DATA_ATTR;
+
 		token = strtok_r(NULL, " \t", &saveptr);
 		if (!token)
 			error(TRUNCATED_AFTER_FLAGS);
+
 	}
-
-	// We may have a '*' (no FNC1) indicator flag
-	(*entry)->fnc1 = strchr(flags, '*') ? NO_FNC1 : DO_FNC1;
-
-	// We may have a '?' (permit GS1 DL URI data attribute) indicator flag
-	(*entry)->dlDataAttr = strchr(flags, '?') ? DL_DATA_ATTR : NO_DATA_ATTR;
 
 	// Read and process the AI components
 	numparts = 0;
@@ -554,9 +566,12 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_,_, N,1,6,MAN,yymmdd,_,_, __, __, __, "req=01,02", "HARVEST DATE"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "01  *?  N14,csum,key  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required */
+	{ true, "01  * ?  N14,csum,key  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required, gappy flags */
 		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,key,_, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
 		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "414  *!?  N13,csum,key  dlpkey=254|7040  # LOC No.", {			/* Christmas tree case for flags */
+		AI_ENTRY("414", NO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,key,_, __, __, __, __, "dlpkey=254|7040", "LOC No."),
 	} },
 	{ true, "8200  X..70  req=01  # PRODUCT URL", {					/* Not GS1 DL URI data attr */
 		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
