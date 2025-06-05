@@ -85,7 +85,7 @@ typedef enum
 	GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR,				///< The component is too short to perform an alphanumeric check character pair calculation.
 	GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,		///< The component is too long to perform an alphanumeric check character pair calculation.
 	GS1_LINTER_GCP_DATASOURCE_OFFLINE,				///< The data source for GCP lookups is offline.
-	GS1_LINTER_TOO_SHORT_FOR_KEY,					///< The component is shorter than the minimum length GS1 Company Prefix.
+	GS1_LINTER_UNUSED_6,
 	GS1_LINTER_INVALID_GCP_PREFIX,					///< The GS1 Company Prefix is invalid.
 	GS1_LINTER_IMPORTER_IDX_MUST_BE_ONE_CHARACTER,			///< The Importer Index must be a single character.
 	GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER,			///< The Importer Index is an invalid character.
@@ -196,6 +196,7 @@ typedef enum
 	GS1_LINTER_SECOND_TOO_SHORT,					///< The second is too short for SS format.
 	GS1_LINTER_SECOND_TOO_LONG,					///< The second is too long for SS format.
 	GS1_LINTER_INVALID_PACKAGE_TYPE,				///< A valid PackageTypeCode is required.
+	GS1_LINTER_TOO_SHORT_FOR_GCP,					///< The component is shorter than the minimum length GS1 Company Prefix.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 
@@ -231,6 +232,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset82(const char *data, size_
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csetnumeric(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos2(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hasnondigit(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char *data, size_t *err_pos, size_t *err_len);
@@ -242,8 +245,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char *data, s
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso5218(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char *data, size_t *err_pos, size_t *err_len);
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_keyoff1(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_latitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char *data, size_t *err_pos, size_t *err_len);
@@ -265,6 +266,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char *data, size_t 
 
 GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_hhmm(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_iso3166list(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_key(const char *data, size_t *err_pos, size_t *err_len);
+GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_keyoff1(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_mmoptss(const char *data, size_t *err_pos, size_t *err_len);
 GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t gs1_lint_yymmddhh(const char *data, size_t *err_pos, size_t *err_len);
 

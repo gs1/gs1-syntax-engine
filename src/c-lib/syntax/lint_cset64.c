@@ -109,11 +109,14 @@ void test_lint_cset64(void)
 {
 
 	UNIT_TEST_PASS(gs1_lint_cset64, "");
+
+	// Padding is optional
+	UNIT_TEST_PASS(gs1_lint_cset64, "1");
+	UNIT_TEST_PASS(gs1_lint_cset64, "12");
+
 	UNIT_TEST_PASS(gs1_lint_cset64, "123");
-	UNIT_TEST_PASS(gs1_lint_cset64, "12");	// Padding is optional
 	UNIT_TEST_PASS(gs1_lint_cset64, "12=");
 	UNIT_TEST_PASS(gs1_lint_cset64, "1==");
-
 	UNIT_TEST_FAIL(gs1_lint_cset64, "===", GS1_LINTER_INVALID_CSET64_PADDING, "*===*");
 
 	UNIT_TEST_FAIL(gs1_lint_cset64, "123=", GS1_LINTER_INVALID_CSET64_PADDING, "123*=*");
@@ -123,6 +126,9 @@ void test_lint_cset64(void)
 	UNIT_TEST_FAIL(gs1_lint_cset64, "1234=", GS1_LINTER_INVALID_CSET64_PADDING, "1234*=*");
 	UNIT_TEST_FAIL(gs1_lint_cset64, "123==", GS1_LINTER_INVALID_CSET64_PADDING, "123*==*");
 	UNIT_TEST_FAIL(gs1_lint_cset64, "12===", GS1_LINTER_INVALID_CSET64_PADDING, "12*===*");
+	UNIT_TEST_FAIL(gs1_lint_cset64, "12====", GS1_LINTER_INVALID_CSET64_PADDING, "12*====*");
+	UNIT_TEST_FAIL(gs1_lint_cset64, "12=====", GS1_LINTER_INVALID_CSET64_PADDING, "12*=====*");
+	UNIT_TEST_FAIL(gs1_lint_cset64, "12======", GS1_LINTER_INVALID_CSET64_PADDING, "12*======*");
 
 	UNIT_TEST_PASS(gs1_lint_cset64, "");
 	UNIT_TEST_PASS(gs1_lint_cset64, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");

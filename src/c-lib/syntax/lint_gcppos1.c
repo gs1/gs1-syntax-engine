@@ -1,5 +1,5 @@
 /*
- * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2025 GS1 AISBL
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  */
 
 /**
- * @file lint_key.c
+ * @file lint_gcppos1.c
  *
- * @brief The `key` linter checks whether an input starts with a GS1 Company
+ * @brief The `gcppos1` linter checks whether an input starts with a GS1 Company
  * Prefix ("GCP").
  *
  * @remark The GCP is defined in the [GS1 General
@@ -76,7 +76,7 @@
  *
  * @return #GS1_LINTER_OK if okay.
  * @return #GS1_LINTER_INVALID_GCP_PREFIX if the data does not start with a GCP.
- * @return #GS1_LINTER_TOO_SHORT_FOR_KEY if the data is too short to start
+ * @return #GS1_LINTER_TOO_SHORT_FOR_GCP if the data is too short to start
  *         with a GCP.
  * @return #GS1_LINTER_GCP_DATASOURCE_OFFLINE if the user-provided GCP lookup
  *         source is unavailable and this should result in the linting failing.
@@ -98,7 +98,7 @@
  *       of service outage.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t i, len;
@@ -113,7 +113,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, si
 	 */
 	if (len < GCP_MIN_LENGTH)
 		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_TOO_SHORT_FOR_KEY,
+			GS1_LINTER_TOO_SHORT_FOR_GCP,
 			0,
 			len
 		);
@@ -156,7 +156,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_key(const char* const data, si
 
 #include "unittest.h"
 
-void test_lint_key(void)
+void test_lint_gcppos1(void)
 {
 
 	char data[GCP_MIN_LENGTH + 2], expect[GCP_MIN_LENGTH + 4];
@@ -171,9 +171,9 @@ void test_lint_key(void)
 	for (i = 0; i < GCP_MIN_LENGTH + 1; i++)
 		data[i] = (char)('0' + i%10);
 	data[i--] = '\0';
-	UNIT_TEST_PASS(gs1_lint_key, data);	// One more than minimum length
+	UNIT_TEST_PASS(gs1_lint_gcppos1, data);	// One more than minimum length
 	data[i--] = '\0';
-	UNIT_TEST_PASS(gs1_lint_key, data);	// Minimum length
+	UNIT_TEST_PASS(gs1_lint_gcppos1, data);	// Minimum length
 
 	/*
 	 *        |----- Indicates end of minimum-length GCP
@@ -190,7 +190,7 @@ void test_lint_key(void)
 		strcpy(expect, "*");
 		strcat(expect, data);
 		strcat(expect, "*");
-		UNIT_TEST_FAIL(gs1_lint_key, data, GS1_LINTER_TOO_SHORT_FOR_KEY, expect);
+		UNIT_TEST_FAIL(gs1_lint_gcppos1, data, GS1_LINTER_TOO_SHORT_FOR_GCP, expect);
 	}
 
 	/*
@@ -200,7 +200,7 @@ void test_lint_key(void)
 		data[i] = (char)('0' + i%10);
 	data[i++] = 'A';
 	data[i] = '\0';
-	UNIT_TEST_PASS(gs1_lint_key, data);	// Minimum-length GCP is all numeric
+	UNIT_TEST_PASS(gs1_lint_gcppos1, data);	// Minimum-length GCP is all numeric
 
 	/*
 	 *        |----- Indicates end of minimum-length GCP
@@ -218,7 +218,7 @@ void test_lint_key(void)
 	while (i >= 0) {
 		data[i] = 'A';
 		memcpy(&expect[i--], "*A*A", 4);
-		UNIT_TEST_FAIL(gs1_lint_key, data, GS1_LINTER_INVALID_GCP_PREFIX, expect);
+		UNIT_TEST_FAIL(gs1_lint_gcppos1, data, GS1_LINTER_INVALID_GCP_PREFIX, expect);
 	}
 
 }

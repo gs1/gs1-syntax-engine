@@ -1194,7 +1194,7 @@ void test_ai_linters(void) {
 		{ "(8013)A",						GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR },
 //		GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION	Parse-time length check prevent this
 //		GS1_LINTER_GCP_DATASOURCE_OFFLINE			Not possible to trigger with default implementation
-		{ "(401)123",						GS1_LINTER_TOO_SHORT_FOR_KEY },
+		{ "(401)123",						GS1_LINTER_TOO_SHORT_FOR_GCP },
 		{ "(7023)12A4",						GS1_LINTER_INVALID_GCP_PREFIX },
 //		GS1_LINTER_IMPORTER_IDX_MUST_BE_ONE_CHARACTER		Parse-time length checks prevent this
 		{ "(7040)1AB=",						GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER },

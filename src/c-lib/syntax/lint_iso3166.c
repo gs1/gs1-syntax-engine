@@ -118,7 +118,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166(const char* const data
 		 *
 		 *  Generated from the above data with:
 		 *
-		 *     for (size_t i = 0; i < sizeof(iso3166) / sizeof(iso3166[0]); i++) { printf("%lx ", iso3166[i]); };
+		 *     for (size_t i = 0; i < sizeof(iso3166) / sizeof(iso3166[0]); i++) { printf("0x%016lx, ", iso3166[i]); };
 		 *
 		 */
 		0x08a888898888b888, 0x8aa80a2888888888, 0x0888888a22232889, 0x88188a2221e322a2,

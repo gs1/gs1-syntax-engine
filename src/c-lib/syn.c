@@ -554,24 +554,24 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY("99", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8010  ?  Y..30,key  dlpkey=8011  # CPID", {				/* CSET 32 */
-		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,key,_,_, __, __, __, __, "dlpkey=8011", "CPID"),
+	{ true, "8010  ?  Y..30,gcppos1  dlpkey=8011  # CPID", {			/* CSET 32 */
+		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,gcppos1,_,_, __, __, __, __, "dlpkey=8011", "CPID"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "253  ?  N13,csum,key [X..17]  dlpkey  # GDTI", {			/* Optional component */
-		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,key,_, X,1,17,OPT,_,_,_, __, __, __, "dlpkey", "GDTI"),
+	{ true, "253  ?  N13,csum,gcppos1 [X..17]  dlpkey  # GDTI", {			/* Optional component */
+		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,gcppos1,_, X,1,17,OPT,_,_,_, __, __, __, "dlpkey", "GDTI"),
 		AI_ENTRY_TERMINATOR
 	} },
 	{ true, "7007  ?  N6,yymmdd [N..6],yymmdd  req=01,02  # HARVEST DATE", {	/* Requisites */
 		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_,_, N,1,6,MAN,yymmdd,_,_, __, __, __, "req=01,02", "HARVEST DATE"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "01  * ?  N14,csum,key  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required, gappy flags */
-		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,key,_, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
+	{ true, "01  * ?  N14,csum,gcppos1  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required, gappy flags */
+		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,gcppos1,_, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "414  *!?  N13,csum,key  dlpkey=254|7040  # LOC No.", {			/* Christmas tree case for flags */
-		AI_ENTRY("414", NO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,key,_, __, __, __, __, "dlpkey=254|7040", "LOC No."),
+	{ true, "414  *!?  N13,csum,gcppos1  dlpkey=254|7040  # LOC No.", {		/* Christmas tree case for flags */
+		AI_ENTRY("414", NO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,gcppos1,_, __, __, __, __, "dlpkey=254|7040", "LOC No."),
 	} },
 	{ true, "8200  X..70  req=01  # PRODUCT URL", {					/* Not GS1 DL URI data attr */
 		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
@@ -581,8 +581,8 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY("8001", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,nonzero,_,_, N,5,5,MAN,nonzero,_,_, N,3,3,MAN,nonzero,_,_, N,1,1,MAN,winding,_,_, N,1,1,MAN,_,_,_, "req=01", "DIMENSIONS"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8014  X..25,csumalpha,key,hasnondigit  req=01  # MUDI", {		/* Max linters */
-		AI_ENTRY("8014", DO_FNC1, NO_DATA_ATTR, X,1,25,MAN,csumalpha,key,hasnondigit, __, __, __, __, "req=01", "MUDI"),
+	{ true, "8014  X..25,csumalpha,gcppos1,hasnondigit  req=01  # MUDI", {		/* Max linters */
+		AI_ENTRY("8014", DO_FNC1, NO_DATA_ATTR, X,1,25,MAN,csumalpha,gcppos1,hasnondigit, __, __, __, __, "req=01", "MUDI"),
 		AI_ENTRY_TERMINATOR
 	} },
 	{ true, "8110  ?  X..70,couponcode", {						/* No attrs and no title */

@@ -52,6 +52,8 @@ const struct name_function_s name_function_map[] = {
 	ENT(csetnumeric),
 	ENT(csum),
 	ENT(csumalpha),
+	ENT(gcppos1),
+	ENT(gcppos2),
 	ENT(hasnondigit),
 	ENT(hh),
 	ENT(hhmi),
@@ -65,8 +67,8 @@ const struct name_function_s name_function_map[] = {
 	DEP(iso3166list),
 	ENT(iso4217),
 	ENT(iso5218),
-	ENT(key),
-	ENT(keyoff1),
+	DEP(key),
+	DEP(keyoff1),
 	ENT(latitude),
 	ENT(longitude),
 	ENT(mediatype),
@@ -146,7 +148,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The component is too short to perform an alphanumeric check character pair calculation.",
 	"The component is too long to perform an alphanumeric check character pair calculation.",
 	"The data source for GCP lookups is offline.",
-	"The component is shorter than the minimum length GS1 Company Prefix.",
+	"",	// Unused
 	"The GS1 Company Prefix is invalid.",
 	"The Importer Index must be a single character.",
 	"The Importer Index is an invalid character.",
@@ -257,6 +259,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The second is too short for SS format.",
 	"The second is too long for SS format.",
 	"A valid PackageTypeCode is required.",
+	"The component is shorter than the minimum length GS1 Company Prefix.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */
@@ -281,8 +284,14 @@ void test_name_function_map_is_sorted(void)
 
 void test_gs1_linter_from_name(void)
 {
-	TEST_CHECK(gs1_linter_from_name("key") == gs1_lint_key);
+	TEST_CHECK(gs1_linter_from_name("gcppos1") == gs1_lint_gcppos1);
 	TEST_CHECK(gs1_linter_from_name("dummy") == NULL);
+
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+	TEST_CHECK(gs1_linter_from_name("key") == gs1_lint_key);
+DIAG_POP
+
 }
 
 

@@ -44,6 +44,8 @@ GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t linter(	\
 
 GS1_LINTER_STUB(gs1_lint_hhmm)
 GS1_LINTER_STUB(gs1_lint_iso3166list)
+GS1_LINTER_STUB(gs1_lint_key)
+GS1_LINTER_STUB(gs1_lint_keyoff1)
 GS1_LINTER_STUB(gs1_lint_mmoptss)
 GS1_LINTER_STUB(gs1_lint_yymmddhh)
 

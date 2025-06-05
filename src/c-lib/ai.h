@@ -42,7 +42,7 @@
  *
  */
 #define MAX_PARTS (5 + 1)		/* Currently AI (8001) = N4 N5 N3 N1 N1            */
-#define MAX_LINTERS (3 + 1)		/* Currently AI (8014) = csumalpha,key,hasnondigit */
+#define MAX_LINTERS (3 + 1)		/* Currently AI (8014) = csumalpha,gcppos1,hasnondigit */
 
 
 typedef enum {
@@ -136,7 +136,7 @@ struct validationEntry {
 #define AI_ENTRY(...) PASS_ON(AI_VA(__VA_ARGS__))
 #define cset_0 0
 #define gs1_lint__ NULL
-#define __ 0,0,0,0,_,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,key */
+#define __ 0,0,0,0,_,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,gcppos1 */
 #define AI_ENTRY_TERMINATOR AI_ENTRY( "", 0, 0, __, __, __, __, __, "", "" )
 
 

@@ -34,7 +34,7 @@ static void DO_UNIT_TEST(int should_succeed, gs1_lint_err_t (*fn)(const char *, 
 
 	gs1_lint_err_t err;
 	size_t err_pos[1], err_len[1];
-	char highlight[100] = {0};
+	char highlight[103] = {0};
 	char casestr[512] = {0};
 
 	strcat(casestr, *data != '\0' ? data : "(empty string)");

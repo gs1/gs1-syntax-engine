@@ -127,7 +127,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * have.
 	 *
 	 */
-	if (len > sizeof(primes) / sizeof(primes[0]))
+	if (len - 2 > sizeof(primes) / sizeof(primes[0]))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
 			0,
@@ -171,7 +171,9 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * positions in CSET 32.
 	 *
 	 */
-	p = primes + len - 3;
+	if (len > 2)
+		p = primes + (len - 3);
+
 	for (i = 0; i < len - 2; i++)
 		sum += (unsigned int)(strchr(cset82, data[i]) - cset82) * *p--;
 	sum %= 1021;
@@ -196,7 +198,11 @@ void test_lint_csumalpha(void)
 {
 
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, "", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "**");
-	UNIT_TEST_FAIL(gs1_lint_csumalpha, "0", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "*0*");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "2", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "*2*");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "22");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "33", GS1_LINTER_INCORRECT_CHECK_PAIR, "*33*");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "!22");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "!!22");
 
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "1987654Ad4X4bL5ttr2310c2K");
 
@@ -230,6 +236,15 @@ void test_lint_csumalpha(void)
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "00000!HV");
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "99999zzzzzzzzzzzzzzzzzzT2");
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "99999zzzzzzzzzzzzzzzzzzT2");
+
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "12345678901234567890123456789012345678901234567890"
+					   "12345678901234567890123456789012345678901234567HA");  // len = 99
+
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123456789012345678901234567890"
+					   "123456789012345678901234567890123456789012345678ZZ",
+					   GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
+					   "*12345678901234567890123456789012345678901234567890"
+					   "123456789012345678901234567890123456789012345678ZZ*");  // len = 100, exceeds implementation
 
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, " 2345678901234567890123NT", GS1_LINTER_INVALID_CSET82_CHARACTER, "* *2345678901234567890123NT");
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, "123456789 1234567890123NT", GS1_LINTER_INVALID_CSET82_CHARACTER, "123456789* *1234567890123NT");

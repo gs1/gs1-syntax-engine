@@ -238,11 +238,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		);
 
 	/*
-	 * Validate the GCP with the "key" linter.
+	 * Validate the GCP with the "gcppos1" linter.
 	 *
 	 */
 	strncpy(gcp, p, (size_t)vli);
-	ret = gs1_lint_key(gcp, err_pos, err_len);
+	ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 	assert (ret == GS1_LINTER_OK ||
 		ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -500,11 +500,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			);
 
 		/*
-		 * Validate the GCP with the "key" linter.
+		 * Validate the GCP with the "gcppos1" linter.
 		 *
 		 */
 		strncpy(gcp, p, (size_t)vli);
-		ret = gs1_lint_key(gcp, err_pos, err_len);
+		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 		assert (ret == GS1_LINTER_OK ||
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -630,11 +630,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			);
 
 		/*
-		 * Validate the GCP with the "key" linter.
+		 * Validate the GCP with the "gcppos1" linter.
 		 *
 		 */
 		strncpy(gcp, p, (size_t)vli);
-		ret = gs1_lint_key(gcp, err_pos, err_len);
+		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 		assert (ret == GS1_LINTER_OK ||
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -824,11 +824,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 			);
 
 		/*
-		 * Validate the GCP/GLN with the "key" linter.
+		 * Validate the GCP/GLN with the "gcppos1" linter.
 		 *
 		 */
 		strncpy(gcp, p, (size_t)vli);
-		ret = gs1_lint_key(gcp, err_pos, err_len);
+		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 		assert (ret == GS1_LINTER_OK ||
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
