@@ -103,9 +103,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 */
 	static const char* const cset32 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-	size_t i, pos, len;
+	size_t pos, len;
 	unsigned int sum = 0;
-	const unsigned int *p;
 
 	assert(data);
 
@@ -171,14 +170,16 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * positions in CSET 32.
 	 *
 	 */
-	if (len > 2)
-		p = primes + (len - 3);
+	if (len > 2) {
+		size_t i;
+		const unsigned int *p;
 
-	for (i = 0; i < len - 2; i++)
-		sum += (unsigned int)(strchr(cset82, data[i]) - cset82) * *p--;
-	sum %= 1021;
+		for (i = 0, p = primes + (len - 3); i < len - 2; i++, p--)
+			sum += (unsigned int)(strchr(cset82, data[i]) - cset82) * *p;
+		sum %= 1021;
+	}
 
-	if (data[i] != cset32[sum >> 5] || data[i+1] != cset32[sum & 31])
+	if (data[len-2] != cset32[sum >> 5] || data[len-1] != cset32[sum & 31])
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INCORRECT_CHECK_PAIR,
 			len - 2,
