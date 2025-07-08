@@ -506,8 +506,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		ailen = (size_t)(r-p-1);
 
-		if (ctx->permitConvenienceAlphas && ailen >= 3 && ailen <= 5 &&
-                    !isdigit(*(p+1))) {			// Possible convenience alpha
+		if (ctx->permitConvenienceAlphas &&
+		    ailen >= 3 && ailen <= 5 &&
+		    !isdigit(*(p+1))) {			// Possible convenience alpha
 			char alpha[6] = { 0 };
 			memcpy(alpha, p+1, ailen);
 			entry = aiEntryFromAlpha(ctx, alpha);
@@ -547,6 +548,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai, *outval;
 		const char *ai;
+		bool fromAlpha = false;
 
 		assert(*p == '/');
 		r = strchr(++p, '/');
@@ -555,12 +557,16 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// AI is known to be valid since we previously walked over it
 		ai = p;
 		ailen = (size_t)(r-p);
-		if (ctx->permitConvenienceAlphas && !isdigit(*p) && ailen <= 5) {
+		if (ctx->permitConvenienceAlphas &&
+		    ailen >= 3 && ailen <= 5 &&
+		    !isdigit(*p)) {
 			char alpha[6] = { 0 };
 			memcpy(alpha, ai, ailen);
 			entry = aiEntryFromAlpha(ctx, alpha);
 		}
-		if (!entry)
+		if (entry)
+			fromAlpha = true;
+		else
 			entry = gs1_lookupAIentry(ctx, ai, ailen);
 		assert(entry);
 
@@ -588,12 +594,15 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		writeDataStr(entry->ai);			// Write AI
+		if (fromAlpha)
+			writeDataStr(entry->ai);		// Resolved from convenience alpha
+		else
+			nwriteDataStr(ai, ailen);		// Might be an "unknown AI"
 		fnc1req = entry->fnc1;				// Record if required before next AI
 
 		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
@@ -690,12 +699,12 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		nwriteDataStr(ai, ailen);			// Write AI
+		nwriteDataStr(ai, ailen);			// Might be an "unknown AI"
 		fnc1req = entry->fnc1;				// Record if required before next AI
 
 		outval = dataStr + strlen(dataStr);		// Save start of value for AI data

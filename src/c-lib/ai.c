@@ -498,7 +498,7 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Record the current start of the output AI
-		nwriteDataStr(p, ailen);			// Write AI
+		nwriteDataStr(p, ailen);			// Might be an "unknown AI"
 		fnc1req = entry->fnc1;				// Record whether FNC1 required before next AI
 
 		if (!*++r) goto fail;				// Advance to start of AI value and fail if at end
