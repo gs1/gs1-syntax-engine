@@ -74,6 +74,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.addCheckDigit = false,
 		.permitUnknownAIs = false,
 		.permitZeroSuppressedGTINinDLuris = false,
+		.permitConvenienceAlphas = false,
 		.includeDataTitlesInHRI = false,
 		.aiTable = NULL,
 		.aiTableEntries = 0,

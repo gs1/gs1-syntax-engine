@@ -61,6 +61,73 @@ static const char *badDomainCharacters = "_~?#@!$&'()*+,;=%";
 
 
 /*
+ *  Convenience alphas (deprecated)
+ *
+ */
+struct alpha_ai {
+	char alpha[6];
+	char ai[5];
+};
+
+static const struct alpha_ai alpha_ai_map[] = {
+	{ "cpid",  "8010" },
+	{ "cpsn",  "8011" },
+	{ "cpv",   "22"   },
+	{ "gcn",   "255"  },
+	{ "gdti",  "253"  },
+	{ "giai",  "8004" },
+	{ "ginc",  "401"  },
+	{ "gln",   "414"  },
+	{ "glnx",  "254"  },
+	{ "gmn",   "8013" },
+	{ "grai",  "8003" },
+	{ "gsin",  "402"  },
+	{ "gsrn",  "8018" },
+	{ "gsrnp", "8017" },
+	{ "gtin",  "01"   },
+	{ "itip",  "8006" },
+	{ "lot",   "10"   },
+	{ "party", "417"  },
+	{ "refno", "8020" },
+	{ "ser",   "21"   },
+	{ "srin",  "8019" },
+	{ "sscc",  "00"   },
+};
+
+
+/*
+ *  Return the AI entry corresponding to a convenience alpha
+ *
+ */
+static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char* const alpha) {
+
+	size_t s = 0, e = SIZEOF_ARRAY(alpha_ai_map);
+
+	while (s < e) {
+		const size_t m = s + (e - s) / 2;
+		const int cmp = strcmp(alpha_ai_map[m].alpha, alpha);
+
+		if (cmp == 0) {
+
+			const char *ai = alpha_ai_map[m].ai;
+			const struct aiEntry *entry = gs1_lookupAIentry(ctx, ai, strlen(ai));
+
+			assert(entry);
+
+			return entry;
+
+		} else if (cmp < 0)
+			s = m + 1;
+		else
+			e = m;
+		}
+
+		return NULL;
+
+	}
+
+
+/*
  *  Load the list of valid DL key-qualifier associations from the attrs of the
  *  AI table entries.
  *
@@ -347,9 +414,6 @@ static size_t URIescape(char* const out, const size_t maxlen, const char* const 
  * path information, and convert it to a regular AI data string with ^ = FNC1,
  * extracting AI data for HRI purposes.
  *
- * Note: "Convenience alphas" (e.g. "/gtin/0123...", which have been
- * deprecated) are not supported.
- *
  */
 bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const dataStr) {
 
@@ -424,7 +488,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	// "/AI/value" pair where AI is a DL primary key
 	while ((r = strrchr(pi, '/')) != NULL) {
 
-		const struct aiEntry* entry;
+		const struct aiEntry* entry = NULL;
+		size_t ailen;
 
 		*p = '/';				// Restore original pair separator
 							// Clobbers first character of path
@@ -439,7 +504,18 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		DEBUG_PRINT("      %s\n", p);
 
-		entry = gs1_lookupAIentry(ctx, p+1, (size_t)(r-p-1));
+		ailen = (size_t)(r-p-1);
+
+		if (ctx->permitConvenienceAlphas && ailen >= 3 && ailen <= 5 &&
+                    !isdigit(*(p+1))) {			// Possible convenience alpha
+			char alpha[6] = { 0 };
+			memcpy(alpha, p+1, ailen);
+			entry = aiEntryFromAlpha(ctx, alpha);
+		}
+
+		if (!entry)
+			entry = gs1_lookupAIentry(ctx, p+1, ailen);
+
 		if (!entry)
 			break;
 
@@ -466,7 +542,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	numPathAIs = 0;
 	while (*p) {
 
-		const struct aiEntry* entry;
+		const struct aiEntry* entry = NULL;
 		size_t ailen, vallen;
 		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai, *outval;
@@ -479,7 +555,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// AI is known to be valid since we previously walked over it
 		ai = p;
 		ailen = (size_t)(r-p);
-		entry = gs1_lookupAIentry(ctx, ai, ailen);
+		if (ctx->permitConvenienceAlphas && !isdigit(*p) && ailen <= 5) {
+			char alpha[6] = { 0 };
+			memcpy(alpha, ai, ailen);
+			entry = aiEntryFromAlpha(ctx, alpha);
+		}
+		if (!entry)
+			entry = gs1_lookupAIentry(ctx, ai, ailen);
 		assert(entry);
 
 		if ((p = strchr(++r, '/')) == NULL)
@@ -506,12 +588,12 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
 		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		nwriteDataStr(ai, ailen);			// Write AI
+		writeDataStr(entry->ai);			// Write AI
 		fnc1req = entry->fnc1;				// Record if required before next AI
 
 		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
@@ -608,7 +690,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted: (%s) %.*s\n", entry->ai, (int)vallen, aival);
 
 		if (fnc1req)
 			writeDataStr("^");			// Write FNC1, if required
@@ -1101,6 +1183,17 @@ void test_dl_parseDLuri(void) {
 		"https://a/00/faux/00/006141411234567890",
 		"^00006141411234567890");
 
+
+	/*
+	 * Test parsing of convenience alphas. Disabled by default.
+	 *
+	 */
+	test_parseDLuri(false, "https://a/gtin/12312312312333", "");
+	ctx->permitConvenienceAlphas = true;			// No API so we hack this
+	test_parseDLuri(true, "https://a/gtin/12312312312333", "^0112312312312333");
+	test_parseDLuri(true, "https://a/gtin/12312312312333/ser/ABC123", "^011231231231233321ABC123");
+	test_parseDLuri(true, "https://a/sscc/006141411234567890", "^00006141411234567890");
+	ctx->permitConvenienceAlphas = false;			// No API so we hack this
 
 	/*
 	 * Test legacy expansion of GTIN-{8,12,13} in AI (01) path component

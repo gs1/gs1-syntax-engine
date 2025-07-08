@@ -194,6 +194,7 @@ struct gs1_encoder {
 	bool addCheckDigit;			// For EAN/UPC and RSS-14/Lim, calculated if true, otherwise validated
 	bool permitUnknownAIs;			// Extract AIs that are not in our AI table during AI element string and DL URI parsing
 	bool permitZeroSuppressedGTINinDLuris;	// Whether to permit a path component GTIN value to be in GTIN-{8,12,13} format
+	bool permitConvenienceAlphas;		// Whether to permit convenience alphas (deprecated, so no API)
 	bool includeDataTitlesInHRI;		// Whether to include the Data Titles in HRI string output
 
 	char errMsg[512];			// The translated error message
