@@ -35,6 +35,7 @@
 
 #ifdef _MSC_VER
 #define strtok_r strtok_s
+#define ssize_t ptrdiff_t
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
