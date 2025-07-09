@@ -99,30 +99,27 @@ static const struct alpha_ai alpha_ai_map[] = {
  *  Return the AI entry corresponding to a convenience alpha
  *
  */
+static int compareAlphaAI(const void* const needle, const void* const haystack, const size_t index) {
+	const char* const alpha = (const char*)needle;
+	const struct alpha_ai* map = (const struct alpha_ai*)haystack;
+	return strcmp(map[index].alpha, alpha);
+}
+
 static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char* const alpha) {
 
-	size_t s = 0, e = SIZEOF_ARRAY(alpha_ai_map);
+	const char* ai;
+	const struct aiEntry *entry;
+	const ssize_t index = gs1_binarySearch(alpha, alpha_ai_map, SIZEOF_ARRAY(alpha_ai_map), compareAlphaAI, NULL);
 
-	while (s < e) {
-		const size_t m = s + (e - s) / 2;
-		const int cmp = strcmp(alpha_ai_map[m].alpha, alpha);
+	if (index < 0)
+		return NULL;
 
-		if (cmp == 0) {
+	ai = alpha_ai_map[index].ai;
+	entry = gs1_lookupAIentry(ctx, ai, strlen(ai));
 
-			const char *ai = alpha_ai_map[m].ai;
-			const struct aiEntry *entry = gs1_lookupAIentry(ctx, ai, strlen(ai));
+	assert(entry);
 
-			assert(entry);
-
-			return entry;
-
-		} else if (cmp < 0)
-			s = m + 1;
-		else
-			e = m;
-	}
-
-	return NULL;
+	return entry;
 
 }
 
@@ -307,13 +304,18 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
  *  the position in the list or -1 if missing
  *
  */
+static int compareDLKeyQualifier(const void* const key, const void* const array, const size_t index) {
+	const char* const aiseq = (const char*)key;
+	const char* const * const qualifiers = (const char* const *)array;
+	return strcmp(qualifiers[index], aiseq);
+}
+
 static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][MAX_AI_LEN+1], const int len) {
 
 	char aiseq[(MAX_AI_LEN+1) * MAX_AIS] = { 0 };
 	char *p = aiseq;
 	int i;
-	size_t s = 0;
-	size_t e = (size_t)ctx->numDLkeyQualifiers;
+	ssize_t index;
 
 	/*
 	 *  Build a space separated AI sequence string
@@ -327,22 +329,13 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][M
 	*--p = '\0';		// Chop stray space
 
 	/*
-	 *  Binary search for string in the list of valid key-qualifier
-	 *  associations.
+	 *  Search for it in the list of valid key-qualifier associations.
 	 *
 	 */
-	while (s < e) {
-		const size_t m = s + (e - s) / 2;
-		const int cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
-		if (cmp == 0)
-			return (int)m;
-		if (cmp < 0)
-			s = m + 1;
-		else
-			e = m;
-	}
+	index = gs1_binarySearch(aiseq, ctx->dlKeyQualifiers, (size_t)ctx->numDLkeyQualifiers,
+				 compareDLKeyQualifier, NULL);
 
-	return -1;
+	return (index >= 0) ? (int)index : -1;
 
 }
 

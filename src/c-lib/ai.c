@@ -241,10 +241,35 @@ static const struct aiEntry unknownAI4fixed6 =
  * an AI in the table that matches a prefix of the given data.
  *
  */
+struct aiLookupKey {
+	const char* const ai;
+	const size_t ailen;
+};
+
+static inline int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiLookupKey* lookupKey = (const struct aiLookupKey*)needle;
+	const struct aiEntry* entries = (const struct aiEntry*)haystack;
+	const char *ai = entries[index].ai;
+
+	return strncmp(ai, lookupKey->ai, strlen(ai));	// Look for matches against the prefix of needle
+}
+
+static inline bool validateAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiLookupKey *lookupKey = (const struct aiLookupKey *)needle;
+	const struct aiEntry *entries = (const struct aiEntry*)haystack;
+	const char *ai = entries[index].ai;
+	const size_t ailen = strlen(ai);
+
+	return lookupKey->ailen == 0 ||			// Prefix of variable-length needle matched an entry
+	       lookupKey->ailen == ailen ||		// Fixed-length needle exactly matched an entry
+	       strncmp(lookupKey->ai, ai, ailen) != 0;	// Fixed-length needle is not a prefix of some longer AI
+}
+
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
-	size_t s = 0, e = ctx->aiTableEntries;
+	const struct aiLookupKey lookupKey = { ai, ailen };
+	ssize_t index;
 
 	assert(ailen == 0 || ailen <= strlen(ai));
 
@@ -256,37 +281,31 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 		return NULL;
 
 	/*
-	 * Binary search through the AI table to find an entry that matches a
-	 * prefix, optionally ensuring that the AI also has a specified length
+	 *  Search AI table to find an entry that matches a prefix, with
+	 *  validation for length and prefix constraints
 	 *
 	 */
-	while (s < e) {
-		const size_t m = s + (e - s) / 2;
-		const struct aiEntry* const entry = &ctx->aiTable[m];
-		const size_t entrylen = strlen(entry->ai);
-		const int cmp = strncmp(entry->ai, ai, entrylen);
-		if (cmp == 0) {
-			if (ailen != 0 && entrylen != ailen)
-				return NULL;	// Prefix match, but incorrect length
-			return entry;		// Found
-		}
-		if (ailen != 0 && strncmp(ai, entry->ai, ailen) == 0)
-			return NULL;	// Don't vivify an AI that is a prefix of a known AI
-		if (cmp < 0)
-			s = m + 1;
-		else
-			e = m;
-	}
+	index = gs1_binarySearch(&lookupKey, ctx->aiTable, ctx->aiTableEntries,
+				 compareAIEntryPrefix, validateAIEntryMatch);
+
+	if (index >= 0)
+		return &ctx->aiTable[index];	// Found and validated
+
+	if (index == GS1_SEARCH_INVALID)
+		return NULL;			// Either length mismatch or prefix conflict
+
+	// Not found, but not conflicting either
+	assert(index == GS1_SEARCH_NOT_FOUND);
 
 	if (!ctx->permitUnknownAIs)
 		return NULL;
 
 	/*
-	 * If permitUnknownAIs is enabled then we vivify the AI by returning a
-	 * pseudo "unknownAI" entry, but only if the length matches that
-	 * indicated by the prefix where such a length is defined.
+	 *  If permitUnknownAIs is enabled then we vivify the AI by returning a
+	 *  pseudo "unknownAI" entry, but only if the length matches that
+	 *  indicated by the prefix where such a length is defined.
 	 *
-	 * Otherwise we return NULL ("not found") to indicate an error.
+	 *  Otherwise we return NULL ("not found") to indicate an error.
 	 *
 	 */
 	aiLenByPrefix = aiLengthByPrefix(ctx, ai);

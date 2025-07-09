@@ -639,6 +639,28 @@ char* gs1_strdup_alloc(const char *s) {
 }
 
 
+ssize_t gs1_binarySearch(const void * const needle, const void * const haystack, const size_t haystack_size,
+			 int (* const compare)(const void * const key, const void * const element, const size_t index),
+			 bool (* const validate)(const void * const key, const void * const element, const size_t index)) {
+
+	size_t s = 0, e = haystack_size;
+
+	while (s < e) {
+		const size_t m = s + (e - s) / 2;
+		const int cmp = compare(needle, haystack, m);
+		if (cmp == 0)
+			return (!validate || validate(needle, haystack, m)) ? (int)m : GS1_SEARCH_INVALID;
+		else if (cmp < 0)
+			s = m + 1;
+		else
+			e = m;
+	}
+
+	return GS1_SEARCH_NOT_FOUND;
+
+}
+
+
 #ifdef UNIT_TESTS
 
 #define TEST_NO_MAIN

@@ -82,6 +82,9 @@
 #endif
 
 
+#define GS1_SEARCH_INVALID   (-2)
+#define GS1_SEARCH_NOT_FOUND (-1)
+
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof(x[0]))
 
 
@@ -235,6 +238,10 @@ struct gs1_encoder {
 bool gs1_allDigits(const uint8_t *str, size_t len);
 
 char* gs1_strdup_alloc(const char *s);
+
+ssize_t gs1_binarySearch(const void* needle, const void* haystack, const size_t haystack_size,
+			 int (*compare)(const void* key, const void* element, const size_t index),
+			 bool (*validate)(const void* key, const void* element, const size_t index));
 
 
 #ifdef UNIT_TESTS
