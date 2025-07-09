@@ -120,11 +120,11 @@ static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char
 			s = m + 1;
 		else
 			e = m;
-		}
-
-		return NULL;
-
 	}
+
+	return NULL;
+
+}
 
 
 /*
