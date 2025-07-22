@@ -234,11 +234,11 @@ static const struct aiEntry unknownAI4fixed6 =
 
 
 /*
- * Lookup an AI table entry matching a given AI or matching prefix of given
- * data
+ *  Lookup an AI table entry matching a given AI or matching prefix of given
+ *  data.
  *
- * For an exact AI lookup its length is given. Otherwise 0 length will look for
- * an AI in the table that matches a prefix of the given data.
+ *  Providing a length will result in an exact AI lookup. Otherwise 0 length
+ *  will look for an AI in the table that matches a prefix of the given data.
  *
  */
 struct aiLookupKey {
@@ -294,7 +294,7 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 	if (index == GS1_SEARCH_INVALID)
 		return NULL;			// Either length mismatch or prefix conflict
 
-	// Not found, but not conflicting either
+	// Not found, but not conflicting with some known AI either
 	assert(index == GS1_SEARCH_NOT_FOUND);
 
 	if (!ctx->permitUnknownAIs)

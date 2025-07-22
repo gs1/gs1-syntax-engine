@@ -638,10 +638,24 @@ char* gs1_strdup_alloc(const char *s) {
 
 }
 
-
-ssize_t gs1_binarySearch(const void * const needle, const void * const haystack, const size_t haystack_size,
-			 int (* const compare)(const void * const key, const void * const element, const size_t index),
-			 bool (* const validate)(const void * const key, const void * const element, const size_t index)) {
+/*
+ *  Implements a binarySearch for needle within haystack array, followed by
+ *  optional validation of the result.
+ *
+ *  Takes a comparator function pointer that is executed at each search step of
+ *  the binary search.
+ *
+ *  Takes an optitional validation function pointer (may be NULL) that checks
+ *  whether the result of the search is valid according to some criteria.
+ *
+ *  This facilitates AI searches using a prefix of needle, followed by a sanity
+ *  check, with the result differented into "not found" (e.g. an unknown AI)
+ *  versus "bad data" (e.g. illegal AI to vivify due to clash with known AIs).
+ *
+ */
+ssize_t gs1_binarySearch(const void* const needle, const void* const haystack, const size_t haystack_size,
+			 int (* const compare)(const void* const key, const void* const element, const size_t index),
+			 bool (* const validate)(const void* const key, const void* const element, const size_t index)) {
 
 	size_t s = 0, e = haystack_size;
 
