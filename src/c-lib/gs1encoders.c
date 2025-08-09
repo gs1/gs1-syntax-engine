@@ -62,7 +62,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 #ifndef NOMALLOC
 		ctx = GS1_ENCODERS_MALLOC(sizeof(gs1_encoder));
 #endif
-		if (ctx == NULL) return NULL;
+		if (unlikely(ctx == NULL)) return NULL;
 	} else {  // Use the provided storage
 		ctx = mem;
 	}
@@ -620,7 +620,7 @@ __ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
 		len = strlen((char *)str);
 
 	for (i = 0; i < len; i++) {
-		if (str[i] < '0' || str[i] > '9')
+		if (unlikely(str[i] < '0' || str[i] > '9'))
 			return false;
 	}
 	return true;

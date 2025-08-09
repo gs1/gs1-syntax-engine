@@ -41,12 +41,18 @@
 #if defined(__GNUC__) || defined(__clang__)
 #define __ATTR_CONST __attribute__ ((__const__))
 #define __ATTR_PURE __attribute__ ((__pure__))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
 #elif _MSC_VER
 #define __ATTR_CONST __declspec(noalias)
 #define __ATTR_PURE
+#define likely(x) (x)
+#define unlikely(x) (x)
 #else
 #define __ATTR_CONST
 #define __ATTR_PURE
+#define likely(x) (x)
+#define unlikely(x) (x)
 #endif
 
 #if defined(__clang__)

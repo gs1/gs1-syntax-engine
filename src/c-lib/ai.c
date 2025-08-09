@@ -735,7 +735,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 		const char *token;
 		char *saveptr = NULL;
 
-		if (ai->kind != aiValue_aival)
+		if (unlikely(ai->kind != aiValue_aival))
 			continue;
 
 		assert(ai->aiEntry);
