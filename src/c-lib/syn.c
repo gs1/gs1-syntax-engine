@@ -164,6 +164,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		error(SYNTAX_DICTIONARY_CAPACITY_TOO_SMALL);
 
 	*(*entry)->ai = '\0';
+	(*entry)->ailen = 0;
 	(*entry)->attrs = NULL;
 	(*entry)->title = NULL;
 	(*entry)->fnc1 = DO_FNC1;
@@ -191,6 +192,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 		memcpy((*entry)->ai, token, len/2);
 		(*entry)->ai[len/2] = '\0';
+		(*entry)->ailen = (uint8_t)len/2;
 
 		rangeEnd = *(token + len-1);
 		len /= 2;
@@ -203,7 +205,10 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		if (strspn(token, "0123456789") != len)
 			error(AI_MUST_BE_NUMBERIC);
 
-		strcpy((*entry)->ai, token);
+		memcpy((*entry)->ai, token, len);
+		(*entry)->ai[len] = '\0';
+		(*entry)->ailen = (uint8_t)len;
+
 		rangeEnd = *(token + len-1);
 
 	}
@@ -334,6 +339,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 		strcpy((*entry)->ai, lastEntry->ai);
 		(*entry)->ai[len-1]++;
+		(*entry)->ailen = lastEntry->ailen;
 		(*entry)->fnc1 = lastEntry->fnc1;
 		(*entry)->dlDataAttr = lastEntry->dlDataAttr;
 		for (part = 0; part < MAX_PARTS; part++) {

@@ -66,6 +66,7 @@ struct aiComponent {
 
 struct aiEntry {
 	char ai[MAX_AI_LEN+1];			// AI itself
+	uint8_t ailen;				// Defined to avoid repeated strlen(ai) at runtime
 	bool fnc1;				// FNC1 required as a separator
 	uint8_t dlDataAttr;			// Permitted as a GS1 DL URI data attribute
 	struct aiComponent parts[MAX_PARTS];	// Format specification components
@@ -119,6 +120,7 @@ struct validationEntry {
 
 #define AI_VA(a, f, d, c1,mn1,mx1,o1,l00,l01,l02, c2,mn2,mx2,o2,l10,l11,l12, c3,mn3,mx3,o3,l20,l21,l22, c4,mn4,mx4,o4,l30,l31,l32, c5,mn5,mx5,o5,l40,l41,l42, k, t) {	\
 		.ai = a,																		\
+		.ailen = (uint8_t)(sizeof(a) - 1),															\
 		.fnc1 = f,																		\
 		.dlDataAttr = d,																	\
 		.parts = {																		\

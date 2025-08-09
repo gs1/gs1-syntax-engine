@@ -91,7 +91,7 @@ static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 
 	for (e = ctx->aiTable; *e->ai; e++) {
 		uint8_t prefix = (uint8_t)((e->ai[0] - '0') * 10 + (e->ai[1] - '0'));
-		uint8_t length = (uint8_t)strlen(e->ai);
+		uint8_t length = e->ailen;
 		if (ctx->aiLengthByPrefix[prefix] != 0 && ctx->aiLengthByPrefix[prefix] != length) {
 			SET_ERR_V(AI_TABLE_BROKEN_PREFIXES_DIFFER_IN_LENGTH, e->ai[0], e->ai[1]);
 			return false;
@@ -249,16 +249,16 @@ struct aiLookupKey {
 static inline __ATTR_PURE int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
 	const struct aiLookupKey* lookupKey = (const struct aiLookupKey*)needle;
 	const struct aiEntry* entries = (const struct aiEntry*)haystack;
-	const char *ai = entries[index].ai;
+	const struct aiEntry* entry = &entries[index];
 
-	return strncmp(ai, lookupKey->ai, strlen(ai));	// Look for matches against the prefix of needle
+	return strncmp(entry->ai, lookupKey->ai, entry->ailen);	// Look for matches against the prefix of needle
 }
 
 static inline __ATTR_PURE bool validateAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
 	const struct aiLookupKey *lookupKey = (const struct aiLookupKey *)needle;
 	const struct aiEntry *entries = (const struct aiEntry*)haystack;
 	const char *ai = entries[index].ai;
-	const size_t ailen = strlen(ai);
+	const size_t ailen = entries[index].ailen;
 
 	return lookupKey->ailen == 0 ||			// Prefix of variable-length needle matched an entry
 	       lookupKey->ailen == ailen ||		// Fixed-length needle exactly matched an entry
@@ -354,10 +354,10 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 	assert(end);
 	assert(end >= start);
 
-	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)strlen(entry->ai), ai, (int)(r-p), start);
+	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)entry->ailen, ai, (int)(r-p), start);
 
 	if (p == r) {
-		SET_ERR_V(AI_DATA_IS_EMPTY, (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_DATA_IS_EMPTY, (int)entry->ailen, ai);
 		return 0;
 	}
 
@@ -379,7 +379,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 			continue;
 
 		if (complen < part->min) {
-			SET_ERR_V(AI_DATA_HAS_INCORRECT_LENGTH, (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_DATA_HAS_INCORRECT_LENGTH, (int)entry->ailen, ai);
 			return 0;
 		}
 
@@ -404,11 +404,11 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 			err = (*l)(compval, &errpos, &errlen);
 			if (err) {
-				SET_ERR_V(AI_LINTER_ERROR, (int)strlen(entry->ai), ai, gs1_lint_err_str[err]);
+				SET_ERR_V(AI_LINTER_ERROR, (int)entry->ailen, ai, gs1_lint_err_str[err]);
 				ctx->linterErr = err;
 				errpos += (size_t)(p-start);
 				snprintf(ctx->linterErrMarkup, sizeof(ctx->linterErrMarkup), "(%.*s)%.*s|%.*s|%.*s",
-					(int)strlen(entry->ai), ai,
+					(int)entry->ailen, ai,
 					(int)errpos, start,
 					(int)errlen, start + errpos,
 					(int)(strlen(compval) - errpos - errlen), start + errpos + errlen);
@@ -458,18 +458,18 @@ bool gs1_aiValLengthContentCheck(gs1_encoder* const ctx, const char* const ai, c
 	assert(aiVal);
 
 	if (vallen < aiEntryMinLength(entry)) {
-		SET_ERR_V(AI_VALUE_IS_TOO_SHORT, (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_VALUE_IS_TOO_SHORT, (int)entry->ailen, ai);
 		return false;
 	}
 
 	if (vallen > aiEntryMaxLength(entry)) {
-		SET_ERR_V(AI_VALUE_IS_TOO_LONG, (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_VALUE_IS_TOO_LONG, (int)entry->ailen, ai);
 		return false;
 	}
 
 	// Also forbid data "^" characters at this stage so we don't conflate with FNC1
 	if (memchr(aiVal, '^', vallen) != NULL) {
-		SET_ERR_V(AI_CONTAINS_ILLEGAL_CARAT_CHARACTER, (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_CONTAINS_ILLEGAL_CARAT_CHARACTER, (int)entry->ailen, ai);
 		return false;
 	}
 
@@ -631,7 +631,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 		// Save start of AI for AI data then jump over
 		ai = p;
-		p += strlen(entry->ai);
+		p += entry->ailen;
 
 		// r points to the next FNC1 or end of string...
 		if ((r = strchr(p, '^')) == NULL)
@@ -651,7 +651,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 				.kind = aiValue_aival,
 				.aiEntry = entry,
 				.ai = ai,
-				.ailen = (uint8_t)strlen(entry->ai),
+				.ailen = entry->ailen,
 				.value = p,
 				.vallen = (uint8_t)vallen,
 				.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
@@ -661,7 +661,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
 		p += vallen;
 		if (entry->fnc1 && *p != '^' && *p != '\0') {
-			SET_ERR_V(AI_DATA_IS_TOO_LONG, (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_DATA_IS_TOO_LONG, (int)entry->ailen, ai);
 			return false;
 		}
 
@@ -1078,8 +1078,8 @@ void test_ai_AItableVsPrefixLength(void) {
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
 		TEST_CASE(entry->ai);
-		TEST_CHECK(strlen(entry->ai) == aiLengthByPrefix(ctx, entry->ai));
-		TEST_MSG("Expected %d; Got %d", aiLengthByPrefix(ctx, entry->ai), strlen(entry->ai));
+		TEST_CHECK(entry->ailen == aiLengthByPrefix(ctx, entry->ai));
+		TEST_MSG("Expected %d; Got %d", aiLengthByPrefix(ctx, entry->ai), entry->ailen);
 	}
 
 	gs1_encoder_free(ctx);

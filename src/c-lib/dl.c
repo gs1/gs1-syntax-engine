@@ -569,7 +569,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			p = r + strlen(r);
 
 		if (p == r) {
-			SET_ERR_V(AI_VALUE_PATH_ELEMENT_IS_EMPTY, (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_PATH_ELEMENT_IS_EMPTY, (int)entry->ailen, ai);
 			goto fail;
 		}
 
@@ -674,13 +674,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		if (r == ++e) {
-			SET_ERR_V(AI_VALUE_QUERY_ELEMENT_IN_EMPTY, (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_QUERY_ELEMENT_IN_EMPTY, (int)entry->ailen, ai);
 			goto fail;
 		}
 
 		// Reverse percent encoding
 		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
-			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)strlen(entry->ai), ai);
+			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)entry->ailen, ai);
 			goto fail;
 		}
 
