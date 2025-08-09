@@ -99,7 +99,7 @@ static const struct alpha_ai alpha_ai_map[] = {
  *  Return the AI entry corresponding to a convenience alpha
  *
  */
-static int compareAlphaAI(const void* const needle, const void* const haystack, const size_t index) {
+static __ATTR_PURE int compareAlphaAI(const void* const needle, const void* const haystack, const size_t index) {
 	const char* const alpha = (const char*)needle;
 	const struct alpha_ai* map = (const struct alpha_ai*)haystack;
 	return strcmp(map[index].alpha, alpha);
@@ -206,7 +206,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 
 }
 
-static int q_cmp(const void* const a, const void* const b) {
+static __ATTR_PURE int q_cmp(const void* const a, const void* const b) {
 	return strcmp(*(const char**)a, *(const char**)b);
 }
 
@@ -304,7 +304,7 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
  *  the position in the list or -1 if missing
  *
  */
-static int compareDLKeyQualifier(const void* const key, const void* const array, const size_t index) {
+static __ATTR_PURE int compareDLKeyQualifier(const void* const key, const void* const array, const size_t index) {
 	const char* const aiseq = (const char*)key;
 	const char* const * const qualifiers = (const char* const *)array;
 	return strcmp(qualifiers[index], aiseq);

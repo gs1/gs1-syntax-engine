@@ -246,7 +246,7 @@ struct aiLookupKey {
 	const size_t ailen;
 };
 
-static inline int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
+static inline __ATTR_PURE int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
 	const struct aiLookupKey* lookupKey = (const struct aiLookupKey*)needle;
 	const struct aiEntry* entries = (const struct aiEntry*)haystack;
 	const char *ai = entries[index].ai;
@@ -254,7 +254,7 @@ static inline int compareAIEntryPrefix(const void* const needle, const void* con
 	return strncmp(ai, lookupKey->ai, strlen(ai));	// Look for matches against the prefix of needle
 }
 
-static inline bool validateAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
+static inline __ATTR_PURE bool validateAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
 	const struct aiLookupKey *lookupKey = (const struct aiLookupKey *)needle;
 	const struct aiEntry *entries = (const struct aiEntry*)haystack;
 	const char *ai = entries[index].ai;
@@ -265,7 +265,7 @@ static inline bool validateAIEntryMatch(const void* const needle, const void* co
 	       strncmp(lookupKey->ai, ai, ailen) != 0;	// Fixed-length needle is not a prefix of some longer AI
 }
 
-const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
+__ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
 	const struct aiLookupKey lookupKey = { ai, ailen };

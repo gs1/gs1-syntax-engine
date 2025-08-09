@@ -653,7 +653,7 @@ char* gs1_strdup_alloc(const char *s) {
  *  versus "bad data" (e.g. illegal AI to vivify due to clash with known AIs).
  *
  */
-ssize_t gs1_binarySearch(const void* const needle, const void* const haystack, const size_t haystack_size,
+__ATTR_PURE ssize_t gs1_binarySearch(const void* const needle, const void* const haystack, const size_t haystack_size,
 			 int (* const compare)(const void* const key, const void* const element, const size_t index),
 			 bool (* const validate)(const void* const key, const void* const element, const size_t index)) {
 
