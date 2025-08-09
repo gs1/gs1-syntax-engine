@@ -143,16 +143,12 @@ struct validationEntry {
 
 
 // Write to unbracketed AI dataStr checking for overflow
-#define writeDataStr(v) do {						\
-	if (strlen(dataStr) + strlen(v) > MAX_DATA)			\
+#define writeDataStr(v, v_len, offset) do {				\
+	if (*(offset) + v_len > MAX_DATA)				\
 		goto fail;						\
-	strcat(dataStr, v);						\
-} while (0)
-
-#define nwriteDataStr(v,l) do {						\
-	if (strlen(dataStr) + l > MAX_DATA)				\
-		goto fail;						\
-	strncat(dataStr, v, l);						\
+	memcpy(dataStr + *(offset), v, v_len);				\
+	*(offset) += v_len;						\
+	dataStr[*(offset)] = '\0';					\
 } while (0)
 
 

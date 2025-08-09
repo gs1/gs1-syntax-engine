@@ -420,6 +420,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };	// Sequence of AIs extracted from the path info
 	int numPathAIs;
 	size_t p_len;
+	size_t dataStr_len = 0;
 
 	assert(ctx);
 	assert(dlData);
@@ -592,16 +593,16 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
+			writeDataStr("^", 1, &dataStr_len);			// Write FNC1, if required
+		outai = dataStr + dataStr_len;					// Save start of AI for AI data
 		if (fromAlpha)
-			writeDataStr(entry->ai);		// Resolved from convenience alpha
+			writeDataStr(entry->ai, entry->ailen, &dataStr_len);	// Resolved from convenience alpha
 		else
-			nwriteDataStr(ai, ailen);		// Might be an "unknown AI"
-		fnc1req = entry->fnc1;				// Record if required before next AI
+			writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;						// Record if required before next AI
 
-		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
-		nwriteDataStr(aival, vallen);			// Write value
+		outval = dataStr + dataStr_len;					// Save start of value for AI data
+		writeDataStr(aival, vallen, &dataStr_len);			// Write value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
@@ -697,13 +698,13 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
 
 		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		nwriteDataStr(ai, ailen);			// Might be an "unknown AI"
-		fnc1req = entry->fnc1;				// Record if required before next AI
+			writeDataStr("^", 1, &dataStr_len);		// Write FNC1, if required
+		outai = dataStr + dataStr_len;				// Save start of AI for AI data
+		writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;					// Record if required before next AI
 
-		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
-		nwriteDataStr(aival, vallen);			// Write value
+		outval = dataStr + dataStr_len;				// Save start of value for AI data
+		writeDataStr(aival, vallen, &dataStr_len);		// Write value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters

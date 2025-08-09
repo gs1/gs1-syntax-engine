@@ -486,6 +486,8 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 
 	const char *p = aiData;
 	bool fnc1req = true;
+	size_t dataStr_len = 0;
+	size_t outval_len;
 
 	assert(ctx);
 	assert(aiData);
@@ -505,7 +507,7 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 		size_t ailen;
 
 		if (*p++ != '(') goto fail; 			// Expect start of AI
-		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
+		if (!(r = strchr(p, ')'))) goto fail;		// Find end of AI
 		ailen = (size_t)(r-p);
 		entry = gs1_lookupAIentry(ctx, p, ailen);
 		if (entry == NULL) {
@@ -515,32 +517,33 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 		ai = p;
 
 		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Record the current start of the output AI
-		nwriteDataStr(p, ailen);			// Might be an "unknown AI"
+			writeDataStr("^", 1, &dataStr_len);	// Write FNC1, if required
+		outai = dataStr + dataStr_len;			// Record the current start of the output AI
+		writeDataStr(p, ailen, &dataStr_len);		// Might be an "unknown AI"
 		fnc1req = entry->fnc1;				// Record whether FNC1 required before next AI
 
 		if (!*++r) goto fail;				// Advance to start of AI value and fail if at end
 
-		outval = dataStr + strlen(dataStr);		// Record the current start of the output value
+		outval = dataStr + dataStr_len;			// Record the current start of the output value
 
 again:
 
 		p = r;
 		while (*p && *p != '(') p++;			// Next AI or end if no more AIs
 
-		if (*p != '\0' && *(p-1) == '\\') {		// This bracket is an escaped data character
-			nwriteDataStr(r, (size_t)(p-r-1));	// Write up to the escape character
-			writeDataStr("(");			// Write the data bracket
-			r = p+1;				// And keep going
+		if (*p != '\0' && *(p-1) == '\\') {			// This bracket is an escaped data character
+			writeDataStr(r, (size_t)(p-r-1), &dataStr_len);	// Write up to the escape character
+			writeDataStr("(", 1, &dataStr_len);		// Write the data bracket
+			r = p+1;					// And keep going
 			goto again;
 		}
 
-		nwriteDataStr(r, (size_t)(p-r));		// Write the remainder of the value
+		writeDataStr(r, (size_t)(p-r), &dataStr_len);	// Write the remainder of the value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, strlen(outval)))
+		outval_len = dataStr_len - (size_t)(outval - dataStr);
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, outval_len))
 			goto fail;
 
 		// Update the AI data
@@ -549,13 +552,14 @@ again:
 			goto fail;
 		}
 
+		outval_len = dataStr_len - (size_t)(outval - dataStr);
 		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
 			.kind = aiValue_aival,
 			.aiEntry = entry,
 			.ai = outai,
 			.ailen = (uint8_t)ailen,
 			.value = outval,
-			.vallen = (uint8_t)strlen(outval),
+			.vallen = (uint8_t)outval_len,
 			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
 		};
 
