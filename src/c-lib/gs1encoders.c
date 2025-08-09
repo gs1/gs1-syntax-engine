@@ -241,6 +241,7 @@ char* gs1_encoder_getDataStr(gs1_encoder* const ctx) {
 bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	char *cc;
+	size_t dataStr_len;
 
 	assert(ctx);
 	assert(dataStr);
@@ -255,10 +256,11 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
-	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// GS1 Digital Link URI
-	    (strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
+	dataStr_len = strlen(ctx->dataStr);
+	if ((dataStr_len >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||	// GS1 Digital Link URI
+	    (dataStr_len >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
+	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
+	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
