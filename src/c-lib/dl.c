@@ -419,6 +419,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	bool fnc1req = true;
 	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };	// Sequence of AIs extracted from the path info
 	int numPathAIs;
+	size_t p_len;
 
 	assert(ctx);
 	assert(dlData);
@@ -432,19 +433,20 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	DEBUG_PRINT("\nParsing DL data: %s\n", dlData);
 
 	p = dlData;
+	p_len = strlen(p);
 
-	if (strspn(p, uriCharacters) != strlen(p)) {
+	if (strspn(p, uriCharacters) != p_len) {
 		SET_ERR(URI_CONTAINS_ILLEGAL_CHARACTERS);
 		goto fail;
 	}
 
-	if (strlen(p) >= 8 && strncmp(p, "https://", 8) == 0)
+	if (p_len >= 8 && strncmp(p, "https://", 8) == 0)
 		p += 8;
-	else if (strlen(p) >= 8 && strncmp(p, "HTTPS://", 8) == 0)
+	else if (p_len >= 8 && strncmp(p, "HTTPS://", 8) == 0)
 		p += 8;
-	else if (strlen(p) >= 7 && strncmp(p, "http://", 7) == 0)
+	else if (p_len >= 7 && strncmp(p, "http://", 7) == 0)
 		p += 7;
-	else if (strlen(p) >= 7 && strncmp(p, "HTTP://", 7) == 0)
+	else if (p_len >= 7 && strncmp(p, "HTTP://", 7) == 0)
 		p += 7;
 	else {
 		SET_ERR(URI_CONTAINS_ILLEGAL_SCHEME);
