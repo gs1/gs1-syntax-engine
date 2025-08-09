@@ -402,6 +402,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	aiMode_t aiMode;
 	char *p;
 	const char *q;
+	size_t dataStr_len;
 
 	assert(ctx);
 	assert(scanData);
@@ -435,16 +436,17 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 		size_t primaryLen = (sym == gs1_encoder_sEAN13) ? 13 : 8;
 		const char *cc = NULL;
+		size_t scanData_len = strlen(scanData);
 
-		if (strlen(scanData) < primaryLen) {
+		if (scanData_len < primaryLen) {
 			SET_ERR(PRIMARY_SCAN_DATA_IS_TOO_SHORT);
 			goto fail;
 		}
 
-		if (strlen(scanData) >= primaryLen + sizeof(CC_SYM_ID) &&
+		if (scanData_len >= primaryLen + sizeof(CC_SYM_ID) &&
 		    strncmp(scanData + primaryLen, "|" CC_SYM_ID, sizeof(CC_SYM_ID)) == 0) {
 			cc = scanData + primaryLen + sizeof(CC_SYM_ID);
-		} else if (strlen(scanData) > primaryLen) {
+		} else if (scanData_len > primaryLen) {
 			SET_ERR(PRIMARY_MESSAGE_IS_TOO_LONG);
 			goto fail;
 		}
@@ -508,10 +510,11 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	strcpy(p, scanData);
 
 	// If a GS1 Digital Link URI is given then process it immediately
-	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
+	dataStr_len = strlen(ctx->dataStr);
+	if ((dataStr_len >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
+	    (dataStr_len >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
+	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
+	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
