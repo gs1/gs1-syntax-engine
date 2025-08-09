@@ -526,8 +526,8 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 
 again:
 
-		if ((p = strchr(r, '(')) == NULL)
-			p = r + strlen(r);			// Move the pointer to the end if no more AIs
+		p = r;
+		while (*p && *p != '(') p++;			// Next AI or end if no more AIs
 
 		if (*p != '\0' && *(p-1) == '\\') {		// This bracket is an escaped data character
 			nwriteDataStr(r, (size_t)(p-r-1));	// Write up to the escape character
@@ -634,8 +634,8 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		p += entry->ailen;
 
 		// r points to the next FNC1 or end of string...
-		if ((r = strchr(p, '^')) == NULL)
-			r = p + strlen(p);
+		r = p;
+		while (*r && *r != '^') r++;
 
 		// Validate and return how much was consumed
 		if ((vallen = validate_ai_val(ctx, ai, entry, p, r)) == 0)
