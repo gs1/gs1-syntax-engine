@@ -495,17 +495,19 @@ void gs1_encoder_copyHRI(gs1_encoder* const ctx, void* const buf, const size_t m
 	numhri = gs1_encoder_getHRI(ctx, &hri);
 
 	p = buf;
-	*p = '\0';
 	for (i = 0; i < numhri; i++) {
-		rem -= (int)strlen(hri[i]) + 1;
+		size_t hri_len = strlen(hri[i]);
+		rem -= (int)hri_len + 1;
 		if (rem < 0) {
-			*p = '\0';
+			*(char*)buf = '\0';
 			return;
 		}
 		if (i != 0)
-			strcat(p, "|");
-		strcat(p, hri[i]);
+			*p++ = '|';
+		memcpy(p, hri[i], hri_len);
+		p += hri_len;
 	}
+	*p = '\0';
 
 	return;
 
@@ -576,17 +578,19 @@ void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const bu
 	numqp = gs1_encoder_getDLignoredQueryParams(ctx, &qp);
 
 	p = buf;
-	*p = '\0';
 	for (i = 0; i < numqp; i++) {
-		rem -= (int)strlen(qp[i]) + 1;
+		size_t qp_len = strlen(qp[i]);
+		rem -= (int)qp_len + 1;
 		if (rem < 0) {
-			*p = '\0';
+			*(char*)buf = '\0';
 			return;
 		}
 		if (i != 0)
-			strcat(p, "&");
-		strcat(p, qp[i]);
+			*p++ = '&';
+		memcpy(p, qp[i], qp_len);
+		p += qp_len;
 	}
+	*p = '\0';
 
 	return;
 
