@@ -186,7 +186,8 @@ static bool validateParity(uint8_t *str) {
 
 static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
 
-	if (strlen(dataStr) != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
+	size_t dataStr_len = strlen(dataStr);
+	if (dataStr_len != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
 		if (ctx->addCheckDigit)
 			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS_WITHOUT_CHECK_DIGIT, length - 1);
 		else
@@ -199,10 +200,13 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 		return false;
 	}
 
-	strcpy(primaryStr, dataStr);
+	memcpy(primaryStr, dataStr, dataStr_len);
+	primaryStr[dataStr_len] = '\0';
 
-	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
+	if (ctx->addCheckDigit) {
+		primaryStr[dataStr_len] = '-';
+		primaryStr[dataStr_len + 1] = '\0';
+	}
 
 	if (!validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
 		SET_ERR(PRIMARY_DATA_CHECK_DIGIT_IS_INCORRECT);
