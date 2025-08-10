@@ -111,6 +111,7 @@ static const __ATTR_PURE char* lookupSymId(const gs1_encoder* const ctx) {
 
 }
 
+
 static void lookupSymAndModeBySymId(const char* const symId, gs1_encoder_symbologies_t* const sym, aiMode_t* const aiMode) {
 
 	size_t i;
@@ -130,13 +131,10 @@ static void lookupSymAndModeBySymId(const char* const symId, gs1_encoder_symbolo
 }
 
 
-static void scancat(char* const out, const char* const in) {
+static size_t scancat(char* const out, const char* const in, const size_t out_len) {
 
 	const char *p = in;
-	char *q = out;
-
-	while (*q)
-		q++;						// Got to end of output
+	char *q = out + out_len;
 
 	if (*p == '^') {					// GS1 mode
 
@@ -158,6 +156,8 @@ static void scancat(char* const out, const char* const in) {
 			*q++ = *p++;
 	}
 	*q = '\0';
+
+	return (size_t)(q - out);
 
 }
 
@@ -226,6 +226,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 	const char *dataStr;
 	int length, aizeros;
 	char* ret;
+	size_t outStr_len = 0;
 
 	assert(ctx);
 
@@ -250,9 +251,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			cc = NULL;
 		}
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		scancat(ctx->outStr, ctx->dataStr);
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		ctx->outStr[outStr_len] = '\0';
+		scancat(ctx->outStr, ctx->dataStr, outStr_len);
 		break;
 
 	case gs1_encoder_sGS1_128_CCA:
@@ -262,9 +265,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			// "]C1" for linear-only GS1-128
 			if (*ctx->dataStr != '^')
 				goto fail;
-			strcat(ctx->outStr, "]");
-			strncat(ctx->outStr, lookupSymId(ctx), 2);
-			scancat(ctx->outStr, ctx->dataStr);
+			ctx->outStr[outStr_len++] = ']';
+			memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+			outStr_len += 2;
+			ctx->outStr[outStr_len] = '\0';
+			scancat(ctx->outStr, ctx->dataStr, outStr_len);
 			break;
 		}
 
@@ -275,8 +280,10 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// "]e0" followed by concatenated AI data from linear and CC
 		if (*ctx->dataStr != '^')
 			goto fail;
-		strcat(ctx->outStr, CC_SYM_ID);
-		scancat(ctx->outStr, ctx->dataStr);
+		memcpy(ctx->outStr + outStr_len, CC_SYM_ID, sizeof(CC_SYM_ID) - 1);
+		outStr_len += sizeof(CC_SYM_ID) - 1;
+		ctx->outStr[outStr_len] = '\0';
+		outStr_len = scancat(ctx->outStr, ctx->dataStr, outStr_len);
 
 		if (cc) {
 
@@ -289,10 +296,12 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			// Append GS if last AI of linear component isn't fixed-length
 			for (i = 0; i < ctx->numAIs && ctx->aiData[i].aiEntry; i++)
 				lastAIfnc1 = ctx->aiData[i].aiEntry->fnc1;
-			if (lastAIfnc1)
-				strcat(ctx->outStr, "\x1D");
+			if (lastAIfnc1) {
+				ctx->outStr[outStr_len++] = '\x1D';
+				ctx->outStr[outStr_len] = '\0';
+			}
 
-			scancat(ctx->outStr, cc);
+			scancat(ctx->outStr, cc, outStr_len);
 
 		}
 
@@ -321,15 +330,18 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			}
 		}
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		strcat(ctx->outStr, "01");		// Convert to AI (01)
-		scancat(ctx->outStr, primaryStr);
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		memcpy(ctx->outStr + outStr_len, "01", 2);
+		outStr_len += 2;
+		ctx->outStr[outStr_len] = '\0';
+		outStr_len = scancat(ctx->outStr, primaryStr, outStr_len);
 
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
-			scancat(ctx->outStr, cc);
+			scancat(ctx->outStr, cc, outStr_len);
 		}
 
 		break;
@@ -364,15 +376,22 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
 			goto fail;
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		strcat(ctx->outStr, pad);
-		scancat(ctx->outStr, primaryStr);
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		if (*pad) {
+			ctx->outStr[outStr_len++] = *pad;
+		}
+		ctx->outStr[outStr_len] = '\0';
+		outStr_len = scancat(ctx->outStr, primaryStr, outStr_len);
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
-			strcat(ctx->outStr, "|" CC_SYM_ID);		// "|" means start of new message
-			scancat(ctx->outStr, cc);
+			ctx->outStr[outStr_len++] = '|';
+			memcpy(ctx->outStr + outStr_len, CC_SYM_ID, sizeof(CC_SYM_ID) - 1);
+			outStr_len += sizeof(CC_SYM_ID) - 1;
+			ctx->outStr[outStr_len] = '\0';		// "|" means start of new message
+			scancat(ctx->outStr, cc, outStr_len);
 		}
 		break;
 
