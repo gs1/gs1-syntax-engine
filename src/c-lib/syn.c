@@ -222,7 +222,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	 *  token has exclusively flag characters then process as such.
 	 *
 	 */
-	while (strspn(token, "*?!\"$%&'()+,-./:;<=>@[\\]^_`{|}~") == strlen(token)) {
+	while (token[strspn(token, "*?!\"$%&'()+,-./:;<=>@[\\]^_`{|}~")] == '\0') {
 
 		// '*' => no FNC1 indicator flag
 		if (strchr(token, '*'))
@@ -282,11 +282,11 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 				error(ATTRIBUTE_NAME_REQUIRED_ON_LHS_OF_ASSIGNMENT);
 
 			*q = '\0';
-			if (strspn(token, "abcdefghijklmnopqrstuvwxyz") != strlen(token))
+			if (token[strspn(token, "abcdefghijklmnopqrstuvwxyz")] != '\0')
 				error(ATTRIBUTE_NAME_CONTAINS_ILLEGAL_CHARACTERS);
 			*q = '=';
 
-			if (strspn(q+1, "abcdefghijklmnopqrstuvwxyz0123456789-+_,|") != strlen(q+1))
+			if ((q+1)[strspn(q+1, "abcdefghijklmnopqrstuvwxyz0123456789-+_,|")] != '\0')
 				error(ATTRIBUTE_VALUE_CONTAINS_ILLEGAL_CHARACTERS);
 
 			if (*(q+1) == '\0')
@@ -294,7 +294,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 		} else {					// e.g. dlpkey
 
-			if (strspn(token, "abcdefghijklmnopqrstuvwxyz") != strlen(token))
+			if (token[strspn(token, "abcdefghijklmnopqrstuvwxyz")] != '\0')
 				error(SINGLETON_ATTRIBUTE_NAME_CONTAINS_ILLEGAL_CHARACTERS);
 
 		}
@@ -317,7 +317,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	token = strtok_r(NULL, "", &saveptr);
 	if (token) {
 
-		if (strspn(token, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890#()-+,./²³ ") != strlen(token))
+		if (token[strspn(token, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890#()-+,./²³ ")] != '\0')
 			error(TITLE_CONTAINS_ILLEGAL_CHARACTERS);
 
 		(*entry)->title = gs1_strdup_alloc(token);
