@@ -1,7 +1,11 @@
 X.X.X
 
+* Core: Additional sanity checks were added to the domain part of GS1 DL URIs.
+* Core: A framework was added for overriding the heap-management functions of the library which may be used for activities such as custom memory profiling.
 * Core: Support was added for DotCode and GS1 DotCode scandata.
+* Core: All data transformation routines were significantly optimised for runtime performance.
 * JS: Added an example node.js web service application to transform GS1 data, which may be useful in the event that the library or its bindings cannot be integrated directly.
+* Java: Windows support was added for building the wrapper and example application.
 
 
 1.2.0
