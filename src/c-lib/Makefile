@@ -386,5 +386,16 @@ setversion:
 	(cd ../js-wasm && npm version --allow-same-version $(VERSION))
 	sed -i 's/name="Implementation-Version" value="[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+"/name="Implementation-Version" value="$(VERSION)"/' ../java/build.xml
 
+syncsyntaxdict:
+	cp ../../../gs1-syntax-dictionary/gs1-syntax-dictionary.txt .
+	cp ../../../gs1-syntax-dictionary/src/acutest.h syntax/
+	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary.c syntax/
+	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary.h syntax/
+	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary-utils.h syntax/
+	cp ../../../gs1-syntax-dictionary/src/lint_*.c syntax/
+	cp ../../../gs1-syntax-dictionary/src/unittest.h syntax/
+	mv aitable.inc aitable.$$(date +%s)
+	cat gs1-syntax-dictionary.txt | ./build-embedded-ai-table.pl > aitable.inc.new && mv aitable.inc.new aitable.inc
+
 
 -include $(DEPS)
