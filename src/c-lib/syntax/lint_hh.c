@@ -54,39 +54,43 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len, pos;
+	int pos;
 
 	assert(data);
 
-	len = strlen(data);
-
 	/*
-	 * Data must be two characters.
+	 * Data must be exactly two characters.
 	 *
 	 */
-	if (len != 2)
+	if (GS1_LINTER_UNLIKELY(!data[0] || !data[1]))
 		GS1_LINTER_RETURN_ERROR(
-			len < 2 ? GS1_LINTER_HOUR_TOO_SHORT : GS1_LINTER_HOUR_TOO_LONG,
+			GS1_LINTER_HOUR_TOO_SHORT,
 			0,
-			len
+			data[0] ? 1 : 0
+		);
+
+	if (GS1_LINTER_UNLIKELY(data[2] != '\0'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_HOUR_TOO_LONG,
+			0,
+			strlen(data)
 		);
 
 	/*
 	 * Data must consist of all digits.
-	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
-		);
+	for (pos = 0; pos < 2; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				(size_t)pos,
+				1
+			);
 
 	/*
-	 * Validate the minute.
-	 *
+	 * Validate the hour (00-23).
 	 */
-	if ((data[0] - '0') * 10 + (data[1] - '0') > 23)
+	if (GS1_LINTER_UNLIKELY((data[0] - '0') * 10 + (data[1] - '0') > 23))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_HOUR,
 			0,
@@ -137,6 +141,7 @@ void test_lint_hh(void)
 	UNIT_TEST_FAIL(gs1_lint_hh, "",    GS1_LINTER_HOUR_TOO_SHORT, "**");
 	UNIT_TEST_FAIL(gs1_lint_hh, "1",   GS1_LINTER_HOUR_TOO_SHORT, "*1*");
 	UNIT_TEST_FAIL(gs1_lint_hh, "111", GS1_LINTER_HOUR_TOO_LONG,  "*111*");
+	UNIT_TEST_FAIL(gs1_lint_hh, "1111", GS1_LINTER_HOUR_TOO_LONG,  "*1111*");
 
 }
 

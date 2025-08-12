@@ -101,22 +101,9 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t i, len;
+	size_t i;
 
 	assert(data);
-
-	len = strlen(data);
-
-	/*
-	 * The current minimum GCP length is defined by GCP_MIN_LENGTH.
-	 *
-	 */
-	if (len < GCP_MIN_LENGTH)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_TOO_SHORT_FOR_GCP,
-			0,
-			len
-		);
 
 	/*
 	 * Any character within the minimum-length GCP prefix that is outside
@@ -124,7 +111,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data
 	 *
 	 */
 	for (i = 0; i < GCP_MIN_LENGTH; i++) {
-		if (data[i] < '0' || data[i] > '9')
+		if (GS1_LINTER_UNLIKELY(!data[i]))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_TOO_SHORT_FOR_GCP,
+				0,
+				i
+			);
+		if (GS1_LINTER_UNLIKELY(data[i] < '0' || data[i] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_GCP_PREFIX,
 				i,
@@ -140,9 +133,9 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data
 {
 	int valid = 0, offline = 0;
 	GS1_LINTER_CUSTOM_GCP_LOOKUP(data);
-	if (offline)
+	if (GS1_LINTER_UNLIKELY(offline))
 		GS1_LINTER_RETURN_ERROR(GS1_LINTER_GCP_DATASOURCE_OFFLINE, 0, 0);
-	else if (!valid)
+	else if (GS1_LINTER_UNLIKELY(!valid))
 		GS1_LINTER_RETURN_ERROR(GS1_LINTER_INVALID_GCP_PREFIX, 0, 0);
 }
 #endif

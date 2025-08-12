@@ -47,13 +47,11 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len;
+	const char *p;
 
 	assert(data);
 
-	len = strlen(data);
-
-	if (*data == '\0')
+	if (GS1_LINTER_UNLIKELY(*data == '\0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_NOT_ZERO,
 			0,
@@ -64,12 +62,16 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char* const data, s
 	 * Data must not contain a non-zero character
 	 *
 	 */
-	if (strspn(data, "0") != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NOT_ZERO,
-			0,
-			len
-		);
+	for (p = data; *p; p++) {
+		if (GS1_LINTER_UNLIKELY(*p != '0')) {
+			while (*p) p++;
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NOT_ZERO,
+				0,
+				(size_t)(p - data)
+			);
+		}
+	}
 
 	GS1_LINTER_RETURN_OK;
 

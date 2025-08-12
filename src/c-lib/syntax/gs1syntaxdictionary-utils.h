@@ -52,6 +52,32 @@
 
 
 /**
+ * @def GS1_LINTER_LIKELY
+ * @brief Implemention may provide hint to the compiler that the expression is
+ * likely to be true.
+ *
+ */
+#if defined(__GNUC__) || defined(__clang__)
+#  define GS1_LINTER_LIKELY(x) __builtin_expect(!!(x), 1)
+#else
+#  define GS1_LINTER_LIKELY(x) (x)
+#endif
+
+
+/**
+ * @def GS1_LINTER_UNLIKELY
+ * @brief Implemention may provide hint to the compiler that the expression is
+ * likely to be false.
+ *
+ */
+#if defined(__GNUC__) || defined(__clang__)
+#  define GS1_LINTER_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#  define GS1_LINTER_UNLIKELY(x) (x)
+#endif
+
+
+/**
  * @brief Return from a linter indicating that no problem was detected with the
  * given data.
  *

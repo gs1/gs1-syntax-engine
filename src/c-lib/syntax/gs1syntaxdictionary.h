@@ -197,6 +197,7 @@ typedef enum
 	GS1_LINTER_SECOND_TOO_LONG,					///< The second is too long for SS format.
 	GS1_LINTER_INVALID_PACKAGE_TYPE,				///< A valid PackageTypeCode is required.
 	GS1_LINTER_TOO_SHORT_FOR_GCP,					///< The component is shorter than the minimum length GS1 Company Prefix.
+	GS1_LINTER_IBAN_TOO_LONG,					///< The IBAN is too long.
 	__GS1_LINTER_NUM_ERRS						//  Keep this as the last element which captures the size of this enumeration.
 } gs1_lint_err_t;
 

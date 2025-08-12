@@ -47,21 +47,26 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hyphen(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len;
+	const char *p;
 
 	assert(data);
 
-	len = strlen(data);
+	if (GS1_LINTER_UNLIKELY(*data == '\0'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NOT_HYPHEN,
+			0,
+			0
+		);
 
-	if (*data == '\0')
-		GS1_LINTER_RETURN_ERROR(GS1_LINTER_NOT_HYPHEN, 0, 0);
-
-	/*
-	 * Data must not contain a non-hyphen character
-	 *
-	 */
-	if (strspn(data, "-") != len)
-		GS1_LINTER_RETURN_ERROR(GS1_LINTER_NOT_HYPHEN, 0, len);
+	for (p = data; *p; p++)
+		if (GS1_LINTER_UNLIKELY(*p != '-')) {
+			while (*p) p++;
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NOT_HYPHEN,
+				0,
+				(size_t)(p - data)
+			);
+		}
 
 	GS1_LINTER_RETURN_OK;
 

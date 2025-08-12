@@ -65,40 +65,40 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 	static const unsigned char daysinmonth[] =
 		{ 31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	size_t len, pos;
+	size_t pos;
 	unsigned char maxdd;
 
 	assert(data);
-
-	len = strlen(data);
-
-	/*
-	 * Data must be eight characters.
-	 *
-	 */
-	if (len != 8)
-		GS1_LINTER_RETURN_ERROR(
-			len < 8 ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
-			0,
-			len
-		);
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len)
+	for (pos = 0; pos < 8 && data[pos]; pos++) {
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+	}
+
+	/*
+	 * Data must be eight characters.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(pos != 8 || data[8]))
 		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
+			(pos < 8) ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
+			0,
+			pos + (data[pos] ? 1 : 0)
 		);
 
 	/*
 	 * Validate that the month is 01 to 12.
 	 *
 	 */
-	if (MM < 1 || MM > 12)
+	if (GS1_LINTER_UNLIKELY(MM < 1 || MM > 12))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_MONTH,
 			4,
@@ -115,7 +115,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmd0(const char* const dat
 		maxdd = daysinmonth[MM - 1];		/* Based at 0 */
 	}
 
-	if (DD > maxdd)		/* Permit "00" */
+	if (GS1_LINTER_UNLIKELY(DD > maxdd))		/* Permit "00" */
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_DAY,
 			6,

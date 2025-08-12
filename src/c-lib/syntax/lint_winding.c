@@ -59,11 +59,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_winding(const char* const data
 	 * The data must be either "0", "1" or "9".
 	 *
 	 */
-	if (strcmp(data, "0") != 0 && strcmp(data, "1") != 0 && strcmp(data, "9") != 0)
+	if (GS1_LINTER_UNLIKELY(data[0] == '\0' || data[1] != '\0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_WINDING_DIRECTION,
 			0,
 			strlen(data)
+		);
+
+	if (GS1_LINTER_UNLIKELY(data[0] != '0' && data[0] != '1' && data[0] != '9'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_WINDING_DIRECTION,
+			0,
+			1
 		);
 
 	GS1_LINTER_RETURN_OK;

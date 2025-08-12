@@ -65,34 +65,34 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 #define YY ( (data[0] - '0') * 10 + (data[1] - '0') )
 /// \endcond
 
-	size_t len, pos;
+	size_t pos;
 	char yyyymmdd[9] = {0};
 	gs1_lint_err_t ret;
 
 	assert(data);
 
-	len = strlen(data);
+	/*
+	 * Data must consist of all digits.
+	 *
+	 */
+	for (pos = 0; pos < 6 && data[pos]; pos++) {
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+	}
 
 	/*
 	 * Data must be six characters.
 	 *
 	 */
-	if (len != 6)
+	if (GS1_LINTER_UNLIKELY(pos != 6 || data[6]))
 		GS1_LINTER_RETURN_ERROR(
-			len < 6 ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
+			(pos < 6) ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
 			0,
-			len
-		);
-
-	/*
-	 * Data must consist of all digits.
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
+			pos + (data[pos] ? 1 : 0)
 		);
 
 	memcpy(yyyymmdd + 2, data, 6);
@@ -116,9 +116,9 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 	       ret == GS1_LINTER_ILLEGAL_DAY);
 
 	assert(!err_pos || ret == GS1_LINTER_OK || (*err_pos >= 2));
-	assert(!err_pos || !err_len || ret == GS1_LINTER_OK || (*err_pos + *err_len <= len + 2));
+	assert(!err_pos || !err_len || ret == GS1_LINTER_OK || (*err_pos + *err_len <= 8));
 
-	if (ret != GS1_LINTER_OK)
+	if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
 		GS1_LINTER_RETURN_ERROR(
 			ret,
 			*err_pos - 2,

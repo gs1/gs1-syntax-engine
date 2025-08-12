@@ -58,29 +58,64 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 #define E(i)    data[i + pos + 1]
 /// \endcond
 
-	size_t pos, len;
+	size_t pos, len, slash_pos;
 
 	assert(data);
 
-	len = strlen(data);
-
 	/*
-	 * Determine that the format is "<pos>/<end>".
+	 * First non-digit should be '/'
 	 *
 	 */
-	pos = strspn(data, "0123456789");
-	if (pos == 0 || pos >= len - 1 || data[pos] != '/' || strspn(data + pos + 1, "0123456789") != len - pos - 1)
+	for (pos = 0; data[pos] >= '0' && data[pos] <= '9'; pos++);
+
+	/*
+	 * Format so far must be digits + '/'
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(pos == 0 || !data[pos] || data[pos] != '/')) {
+		while (data[pos]) pos++;
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+			0,
+			pos
+		);
+	}
+
+	slash_pos = pos;
+
+	/*
+	 * Validate that remaining characters are digits and measure length
+	 *
+	 */
+	for (pos++; data[pos]; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9')) {
+			while (data[pos]) pos++;
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+				0,
+				pos
+			);
+		}
+
+	len = pos;
+
+	/*
+	 * Must have digits after slash
+	 */
+	if (GS1_LINTER_UNLIKELY(slash_pos >= len - 1))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
 			0,
 			len
 		);
 
+	pos = slash_pos;
+
 	/*
 	 * Ensure position number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (P(0) == '0')
+	if (GS1_LINTER_UNLIKELY(P(0) == '0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
 			0,
@@ -91,7 +126,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 	 * Ensure end number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (E(0) == '0')
+	if (GS1_LINTER_UNLIKELY(E(0) == '0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
 			pos + 1,
@@ -108,13 +143,13 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 		for (i = 0; i < pos && !compare; i++)
 			if (P(i) != E(i))
 				compare = P(i) < E(i) ? -1 : 1;
-		if (compare == 1)
+		if (GS1_LINTER_UNLIKELY(compare == 1))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_POSITION_EXCEEDS_END,
 				0,
 				len
 			);
-	} else if (pos > len - pos - 1)
+	} else if (GS1_LINTER_UNLIKELY(pos > len - pos - 1))
 		/* Non-zero prefix, so a length check is sufficient. */
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_POSITION_EXCEEDS_END,

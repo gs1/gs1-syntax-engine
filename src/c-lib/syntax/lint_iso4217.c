@@ -150,7 +150,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 	 *
 	 */
 	GS1_LINTER_ISO4217_LOOKUP(data);
-	if (valid)
+	if (GS1_LINTER_LIKELY(valid))
 		GS1_LINTER_RETURN_OK;
 
 	/*

@@ -49,32 +49,27 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nonzero(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len, pos;
+	size_t pos;
+	int has_nonzero = 0;
 
 	assert(data);
 
-	len = strlen(data);
+	for (pos = 0; data[pos]; pos++) {
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+		if (data[pos] != '0')
+			has_nonzero = 1;
+	}
 
-	/*
-	 * Data must be all numeric
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
-		);
-
-	/*
-	 * Data must contain a non-zero digit
-	 *
-	 */
-	if (strspn(data, "0") >= len)
+	if (GS1_LINTER_UNLIKELY(!has_nonzero))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_ZERO_VALUE,
 			0,
-			len
+			pos
 		);
 
 	GS1_LINTER_RETURN_OK;

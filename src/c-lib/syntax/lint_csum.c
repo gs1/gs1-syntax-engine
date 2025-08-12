@@ -59,7 +59,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	int weight;
 	int parity = 0;
 	const char *p;
-	size_t len, pos;
+	size_t len;
 
 	assert(data);
 
@@ -69,22 +69,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	 * Data must include at least the check digit.
 	 *
 	 */
-	if (*data == '\0')
+	if (GS1_LINTER_UNLIKELY(*data == '\0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT,
 			0,
 			0
-		);
-
-	/*
-	 * Data must consist of all digits.
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
 		);
 
 	/*
@@ -99,12 +88,35 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	weight = len % 2 == 0 ? 3 : 1;
 	p = data;
 	while (*(p+1)) {
+
+		/*
+		 * Data must consist of all digits.
+		 *
+		 */
+		if (GS1_LINTER_UNLIKELY(*p < '0' || *p > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				(size_t)(p - data),
+				1
+			);
+
 		parity += weight * (*p++ - '0');
 		weight = 4 - weight;
 	}
+
+	/*
+	 * Check character must also be a digit.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(*p < '0' || *p > '9'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			len - 1,
+			1
+		);
 	parity = (10 - parity % 10) % 10;
 
-	if (parity + '0' != *p)
+	if (GS1_LINTER_UNLIKELY(parity + '0' != *p))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INCORRECT_CHECK_DIGIT,
 			len - 1,

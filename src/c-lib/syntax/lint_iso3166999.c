@@ -71,8 +71,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char* const d
 
 	assert(ret == GS1_LINTER_OK || ret == GS1_LINTER_NOT_ISO3166);
 
+	if (GS1_LINTER_LIKELY(ret == GS1_LINTER_OK))
+		GS1_LINTER_RETURN_OK;
+
 	GS1_LINTER_RETURN_ERROR(
-		ret == GS1_LINTER_NOT_ISO3166 ? GS1_LINTER_NOT_ISO3166_OR_999 : ret,
+		GS1_LINTER_NOT_ISO3166_OR_999,
 		*err_pos,
 		*err_len
 	);

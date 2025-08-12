@@ -57,15 +57,16 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csetnumeric(const char* const 
 	assert(data);
 
 	/*
-	 * Any character outside the range '0' to '9' is illegal.
-	 *
+	 * Validate digits using direct range checking
 	 */
-	if ((pos = strspn(data, "0123456789")) != strlen(data))
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
-		);
+	for (pos = 0; data[pos] != '\0'; pos++) {
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+	}
 
 	GS1_LINTER_RETURN_OK;
 

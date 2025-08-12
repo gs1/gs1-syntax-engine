@@ -62,14 +62,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yyyymmdd(const char* const dat
 	       ret == GS1_LINTER_ILLEGAL_MONTH ||
 	       ret == GS1_LINTER_ILLEGAL_DAY);
 
-	if (ret != GS1_LINTER_OK)
+	if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
 		GS1_LINTER_RETURN_ERROR(
 			ret,
 			*err_pos,
 			*err_len
 		);
 
-	if (data[6] == '0' && data[7] == '0')
+	if (GS1_LINTER_UNLIKELY(data[6] == '0' && data[7] == '0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_DAY,
 			6,

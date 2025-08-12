@@ -66,28 +66,28 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 
 	assert(data);
 
-	len = strlen(data);
+	/*
+	 * Data must consist of all digits.
+	 *
+	 */
+	for (pos = 0; data[pos]; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+	len = pos;
 
 	/*
 	 * Data must be a non-zero, even number of characters.
 	 *
 	 */
-	if (len == 0 || len % 2 != 0)
+	if (GS1_LINTER_UNLIKELY(len == 0 || len % 2 != 0))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL,
 			0,
 			len
-		);
-
-	/*
-	 * Data must consist of all digits.
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_NON_DIGIT_CHARACTER,
-			pos,
-			1
 		);
 
 	/*
@@ -107,7 +107,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * Neither piece nor total may be zero.
 	 *
 	 */
-	if (pieceiszero || totaliszero)
+	if (GS1_LINTER_UNLIKELY(pieceiszero || totaliszero))
 		GS1_LINTER_RETURN_ERROR(
 			pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES,
 			pieceiszero ? 0 : len / 2,
@@ -118,7 +118,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * The piece number must not exceed the total piece count.
 	 *
 	 */
-	if (compare == 1)
+	if (GS1_LINTER_UNLIKELY(compare == 1))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL,
 			0,

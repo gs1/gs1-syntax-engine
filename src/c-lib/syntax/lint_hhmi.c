@@ -66,7 +66,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, s
 	 * Data must be four characters.
 	 *
 	 */
-	if (len != 4)
+	if (GS1_LINTER_UNLIKELY(len != 4))
 		GS1_LINTER_RETURN_ERROR(
 			len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,
 			0,
@@ -80,7 +80,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, s
 	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
 	       ret == GS1_LINTER_ILLEGAL_HOUR);
 
-	if (ret != GS1_LINTER_OK)
+	if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
 		GS1_LINTER_RETURN_ERROR(ret, *err_pos, *err_len);
 
 	memcpy(buf, data+2, 2);
@@ -90,7 +90,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, s
 	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
 	       ret == GS1_LINTER_ILLEGAL_MINUTE);
 
-	if (ret != GS1_LINTER_OK)
+	if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
 		GS1_LINTER_RETURN_ERROR(ret, *err_pos + 2, *err_len);
 
 	GS1_LINTER_RETURN_OK;

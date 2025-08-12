@@ -260,6 +260,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The second is too long for SS format.",
 	"A valid PackageTypeCode is required.",
 	"The component is shorter than the minimum length GS1 Company Prefix.",
+	"The IBAN is too long.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */

@@ -28,6 +28,7 @@
 
 
 #include <assert.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -53,13 +54,11 @@
 GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, size_t* const err_pos, size_t* const err_len)
 {
 
-	const char *p, *q;
-	char pct[3] = {0};
+	const char *p;
 
 	assert(data);
 
 	p = data;
-	q = data + strlen(data);
 
 	/*
 	 * Find each instance of "%" in the data and ensure that there are at
@@ -67,17 +66,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, 
 	 * represent a hex value.
 	 *
 	 */
-	while (p != q && (p = strchr(p, '%')) != NULL) {
+	while ((p = strchr(p, '%')) != NULL) {
 
-		if (q - p < 3)
+		if (GS1_LINTER_UNLIKELY(!p[1] || !p[2])) {
+			size_t remaining = 0;
+			if (p[1]) remaining = p[2] ? 2 : 1;
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
 				(size_t)(p - data),
-				(size_t)(q - p)
+				remaining + 1
 			);
+		}
 
-		memcpy(pct, p + 1, 2);
-		if (strspn(pct, "0123456789ABCDEFabcdef") != 2)
+		if (GS1_LINTER_UNLIKELY(!isxdigit(p[1]) || !isxdigit(p[2])))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
 				(size_t)(p - data),

@@ -39,6 +39,8 @@
 #define IBAN_MIN_LENGTH 10  ///< No clear minimum length; sufficient for check characters.
 #endif
 
+#define IBAN_MAX_LENGTH 34  ///< Per specification.
+
 
 /**
  * Used to validate that an AI component conforms to the format required for an
@@ -55,6 +57,7 @@
  * @return #GS1_LINTER_INCORRECT_IBAN_CHECKSUM if the IBAN checksum is
  *         incorrect for the data.
  * @return #GS1_LINTER_IBAN_TOO_SHORT if the data is too short to be an IBAN.
+ * @return #GS1_LINTER_IBAN_TOO_LONG if the data is too long to be an IBAN.
  * @return #GS1_LINTER_INVALID_IBAN_CHARACTER if the data contains a character
  *         that isn't permissible within an IBAN.
  * @return #GS1_LINTER_ILLEGAL_IBAN_COUNTRY_CODE if the leading two characters
@@ -66,79 +69,93 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 
 	char cc[3] = {0};
 	gs1_lint_err_t ret;
-	size_t len, pos;
-	const char *p;
-	unsigned int csum;
+	size_t len = 0, pos;
+	unsigned int csum = 0;
+	unsigned char weight;
 
-	static const char* const csetiban = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	/*
+	 * IBAN character checksum weights (0 = invalid; weight off by 1)
+	 *
+	 */
+	static const unsigned char iban_weights[256] = {
+		['0'] = 1, ['1'] = 2, ['2'] = 3, ['3'] = 4, ['4'] = 5,
+		['5'] = 6, ['6'] = 7, ['7'] = 8, ['8'] = 9, ['9'] = 10,
+		['A'] = 11, ['B'] = 12, ['C'] = 13, ['D'] = 14, ['E'] = 15,
+		['F'] = 16, ['G'] = 17, ['H'] = 18, ['I'] = 19, ['J'] = 20,
+		['K'] = 21, ['L'] = 22, ['M'] = 23, ['N'] = 24, ['O'] = 25,
+		['P'] = 26, ['Q'] = 27, ['R'] = 28, ['S'] = 29, ['T'] = 30,
+		['U'] = 31, ['V'] = 32, ['W'] = 33, ['X'] = 34, ['Y'] = 35, ['Z'] = 36
+	};
 
 	assert(data);
 
-	len = strlen(data);
-
-	if (len <= IBAN_MIN_LENGTH)
+	/*
+	 * Require at least 4 characters before main loop
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(!data[0] || !data[1] || !data[2] || !data[3]))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_IBAN_TOO_SHORT,
 			0,
-			len
+			strlen(data)
 		);
 
 	/*
-	 * Any character outside of the set of valid IBAN characters is illegal.
+	 * Validate the leading two-character country code
 	 *
 	 */
-	if ((pos = strspn(data, csetiban)) != len)
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_INVALID_IBAN_CHARACTER,
-			pos,
-			1
-		);
-
-	/*
-	 *  The first two characters must be an ISO 3166 alpha-2 country code.
-	 *
-	 */
-	strncpy(cc, data, 2);
+	memcpy(cc, data, 2);
 	ret = gs1_lint_iso3166alpha2(cc, err_pos, err_len);
 	assert(ret == GS1_LINTER_OK || ret == GS1_LINTER_NOT_ISO3166_ALPHA2);
-
-	if (ret == GS1_LINTER_NOT_ISO3166_ALPHA2)
+	if (GS1_LINTER_UNLIKELY(ret == GS1_LINTER_NOT_ISO3166_ALPHA2))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_IBAN_COUNTRY_CODE,
 			0,
 			2
 		);
 
-	/*
-	 * Compute the IBAN checksum as the sum of digits, with characters
-	 * converted to digits (A => 10; B => 11), starting with the forth
-	 * character and wrapping at the end.
-	 *
-	 */
-	csum = 0;
-	p = data + 4;
+	pos = 4;	/* Start at first data character after the check characters */
 	do {
-
-		if (*p < 'A')
-			csum = csum * 10 + (unsigned int)(*p - '0');
-		else
-			csum = csum * 100 + (unsigned int)(*p - 'A' + 10);
-		csum %= 97;
+		if (GS1_LINTER_UNLIKELY(pos > IBAN_MAX_LENGTH)) {
+			while (data[pos]) pos++;
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_IBAN_TOO_LONG,
+				0,
+				pos
+			);
+		}
 
 		/*
-		 * Next character, wrapping at the end.
+		 * Wrap at end of data and record length
 		 *
 		 */
-		if (++p == data + len)
-			p = data;
+		if (!data[pos]) {
+			if (GS1_LINTER_UNLIKELY(pos <= IBAN_MIN_LENGTH))
+				GS1_LINTER_RETURN_ERROR(
+					GS1_LINTER_IBAN_TOO_SHORT,
+					0,
+					pos
+				);
+			len = pos;
+			pos = 0;
+		}
 
-	} while (p != data + 4);
+		weight = iban_weights[(unsigned char)data[pos]];
+		if (GS1_LINTER_UNLIKELY(weight == 0))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INVALID_IBAN_CHARACTER,
+				pos,
+				1
+			);
 
-	/*
-	 * Sum (mod 97) is 1 for correctly formatted IBANs.
-	 *
-	 */
-	if (csum != 1)
+		csum *= weight <= 10 ? 10 : 100;
+		csum += weight - 1;
+		csum %= 97;
+		pos++;
+
+	} while (pos < 4 || len == 0);  /* Until we wrap and pass the CC */
+
+	if (GS1_LINTER_UNLIKELY(csum != 1))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INCORRECT_IBAN_CHECKSUM,
 			2,
@@ -175,11 +192,16 @@ void test_lint_iban(void)
 	UNIT_TEST_PASS(gs1_lint_iban, "LC14BOSL123456789012345678901234");
 	UNIT_TEST_FAIL(gs1_lint_iban, "LC14BOSL123456789012345678901230", GS1_LINTER_INCORRECT_IBAN_CHECKSUM, "LC*14*BOSL123456789012345678901230");
 
+	UNIT_TEST_PASS(gs1_lint_iban, "MT90MALT011000012345MTLCAST001SABC");  /* 34 chars: Max length per standard */
+	UNIT_TEST_FAIL(gs1_lint_iban, "MT90MALT011000012345MTLCAST001SAB0", GS1_LINTER_INCORRECT_IBAN_CHECKSUM, "MT*90*MALT011000012345MTLCAST001SAB0");
+
 	UNIT_TEST_FAIL(gs1_lint_iban, "", GS1_LINTER_IBAN_TOO_SHORT, "**");
 	UNIT_TEST_FAIL(gs1_lint_iban, "B", GS1_LINTER_IBAN_TOO_SHORT, "*B*");
 	UNIT_TEST_FAIL(gs1_lint_iban, "BE", GS1_LINTER_IBAN_TOO_SHORT, "*BE*");
 	UNIT_TEST_FAIL(gs1_lint_iban, "BE7", GS1_LINTER_IBAN_TOO_SHORT, "*BE7*");
 	UNIT_TEST_FAIL(gs1_lint_iban, "BE71", GS1_LINTER_IBAN_TOO_SHORT, "*BE71*");
+	UNIT_TEST_FAIL(gs1_lint_iban, "MTXXMALT011000012345MTLCAST001SABCD", GS1_LINTER_IBAN_TOO_LONG, "*MTXXMALT011000012345MTLCAST001SABCD*");
+	UNIT_TEST_FAIL(gs1_lint_iban, "MTXXMALT011000012345MTLCAST001SABCDE", GS1_LINTER_IBAN_TOO_LONG, "*MTXXMALT011000012345MTLCAST001SABCDE*");
 
 	UNIT_TEST_FAIL(gs1_lint_iban, "LC14BOSLxx3456789012345678901230", GS1_LINTER_INVALID_IBAN_CHARACTER, "LC14BOSL*x*x3456789012345678901230");
 

@@ -148,7 +148,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_packagetype(const char *data, 
 	 *
 	 */
 	GS1_LINTER_PACKAGE_TYPE_LOOKUP(data);
-	if (valid)
+	if (GS1_LINTER_LIKELY(valid))
 		GS1_LINTER_RETURN_OK;
 
 	/*
