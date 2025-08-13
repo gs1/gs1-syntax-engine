@@ -243,7 +243,7 @@ static const struct aiEntry unknownAI4fixed6 =
  */
 struct aiLookupKey {
 	const char* const ai;
-	const size_t ailen;
+	size_t ailen;
 };
 
 static inline __ATTR_PURE int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
@@ -268,7 +268,7 @@ static inline __ATTR_PURE bool validateAIEntryMatch(const void* const needle, co
 __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
-	const struct aiLookupKey lookupKey = { ai, ailen };
+	struct aiLookupKey lookupKey = { ai, ailen };
 	ssize_t index;
 
 	assert(ailen == 0 || ailen <= strlen(ai));
@@ -276,9 +276,20 @@ __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx
 	if (ailen != 0 && (ailen < MIN_AI_LEN || ailen > MAX_AI_LEN))	// Even for unknown AIs
 		return NULL;
 
-	// Don't attempt to find a non-digit AI
+	/*
+	 *  Don't attempt to find a non-digit AI
+	 *
+	 */
 	if (!gs1_allDigits((uint8_t *)ai, ailen != 0 ? ailen : MIN_AI_LEN))
 		return NULL;
+
+	/*
+	 *  With a variable-length AI lookup we might actually know the AI
+	 *  length from the length by prefix table
+	 *
+	 */
+	if (ailen == 0 && (aiLenByPrefix = aiLengthByPrefix(ctx, ai)) > 0)
+		lookupKey.ailen = aiLenByPrefix;
 
 	/*
 	 *  Search AI table to find an entry that matches a prefix, with
