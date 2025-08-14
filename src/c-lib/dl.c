@@ -46,14 +46,6 @@ static const char *uriCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
 
 
 /*
- *  Set of unreserved characters that do not require escaping when used in URI
- *  components (path elements and query parameter values)
- *
- */
-static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-
-
-/*
  *  Characters from uriCharacters that are illegal within a domain name
  *
  */
@@ -376,23 +368,42 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 }
 
 
+/*
+ *  Set of unreserved characters that do not require escaping when used in URI
+ *  components (path elements and query parameter values):
+ *
+ *      ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~
+ *
+ */
+static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
+	return ( (c>='A' && c<='Z') || (c>='a' && c<='z') ||
+		 (c>='0' && c<='9') ||
+		 c=='-' || c=='.' || c=='_' || c=='~' );
+}
+
+
 static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
+	static const char HEX[16] = "0123456789ABCDEF";
 	size_t i, j;
 
 	assert(in);
 	assert(out);
 
 	for (i = 0, j = 0; i < inlen && j < maxlen; i++) {
-		if (strchr(uriUnreservedCharacters, in[i]))
-			out[j++] = in[i];
-		else if (in[i] == ' ' && is_query_component)
+		const unsigned char c = (unsigned char)in[i];
+
+		if (isURIunreservedCharacters(c))
+			out[j++] = (char)c;
+		else if (c == ' ' && is_query_component)
 			out[j++] = '+';
-//		else if (in[i] == '+' && !is_query_component)		// Encoding '+' as '%2d' in path info is preferred
+//		else if (c == '+' && !is_query_component)		// Encoding '+' as '%2d' in path info is preferred
 //			out[j++] = '+';
-		else if (j+2 < maxlen)
-			j += (size_t)snprintf(&out[j], 4, "%%%02X", in[i]);
-		else
+		else if (j+2 < maxlen) {
+			out[j++] = '%';
+			out[j++] = HEX[c >> 4];
+			out[j++] = HEX[c & 0x0F];
+		} else
 			break;		/* Out of space */
 	}
 	out[j] = '\0';
