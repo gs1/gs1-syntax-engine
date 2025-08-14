@@ -384,7 +384,7 @@ static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
 
 static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
-	static const char HEX[16] = "0123456789ABCDEF";
+	static const char HEX[] = "0123456789ABCDEF";
 	size_t i, j;
 
 	assert(in);
