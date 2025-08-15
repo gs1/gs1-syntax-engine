@@ -319,6 +319,8 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 	if ((cc = strchr(aiData, '|')) != NULL)		// Composite symbol
 	{
 
+		char* p;
+
 		*cc = '\0';					// Delimit end of linear component
 
 		if (!gs1_parseAIdata(ctx, aiData, ctx->dataStr))
@@ -329,13 +331,14 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 			goto fail;
 		}
 
-		strcat(ctx->dataStr, "|");
+		p = ctx->dataStr + strlen(ctx->dataStr);
+		*p++ = '|';
 
 		// Indicate separator in HRI
 		ctx->aiData[ctx->numAIs].kind = aiValue_ccsep;
 		ctx->numAIs++;
 
-		if (!gs1_parseAIdata(ctx, cc+1, ctx->dataStr + strlen(ctx->dataStr)))
+		if (!gs1_parseAIdata(ctx, cc+1, p))
 			goto fail;
 
 		*cc = '|';					// Restore orginal "|"

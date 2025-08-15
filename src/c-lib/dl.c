@@ -1746,13 +1746,17 @@ void test_dl_testValidateDLpathAIseq(void) {
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(seq); i++) {
-		int num;
+		int num, n;
 		char casename[256] = { 0 };
-		for (num = 0; *seq[i][num]; num++) {
-			strcat(casename, seq[i][num]);
-			strcat(casename, " ");
+		char *p;
+
+		for (num = 0, p = casename; *seq[i][num]; num++, p += n) {
+			n = snprintf(p, sizeof(casename) - (size_t)(p - casename), "%s ", seq[i][num]);
+			assert(n >= 0 || n < (int)(sizeof(casename) - (size_t)(p - casename)));
 		}
+		*(p-1) = '\0';
 		TEST_CASE(casename);
+
 		TEST_CHECK(isValidDLpathAIseq(ctx, seq[i], num));
 	}
 
