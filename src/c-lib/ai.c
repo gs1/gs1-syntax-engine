@@ -422,7 +422,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 					(int)entry->ailen, ai,
 					(int)errpos, start,
 					(int)errlen, start + errpos,
-					(int)(strlen(compval) - errpos - errlen), start + errpos + errlen);
+					(int)(complen - errpos - errlen), start + errpos + errlen);
 				return 0;
 			}
 			l = (l == &cset_linter) ? &(part->linters[0]) : l+1;
