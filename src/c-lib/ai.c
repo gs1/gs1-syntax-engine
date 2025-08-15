@@ -707,6 +707,7 @@ static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const c
 
 	int i;
 	const size_t prefixlen = strspn(ai, "0123456789");
+	size_t ailen = strlen(ai);
 
 	for (i = 0; i < ctx->numAIs; i++) {
 
@@ -714,7 +715,7 @@ static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const c
 
 		if (ai2->kind != aiValue_aival ||
 		    strncmp(ai2->ai, ai, prefixlen) != 0 ||
-		    (ignoreAI && strncmp(ai2->ai, ignoreAI, strlen(ai)) == 0)
+		    (ignoreAI && strncmp(ai2->ai, ignoreAI, ailen) == 0)
 		   )
 			continue;
 
