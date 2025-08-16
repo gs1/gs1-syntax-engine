@@ -204,8 +204,8 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 	primaryStr[dataStr_len] = '\0';
 
 	if (ctx->addCheckDigit) {
-		primaryStr[dataStr_len] = '-';
-		primaryStr[dataStr_len + 1] = '\0';
+		primaryStr[dataStr_len++] = '-';
+		primaryStr[dataStr_len] = '\0';
 	}
 
 	if (!validateParity((uint8_t*)primaryStr, dataStr_len) && !ctx->addCheckDigit) {
@@ -473,8 +473,8 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 			goto fail;
 		}
 
-		*p = '\0';
-		strncat(p, scanData, primaryLen);
+		strncpy(p, scanData, primaryLen);
+		p[primaryLen] = '\0';
 
 		if (!gs1_allDigits((uint8_t*)p, 0)) {
 			SET_ERR(PRIMARY_MESSAGE_MAY_ONLY_CONTAIN_DIGITS);
