@@ -415,14 +415,34 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 			err = (*l)(compval, &errpos, &errlen);
 			if (err) {
+				char *m = ctx->linterErrMarkup;
+				size_t rem = sizeof(ctx->linterErrMarkup);
+
 				SET_ERR_V(AI_LINTER_ERROR, (int)entry->ailen, ai, gs1_lint_err_str[err]);
 				ctx->linterErr = err;
 				errpos += (size_t)(p-start);
-				snprintf(ctx->linterErrMarkup, sizeof(ctx->linterErrMarkup), "(%.*s)%.*s|%.*s|%.*s",
-					(int)entry->ailen, ai,
-					(int)errpos, start,
-					(int)errlen, start + errpos,
-					(int)(complen - errpos - errlen), start + errpos + errlen);
+
+#define ERR_CAT(src, len) do {		\
+	size_t n = (len);		\
+	if (n > rem - 1) n = rem - 1;	\
+	memcpy(m, (src), n);		\
+	m += n;				\
+	rem -= n;			\
+} while(0)
+
+				// "(AI)before|error|after"
+				ERR_CAT("(", 1);
+				ERR_CAT(ai, entry->ailen);
+				ERR_CAT(")", 1);
+				ERR_CAT(start, errpos);
+				ERR_CAT("|", 1);
+				ERR_CAT(start + errpos, errlen);
+				ERR_CAT("|", 1);
+				ERR_CAT(start + errpos + errlen, complen - errpos - errlen);
+				*m = '\0';
+
+#undef ERR_CAT
+
 				return 0;
 			}
 			l = (l == &cset_linter) ? &(part->linters[0]) : l+1;
