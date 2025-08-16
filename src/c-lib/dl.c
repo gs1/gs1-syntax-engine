@@ -184,9 +184,15 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	     i++, j *= 2, token = strtok_r(NULL, ",", &saveptr)) {
 
 		int k;
+		size_t token_len = strlen(token);
 
 		for (k = 0; k < j; k++) {
-			snprintf(buf, sizeof(buf), "%s %s", addedQualifiers[k], token);
+			size_t q_len = strlen(addedQualifiers[k]);
+			assert(q_len + 1 + token_len < sizeof(buf));	// "<Q> <token>"
+			memcpy(buf, addedQualifiers[k], q_len);
+			buf[q_len] = ' ';
+			memcpy(buf + q_len + 1, token, token_len);
+			buf[q_len + 1 + token_len] = '\0';
 			addedQualifiers[k + j] = gs1_strdup_alloc(buf);
 			if (!addedQualifiers[k + j])
 				return false;
