@@ -443,7 +443,7 @@ int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const out) {
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
-		int n;
+		size_t title_len = 0;
 
 		if (ai->kind != aiValue_aival)
 			continue;
@@ -452,13 +452,29 @@ int gs1_encoder_getHRI(gs1_encoder* const ctx, char*** const out) {
 
 		ctx->outHRI[j] = p;
 
-		if (!ctx->includeDataTitlesInHRI || *ai->aiEntry->title == '\0')
-			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s) %.*s", ai->ailen, ai->ai, ai->vallen, ai->value);
-		else
-			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%s (%.*s) %.*s", ai->aiEntry->title, ai->ailen, ai->ai, ai->vallen, ai->value);
-		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
-		p += n;
+		if (ctx->includeDataTitlesInHRI && *ai->aiEntry->title != '\0')
+			title_len = strlen(ai->aiEntry->title);
 
+		/*
+		 *  "data_title (AI) VALUE" or "(AI) VALUE"
+		 *
+		 */
+		assert((title_len > 0 ? title_len + 1 : 0) + (size_t)ai->ailen + (size_t)ai->vallen + 4 <
+		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));
+
+		if (title_len > 0) {
+			memcpy(p, ai->aiEntry->title, title_len);
+			p += title_len;
+			*p++ = ' ';
+		}
+
+		*p++ = '(';
+		memcpy(p, ai->ai, ai->ailen);
+		p += ai->ailen;
+		*p++ = ')';
+		*p++ = ' ';
+		memcpy(p, ai->value, ai->vallen);
+		p += ai->vallen;
 		*p++ = '\0';
 
 		j++;
