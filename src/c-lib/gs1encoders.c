@@ -365,6 +365,7 @@ char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 
 	int i, j;
 	char *p = ctx->outStr;
+	size_t len;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -376,9 +377,12 @@ char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		const struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind == aiValue_aival) {
-			int n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "(%.*s)", ai->ailen, ai->ai);
-			assert(n >= 0 || n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
-			p += n;
+			len = (size_t)ai->ailen + 2;		// "(AI)"
+			assert(len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));
+			*p++ = '(';
+			memcpy(p, ai->ai, ai->ailen);
+			p += ai->ailen;
+			*p++ = ')';
 			for (j = 0; j < ai->vallen; j++) {
 				if (ai->value[j] == '(')	// Escape data "("
 					*p++ = '\\';
