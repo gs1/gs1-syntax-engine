@@ -422,12 +422,13 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 				ctx->linterErr = err;
 				errpos += (size_t)(p-start);
 
-#define ERR_CAT(src, len) do {		\
-	size_t n = (len);		\
-	if (n > rem - 1) n = rem - 1;	\
-	memcpy(m, (src), n);		\
-	m += n;				\
-	rem -= n;			\
+#define ERR_CAT(src, len) do {			\
+	size_t n = (len);			\
+	if (n == 0 || n > SIZE_MAX/2) break;	\
+	if (n > rem - 1) n = rem - 1;		\
+	memcpy(m, (src), n);			\
+	m += n;					\
+	rem -= n;				\
 } while(0)
 
 				// "(AI)before|error|after"
