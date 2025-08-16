@@ -756,8 +756,8 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 		assert(ai->aiEntry);
 
-		*attrs = '\0';
-		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		strncpy(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		attrs[MAX_AI_ATTR_LEN] = '\0';
 
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
@@ -811,8 +811,8 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 		assert(ai->aiEntry);
 
-		*attrs = '\0';
-		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		strncpy(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		attrs[MAX_AI_ATTR_LEN] = '\0';
 
 		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
 
@@ -823,7 +823,8 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 			if (strncmp(token, "req=", 4) != 0)
 				continue;
 
-			strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
+			strncpy(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
+			reqErr[MAX_AI_ATTR_LEN - 4] = '\0';
 
 			for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
 

@@ -171,7 +171,8 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *  key-qualifier sequence
 	 *
 	 */
-	strncat(buf, key, MAX_AI_ATTR_LEN);
+	strncpy(buf, key, MAX_AI_ATTR_LEN);
+	buf[MAX_AI_ATTR_LEN] = '\0';
 	*addedQualifiers = gs1_strdup_alloc(buf);
 	if (!*addedQualifiers)
 		return false;
@@ -223,7 +224,8 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 		char *saveptr = NULL;
 		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 
-		strncat(attrs, ctx->aiTable[i].attrs, MAX_AI_ATTR_LEN);
+		strncpy(attrs, ctx->aiTable[i].attrs, MAX_AI_ATTR_LEN);
+		attrs[MAX_AI_ATTR_LEN] = '\0';
 		for (token = strtok_r(attrs, " ", &saveptr);
 		     token;
 		     token = strtok_r(NULL, " ", &saveptr)) {
