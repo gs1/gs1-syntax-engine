@@ -985,8 +985,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			if (ai->kind != aiValue_aival || ai->dlPathOrder != i)
 				continue;
 
-			URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-			len = strlen(encval);
+			len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
 			assert(1 + (size_t)ai->ailen + 1 + len <
 			       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
 			*p++ = '/';
