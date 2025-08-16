@@ -440,7 +440,6 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	bool fnc1req = true;
 	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };	// Sequence of AIs extracted from the path info
 	int numPathAIs;
-	size_t p_len;
 	size_t dataStr_len = 0;
 
 	assert(ctx);
@@ -455,9 +454,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	DEBUG_PRINT("\nParsing DL data: %s\n", dlData);
 
 	p = dlData;
-	p_len = strlen(p);
 
-	if (strspn(p, uriCharacters) != p_len) {
+	if (p[strspn(p, uriCharacters)] != '\0') {
 		SET_ERR(URI_CONTAINS_ILLEGAL_CHARACTERS);
 		goto fail;
 	}
