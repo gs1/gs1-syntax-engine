@@ -578,8 +578,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			entry = gs1_lookupAIentry(ctx, ai, ailen);
 		assert(entry);
 
-		if ((p = strchr(++r, '/')) == NULL)
-			p = r + strlen(r);
+		++r;
+		p = r;
+		while (*p && *p != '/') p++;	// Find next '/' or end of string
 
 		if (p == r) {
 			SET_ERR_V(AI_VALUE_PATH_ELEMENT_IS_EMPTY, (int)entry->ailen, ai);
@@ -659,8 +660,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		while (*p == '&')				// Jump any & separators
 			p++;
-		if ((r = strchr(p, '&')) == NULL)
-			r = p + strlen(p);			// Value-pair finishes at end of data
+		r = p;
+		while (*r && *r != '&') r++;		// Find next '&' or end of string
 
 		// Discard parameters with no value
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
