@@ -1049,8 +1049,7 @@ again:
 			return NULL;
 		}
 
-		URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-		len = strlen(encval);
+		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
 		assert((size_t)ai->ailen + 1 + len + 1 <
 		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
 		memcpy(p, ai->ai, ai->ailen);
