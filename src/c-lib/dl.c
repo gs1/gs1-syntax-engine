@@ -452,13 +452,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		goto fail;
 	}
 
-	if (p_len >= 8 && strncmp(p, "https://", 8) == 0)
+	if (strncmp(p, "https://", 8) == 0 || strncmp(p, "HTTPS://", 8) == 0)
 		p += 8;
-	else if (p_len >= 8 && strncmp(p, "HTTPS://", 8) == 0)
-		p += 8;
-	else if (p_len >= 7 && strncmp(p, "http://", 7) == 0)
-		p += 7;
-	else if (p_len >= 7 && strncmp(p, "HTTP://", 7) == 0)
+	else if (strncmp(p, "http://", 7) == 0 || strncmp(p, "HTTP://", 7) == 0)
 		p += 7;
 	else {
 		SET_ERR(URI_CONTAINS_ILLEGAL_SCHEME);

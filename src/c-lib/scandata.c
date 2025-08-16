@@ -316,7 +316,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// "]e0" followed by concatenated AI data from linear and CC
 
 		dataStr = ctx->dataStr;
-		if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
+		if (strncmp(dataStr, "^01", 3) == 0)
 			dataStr += 3;
 
 		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
@@ -370,7 +370,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// If AI data beginning (01) then skip leading zeros of the GTIN-14
 		dataStr = ctx->dataStr;
 		aizeros = 17 - length;
-		if (strlen(dataStr) >= (size_t)aizeros && strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
+		if (strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
 			dataStr += aizeros;
 
 		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
@@ -425,7 +425,6 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	aiMode_t aiMode;
 	char *p;
 	const char *q;
-	size_t dataStr_len;
 
 	assert(ctx);
 	assert(scanData);
@@ -533,11 +532,10 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	strcpy(p, scanData);
 
 	// If a GS1 Digital Link URI is given then process it immediately
-	dataStr_len = strlen(ctx->dataStr);
-	if ((dataStr_len >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
-	    (dataStr_len >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
-	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
-	    (dataStr_len >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
+	if (strncmp(ctx->dataStr, "https://", 8) == 0 ||
+	    strncmp(ctx->dataStr, "HTTPS://", 8) == 0 ||
+	    strncmp(ctx->dataStr, "http://",  7) == 0 ||
+	    strncmp(ctx->dataStr, "HTTP://",  7) == 0) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
