@@ -867,6 +867,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	const char *token;
 	char tmp[256];
 	bool emitFixed;
+	size_t len;
 
 	assert(ctx);
 
@@ -960,7 +961,10 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	p = ctx->outStr;
-	p += snprintf(p, sizeof(ctx->outStr), "%s", stem ? stem : CANONICAL_DL_STEM);
+	len = strlen(stem ? stem : CANONICAL_DL_STEM);
+	assert(len < sizeof(ctx->outStr));
+	memcpy(p, stem ? stem : CANONICAL_DL_STEM, len);
+	p += len;
 
 	// Trim trailing slash
 	if (*(p-1) == '/')
@@ -976,21 +980,26 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		for (j = 0; j < ctx->numAIs; j++) {
 
 			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-			int n;
 			const struct aiValue* const ai = &ctx->aiData[j];
 
 			if (ai->kind != aiValue_aival || ai->dlPathOrder != i)
 				continue;
 
 			URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
-			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-			p += n;
+			len = strlen(encval);
+			assert(1 + (size_t)ai->ailen + 1 + len <
+			       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
+			*p++ = '/';
+			memcpy(p, ai->ai, ai->ailen);
+			p += ai->ailen;
+			*p++ = '/';
+			memcpy(p, encval, len);
+			p += len;
 			break;
 
 		}
 	}
-	p += snprintf(p, 2, "?");
+	*p++ = '?';
 
 	/*
 	 *  Output the query parameter components (i.e. attribute AIs) in received order (i.e. attribute AIs), fixed-length first
@@ -1001,7 +1010,7 @@ again:
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-		int j, n;
+		int j;
 		bool skip = false;
 		const struct aiValue* ai = &ctx->aiData[i];
 
@@ -1042,9 +1051,15 @@ again:
 		}
 
 		URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-		n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
-		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-		p += n;
+		len = strlen(encval);
+		assert((size_t)ai->ailen + 1 + len + 1 <
+		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
+		memcpy(p, ai->ai, ai->ailen);
+		p += ai->ailen;
+		*p++ = '=';
+		memcpy(p, encval, len);
+		p += len;
+		*p++ = '&';
 
 	}
 	if (emitFixed) {
