@@ -519,6 +519,7 @@ int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx, char*** const ou
 
 	int i, j;
 	char *p = ctx->outStr;
+	size_t len;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
@@ -528,16 +529,16 @@ int gs1_encoder_getDLignoredQueryParams(gs1_encoder* const ctx, char*** const ou
 	for (i = 0, j = 0; i < ctx->numAIs; i++) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
-		int n;
 
 		if (ai->kind != alValue_dlign)
 			continue;
 
 		ctx->outHRI[j] = p;
 
-		n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s", ai->vallen, ai->value);
-		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));
-		p += n;
+		len = (size_t)ai->vallen;
+		assert(len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));
+		memcpy(p, ai->value, len);
+		p += len;
 
 		*p++ = '\0';
 
