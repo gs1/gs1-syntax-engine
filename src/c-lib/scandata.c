@@ -195,7 +195,7 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 		return false;
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
+	if (!gs1_allDigits((uint8_t*)dataStr, dataStr_len)) {
 		SET_ERR(PRIMARY_DATA_MUST_BE_ALL_DIGITS);
 		return false;
 	}
@@ -476,7 +476,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		strncpy(p, scanData, primaryLen);
 		p[primaryLen] = '\0';
 
-		if (!gs1_allDigits((uint8_t*)p, 0)) {
+		if (!gs1_allDigits((uint8_t*)p, primaryLen)) {
 			SET_ERR(PRIMARY_MESSAGE_MAY_ONLY_CONTAIN_DIGITS);
 			goto fail;
 		}

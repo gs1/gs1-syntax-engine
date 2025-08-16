@@ -621,9 +621,6 @@ __ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 	assert(str);
 
-	if (!len)
-		len = strlen((char *)str);
-
 	for (i = 0; i < len; i++) {
 		if (unlikely(str[i] < '0' || str[i] > '9'))
 			return false;
