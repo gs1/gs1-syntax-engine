@@ -868,6 +868,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	char tmp[256];
 	bool emitFixed;
 	size_t len;
+	const char *stem_to_use;
 
 	assert(ctx);
 
@@ -961,9 +962,10 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	p = ctx->outStr;
-	len = strlen(stem ? stem : CANONICAL_DL_STEM);
+	stem_to_use = stem ? stem : CANONICAL_DL_STEM;
+	len = strlen(stem_to_use);
 	assert(len < sizeof(ctx->outStr));
-	memcpy(p, stem ? stem : CANONICAL_DL_STEM, len);
+	memcpy(p, stem_to_use, len);
 	p += len;
 
 	// Trim trailing slash
