@@ -273,8 +273,8 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	p = buf;
 	while (token && strcmp(token, "#") != 0) {
 
-		int n;
 		char *q;
+		size_t len;
 
 		if ((q = strchr(token, '=')) != NULL) {		// e.g. dlpkey=1,2,3
 
@@ -299,10 +299,12 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 		}
 
-		n = snprintf(p, sizeof(buf) - (size_t)(p-buf), "%s ", token);
-		if (n < 0 || n >= (int)(sizeof(buf) - (size_t)(p-buf)))
+		len = strlen(token);
+		if (len >= sizeof(buf) - (size_t)(p-buf) - 1)
 			error(ATTRIBUTES_TOO_LONG);
-		p += n;
+		memcpy(p, token, len);
+		p += len;
+		*p++ = ' ';
 
 		token = strtok_r(NULL, " \t", &saveptr);
 
