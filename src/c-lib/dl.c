@@ -504,10 +504,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 							// info on first iteration
 
 		// Find start of AI
-		*r = '\0';				// Chop off value
-		p = strrchr(pi, '/'); 			// Beginning of AI
-		*r = '/';				// Restore original AI/value separator
-		if (!p)					// At beginning of path
+		p = r - 1;
+		while (p >= pi && *p != '/') p--;
+		if (p < pi)				// At beginning of path
 			break;
 
 		DEBUG_PRINT("      %s\n", p);
