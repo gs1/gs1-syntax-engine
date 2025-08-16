@@ -322,9 +322,11 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][M
 	 *
 	 */
 	for (i = 0 ; i < len; i++) {
-		const int n = snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
-		assert(n >= 1 && n < (int)(sizeof(aiseq) - (size_t)(p - aiseq)));
-		p += n;
+		size_t seq_len = strlen(seq[i]);
+		assert(seq_len + 1 < sizeof(aiseq) - (size_t)(p - aiseq));	// Includes space
+		memcpy(p, seq[i], seq_len);
+		p += seq_len;
+		*p++ = ' ';
 	}
 	*--p = '\0';		// Chop stray space
 
