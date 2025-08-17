@@ -370,6 +370,13 @@ static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
 }
 
 
+static inline __ATTR_CONST uint8_t hex_nibble(char c) {
+	if (c >= '0' && c <= '9') return (uint8_t)(c - '0');
+	if (c >= 'A' && c <= 'F') return (uint8_t)(c - 'A' + 10);
+	if (c >= 'a' && c <= 'f') return (uint8_t)(c - 'a' + 10);
+	return UINT8_MAX;
+}
+
 static size_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
@@ -378,10 +385,15 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 	assert(out);
 
 	for (i = 0, j = 0; i < inlen && j < maxlen; i++, j++) {
-		if (i < inlen - 2 && in[i] == '%' && isxdigit(in[i+1]) && isxdigit(in[i+2])) {
-			const char hex[] = { in[i+1], in[i+2], '\0' };
-			out[j] = (char)strtoul(hex, NULL, 16);
-			if (out[j] == 0)	// Illegal null
+		if (i < inlen - 2 && in[i] == '%') {
+			uint8_t hi = hex_nibble(in[i+1]);
+			uint8_t lo = hex_nibble(in[i+2]);
+			if (hi == UINT8_MAX || lo == UINT8_MAX) {	// Invalid hex character
+				out[j] = '%';
+				continue;
+			}
+			out[j] = (char)((hi << 4) | lo);
+			if (out[j] == 0)				// Illegal null
 				return 0;
 			i += 2;
 		} else if (is_query_component && in[i] == '+')
