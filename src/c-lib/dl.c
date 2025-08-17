@@ -653,7 +653,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			.dlPathOrder = (uint8_t)numPathAIs
 		};
 
-		strcpy(pathAIseq[numPathAIs], entry->ai);
+		memcpy(pathAIseq[numPathAIs], entry->ai, entry->ailen + 1);	// Includes NULL
+
 		numPathAIs++;
 
 	}
@@ -818,7 +819,7 @@ add_query_param_to_ai_data:
 			for (j = 1; j <= numPathAIs; j++) {
 
 				memcpy(&seq[0], &pathAIseq[0], (size_t)j * sizeof(seq[0]));
-				strcpy(seq[j], ai->aiEntry->ai);
+				memcpy(seq[j], ai->aiEntry->ai, ai->aiEntry->ailen + 1);	// Includes NULL
 				memcpy(&seq[j+1], &pathAIseq[j], (size_t)(numPathAIs-j) * sizeof(seq[0]));
 
 				if (getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
@@ -898,7 +899,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 		assert(ai->aiEntry);
 
-		strcpy(seq[0], ai->aiEntry->ai);
+		memcpy(seq[0], ai->aiEntry->ai, ai->aiEntry->ailen + 1);	// Includes NULL
 		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1)) != -1) {
 			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
