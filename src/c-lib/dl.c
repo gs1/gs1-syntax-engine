@@ -46,10 +46,31 @@ static const char *uriCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
 
 
 /*
- *  Characters from uriCharacters that are illegal within a domain name
+ *  Set of unreserved characters that do not require escaping when used in URI
+ *  components (path elements and query parameter values):
+ *
+ *      ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~
  *
  */
-static const char *badDomainCharacters = "_~?#@!$&'()*+,;=%";
+static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
+	return ( (c>='A' && c<='Z') || (c>='a' && c<='z') ||
+		 (c>='0' && c<='9') ||
+		 c=='-' || c=='.' || c=='_' || c=='~' );
+}
+
+
+/*
+ *  Set of characters in urlCharacters that are illegal in a domain
+ *
+ *     _~?#@!$&'()*+,;=%
+ *
+ */
+static inline __ATTR_CONST bool isBadDomainChar(char c) {
+	return c == '_' || c == '~' || c == '?' || c == '#' || c == '@' ||
+	       c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' ||
+	       c == ')' || c == '*' || c == '+' || c == ',' || c == ';' ||
+	       c == '=' || c == '%';
+}
 
 
 /*
@@ -375,20 +396,6 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 }
 
 
-/*
- *  Set of unreserved characters that do not require escaping when used in URI
- *  components (path elements and query parameter values):
- *
- *      ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~
- *
- */
-static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
-	return ( (c>='A' && c<='Z') || (c>='a' && c<='z') ||
-		 (c>='0' && c<='9') ||
-		 c=='-' || c=='.' || c=='_' || c=='~' );
-}
-
-
 static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	static const char HEX[] = "0123456789ABCDEF";
@@ -468,13 +475,17 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	DEBUG_PRINT("  Scheme %.*s\n", (int)(p-dlData-3), dlData);
 
-	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
-		SET_ERR(URI_MISSING_DOMAIN_AND_PATH_INFO);
-		goto fail;
+	// Scan domain for '/' delimiter while validating characters
+	r = p;
+	while (*r && *r != '/') {
+		if (isBadDomainChar(*r)) {
+			SET_ERR(DOMAIN_CONTAINS_ILLEGAL_CHARACTERS);
+			goto fail;
+		}
+		r++;
 	}
-
-	if ((int)strcspn(p, badDomainCharacters) < r-p) {
-		SET_ERR(DOMAIN_CONTAINS_ILLEGAL_CHARACTERS);
+	if (*r != '/' || r-p < 1) {
+		SET_ERR(URI_MISSING_DOMAIN_AND_PATH_INFO);
 		goto fail;
 	}
 
