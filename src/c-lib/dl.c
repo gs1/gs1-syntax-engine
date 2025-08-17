@@ -505,10 +505,14 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	// Search backwards from the end of the path info looking for an
 	// "/AI/value" pair where AI is a DL primary key
-	while ((r = strrchr(pi, '/')) != NULL) {
-
+	r = (char *)pi + strlen(pi);			// Start from end
+	while (r > pi) {
 		const struct aiEntry* entry = NULL;
 		size_t ailen;
+
+		// Find previous slash by scanning backwards
+		while (r > pi && *--r != '/') ;
+		if (r == pi) break;			// No more slashes
 
 		*p = '/';				// Restore original pair separator
 							// Clobbers first character of path
@@ -543,7 +547,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			break;
 		}
 
-		*p = '\0';
+		// Continue backwards from current position (p points to start of AI)
+		r = p;
 
 	}
 
