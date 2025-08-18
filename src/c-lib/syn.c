@@ -151,11 +151,12 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	char buf[MAX_AI_ATTR_LEN + 2] = { 0 };
 	char linebuf[MAX_SD_ENTRY_LEN + 1] = { 0 };
 
-	if (strlen(line) > MAX_SD_ENTRY_LEN)
+	len = strlen(line);
+	if (len > MAX_SD_ENTRY_LEN)
 		error(ENTRY_TOO_LONG);
 
 	// Do nothing with empty and comment-only lines
-	strcpy(linebuf, line);
+	memcpy(linebuf, line, len + 1);			// Includes NULL
 	token = strtok_r(linebuf, " \t", &saveptr);
 	if (!token || *token == '#')
 		return 0;
@@ -339,7 +340,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		if ((uint16_t)(*entry - sd) >= cap - 1)
 			error(SYNTAX_DICTIONARY_CAPACITY_TOO_SMALL);
 
-		strcpy((*entry)->ai, lastEntry->ai);
+		memcpy((*entry)->ai, lastEntry->ai, lastEntry->ailen + 1);	// Includes NULL
 		(*entry)->ai[len-1]++;
 		(*entry)->ailen = lastEntry->ailen;
 		(*entry)->fnc1 = lastEntry->fnc1;

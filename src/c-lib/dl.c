@@ -147,7 +147,7 @@ static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char
  */
 static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
 
-	int i, j, num;
+	int i, j, num, qualifiers_len;
 	size_t req;
 	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	char qualifiersbuf[MAX_AI_ATTR_LEN + 1] = { 0 };
@@ -164,6 +164,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 			num++;
 	if (*qualifiers != '\0')
 		num++;
+	qualifiers_len = i;
 
 	/*
 	 *  Grow dlKeyQualifiers if necessary
@@ -199,7 +200,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		return false;
 	(*pos)++;
 
-	strcpy(qualifiersbuf, qualifiers);
+	memcpy(qualifiersbuf, qualifiers, (size_t)qualifiers_len + 1);		// Includes NULL
 	for (i = 0, j = 1, token = strtok_r(qualifiersbuf, ",", &saveptr);
 	     i < num;
 	     i++, j *= 2, token = strtok_r(NULL, ",", &saveptr)) {
@@ -363,9 +364,9 @@ static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX
 	return getDLpathAIseqEntry(ctx, seq, len) != -1;
 }
 
-static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
+static inline bool isDLpkey(gs1_encoder* const ctx, const struct aiEntry* const entry) {
 	char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
-	strcpy(seq[0], p);
+	memcpy(seq[0], entry->ai, entry->ailen);
 	return getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1) != -1;
 }
 
@@ -554,7 +555,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (!entry)
 			break;
 
-		if (isDLpkey(ctx, entry->ai)) {		// Found root of DL path info
+		if (isDLpkey(ctx, entry)) {		// Found root of DL path info
 			dp = p;
 			break;
 		}

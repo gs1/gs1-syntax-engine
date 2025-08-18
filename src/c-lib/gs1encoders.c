@@ -241,17 +241,19 @@ char* gs1_encoder_getDataStr(gs1_encoder* const ctx) {
 bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	char *cc;
+	size_t len;
 
 	assert(ctx);
 	assert(dataStr);
 	reset_error(ctx);
 
-	if (strlen(dataStr) > MAX_DATA) {
+	len = strlen(dataStr);
+	if (len > MAX_DATA) {
 		SET_ERR_V(DATA_TOO_LONG, MAX_DATA);
 		return false;
 	}
-	if (ctx->dataStr != dataStr)					// File input is via ctx->dataStr
-		strcpy(ctx->dataStr, dataStr);
+	if (ctx->dataStr != dataStr)				// File input is via ctx->dataStr
+		memcpy(ctx->dataStr, dataStr, len + 1);		// Includes NULL
 
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
