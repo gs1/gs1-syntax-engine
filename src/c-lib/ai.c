@@ -381,7 +381,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
 		if (part->max < r-p)
 			complen = part->max;	// ... reduced to max length of component
-		strncpy(compval, p, complen);
+		memcpy(compval, p, complen);
 		compval[complen] = '\0';
 
 		DEBUG_PRINT("    Validating component: %s\n", compval);
