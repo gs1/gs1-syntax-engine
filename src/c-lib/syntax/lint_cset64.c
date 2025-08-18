@@ -29,6 +29,8 @@
  */
 
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"

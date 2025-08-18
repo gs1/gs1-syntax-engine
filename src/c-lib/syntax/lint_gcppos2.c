@@ -124,11 +124,13 @@ void test_lint_gcppos2(void)
 	 *  I01    |  => Short; I*01*
 	 *  I0     |  => Short; I*0*
 	 */
-	while (i >= 2) {
-		data[i--] = '\0';
-		strcpy(expect, "I*");
-		strcat(expect, data+1);
-		strcat(expect, "*");
+	for (i = GCP_MIN_LENGTH; i >= 2; i--) {
+		data[i] = '\0';
+		expect[0] = 'I';
+		expect[1] = '*';
+		memcpy(expect+2, data+1, (size_t)i-1);
+		expect[i+1] = '*';
+		expect[i+2] = '\0';
 		UNIT_TEST_FAIL(gs1_lint_gcppos2, data, GS1_LINTER_TOO_SHORT_FOR_GCP, expect);
 	}
 
@@ -166,12 +168,11 @@ void test_lint_gcppos2(void)
 	 *  I0AAAAA|A => Bad; I0*A*AAAAA
 	 *  IAAAAAA|A => Bad; I*A*AAAAAA
 	 */
-	strcpy(expect, data);
-	expect[i+2] = '\0';
-	i -= 2;
-	while (i >= 1) {
+	memcpy(expect, data, (size_t)GCP_MIN_LENGTH);
+	expect[GCP_MIN_LENGTH+4] = '\0';
+	for (i = GCP_MIN_LENGTH; i >= 1; i--) {
 		data[i] = 'A';
-		memcpy(&expect[i--], "*A*A", 4);
+		memcpy(&expect[i], "*A*A", 4);
 		UNIT_TEST_FAIL(gs1_lint_gcppos2, data, GS1_LINTER_INVALID_GCP_PREFIX, expect);
 	}
 

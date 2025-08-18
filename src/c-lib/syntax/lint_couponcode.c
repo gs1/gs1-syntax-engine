@@ -243,7 +243,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Validate the GCP with the "gcppos1" linter.
 	 *
 	 */
-	strncpy(gcp, p, (size_t)vli);
+	memcpy(gcp, p, (size_t)vli);
+	gcp[vli] = '\0';
 	ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 	assert (ret == GS1_LINTER_OK ||
@@ -505,21 +506,24 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate the GCP with the "gcppos1" linter.
 		 *
 		 */
-		strncpy(gcp, p, (size_t)vli);
-		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+		if (vli > 0) {
+			memcpy(gcp, p, (size_t)vli);
+			gcp[vli] = '\0';
+			ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
-		assert (ret == GS1_LINTER_OK ||
-			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
-			ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
+			assert (ret == GS1_LINTER_OK ||
+				ret == GS1_LINTER_INVALID_GCP_PREFIX ||
+				ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-		if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
-			GS1_LINTER_RETURN_ERROR(
-				ret,
-				(size_t)(p - data),
-				(size_t)vli
-			);
+			if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
+				GS1_LINTER_RETURN_ERROR(
+					ret,
+					(size_t)(p - data),
+					(size_t)vli
+				);
 
-		p += vli;
+			p += vli;
+		}
 
 	}
 
@@ -635,21 +639,24 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate the GCP with the "gcppos1" linter.
 		 *
 		 */
-		strncpy(gcp, p, (size_t)vli);
-		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+		if (vli > 0) {
+			memcpy(gcp, p, (size_t)vli);
+			gcp[vli] = '\0';
+			ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
-		assert (ret == GS1_LINTER_OK ||
-			ret == GS1_LINTER_INVALID_GCP_PREFIX ||
-			ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
+			assert (ret == GS1_LINTER_OK ||
+				ret == GS1_LINTER_INVALID_GCP_PREFIX ||
+				ret == GS1_LINTER_GCP_DATASOURCE_OFFLINE);
 
-		if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
-			GS1_LINTER_RETURN_ERROR(
-				ret,
-				(size_t)(p - data),
-				(size_t)vli
-			);
+			if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
+				GS1_LINTER_RETURN_ERROR(
+					ret,
+					(size_t)(p - data),
+					(size_t)vli
+				);
 
-		p += vli;
+			p += vli;
+		}
 
 	}
 
@@ -829,7 +836,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate the GCP/GLN with the "gcppos1" linter.
 		 *
 		 */
-		strncpy(gcp, p, (size_t)vli);
+		memcpy(gcp, p, (size_t)vli);
+		gcp[vli] = '\0';
 		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
 
 		assert (ret == GS1_LINTER_OK ||
