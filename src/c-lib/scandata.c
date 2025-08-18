@@ -473,7 +473,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 			goto fail;
 		}
 
-		strncpy(p, scanData, primaryLen);
+		memcpy(p, scanData, primaryLen);
 		p[primaryLen] = '\0';
 
 		if (!gs1_allDigits((uint8_t*)p, primaryLen)) {
