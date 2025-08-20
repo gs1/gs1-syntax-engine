@@ -432,6 +432,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	ctx->sym = gs1_encoder_sNONE;
 	*ctx->dataStr = '\0';
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 
 	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';

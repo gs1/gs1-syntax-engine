@@ -155,6 +155,7 @@ struct validationEntry {
 #include "gs1encoders.h"
 
 void gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table);
+void gs1_sortAIs(gs1_encoder* ctx);
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder *ctx, const char *ai, size_t ailen);
 bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct aiEntry *entry, const char *aiVal, size_t vallen);
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
@@ -166,6 +167,7 @@ void gs1_loadValidationTable(gs1_encoder* ctx);
 #ifdef UNIT_TESTS
 
 void test_ai_lookupAIentry(void);
+void test_ai_existsInAIdata(void);
 void test_ai_checkAIlengthByPrefix(void);
 void test_ai_AItableVsPrefixLength(void);
 void test_ai_AItableVsIsFNC1required(void);

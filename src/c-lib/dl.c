@@ -1114,10 +1114,12 @@ static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, c
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	strcpy(in, dlData);
 	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ (!should_succeed));
 	TEST_MSG("Err: %s", ctx->errMsg);
 	if (should_succeed) {
+		gs1_sortAIs(ctx);
 		TEST_CHECK(strcmp(out, expect) == 0);
 		TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
 	}
@@ -1821,6 +1823,7 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK((ret = gs1_parseAIdata(ctx, aiData, out)) == true);
 	TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
 	if (!ret)
@@ -1830,6 +1833,8 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 		TEST_CHECK(gs1_generateDLuri(ctx, stem) == NULL);
 		return;
 	}
+
+	gs1_sortAIs(ctx);
 
 	TEST_CHECK((uri = gs1_generateDLuri(ctx, stem)) != NULL);
 	TEST_MSG("Expected success. Got error: %s", ctx->errMsg);

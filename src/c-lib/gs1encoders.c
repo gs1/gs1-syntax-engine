@@ -82,6 +82,7 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.dlKeyQualifiers = NULL,
 		.numDLkeyQualifiers = 0,
 		.numAIs = 0,
+		.numSortedAIs = 0,
 		.dataStr = { 0 },
 		.errMsg = { 0 },
 		.linterErr = GS1_LINTER_OK,
@@ -257,6 +258,7 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 
 	// Validate and process data, including extraction of HRI
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	if (strncmp(ctx->dataStr, "https://", 8) == 0 ||	// GS1 Digital Link URI
 	    strncmp(ctx->dataStr, "HTTPS://", 8) == 0 ||
 	    strncmp(ctx->dataStr, "http://",  7) == 0 ||
@@ -292,6 +294,8 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 			goto fail;
 	}
 
+	gs1_sortAIs(ctx);
+
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 
@@ -301,6 +305,7 @@ fail:
 
 	*ctx->dataStr = '\0';
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	return false;
 
 }
@@ -316,6 +321,7 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 
 	// Validate AI data
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	if ((cc = strchr(aiData, '|')) != NULL)		// Composite symbol
 	{
 
@@ -349,6 +355,7 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 			goto fail;
 	}
 
+	gs1_sortAIs(ctx);
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 
@@ -358,6 +365,7 @@ fail:
 
 	*ctx->dataStr = '\0';
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	return false;
 
 }
@@ -420,6 +428,7 @@ bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char* const scanData)
 	if (!gs1_processScanData(ctx, scanData))
 		goto fail;
 
+	gs1_sortAIs(ctx);
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 

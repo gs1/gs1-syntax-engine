@@ -89,6 +89,7 @@ TEST_LIST = {
      *
      */
     { "ai_lookupAIentry", test_ai_lookupAIentry },
+    { "ai_existsInAIdata", test_ai_existsInAIdata },
     { "ai_test_ai_checkAIlengthByPrefix", test_ai_checkAIlengthByPrefix },
     { "ai_AItableVsPrefixLength", test_ai_AItableVsPrefixLength },
     { "ai_AItableVsIsFNC1required", test_ai_AItableVsIsFNC1required },

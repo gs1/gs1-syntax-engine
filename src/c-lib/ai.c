@@ -241,21 +241,21 @@ static const struct aiEntry unknownAI4fixed6 =
  *  will look for an AI in the table that matches a prefix of the given data.
  *
  */
-struct aiLookupKey {
+struct aiTableLookupKey {
 	const char* const ai;
 	size_t ailen;
 };
 
-static inline __ATTR_PURE int compareAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
-	const struct aiLookupKey* lookupKey = (const struct aiLookupKey*)needle;
+static inline __ATTR_PURE int compareAItableAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiTableLookupKey* lookupKey = (const struct aiTableLookupKey*)needle;
 	const struct aiEntry* entries = (const struct aiEntry*)haystack;
 	const struct aiEntry* entry = &entries[index];
 
 	return strncmp(entry->ai, lookupKey->ai, entry->ailen);	// Look for matches against the prefix of needle
 }
 
-static inline __ATTR_PURE bool validateAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
-	const struct aiLookupKey *lookupKey = (const struct aiLookupKey *)needle;
+static inline __ATTR_PURE bool validateAItableAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiTableLookupKey *lookupKey = (const struct aiTableLookupKey *)needle;
 	const struct aiEntry *entries = (const struct aiEntry*)haystack;
 	const char *ai = entries[index].ai;
 	const size_t ailen = entries[index].ailen;
@@ -268,7 +268,7 @@ static inline __ATTR_PURE bool validateAIEntryMatch(const void* const needle, co
 __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
-	struct aiLookupKey lookupKey = { ai, ailen };
+	struct aiTableLookupKey lookupKey = { ai, ailen };
 	ssize_t index;
 
 	assert(ailen == 0 || ailen <= strlen(ai));
@@ -297,7 +297,7 @@ __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx
 	 *
 	 */
 	index = gs1_binarySearch(&lookupKey, ctx->aiTable, ctx->aiTableEntries,
-				 compareAIEntryPrefix, validateAIEntryMatch);
+				 compareAItableAIEntryPrefix, validateAItableAIEntryMatch);
 
 	if (index >= 0)
 		return &ctx->aiTable[index];	// Found and validated
@@ -346,6 +346,98 @@ __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx
 	}
 
 	return &unknownAI;	// Unknown AI length
+
+}
+
+
+/*
+ *  Lookup the extracted AI data using a given template, e.g. "12nn"
+ *
+ */
+struct aiDataLookupKey {
+	const char* const ai;
+	size_t ailen;
+	size_t prefixlen;
+	const char* const ignoreAI;
+};
+
+static inline __ATTR_PURE int compareAIdataTemplate(const void* const needle, const void* const haystack, const size_t index) {
+
+	const struct aiDataLookupKey* lookupKey = (const struct aiDataLookupKey*)needle;
+	const struct aiValue* const* aiArray = (const struct aiValue* const*)haystack;
+	const struct aiValue* const ai = aiArray[index];
+
+	/*
+	 *  We compare the numeric prefix only and let the validation function
+	 *  take care of the rest.
+	 *
+	 */
+	return strncmp(ai->ai, lookupKey->ai, lookupKey->prefixlen);
+
+}
+
+static inline __ATTR_PURE bool validateAIdataTemplate(const void* const needle, const void* const haystack, const size_t index) {
+
+	const struct aiDataLookupKey* lookupKey = (const struct aiDataLookupKey*)needle;
+	const struct aiValue* const* aiArray = (const struct aiValue* const*)haystack;
+	const struct aiValue* const ai = aiArray[index];
+
+	/*
+	 *  This is a template. The prefix already matched, but it is invalid
+	 *  for the overall length not to match
+	 *
+	 */
+	if (lookupKey->ailen != ai->ailen)
+		return false;
+
+	/*
+	 *  If we are ignoring a specific AI then a match is invalid
+	 *
+	 */
+	if (lookupKey->ignoreAI &&
+	    strncmp(ai->ai, lookupKey->ignoreAI, lookupKey->ailen) == 0)
+		return false;
+
+	return true;
+
+}
+
+
+/*
+ *  Compare function for sorting AI pointers by their lexical value
+ *
+ */
+static __ATTR_PURE int compareAIPointers(const void *a, const void *b) {
+
+	const struct aiValue * const *ai1 = (const struct aiValue * const *)a;
+	const struct aiValue * const *ai2 = (const struct aiValue * const *)b;
+
+	return strncmp((*ai1)->ai, (*ai2)->ai, (*ai1)->ailen);
+
+}
+
+
+/*
+ *  Sort the extracted AIs to enable binary search
+ *
+ *  Populates the sortedAIs array with pointers to aiData entries.
+ *
+ */
+void gs1_sortAIs(gs1_encoder* const ctx) {
+
+	int i, j;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+
+	// Populate sortedAIs with pointers to AI data entries
+	for (i = 0, j = 0; i < ctx->numAIs; i++)
+		if (ctx->aiData[i].kind == aiValue_aival)
+			ctx->sortedAIs[j++] = &ctx->aiData[i];
+
+	ctx->numSortedAIs = j;
+
+	qsort(ctx->sortedAIs, (size_t)ctx->numSortedAIs, sizeof(struct aiValue *), compareAIPointers);
 
 }
 
@@ -713,38 +805,37 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 
 /*
- *  Search the AIs for any match with the given AI pattern, optionally
- *  returning the matched AI.
+ *  Search the extracted data AIs for any match with the given AI pattern,
+ *  optionally returning the matched AI.
  *
  *  Ignore AI can be set to the current AI to avoid matching triggering on
  *  itself when matching by a self-referencing pattern.
  *
- *  Note: Given the typically small number of AIs and template matching
- *  requirement, there is little to be gained by maintaining a more advanced
- *  data structure versus the current approach of simply walking the AIs.
- *
  */
-static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
+static bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
 
-	int i;
-	const size_t prefixlen = strspn(ai, "0123456789");
-	size_t ailen = strlen(ai);
+	const size_t ailen = strlen(ai);
+	const size_t prefixlen = strspn(ai, "0123456789");	// Fixed digits in a template such as "35nn" (2) or "310n" (3)
+	struct aiDataLookupKey searchKey = { ai, ailen, prefixlen, ignoreAI };
+	ssize_t index;
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	assert(ailen >= MIN_AI_LEN && ailen <= MAX_AI_LEN);
 
-		const struct aiValue* const ai2 = &ctx->aiData[i];
+	if (unlikely(prefixlen < 1))
+		goto fail;
 
-		if (ai2->kind != aiValue_aival ||
-		    strncmp(ai2->ai, ai, prefixlen) != 0 ||
-		    (ignoreAI && strncmp(ai2->ai, ignoreAI, ailen) == 0)
-		   )
-			continue;
+	index = gs1_binarySearch(&searchKey, ctx->sortedAIs, (size_t)ctx->numSortedAIs,
+				 compareAIdataTemplate, validateAIdataTemplate);
 
-		if (matchedAI)
-			*matchedAI = ai2;
-		return true;
+	if (unlikely(index < 0))	/* Not found or invalid */
+		goto fail;
 
-	}
+	if (matchedAI)
+		*matchedAI = ctx->sortedAIs[index];
+
+	return true;
+
+fail:
 
 	if (matchedAI)
 		*matchedAI = NULL;
@@ -789,7 +880,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 				const struct aiValue *matchedAI;
 
-				if (!aiExists(ctx, token, ai->ai, &matchedAI))
+				if (!existsInAIdata(ctx, token, ai->ai, &matchedAI))
 					continue;
 
 				SET_ERR_V(INVALID_AI_PAIRS, ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
@@ -850,7 +941,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 				// All members of a group (e.g. "01+21") must be present
 				for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
-					if (!aiExists(ctx, token, ai->ai, NULL))
+					if (!existsInAIdata(ctx, token, ai->ai, NULL))
 						satisfied = false;
 
 				if (satisfied)		// Any wholly satisfied group is sufficient for req
@@ -885,29 +976,20 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// If there's 0 or 1 AI, there can't be any repeats
+	if (ctx->numSortedAIs <= 1)
+		return true;
 
-		const struct aiValue* const ai = &ctx->aiData[i];
-		int j;
+	for (i = 0; i < ctx->numSortedAIs - 1; i++) {
+		const struct aiValue* const ai = ctx->sortedAIs[i];
+		const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
 
-		if (ai->kind != aiValue_aival)
-			continue;
-
-		for (j = i + 1; j < ctx->numAIs; j++) {
-
-			const struct aiValue* const ai2 = &ctx->aiData[j];
-
-			if (ai2->kind != aiValue_aival)
-				continue;
-
-			if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
-			   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
-				SET_ERR_V(INSTANCES_OF_AI_HAVE_DIFFERENT_VALUES, ai->ailen, ai->ai);
-				return false;
-			}
-
+		// Check if consecutive sorted AIs have same AI but different values
+		if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
+		   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
+			SET_ERR_V(INSTANCES_OF_AI_HAVE_DIFFERENT_VALUES, ai->ailen, ai->ai);
+			return false;
 		}
-
 	}
 
 	return true;
@@ -922,30 +1004,23 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
  */
 static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 
-	int i;
+	const char* serialAIs[] = { "253", "255", "8003" };
+	size_t i;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
 
-	if (!aiExists(ctx, "8030", NULL, NULL))
+	if (!existsInAIdata(ctx, "8030", NULL, NULL))
 		return true;
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	for (i = 0; i < sizeof(serialAIs)/sizeof(serialAIs[0]); i++) {
+		const struct aiValue *ai = NULL;
 
-		const struct aiValue* ai = &ctx->aiData[i];
-
-		if (ai->kind != aiValue_aival ||
-		        (strcmp(ai->aiEntry->ai, "253") != 0 &&
-		         strcmp(ai->aiEntry->ai, "255") != 0 &&
-		         strcmp(ai->aiEntry->ai, "8003") != 0)
-		   )
-			continue;
-
-		if (ai->vallen == aiEntryMinLength(ai->aiEntry)) {
+		if (existsInAIdata(ctx, serialAIs[i], NULL, &ai) && ai &&	// Matching entry
+		    ai->vallen == aiEntryMinLength(ai->aiEntry)) {
 			SET_ERR_V(SERIAL_NOT_PRESENT, ai->ailen, ai->ai);
 			return false;
 		}
-
 	}
 
 	return true;
@@ -990,7 +1065,6 @@ void gs1_loadValidationTable(gs1_encoder* const ctx) {
 #undef ENTRY
 
 }
-
 
 
 #ifdef UNIT_TESTS
@@ -1042,6 +1116,81 @@ void test_ai_lookupAIentry(void) {
 	TEST_CHECK(gs1_lookupAIentry(ctx, "419", 3) == &unknownAI3fixed13);		// So (419) is okay, not requiring FNC1
 
 	gs1_encoder_free(ctx);
+
+}
+
+
+static void do_test_existsInAIdata(gs1_encoder* const ctx, const char* const file, const int line, const bool should_succeed, const char* const dataStr, const char* const needle, const char* const ignore, const char* const expect) {
+
+	char casename[256];
+	const struct aiValue* match = NULL;
+
+	snprintf(casename, sizeof(casename), "%s:%d: %s | +(%s) | -(%s)", file, line, dataStr, needle, ignore);
+	TEST_CASE(casename);
+
+	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, dataStr));
+
+	TEST_CHECK(existsInAIdata(ctx, needle, ignore, (expect != NULL ? &match : NULL)) ^ !should_succeed);
+
+	if (expect != NULL) {
+		TEST_ASSERT(match != NULL);
+		TEST_CHECK(strcmp(match->aiEntry->ai, expect) == 0);
+		TEST_MSG("Expected to match '%s' but got '%s'", expect, match->aiEntry->ai);
+	}
+
+}
+
+void test_ai_existsInAIdata(void) {
+
+	gs1_encoder* ctx;
+
+	static const char* dataStr1 = "(01)12345678901231";
+	static const char* dataStr2 = "(98)DEF(97)GHI(96)JKL(95)MNO";
+	static const char* dataStr3 = "(01)12345678901231(235)ABC123(8002)123456";
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+#define test_existsInAIdata(s, d, n, i, e) do {					\
+	do_test_existsInAIdata(ctx, __FILE__, __LINE__, s, d, n, i, e);		\
+} while (0)
+
+	test_existsInAIdata(true,  dataStr1, "01",   NULL, "01");
+	test_existsInAIdata(true,  dataStr1, "01",   "99", "01");
+	test_existsInAIdata(false, dataStr1, "01",   "01", NULL); 	// Never match on ignore
+	test_existsInAIdata(false, dataStr1, "02",   NULL, NULL);
+	test_existsInAIdata(true,  dataStr1, "0n",   NULL, "01");
+	test_existsInAIdata(false, dataStr1, "0nn",  NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "0nnn", NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "01n",  NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "01nn", NULL, NULL);
+
+	test_existsInAIdata(false, dataStr2, "01", NULL, NULL);
+	test_existsInAIdata(false, dataStr2, "94", NULL, NULL);
+	test_existsInAIdata(true,  dataStr2, "95", NULL, "95");
+	test_existsInAIdata(true,  dataStr2, "96", NULL, "96");
+	test_existsInAIdata(true,  dataStr2, "97", NULL, "97");
+	test_existsInAIdata(true,  dataStr2, "98", NULL, "98");
+	test_existsInAIdata(false, dataStr2, "99", NULL, NULL);
+	test_existsInAIdata(true,  dataStr2, "9n", NULL, NULL);		// Matched value is meaningless due to dups
+
+	test_existsInAIdata(true,  dataStr3, "01",   NULL, "01");
+	test_existsInAIdata(false, dataStr3, "nn",   NULL, NULL);
+	test_existsInAIdata(true,  dataStr3, "235",  NULL, "235");
+	test_existsInAIdata(true,  dataStr3, "23n",  NULL, "235");
+	test_existsInAIdata(true,  dataStr3, "2nn",  NULL, "235");
+	test_existsInAIdata(false, dataStr3, "nnn",  NULL, NULL);
+	test_existsInAIdata(true,  dataStr3, "8002", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "800n", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "80nn", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "8nnn", NULL, "8002");
+	test_existsInAIdata(false, dataStr3, "nnnn", NULL, NULL);
+
+	gs1_encoder_free(ctx);
+
+#undef test_existsInAIdata
 
 }
 
@@ -1147,8 +1296,10 @@ static void do_test_parseAIdata(gs1_encoder* const ctx, const char* const file, 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ (!should_succeed));
 	if (should_succeed)
+		gs1_sortAIs(ctx);
 		TEST_CHECK(strcmp(out, expect) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, out, expect, ctx->errMsg);
 
@@ -1209,7 +1360,9 @@ static void test_linters(gs1_encoder* const ctx, const char* const aiData, gs1_l
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) || ctx->linterErr != GS1_LINTER_OK);
+	gs1_sortAIs(ctx);
 	TEST_MSG("Parse failed for non-linter reasons. Err: %s", ctx->errMsg);
 
 	TEST_CHECK(ctx->linterErr == expect);
@@ -1497,10 +1650,13 @@ static void do_test_validateAIs(gs1_encoder* const ctx, const char* const file, 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK((ret = gs1_parseAIdata(ctx, aiData, out)) == true);
 	TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
 	if (!ret)
 		return;
+
+	gs1_sortAIs(ctx);
 
 	if (!should_succeed) {
 		TEST_CHECK(!fn(ctx));

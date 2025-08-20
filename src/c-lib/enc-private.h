@@ -226,6 +226,8 @@ struct gs1_encoder {
 
 	struct aiValue aiData[MAX_AIS];		// List of AI components
 	int numAIs;
+	struct aiValue *sortedAIs[MAX_AIS];		// Sorted pointers to aiData entries
+	int numSortedAIs;				// Number of entries in sortedAIs
 
 	struct validationEntry validationTable[gs1_encoder_vNUMVALIDATIONS];
 						// Table of all global validation functions
