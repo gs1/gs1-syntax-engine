@@ -1166,6 +1166,8 @@ void test_ai_existsInAIdata(void) {
 	test_existsInAIdata(false, dataStr1, "0nnn", NULL, NULL);
 	test_existsInAIdata(false, dataStr1, "01n",  NULL, NULL);
 	test_existsInAIdata(false, dataStr1, "01nn", NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "n0",   NULL, NULL);	// Mask must be at end
+	test_existsInAIdata(false, dataStr1, "n0n",  NULL, NULL);
 
 	test_existsInAIdata(false, dataStr2, "01", NULL, NULL);
 	test_existsInAIdata(false, dataStr2, "94", NULL, NULL);
@@ -1179,6 +1181,8 @@ void test_ai_existsInAIdata(void) {
 	test_existsInAIdata(true,  dataStr3, "01",   NULL, "01");
 	test_existsInAIdata(false, dataStr3, "nn",   NULL, NULL);
 	test_existsInAIdata(true,  dataStr3, "235",  NULL, "235");
+	test_existsInAIdata(false, dataStr3, "23",   NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "2n",   NULL, NULL);
 	test_existsInAIdata(true,  dataStr3, "23n",  NULL, "235");
 	test_existsInAIdata(true,  dataStr3, "2nn",  NULL, "235");
 	test_existsInAIdata(false, dataStr3, "nnn",  NULL, NULL);
@@ -1187,6 +1191,10 @@ void test_ai_existsInAIdata(void) {
 	test_existsInAIdata(true,  dataStr3, "80nn", NULL, "8002");
 	test_existsInAIdata(true,  dataStr3, "8nnn", NULL, "8002");
 	test_existsInAIdata(false, dataStr3, "nnnn", NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "800",  NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "80n",  NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "80",   NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "8n",   NULL, NULL);
 
 	gs1_encoder_free(ctx);
 
