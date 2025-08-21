@@ -1298,9 +1298,10 @@ static void do_test_parseAIdata(gs1_encoder* const ctx, const char* const file, 
 	ctx->numAIs = 0;
 	ctx->numSortedAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ (!should_succeed));
-	if (should_succeed)
+	if (should_succeed) {
 		gs1_sortAIs(ctx);
 		TEST_CHECK(strcmp(out, expect) == 0);
+	}
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, out, expect, ctx->errMsg);
 
 }
