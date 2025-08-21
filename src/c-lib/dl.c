@@ -66,9 +66,9 @@ static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
  *
  */
 static inline __ATTR_CONST bool isBadDomainChar(char c) {
-	return c == '_' || c == '~' || c == '?' || c == '#' || c == '@' ||
+	return c == '_' || c == '~' || c == '?' || c == '#'  || c == '@' ||
 	       c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' ||
-	       c == ')' || c == '*' || c == '+' || c == ',' || c == ';' ||
+	       c == ')' || c == '*' || c == '+' || c == ','  || c == ';' ||
 	       c == '=' || c == '%';
 }
 
@@ -209,7 +209,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 
 		for (k = 0; k < j; k++) {
 			size_t q_len = strlen(addedQualifiers[k]);
-			assert(q_len + 1 + token_len < sizeof(buf));	// "<Q> <token>"
+			assert(q_len + 1 + token_len < sizeof(buf));		// "<Q> <token>"
 			memcpy(buf, addedQualifiers[k], q_len);
 			buf[q_len] = ' ';
 			memcpy(buf + q_len + 1, token, token_len);
@@ -688,7 +688,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		while (*p == '&')				// Jump any & separators
 			p++;
 		r = p;
-		while (*r && *r != '&') r++;		// Find next '&' or end of string
+		while (*r && *r != '&') r++;			// Find next '&' or end of string
 
 		// Discard parameters with no value
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
@@ -850,12 +850,12 @@ add_query_param_to_ai_data:
 
 out:
 
-	if (qp) {			// Restore original query parameter delimiter
+	if (qp) {					// Restore original query parameter delimiter
 //		*(qp-1) = '?';
-		dlData[qp - dlData - 1] = '?';  // Ugly hack generates same code as above to satiate GCC 11
+		dlData[qp - dlData - 1] = '?';		// Ugly hack generates same code as above to satiate GCC 11
 	}
 
-	if (fr) {			// Restore original fragment delimiter
+	if (fr) {					// Restore original fragment delimiter
 //		*(fr-1) = '#';
 		dlData[fr - dlData - 1] = '#';  // Ditto
 	}
@@ -1146,11 +1146,11 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(false, "", "");
 	test_parseDLuri(false, "ftp://", "");
 	test_parseDLuri(false, "http://", "");
-	test_parseDLuri(false, "http:///", "");				// No domain
-	test_parseDLuri(false, "http://a", "");				// No path info
-	test_parseDLuri(false, "http://a/", "");			// Pathelogical minimal domain but no AI info
-	test_parseDLuri(false, "http://a/b", "");			// No path info
-	test_parseDLuri(false, "http://a/b/", "");			// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http:///", "");			// No domain
+	test_parseDLuri(false, "http://a", "");			// No path info
+	test_parseDLuri(false, "http://a/", "");		// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/b", "");		// No path info
+	test_parseDLuri(false, "http://a/b/", "");		// Pathelogical minimal domain but no AI info
 
 	test_parseDLuri(true,					// http
 		"http://a/00/006141411234567890",
@@ -1392,19 +1392,19 @@ void test_dl_parseDLuri(void) {
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ+987",	// "+" means " " in path info
 		"");
 
-	test_parseDLuri(true,					// Empty fragment after path info
+	test_parseDLuri(true,							// Empty fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(true,					// Ignore fragment after path info
+	test_parseDLuri(true,							// Ignore fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#fragment",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(true,					// Empty fragment after query info
+	test_parseDLuri(true,							// Empty fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#",
 		"^0000614141123456789099ABC");
 
-	test_parseDLuri(true,					// Ignore fragment after query info
+	test_parseDLuri(true,							// Ignore fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#fragment",
 		"^0000614141123456789099ABC");
 
@@ -1546,7 +1546,7 @@ void test_dl_parseDLuri(void) {
 
 	// Examples with unknown AIs
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_parseDLuri(false,								// Unknown AIs are not permitted data attributes
+	test_parseDLuri(false,									// Unknown AIs are not permitted data attributes
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);	// ... unless when explicitly permitted
@@ -1902,7 +1902,8 @@ void test_dl_generateDLuri(void) {
 	 *
 	 */
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");	// Unknown AIs not permitted as DL URI data attributes...
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");		// Unknown AIs not permitted as DL URI data attributes...
+
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);				// ... unless when explicitly permitted
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);

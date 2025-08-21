@@ -1323,27 +1323,27 @@ void test_ai_parseAIdata(void) {
 
 	test_parseAIdata(true,  "(01)12345678901231", "^0112345678901231");
 	test_parseAIdata(true,  "(10)12345", "^1012345");
-	test_parseAIdata(true,  "(01)12345678901231(10)12345", "^01123456789012311012345");		// No FNC1 after (01)
-	test_parseAIdata(true,  "(3100)123456(10)12345", "^31001234561012345");				// No FNC1 after (3100)
-	test_parseAIdata(true,  "(10)12345(11)991225", "^1012345^11991225");				// FNC1 after (10)
-	test_parseAIdata(true,  "(3900)12345(11)991225", "^390012345^11991225");				// FNC1 after (3900)
-	test_parseAIdata(true,  "(10)12345\\(11)991225", "^1012345(11)991225");				// Escaped bracket
-	test_parseAIdata(true,  "(10)12345\\(", "^1012345(");						// At end if fine
+	test_parseAIdata(true,  "(01)12345678901231(10)12345", "^01123456789012311012345");	// No FNC1 after (01)
+	test_parseAIdata(true,  "(3100)123456(10)12345", "^31001234561012345");			// No FNC1 after (3100)
+	test_parseAIdata(true,  "(10)12345(11)991225", "^1012345^11991225");			// FNC1 after (10)
+	test_parseAIdata(true,  "(3900)12345(11)991225", "^390012345^11991225");		// FNC1 after (3900)
+	test_parseAIdata(true,  "(10)12345\\(11)991225", "^1012345(11)991225");			// Escaped bracket
+	test_parseAIdata(true,  "(10)12345\\(", "^1012345(");					// At end if fine
 
-	test_parseAIdata(false, "(10)(11)98765", "");							// Value must not be empty
-	test_parseAIdata(false, "(10)12345(11)", "");							// Value must not be empty
-	test_parseAIdata(false, "(1A)12345", "");								// AI must be numeric
-	test_parseAIdata(false, "1(12345", "");								// Must start with AI
-	test_parseAIdata(false, "12345", "");								// Must start with AI
-	test_parseAIdata(false, "()12345", "");								// AI too short
-	test_parseAIdata(false, "(1)12345", "");								// AI too short
-	test_parseAIdata(false, "(12345)12345", "");							// AI too long
-	test_parseAIdata(false, "(15", "");								// AI must terminate
-	test_parseAIdata(false, "(1", "");									// AI must terminate
-	test_parseAIdata(false, "(", "");									// AI must terminate
-	test_parseAIdata(false, "(01)123456789012312(10)12345", "");					// Fixed-length AI too long
-	test_parseAIdata(false, "(10)12345^", "");								// Reject "^": Conflated with FNC1
-	test_parseAIdata(false, "(17)9(90)217", "");							// Should not parse to ^7990217
+	test_parseAIdata(false, "(10)(11)98765", "");						// Value must not be empty
+	test_parseAIdata(false, "(10)12345(11)", "");						// Value must not be empty
+	test_parseAIdata(false, "(1A)12345", "");						// AI must be numeric
+	test_parseAIdata(false, "1(12345", "");							// Must start with AI
+	test_parseAIdata(false, "12345", "");							// Must start with AI
+	test_parseAIdata(false, "()12345", "");							// AI too short
+	test_parseAIdata(false, "(1)12345", "");						// AI too short
+	test_parseAIdata(false, "(12345)12345", "");						// AI too long
+	test_parseAIdata(false, "(15", "");							// AI must terminate
+	test_parseAIdata(false, "(1", "");							// AI must terminate
+	test_parseAIdata(false, "(", "");							// AI must terminate
+	test_parseAIdata(false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
+	test_parseAIdata(false, "(10)12345^", "");						// Reject "^": Conflated with FNC1
+	test_parseAIdata(false, "(17)9(90)217", "");						// Should not parse to ^7990217
 
 	gs1_encoder_free(ctx);
 
@@ -1559,11 +1559,11 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(false, "^011234567890123A");				// Bad numeric character
 	test_processAIdata(false, "^0112345678901234");				// Incorrect check digit (csum linter)
 	test_processAIdata(false, "^011234567890123");				// Too short
-	test_processAIdata(false, "^01123456789012312");				// No such AI (2). Can't be "too long" since FNC1 not required
+	test_processAIdata(false, "^01123456789012312");			// No such AI (2). Can't be "too long" since FNC1 not required
 
-	test_processAIdata(true,  "^0112345678901231^");				// Tolerate superflous FNC1
+	test_processAIdata(true,  "^0112345678901231^");			// Tolerate superflous FNC1
 	test_processAIdata(false, "^011234567890123^");				// Short, with superflous FNC1
-	test_processAIdata(false, "^01123456789012345^");				// Long, with superflous FNC1 (no following AIs)
+	test_processAIdata(false, "^01123456789012345^");			// Long, with superflous FNC1 (no following AIs)
 	test_processAIdata(false, "^01123456789012345^991234");			// Long, with superflous FNC1 and meaningless AI (5^..)
 
 	test_processAIdata(true,  "^0112345678901231991234");			// Fixed-length, run into next AI (01)...(99)...
@@ -1575,44 +1575,44 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(true,  "^2421234");
 	test_processAIdata(true,  "^24212345");
 	test_processAIdata(true,  "^242123456");
-	test_processAIdata(true,  "^242123456^10ABC123");				// Limit, then following AI
-	test_processAIdata(true,  "^242123456^");					// Tolerant of FNC1 at end of data
-	test_processAIdata(false, "^2421234567");					// Data too long
+	test_processAIdata(true,  "^242123456^10ABC123");			// Limit, then following AI
+	test_processAIdata(true,  "^242123456^");				// Tolerant of FNC1 at end of data
+	test_processAIdata(false, "^2421234567");				// Data too long
 
 	test_processAIdata(true,  "^81111234");					// N4; FNC1 required
 	test_processAIdata(false, "^8111123");					// Too short
-	test_processAIdata(false, "^811112345");					// Too long
-	test_processAIdata(true,  "^81111234^10ABC123");				// Followed by another AI
+	test_processAIdata(false, "^811112345");				// Too long
+	test_processAIdata(true,  "^81111234^10ABC123");			// Followed by another AI
 
-	test_processAIdata(true,  "^800112341234512398");				// N4-5-3-1-1; FNC1 required
-	test_processAIdata(false, "^80011234123451239");				// Too short
-	test_processAIdata(false, "^8001123412345123981");				// Too long
+	test_processAIdata(true,  "^800112341234512398");			// N4-5-3-1-1; FNC1 required
+	test_processAIdata(false, "^80011234123451239");			// Too short
+	test_processAIdata(false, "^8001123412345123981");			// Too long
 	test_processAIdata(true,  "^800112341234512398^0112345678901231");
-	test_processAIdata(false, "^80011234123451239^0112345678901231");		// Too short
+	test_processAIdata(false, "^80011234123451239^0112345678901231");	// Too short
 	test_processAIdata(false, "^8001123412345123981^01123456789012312");	// Too long
 
 	test_processAIdata(true,  "^7007211225211231");				// N6 [N6]; FNC1 required
-	test_processAIdata(true,  "^7007211225");					// No optional component
-	test_processAIdata(false, "^70072112252");					// Incorrect length
+	test_processAIdata(true,  "^7007211225");				// No optional component
+	test_processAIdata(false, "^70072112252");				// Incorrect length
 	test_processAIdata(false, "^700721122521");				// Incorrect length
 	test_processAIdata(false, "^7007211225211");				// Incorrect length
 	test_processAIdata(false, "^70072112252112");				// Incorrect length
 	test_processAIdata(false, "^700721122521123");				// Incorrect length
-	test_processAIdata(false, "^70072112252212311");				// Too long
+	test_processAIdata(false, "^70072112252212311");			// Too long
 
 	test_processAIdata(true,  "^800302112345678900ABC");			// N1 N13,csum X0..16; FNC1 required
 	test_processAIdata(false, "^800302112345678901ABC");			// Bad check digit on N13 component
-	test_processAIdata(true,  "^800302112345678900");				// Empty final component
-	test_processAIdata(true,  "^800302112345678900^10ABC123");			// Empty final component and following AI
-	test_processAIdata(true,  "^800302112345678900ABCDEFGHIJKLMNOP");		// Empty final component and following AI
-	test_processAIdata(false, "^800302112345678900ABCDEFGHIJKLMNOPQ");		// Empty final component and following AI
+	test_processAIdata(true,  "^800302112345678900");			// Empty final component
+	test_processAIdata(true,  "^800302112345678900^10ABC123");		// Empty final component and following AI
+	test_processAIdata(true,  "^800302112345678900ABCDEFGHIJKLMNOP");	// Empty final component and following AI
+	test_processAIdata(false, "^800302112345678900ABCDEFGHIJKLMNOPQ");	// Empty final component and following AI
 
-	test_processAIdata(true,  "^7230121234567890123456789012345678");		// X2 X1..28; FNC1 required
-	test_processAIdata(false, "^72301212345678901234567890123456789");		// Too long
+	test_processAIdata(true,  "^7230121234567890123456789012345678");	// X2 X1..28; FNC1 required
+	test_processAIdata(false, "^72301212345678901234567890123456789");	// Too long
 	test_processAIdata(true,  "^7230123");					// Shortest
 	test_processAIdata(false, "^723012");					// Too short
 
-	test_processAIdata(false, "^423");						// List of 3-digit ISO-3166 codes
+	test_processAIdata(false, "^423");					// List of 3-digit ISO-3166 codes
 	test_processAIdata(false, "^4235");
 	test_processAIdata(false, "^42352");
 	test_processAIdata(true,  "^423528");
