@@ -294,8 +294,6 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 			goto fail;
 	}
 
-	gs1_sortAIs(ctx);
-
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 
@@ -355,7 +353,6 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 			goto fail;
 	}
 
-	gs1_sortAIs(ctx);
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 
@@ -428,7 +425,6 @@ bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char* const scanData)
 	if (!gs1_processScanData(ctx, scanData))
 		goto fail;
 
-	gs1_sortAIs(ctx);
 	if (!gs1_validateAIs(ctx))
 		goto fail;
 

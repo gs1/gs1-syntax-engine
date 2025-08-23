@@ -429,6 +429,9 @@ void gs1_sortAIs(gs1_encoder* const ctx) {
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
+	
+	if (ctx->numSortedAIs > 0)
+		return;
 
 	// Populate sortedAIs with pointers to AI data entries
 	for (i = 0, j = 0; i < ctx->numAIs; i++)
@@ -1031,6 +1034,9 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 bool gs1_validateAIs(gs1_encoder* const ctx) {
 
 	int i;
+
+	// Sort AIs to enable efficient validation checks
+	gs1_sortAIs(ctx);
 
 	for (i = 0; i < gs1_encoder_vNUMVALIDATIONS; i++) {
 

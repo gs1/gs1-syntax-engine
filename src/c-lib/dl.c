@@ -794,15 +794,15 @@ add_query_param_to_ai_data:
 	if (numPathAIs < MAX_AIS) {
 		int i;
 
-		// TODO make sure we don't subsequently "double sort"
+		// Sort AIs to enable O(n) duplicate check
 		gs1_sortAIs(ctx);
 
 		// First, check for duplicate AIs in attributes using sorted array - O(n) instead of O(n²)
+		// Forbid duplicate AIs
 		for (i = 0; i < ctx->numSortedAIs - 1; i++) {
 			const struct aiValue* const ai = ctx->sortedAIs[i];
 			const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
 
-			// Check for any duplicate AIs
 			if (ai->ailen == ai2->ailen &&
 			    memcmp(ai->ai, ai2->ai, ai->ailen) == 0) {
 				SET_ERR_V(DUPLICATE_AI, ai->ailen, ai->ai);
@@ -812,13 +812,13 @@ add_query_param_to_ai_data:
 		}
 
 		// Now validate each attribute AI
-		for (i = 0; i < ctx->numAIs; i++) {
+		for (i = 0; i < ctx->numSortedAIs; i++) {
 
 			char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
-			const struct aiValue* const ai = &ctx->aiData[i];
+			const struct aiValue* const ai = ctx->sortedAIs[i];
 			int j;
 
-			if (ai->kind != aiValue_aival || ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
+			if (ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
 				continue;
 
 			assert(ai->aiEntry);
@@ -1840,8 +1840,6 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 		TEST_CHECK(gs1_generateDLuri(ctx, stem) == NULL);
 		return;
 	}
-
-	gs1_sortAIs(ctx);
 
 	TEST_CHECK((uri = gs1_generateDLuri(ctx, stem)) != NULL);
 	TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
