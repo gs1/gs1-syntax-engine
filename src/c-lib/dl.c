@@ -793,6 +793,25 @@ add_query_param_to_ai_data:
 	// instead belong within path info
 	if (numPathAIs < MAX_AIS) {
 		int i;
+
+		// TODO make sure we don't subsequently "double sort"
+		gs1_sortAIs(ctx);
+
+		// First, check for duplicate AIs in attributes using sorted array - O(n) instead of O(n²)
+		for (i = 0; i < ctx->numSortedAIs - 1; i++) {
+			const struct aiValue* const ai = ctx->sortedAIs[i];
+			const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
+
+			// Check for any duplicate AIs
+			if (ai->ailen == ai2->ailen &&
+			    memcmp(ai->ai, ai2->ai, ai->ailen) == 0) {
+				SET_ERR_V(DUPLICATE_AI, ai->ailen, ai->ai);
+				ret = false;
+				goto out;
+			}
+		}
+
+		// Now validate each attribute AI
 		for (i = 0; i < ctx->numAIs; i++) {
 
 			char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
@@ -803,18 +822,6 @@ add_query_param_to_ai_data:
 				continue;
 
 			assert(ai->aiEntry);
-
-			// Forbid duplicate AIs
-			for (j = 0; j < i; j++) {
-				const struct aiValue* ai2 = &ctx->aiData[j];
-				if (ai2->kind == aiValue_aival &&
-				    ai2->ailen == ai->ailen &&
-				    memcmp(ai2->ai, ai->ai, ai2->ailen) == 0) {
-					SET_ERR_V(DUPLICATE_AI, ai->ailen, ai->ai);
-					ret = false;
-					goto out;
-				}
-			}
 
 			// Check that the AI is a permitted DL URI data attribute
 			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||

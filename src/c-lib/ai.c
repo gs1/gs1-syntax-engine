@@ -854,17 +854,15 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 	int i;
 
 	assert(ctx);
-	assert(ctx->numAIs <= MAX_AIS);
+	assert(ctx->numSortedAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// Use sorted AI array to skip non-AI values entirely
+	for (i = 0; i < ctx->numSortedAIs; i++) {
 
-		const struct aiValue* const ai = &ctx->aiData[i];
+		const struct aiValue* const ai = ctx->sortedAIs[i];
 		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 		const char *token;
 		char *saveptr = NULL;
-
-		if (unlikely(ai->kind != aiValue_aival))
-			continue;
 
 		assert(ai->aiEntry);
 
@@ -907,17 +905,15 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	int i;
 
 	assert(ctx);
-	assert(ctx->numAIs <= MAX_AIS);
+	assert(ctx->numSortedAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// Use sorted AI array to skip non-AI values entirely
+	for (i = 0; i < ctx->numSortedAIs; i++) {
 
-		const struct aiValue* const ai = &ctx->aiData[i];
+		const struct aiValue* const ai = ctx->sortedAIs[i];
 		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
 		const char *token;
 		char *saveptr = NULL;
-
-		if (ai->kind != aiValue_aival)
-			continue;
 
 		assert(ai->aiEntry);
 
