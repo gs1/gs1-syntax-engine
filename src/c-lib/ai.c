@@ -1004,7 +1004,7 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
  */
 static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 
-	const char* serialAIs[] = { "253", "255", "8003" };
+	static const char* serialAIs[] = { "253", "255", "8003" };
 	size_t i;
 
 	assert(ctx);
