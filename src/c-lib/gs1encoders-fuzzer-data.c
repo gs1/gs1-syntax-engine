@@ -28,6 +28,7 @@
 #include "enc-private.h"
 
 static gs1_encoder *ctx = NULL;
+static int initialized = 0;
 
 
 int LLVMFuzzerInitialize(int *argc, char ***argv) {
@@ -37,6 +38,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv) {
 
 	ctx = gs1_encoder_init(NULL);
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
+	initialized = 1;
 
 	return 0;
 
@@ -52,6 +54,11 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	if (len > MAX_DATA)
 		return 0;
+
+	// Nasty hack required for running on MacOS
+	if (!initialized) {
+		LLVMFuzzerInitialize(NULL, NULL);
+	}
 
 	memcpy(in, buf, len);
 	in[len] = '\0';
