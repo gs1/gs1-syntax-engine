@@ -1,7 +1,7 @@
 /**
  * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  *
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -27,26 +28,9 @@
 #include "gs1encoders.h"
 #include "enc-private.h"
 
-static gs1_encoder *ctx = NULL;
-static int initialized = 0;
-
-
-int LLVMFuzzerInitialize(int *argc, char ***argv) {
-
-	(void)argc;
-	(void)argv;
-
-	ctx = gs1_encoder_init(NULL);
-	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
-	initialized = 1;
-
-	return 0;
-
-}
-
-
 int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
+
+	static gs1_encoder *ctx = NULL;
 
 	char in[MAX_DATA+1];
 	char outDL1[MAX_DATA+1];
@@ -54,13 +38,15 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	const char *out;
 	char **qp;
 
+	if (!ctx) {
+		ctx = gs1_encoder_init(NULL);
+		assert(ctx);
+		gs1_encoder_setPermitUnknownAIs(ctx, true);
+		gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
+	}
+
 	if (len > MAX_DATA)
 		return 0;
-
-	// Nasty hack required for running on MacOS
-	if (!initialized) {
-		LLVMFuzzerInitialize(NULL, NULL);
-	}
 
 	memcpy(in, buf, len);
 	in[len] = '\0';

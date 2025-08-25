@@ -18,6 +18,7 @@
  *
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,36 +27,20 @@
 #include "enc-private.h"
 #include "syn.h"
 
-static gs1_encoder *ctx = NULL;
-static int initialized = 0;
-
-
-int LLVMFuzzerInitialize(int *argc, char ***argv) {
-
-	(void)argc;
-	(void)argv;
-
-	ctx = gs1_encoder_init(NULL);
-	initialized = 1;
-
-	return 0;
-
-}
-
-
 int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
+	static gs1_encoder *ctx = NULL;
 	char in[MAX_DATA+1];
 	struct aiEntry sd[150];
 	struct aiEntry *tmp = sd;
 
+	if (!ctx) {
+		ctx = gs1_encoder_init(NULL);
+		assert(ctx);
+	}
+
 	if (len > MAX_DATA)
 		return 0;
-
-	// Nasty hack required for running on MacOS
-	if (!initialized) {
-		LLVMFuzzerInitialize(NULL, NULL);
-	}
 
 	memcpy(in, buf, len);
 	in[len] = '\0';
