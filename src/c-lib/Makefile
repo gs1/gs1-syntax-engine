@@ -314,7 +314,44 @@ wasm: $(WASM_JS)
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
-fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
+fuzzer-corpus-seeds: | $(FUZZER_CORPUSES)
+	@need_seeds=false; \
+	for corpus in $(FUZZER_CORPUSES); do \
+		if [ -z "$$(ls -A $$corpus 2>/dev/null)" ]; then \
+			need_seeds=true; \
+			break; \
+		fi; \
+	done; \
+	if [ "$$need_seeds" = "true" ]; then \
+		echo "Generating fuzzer corpus seeds from test strings..."; \
+		grep -h -o '"[^"\\]*\(\\.[^"\\]*\)*"' *test*.c dl.c ai.c scandata.c syn.c 2>/dev/null | \
+			awk -v corpuses="$(FUZZER_CORPUSES)" ' \
+			BEGIN { split(corpuses, corps, " "); count = 0 } \
+			{ \
+				# Remove surrounding quotes \
+				gsub(/^"|"$$/, ""); \
+				# Unescape common sequences \
+				gsub(/\\"/, "\""); gsub(/\\\\/, "\\"); \
+				# Skip empty strings \
+				if (length($$0) == 0) next; \
+				# Deduplicate \
+				if (seen[$$0]) next; \
+				seen[$$0] = 1; \
+				# Write to all corpus directories \
+				filename = sprintf("seed_%04d", ++count); \
+				for (i in corps) { \
+					outfile = corps[i] filename; \
+					print > outfile; \
+					close(outfile); \
+				} \
+			}'; \
+		echo "Corpus seeds generated in: $(FUZZER_CORPUSES)"; \
+	else \
+		echo "Corpus directories already contain files, skipping seed generation"; \
+		echo "Use 'make clean-fuzzer-corpus' to regenerate seeds"; \
+	fi
+
+fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 	@echo
 	@echo Start fuzzing as follows:
 	@echo
@@ -325,6 +362,9 @@ fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
 
 clean:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+
+clean-fuzzer-corpus:
+	$(RM) -r $(FUZZER_CORPUSES)
 
 clean-test:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
