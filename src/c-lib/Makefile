@@ -314,7 +314,7 @@ wasm: $(WASM_JS)
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
-fuzzer-corpus-seeds: | $(FUZZER_CORPUSES)
+fuzzer-corpus-seeds: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
 	@need_seeds=false; \
 	for corpus in $(FUZZER_CORPUSES); do \
 		if [ -z "$$(ls -A $$corpus 2>/dev/null)" ]; then \
@@ -345,7 +345,14 @@ fuzzer-corpus-seeds: | $(FUZZER_CORPUSES)
 					close(outfile); \
 				} \
 			}'; \
-		echo "Corpus seeds generated in: $(FUZZER_CORPUSES)"; \
+		for fuzzer in ais data dl scandata syn; do \
+			corpus_dir="corpus-$$fuzzer"; \
+			temp_dir="$$corpus_dir-tmp"; \
+			mkdir -p "$$temp_dir"; \
+			echo "Mergiing seeds for $$corpus_dir..."; \
+			$(SAN_ENV) build/gs1encoders-fuzzer-$$fuzzer -merge=1 "$$temp_dir" "$$corpus_dir" > /dev/null 2>&1 && \
+			rm -rf "$$corpus_dir" && mv "$$temp_dir" "$$corpus_dir"; \
+		done; \
 	else \
 		echo "Corpus directories already contain files, skipping seed generation"; \
 		echo "Use 'make clean-fuzzer-corpus' to regenerate seeds"; \
