@@ -82,11 +82,16 @@ ifeq ($(MAKECMDGOALS),clean-test)
 BUILD_DIR = build-test
 endif
 
+ifeq ($(MAKECMDGOALS),clean-fuzzer)
+BUILD_DIR = build-fuzzer
+endif
+
 ifeq ($(MAKECMDGOALS),clean-wasm)
 BUILD_DIR = build-wasm
 endif
 
 ifeq ($(MAKECMDGOALS),fuzzer)
+BUILD_DIR = build-fuzzer
 SANITIZE = yes
 FUZZER_SAN_OPT = ,fuzzer
 FUZZER_CORPUS = corpus
@@ -187,7 +192,7 @@ OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test wasm clean-wasm fuzzer docs copyright setversion
+.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test wasm clean-wasm fuzzer clean-fuzzer docs copyright setversion
 
 default: lib app-static
 all: lib app app-static
@@ -370,11 +375,14 @@ fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 clean:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
-clean-fuzzer-corpus:
-	$(RM) -r $(FUZZER_CORPUSES)
-
 clean-test:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+
+clean-fuzzer:
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+
+clean-fuzzer-corpus:
+	$(RM) -r $(FUZZER_CORPUSES)
 
 clean-wasm:
 	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(WASM_DIST_FILES) $(DEPS)
