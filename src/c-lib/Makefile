@@ -90,7 +90,7 @@ ifeq ($(MAKECMDGOALS),clean-wasm)
 BUILD_DIR = build-wasm
 endif
 
-ifeq ($(MAKECMDGOALS),fuzzer)
+ifneq ($(filter fuzzer fuzzer-% fuzzer-corpus-seeds,$(MAKECMDGOALS)),)
 BUILD_DIR = build-fuzzer
 SANITIZE = yes
 FUZZER_SAN_OPT = ,fuzzer
@@ -181,10 +181,12 @@ LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
 FUZZER_PREFIX = $(NAME)-fuzzer-
 FUZZER_SRCS = gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-data.c gs1encoders-fuzzer-dl.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-syn.c
 FUZZER_OBJS = $(addprefix $(BUILD_DIR)/, $(FUZZER_SRCS:.c=.o))
-FUZZER_BINS = $(BUILD_DIR)/$(FUZZER_PREFIX)ais $(BUILD_DIR)/$(FUZZER_PREFIX)data $(BUILD_DIR)/$(FUZZER_PREFIX)dl $(BUILD_DIR)/$(FUZZER_PREFIX)scandata $(BUILD_DIR)/$(FUZZER_PREFIX)syn
+FUZZER_NAMES = $(patsubst gs1encoders-fuzzer-%.c,%,$(FUZZER_SRCS))
+FUZZER_BINS = $(addprefix $(BUILD_DIR)/$(FUZZER_PREFIX),$(FUZZER_NAMES))
 
 FUZZER_CORPUS_PREFIX = corpus-
-FUZZER_CORPUSES = $(FUZZER_CORPUS_PREFIX)ais/ $(FUZZER_CORPUS_PREFIX)data/ $(FUZZER_CORPUS_PREFIX)dl/ $(FUZZER_CORPUS_PREFIX)scandata/ $(FUZZER_CORPUS_PREFIX)syn/
+FUZZER_CORPUSES = $(addsuffix /,$(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_NAMES)))
+FUZZER_SEED_SOURCES = *test*.c dl.c ai.c scandata.c syn.c
 
 ALL_SRCS = $(wildcard *.c) $(wildcard syntax/*.c)
 SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(LINTER_TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
@@ -319,53 +321,53 @@ wasm: $(WASM_JS)
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
-fuzzer-corpus-seeds: $(FUZZER_BINS) | $(FUZZER_CORPUSES)
-	@need_seeds=false; \
-	for corpus in $(FUZZER_CORPUSES); do \
-		if [ -z "$$(ls -A $$corpus 2>/dev/null)" ]; then \
-			need_seeds=true; \
-			break; \
-		fi; \
-	done; \
-	if [ "$$need_seeds" = "true" ]; then \
-		echo "Generating fuzzer corpus seeds from test strings..."; \
-		grep -h -o '"[^"\\]*\(\\.[^"\\]*\)*"' *test*.c dl.c ai.c scandata.c syn.c 2>/dev/null | \
-			awk -v corpuses="$(FUZZER_CORPUSES)" ' \
-			BEGIN { split(corpuses, corps, " "); count = 0 } \
-			{ \
+# Generate seeds for a specific fuzzer (internal target)
+.PHONY: fuzzer-corpus-seeds-%
+fuzzer-corpus-seeds-%: $(BUILD_DIR)/$(FUZZER_PREFIX)% | $(FUZZER_CORPUS_PREFIX)%/
+	@corpus_dir="$(FUZZER_CORPUS_PREFIX)$*" && \
+	if [ -z "$$(ls -A $$corpus_dir 2>/dev/null)" ]; then \
+		temp_dir="$$(mktemp -d)" && \
+		awk ' \
+		{ \
+			# Extract all quoted strings from each line \
+			while (match($$0, /"[^"\\\\]*(\\\.[^"\\\\]*)*"/)) { \
+				str = substr($$0, RSTART, RLENGTH); \
+				$$0 = substr($$0, RSTART + RLENGTH); \
 				# Remove surrounding quotes \
-				gsub(/^"|"$$/, ""); \
+				gsub(/^"|"$$/, "", str); \
 				# Unescape common sequences \
-				gsub(/\\"/, "\""); gsub(/\\\\/, "\\"); \
+				gsub(/\\\\"/, "\"", str); gsub(/\\\\\\\\/, "\\\\", str); \
 				# Skip empty strings \
-				if (length($$0) == 0) next; \
-				# Deduplicate \
-				if (seen[$$0]) next; \
-				seen[$$0] = 1; \
-				# Write to all corpus directories \
-				filename = sprintf("seed_%04d", ++count); \
-				for (i in corps) { \
-					outfile = corps[i] filename; \
-					print > outfile; \
-					close(outfile); \
+				if (length(str) > 0 && !seen[str]++) { \
+					filename = sprintf("'"$$temp_dir"'/seeds-%05d", ++count); \
+					printf "%s", str > filename; \
+					close(filename); \
 				} \
-			}'; \
-		for fuzzer in ais data dl scandata syn; do \
-			corpus_dir="corpus-$$fuzzer"; \
-			temp_dir="$$corpus_dir-tmp"; \
-			mkdir -p "$$temp_dir"; \
-			echo "Mergiing seeds for $$corpus_dir..."; \
-			$(SAN_ENV) build/gs1encoders-fuzzer-$$fuzzer -merge=1 "$$temp_dir" "$$corpus_dir" > /dev/null 2>&1 && \
-			rm -rf "$$corpus_dir" && mv "$$temp_dir" "$$corpus_dir"; \
-		done; \
+			} \
+		}' $(FUZZER_SEED_SOURCES) 2>/dev/null && \
+		if [ -n "$$(ls $$temp_dir/seeds-* 2>/dev/null)" ]; then \
+			echo "Merging extracted strings into $$corpus_dir" && \
+			$(SAN_ENV) $(BUILD_DIR)/$(FUZZER_PREFIX)$* -merge=1 "$$corpus_dir" "$$temp_dir" >/dev/null 2>&1; \
+		fi && \
+		rm -rf "$$temp_dir"; \
 	else \
-		echo "Corpus directories already contain files, skipping seed generation"; \
-		echo "Use 'make clean-fuzzer-corpus' to regenerate seeds"; \
+		echo "Corpus $$corpus_dir already exists, skipping seed generation"; \
 	fi
+
+.PHONY: fuzzer-corpus-seeds
+fuzzer-corpus-seeds: $(addprefix fuzzer-corpus-seeds-,$(FUZZER_NAMES))
+
+.PHONY: $(addprefix fuzzer-,$(FUZZER_NAMES))
+$(addprefix fuzzer-,$(FUZZER_NAMES)): fuzzer-%: $(BUILD_DIR)/$(FUZZER_PREFIX)% fuzzer-corpus-seeds-% | $(FUZZER_CORPUS_PREFIX)%/
+	@echo
+	@echo "Start $* fuzzer as follows:"
+	@echo
+	@echo '$(SAN_ENV)' $(BUILD_DIR)/$(FUZZER_PREFIX)$* -jobs=`$(NPROC)` -workers=`$(NPROC)` $(FUZZER_CORPUS_PREFIX)$*
+	@echo
 
 fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 	@echo
-	@echo Start fuzzing as follows:
+	@echo "Start fuzzing as follows:"
 	@echo
 	@for sym in $^ ; do \
 		echo '$(SAN_ENV)' $$sym -jobs=`$(NPROC)` -workers=`$(NPROC)` $(FUZZER_CORPUS_PREFIX)$${sym##*-} ; echo ; \
