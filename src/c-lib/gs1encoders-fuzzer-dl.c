@@ -57,10 +57,10 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	 *
 	 */
 	if (!gs1_encoder_setDataStr(ctx, in))
-		return -1;
+		return 0;
 
 	if ((out = gs1_encoder_getDLuri(ctx, NULL)) == NULL)
-		return -1;
+		return 0;
 	strcpy(outDL1, out);
 
 	/*
