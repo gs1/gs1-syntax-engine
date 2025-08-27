@@ -890,7 +890,7 @@ fail:
  */
 char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
-	int i, maxQualifiers, numQualifiers;
+	int i, maxQualifiers, numQualifiers = -1;
 	const char *key = NULL;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
@@ -904,6 +904,30 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	assert(ctx);
 
 	/*
+	 *  Check whether we already have path orders for the elements, i.e.
+	 *  the data originated from a GS1 DL URI, in which case we can just
+	 *  output what we already have
+	 *
+	 */
+	for (i = 0; i < ctx->numAIs; i++) {
+
+		const struct aiValue* const ai = &ctx->aiData[i];
+
+		if (ai->kind == aiValue_aival && ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE &&
+		    ai->dlPathOrder + 1 > numQualifiers)
+			numQualifiers = ai->dlPathOrder + 1;
+
+	}
+
+	if (numQualifiers != -1) {
+		DEBUG_PRINT("  Skipping assignment of path order as already set");
+		goto output;
+	}
+
+	/*
+	 *  No path orders exists to be must assign them by hoisting as many
+	 *  AIs as we can into the path
+	 *
 	 *  Select the first AI that is a valid primary key for a DL
 	 *
 	 */
@@ -982,6 +1006,8 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		}
 	}
 	numQualifiers = i;
+
+output:
 
 	/*
 	 *  Now build the output
@@ -1909,6 +1935,33 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
+
+	/*
+	 *  The following will not render from regular AI data due to
+	 *  /01/../10/.. path chosen, but (235) is not a valid attribute...
+	 *
+	 */
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(235)ABC(10)DEF","");
+
+	/*
+	 *  ... but it will render from a given DL URI which provides path info
+	 *  order causing /01/../235/..?10=... to be the chosen form
+	 *
+	 */
+	{
+		const char *uri;
+		const char *expect = "https://example.com/01/12312312312326/235/ABC?10=DEF";
+
+		TEST_CASE("DL URI, having path order: https://example.com/01/12312312312326/235/ABC?10=DEF");
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, "https://example.com/01/12312312312326/235/ABC?10=DEF") == true);
+		TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
+		TEST_CHECK((uri = gs1_generateDLuri(ctx, "https://example.com")) != NULL);
+		if (uri) {
+			TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
+			TEST_CHECK(strcmp(uri, expect) == 0);
+			TEST_MSG("Expected: '%s'. Got: '%s'", expect, uri);
+		}
+	}
 
 #undef test_testGenerateDLuri
 
