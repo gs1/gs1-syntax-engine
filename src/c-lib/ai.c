@@ -418,6 +418,46 @@ static __ATTR_PURE int compareAIPointers(const void *a, const void *b) {
 
 
 /*
+ *  Search the extracted data AIs for any match with the given AI pattern,
+ *  optionally returning the matched AI.
+ *
+ *  Ignore AI can be set to the current AI to avoid matching triggering on
+ *  itself when matching by a self-referencing pattern.
+ *
+ */
+bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
+
+	const size_t ailen = strlen(ai);
+	const size_t prefixlen = strspn(ai, "0123456789");	// Fixed digits in a template such as "35nn" (2) or "310n" (3)
+	struct aiDataLookupKey searchKey = { ai, ailen, prefixlen, ignoreAI };
+	ssize_t index;
+
+	assert(ailen >= MIN_AI_LEN && ailen <= MAX_AI_LEN);
+
+	if (unlikely(prefixlen < 1))
+		goto fail;
+
+	index = gs1_binarySearch(&searchKey, ctx->sortedAIs, (size_t)ctx->numSortedAIs,
+				 compareAIdataTemplate, validateAIdataTemplate);
+
+	if (unlikely(index < 0))	/* Not found or invalid */
+		goto fail;
+
+	if (matchedAI)
+		*matchedAI = ctx->sortedAIs[index];
+
+	return true;
+
+fail:
+
+	if (matchedAI)
+		*matchedAI = NULL;
+	return false;
+
+}
+
+
+/*
  *  Sort the extracted AIs to enable binary search
  *
  *  Populates the sortedAIs array with pointers to aiData entries.
@@ -803,46 +843,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 	}
 
 	return true;
-
-}
-
-
-/*
- *  Search the extracted data AIs for any match with the given AI pattern,
- *  optionally returning the matched AI.
- *
- *  Ignore AI can be set to the current AI to avoid matching triggering on
- *  itself when matching by a self-referencing pattern.
- *
- */
-static bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
-
-	const size_t ailen = strlen(ai);
-	const size_t prefixlen = strspn(ai, "0123456789");	// Fixed digits in a template such as "35nn" (2) or "310n" (3)
-	struct aiDataLookupKey searchKey = { ai, ailen, prefixlen, ignoreAI };
-	ssize_t index;
-
-	assert(ailen >= MIN_AI_LEN && ailen <= MAX_AI_LEN);
-
-	if (unlikely(prefixlen < 1))
-		goto fail;
-
-	index = gs1_binarySearch(&searchKey, ctx->sortedAIs, (size_t)ctx->numSortedAIs,
-				 compareAIdataTemplate, validateAIdataTemplate);
-
-	if (unlikely(index < 0))	/* Not found or invalid */
-		goto fail;
-
-	if (matchedAI)
-		*matchedAI = ctx->sortedAIs[index];
-
-	return true;
-
-fail:
-
-	if (matchedAI)
-		*matchedAI = NULL;
-	return false;
 
 }
 
