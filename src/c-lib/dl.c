@@ -30,6 +30,7 @@
 #include "gs1encoders.h"
 #include "enc-private.h"
 #include "debug.h"
+#include "ai.h"
 #include "dl.h"
 #include "tr.h"
 
@@ -931,6 +932,8 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		return NULL;
 	}
 
+	gs1_sortAIs(ctx);
+
 	/*
 	 *  Pick a qualifier-key sequence starting with the chosen primary key
 	 *  and having a maximum number of matching qualifier AIs
@@ -948,16 +951,9 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 		numQualifiers = 0;
 		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL)
-			for (i = 0; i < ctx->numAIs; i++) {
+			if (existsInAIdata(ctx, token, NULL, NULL))
+				numQualifiers++;
 
-				if (ctx->aiData[i].kind != aiValue_aival)
-					continue;
-
-				assert(ctx->aiData[i].aiEntry);
-				if (strcmp(ctx->aiData[i].aiEntry->ai, token) == 0)
-					numQualifiers++;
-
-			}
 		if (numQualifiers > maxQualifiers) {
 			maxQualifiers = numQualifiers;
 			bestKeyEntry = keyEntry;
