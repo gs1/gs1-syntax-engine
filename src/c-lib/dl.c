@@ -900,6 +900,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	bool emitFixed;
 	size_t len;
 	const char *stem_to_use;
+	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
 
 	assert(ctx);
 
@@ -913,9 +914,12 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 		const struct aiValue* const ai = &ctx->aiData[i];
 
-		if (ai->kind == aiValue_aival && ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE &&
-		    ai->dlPathOrder + 1 > numQualifiers)
-			numQualifiers = ai->dlPathOrder + 1;
+		if (ai->kind == aiValue_aival && ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE) {
+			assert(ai->dlPathOrder < MAX_AIS);
+			pathAIs[ai->dlPathOrder] = ai;
+			if (ai->dlPathOrder + 1 > numQualifiers)
+				numQualifiers = ai->dlPathOrder + 1;
+		}
 
 	}
 
@@ -959,14 +963,14 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	gs1_sortAIs(ctx);
 
 	/*
-	 *  Pick a qualifier-key sequence starting with the chosen primary key
-	 *  and having a maximum number of matching qualifier AIs
+	 *  Pick a maximum length key-qualifier sequence satisfied by the data
 	 *
 	 */
 	DEBUG_PRINT("Considering DL key-qualifier sequences\n");
 	bestKeyEntry = keyEntry;
 	maxQualifiers = 0;
 	while (++keyEntry < ctx->numDLkeyQualifiers) {
+		bool satisfied = true;
 
 		strcpy(tmp, ctx->dlKeyQualifiers[keyEntry]);
 		token = strtok_r(tmp, " ", &saveptr);
@@ -974,11 +978,15 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			break;
 
 		numQualifiers = 0;
-		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL)
-			if (existsInAIdata(ctx, token, NULL, NULL))
-				numQualifiers++;
+		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL) {
+			if (!existsInAIdata(ctx, token, NULL, NULL)) {
+				satisfied = false;
+				break;
+			}
+			numQualifiers++;
+		}
 
-		if (numQualifiers > maxQualifiers) {
+		if (satisfied && numQualifiers > maxQualifiers) {
 			maxQualifiers = numQualifiers;
 			bestKeyEntry = keyEntry;
 		}
@@ -1000,10 +1008,15 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 				continue;
 
 			assert(ctx->aiData[j].aiEntry);
-			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0)
+			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0) {
+				assert(i < MAX_AIS);
 				ctx->aiData[j].dlPathOrder = (uint8_t)i;
+				pathAIs[i] = &ctx->aiData[j];
+				break;
+			}
 
 		}
+		assert(j < ctx->numAIs);	// Should never fail since key-qualifier selection ensures all present
 	}
 	numQualifiers = i;
 
@@ -1030,27 +1043,20 @@ output:
 	 *
 	 */
 	for (i = 0; i < numQualifiers; i++) {
-		int j;
-		for (j = 0; j < ctx->numAIs; j++) {
+		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
+		const struct aiValue* const ai = pathAIs[i];
 
-			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-			const struct aiValue* const ai = &ctx->aiData[j];
+		assert(ai);		// Should not have gaps in the path order
 
-			if (ai->kind != aiValue_aival || ai->dlPathOrder != i)
-				continue;
-
-			len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-			assert(1 + (size_t)ai->ailen + 1 + len <
-			       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
-			*p++ = '/';
-			memcpy(p, ai->ai, ai->ailen);
-			p += ai->ailen;
-			*p++ = '/';
-			memcpy(p, encval, len);
-			p += len;
-			break;
-
-		}
+		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
+		assert(1 + (size_t)ai->ailen + 1 + len <
+		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
+		*p++ = '/';
+		memcpy(p, ai->ai, ai->ailen);
+		p += ai->ailen;
+		*p++ = '/';
+		memcpy(p, encval, len);
+		p += len;
 	}
 	*p++ = '?';
 
