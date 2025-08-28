@@ -19,6 +19,7 @@
  */
 
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -901,6 +902,30 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	size_t len;
 	const char *stem_to_use;
 	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
+	uint64_t outputAIbitfield[157] = { 0 };		// Track when an AI is emitted
+	bool emitted;
+
+#define GS1_AI_OUTPUT_VAL(ai, val) do {								\
+	uint8_t k;										\
+	for (k = 0, val = 0; k < (ai)->ailen; k++)						\
+		val = (uint16_t)(val * 10 + ((ai)->ai[k] - '0'));				\
+} while (0)
+
+#define GS1_SET_AI_OUTPUT(ai) do {								\
+	uint16_t val;										\
+	int w = CHAR_BIT * sizeof(outputAIbitfield[0]);						\
+	GS1_AI_OUTPUT_VAL(ai, val);								\
+	assert((size_t)(val/w) < sizeof(outputAIbitfield) / sizeof(outputAIbitfield[0]));	\
+	outputAIbitfield[val/w] |= (UINT64_C(1) << (w-1) >> (val%w));				\
+} while (0)
+
+#define GS1_GET_AI_OUTPUT(ai) do {								\
+	uint16_t val;										\
+	int w = CHAR_BIT * sizeof(outputAIbitfield[0]);						\
+	GS1_AI_OUTPUT_VAL(ai, val);								\
+	assert((size_t)(val/w) < sizeof(outputAIbitfield) / sizeof(outputAIbitfield[0]));	\
+	emitted = (outputAIbitfield[val/w] & (UINT64_C(1) << (w-1) >> (val%w))) != 0;		\
+} while (0)
 
 	assert(ctx);
 
@@ -1010,7 +1035,6 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			assert(ctx->aiData[j].aiEntry);
 			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0) {
 				assert(i < MAX_AIS);
-				ctx->aiData[j].dlPathOrder = (uint8_t)i;
 				pathAIs[i] = &ctx->aiData[j];
 				break;
 			}
@@ -1046,7 +1070,9 @@ output:
 		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 		const struct aiValue* const ai = pathAIs[i];
 
-		assert(ai);		// Should not have gaps in the path order
+		assert(ai);			// Should not have gaps in the path order
+
+		GS1_SET_AI_OUTPUT(ai);		// Mark as processed
 
 		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
 		assert(1 + (size_t)ai->ailen + 1 + len <
@@ -1069,8 +1095,6 @@ again:
 	for (i = 0; i < ctx->numAIs; i++) {
 
 		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-		int j;
-		bool skip = false;
 		const struct aiValue* ai = &ctx->aiData[i];
 
 		if (ai->kind != aiValue_aival ||
@@ -1078,25 +1102,10 @@ again:
 		    ai->aiEntry->fnc1 == emitFixed)
 			continue;
 
-		/*
-		 *  Skip duplicate AIs that we have already processed
-		 *
-		 */
-		for (j = 0; j < i; j++) {
-
-			const struct aiValue* ai2 = &ctx->aiData[j];
-
-			if (ai2->kind != aiValue_aival ||
-			    ai2->aiEntry->fnc1 == emitFixed ||
-			    ai2->ailen != ai->ailen ||
-			    memcmp(ai2->ai, ai->ai, ai2->ailen) != 0)
-				continue;
-
-			skip = true;
-			break;
-
-		}
-		if (skip) continue;
+		// Check if we've already processed this AI
+		GS1_GET_AI_OUTPUT(ai);
+		if (emitted)
+			continue;
 
 		/*
 		 *  Check that the AI is permitted as a data attribute
@@ -1119,6 +1128,8 @@ again:
 		p += len;
 		*p++ = '&';
 
+		GS1_SET_AI_OUTPUT(ai);		// Mark as processed
+
 	}
 	if (emitFixed) {
 		emitFixed = false;
@@ -1129,6 +1140,10 @@ again:
 	*(p-1) = '\0';
 
 	return ctx->outStr;
+
+#undef GS1_AI_OUTPUT_VAL
+#undef GS1_SET_AI_OUTPUT
+#undef GS1_GET_AI_OUTPUT
 
 }
 
