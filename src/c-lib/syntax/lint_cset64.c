@@ -94,8 +94,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data,
 	 *
 	 */
 	for (pos = 0; pos < len; pos++) {
-		int valid = 0;
-		GS1_LINTER_BITFIELD_LOOKUP((unsigned char)data[pos], cset64_bitfield);
+		int valid;
+		GS1_LINTER_BITFIELD_LOOKUP((unsigned char)data[pos], cset64_bitfield, valid);
 		if (GS1_LINTER_UNLIKELY(!valid))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_CSET64_CHARACTER,

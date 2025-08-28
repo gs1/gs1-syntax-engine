@@ -60,8 +60,9 @@
  *       header file to be included that defines a custom
  *       `GS1_LINTER_CUSTOM_GCP_LOOKUP` macro.
  * @note If provided, the GS1_LINTER_CUSTOM_GCP_LOOKUP macro shall invoke whatever
- *       API is defined by the user-provided GCP lookup service, then using
- *       the result must assign to locally-scoped variables as follows:
+ *       API is defined by the user-provided GCP lookup service using the first
+ *       argument, then using the result must assign to second and third
+ *       (output) arguments as follows:
  *         - `valid`: Set to 1 if the GCP is valid (or should be treated as
  *           such). Otherwise 0.
  *         - `offline`: Set to 1 to indicate that the GCP data source is
@@ -131,8 +132,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data
 	 */
 #ifdef GS1_LINTER_CUSTOM_GCP_LOOKUP
 {
-	int valid = 0, offline = 0;
-	GS1_LINTER_CUSTOM_GCP_LOOKUP(data);
+	int valid, offline;
+	GS1_LINTER_CUSTOM_GCP_LOOKUP(data, valid, offline);
 	if (GS1_LINTER_UNLIKELY(offline))
 		GS1_LINTER_RETURN_ERROR(GS1_LINTER_GCP_DATASOURCE_OFFLINE, 0, 0);
 	else if (GS1_LINTER_UNLIKELY(!valid))

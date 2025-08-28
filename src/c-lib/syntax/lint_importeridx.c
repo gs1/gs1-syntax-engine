@@ -70,7 +70,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char* const 
 		0x0000000000000000
 	};
 
-	int valid = 0;
+	int valid;
 
 	assert(data);
 
@@ -91,7 +91,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_importeridx(const char* const 
 	 * Validate character using bitfield lookup
 	 *
 	 */
-	GS1_LINTER_BITFIELD_LOOKUP((unsigned char)data[0], importeridx_bitfield);
+	GS1_LINTER_BITFIELD_LOOKUP((unsigned char)data[0], importeridx_bitfield, valid);
 	if (GS1_LINTER_UNLIKELY(!valid))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER,

@@ -60,8 +60,8 @@
  *       `GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP` macro.
  * @note If provided, the GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP macro shall invoke
  *       whatever functionality is available in the user-provided lookup
- *       function, then using the result must assign to a locally-scoped
- *       variable as follows:
+ *       function using the first argument, then using the result must assign
+ *       to second (output) argument as follows:
  *         - `valid`: Set to 1 if the lookup was successful. Otherwise 0.
  *
  * @param [in] data Pointer to the null-terminated data to be linted. Must not
@@ -83,7 +83,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	 *
 	 */
 #ifdef GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP
-#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc) GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP(cc)
+#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc, valid) GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP(cc, valid)
 #else
 
 	/*
@@ -121,17 +121,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	};
 
 /// \cond
-#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc) do {					\
+#define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc, valid) do {				\
+	valid = 0;								\
 	if (strlen(cc) == 2 && isdigit(cc[0]) && isdigit(cc[1])) {		\
 		int v = (cc[0] - '0') * 10 + (cc[1] - '0');			\
-		GS1_LINTER_BITFIELD_LOOKUP(v, mediatypes);			\
+		GS1_LINTER_BITFIELD_LOOKUP(v, mediatypes, valid);		\
 	}									\
 } while (0)
 /// \endcond
 
 #endif
 
-	int valid = 0;
+	int valid;
 
 	assert(data);
 
@@ -139,7 +140,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 	 * Ensure that the data is in the list.
 	 *
 	 */
-	GS1_LINTER_MEDIA_TYPE_LOOKUP(data);
+	GS1_LINTER_MEDIA_TYPE_LOOKUP(data, valid);
 	if (GS1_LINTER_LIKELY(valid))
 		GS1_LINTER_RETURN_OK;
 

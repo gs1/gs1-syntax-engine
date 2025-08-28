@@ -117,17 +117,15 @@ do {								\
  *                   concatinated produce a single bit field whose positions
  *                   are numbered from left to right (MSB of first element to
  *                   LSB of last element).
- *
- * The macro's effect is to set the value of the variable `valid` to `1` if
- * the position numbered `bit` is set in the `field`.
+ * @param [out] valid Set to `1` if the position numbered `bit` is set in the
+ *                    `field`, otherwise set to `0`.
  *
  */
-#define GS1_LINTER_BITFIELD_LOOKUP(bit, field)				\
-do {									\
-	int w = CHAR_BIT * sizeof(field[0]);				\
-	assert((size_t)(bit/w) < sizeof(field) / sizeof(field[0]));	\
-	if (field[bit/w] & (UINT64_C(1) << (w-1) >> (bit%w)))		\
-		valid = 1;						\
+#define GS1_LINTER_BITFIELD_LOOKUP(bit, field, valid)				\
+do {										\
+	int w = CHAR_BIT * sizeof(field[0]);					\
+	assert((size_t)(bit/w) < sizeof(field) / sizeof(field[0]));		\
+	valid = (field[bit/w] & (UINT64_C(1) << (w-1) >> (bit%w))) ? 1 : 0;	\
 } while (0)
 
 
@@ -137,15 +135,15 @@ do {									\
  * @param [in] needle A search term string to be exactly matched.
  * @param [in] haystack A array of strings to be searched. The array must be
  *                      otherwise the matching behaviour is undefined.
- *
- * The macro's effect is to set the value of the variable `valid` to `1` if
- * `needle` is found in `haystack`.
+ * @param [out] valid Set to `1` if `needle` is found in `haystack`, otherwise
+ *                    set to `0`.
  *
  */
-#define GS1_LINTER_BINARY_SEARCH(needle, haystack)		\
+#define GS1_LINTER_BINARY_SEARCH(needle, haystack, valid)	\
 do {								\
 	size_t s = 0;						\
 	size_t e = sizeof(haystack) / sizeof(haystack[0]);	\
+	valid = 0;						\
 	while (s < e) {						\
 		const size_t m = s + (e - s) / 2;		\
 		const int cmp = strcmp(haystack[m], needle);	\
