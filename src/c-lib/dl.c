@@ -903,7 +903,6 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	const char *stem_to_use;
 	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
 	uint64_t outputAIbitfield[157] = { 0 };		// Track when an AI is emitted
-	bool emitted;
 
 #define GS1_AI_OUTPUT_VAL(ai, val) do {								\
 	uint8_t k;										\
@@ -919,12 +918,12 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	outputAIbitfield[val/w] |= (UINT64_C(1) << (w-1) >> (val%w));				\
 } while (0)
 
-#define GS1_GET_AI_OUTPUT(ai) do {								\
+#define GS1_GET_AI_OUTPUT(ai, exists) do {							\
 	uint16_t val;										\
 	int w = CHAR_BIT * sizeof(outputAIbitfield[0]);						\
 	GS1_AI_OUTPUT_VAL(ai, val);								\
 	assert((size_t)(val/w) < sizeof(outputAIbitfield) / sizeof(outputAIbitfield[0]));	\
-	emitted = (outputAIbitfield[val/w] & (UINT64_C(1) << (w-1) >> (val%w))) != 0;		\
+	exists = (outputAIbitfield[val/w] & (UINT64_C(1) << (w-1) >> (val%w))) != 0;		\
 } while (0)
 
 	assert(ctx);
@@ -1061,9 +1060,7 @@ output:
 		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 		const struct aiValue* const ai = pathAIs[i];
 
-		assert(ai);			// Should not have gaps in the path order
-
-		GS1_SET_AI_OUTPUT(ai);		// Mark as processed
+		assert(ai);				// Should not have gaps in the path order
 
 		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
 		assert(1 + (size_t)ai->ailen + 1 + len <
@@ -1074,6 +1071,8 @@ output:
 		*p++ = '/';
 		memcpy(p, encval, len);
 		p += len;
+
+		GS1_SET_AI_OUTPUT(ai);			// Mark as processed
 	}
 	*p++ = '?';
 
@@ -1087,6 +1086,7 @@ again:
 
 		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 		const struct aiValue* ai = &ctx->aiData[i];
+		bool emitted;
 
 		if (ai->kind != aiValue_aival ||
 		    ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE ||
@@ -1094,7 +1094,7 @@ again:
 			continue;
 
 		// Check if we've already processed this AI
-		GS1_GET_AI_OUTPUT(ai);
+		GS1_GET_AI_OUTPUT(ai, emitted);
 		if (emitted)
 			continue;
 
