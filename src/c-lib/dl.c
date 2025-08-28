@@ -1026,21 +1026,12 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	strcpy(tmp, ctx->dlKeyQualifiers[bestKeyEntry]);
 	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr)) {
-		int j;
-		for (j = 0; j < ctx->numAIs; j++) {
+		const struct aiValue *match = NULL;
 
-			if (ctx->aiData[j].kind != aiValue_aival)
-				continue;
+		existsInAIdata(ctx, token, NULL, &match);
+		assert(match);		// Should never fail since key-qualifier selection ensures all present
 
-			assert(ctx->aiData[j].aiEntry);
-			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0) {
-				assert(i < MAX_AIS);
-				pathAIs[i] = &ctx->aiData[j];
-				break;
-			}
-
-		}
-		assert(j < ctx->numAIs);	// Should never fail since key-qualifier selection ensures all present
+		pathAIs[i] = match;
 	}
 	numQualifiers = i;
 
