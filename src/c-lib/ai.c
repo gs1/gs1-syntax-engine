@@ -947,12 +947,9 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 
 				// All members of a group (e.g. "01+21") must be present
 				tok3 = (gs1_tok_t) { .len = tok2.len };
-				for (more3 = gs1_tokenise(tok2.ptr, '+', &tok3); more3; more3 = gs1_tokenise(NULL, '+', &tok3)) {
-
+				for (more3 = gs1_tokenise(tok2.ptr, '+', &tok3); more3; more3 = gs1_tokenise(NULL, '+', &tok3))
 					if (!existsInAIdata(ctx, tok3.ptr, tok3.len, ai->ai, NULL))
 						satisfied = false;
-
-				}
 
 				if (satisfied)		// Any wholly satisfied group is sufficient for req
 					break;

@@ -389,7 +389,7 @@ static inline __ATTR_CONST uint8_t hex_nibble(char c) {
 	return UINT8_MAX;
 }
 
-static size_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
+static ssize_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
 
@@ -415,12 +415,12 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 	}
 	out[j] = '\0';
 
-	return j;
+	return (i == inlen) ? (ssize_t)j : -1;
 
 }
 
 
-static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
+static ssize_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	static const char HEX[] = "0123456789ABCDEF";
 	size_t i, j;
@@ -446,7 +446,7 @@ static size_t URIescape(char* const out, const size_t maxlen, const char* const 
 	}
 	out[j] = '\0';
 
-	return j;
+	return (i == inlen) ? (ssize_t)j : -1;
 
 }
 
@@ -592,7 +592,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	while (*p) {
 
 		const struct aiEntry* entry = NULL;
-		size_t ailen, vallen;
+		size_t ailen;
+		ssize_t vallen;
 		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai, *outval;
 		const char *ai;
@@ -628,7 +629,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false)) == 0) {
+		vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false);
+		assert(vallen >= 0);	// URI decoding should not overflow
+		if (vallen == 0) {
 			SET_ERR_V(DECODED_AI_FROM_DL_PATH_INFO_CONTAINS_ILLEGAL_NULL, (int)ailen, ai);
 			goto fail;
 		}
@@ -638,7 +641,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t i;
 			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
+				aival[13-i] = vallen >= (ssize_t)(i+1) ? aival[(size_t)vallen-i-1] : '0';
 			aival[14] = '\0';
 			vallen = 14;
 		}
@@ -655,11 +658,11 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		fnc1req = entry->fnc1;						// Record if required before next AI
 
 		outval = dataStr + dataStr_len;					// Save start of value for AI data
-		writeDataStr(aival, vallen, &dataStr_len);			// Write value
+		writeDataStr(aival, (size_t)vallen, &dataStr_len);		// Write value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, (size_t)vallen))
 			goto fail;
 
 		// Update the AI data
@@ -691,7 +694,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	while (p && *p) {
 
 		const struct aiEntry* entry = NULL;
-		size_t ailen = 0, vallen;
+		size_t ailen = 0;
+		ssize_t vallen;
 		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai = NULL, *outval, *ai, *e;
 
@@ -732,7 +736,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		}
 
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
+		vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true);
+		assert(vallen >= 0);	// URI decoding should not overflow
+		if (vallen == 0) {
 			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)entry->ailen, ai);
 			goto fail;
 		}
@@ -742,7 +748,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t i;
 			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
+				aival[13-i] = vallen >= (ssize_t)(i+1) ? aival[(size_t)vallen-i-1] : '0';
 			aival[14] = '\0';
 			vallen = 14;
 		}
@@ -756,11 +762,11 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		fnc1req = entry->fnc1;					// Record if required before next AI
 
 		outval = dataStr + dataStr_len;				// Save start of value for AI data
-		writeDataStr(aival, vallen, &dataStr_len);		// Write value
+		writeDataStr(aival, (size_t)vallen, &dataStr_len);	// Write value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, (size_t)vallen))
 			goto fail;
 
 		kind = aiValue_aival;
@@ -921,7 +927,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
 	bool emitFixed;
-	size_t len;
+	ssize_t len;
 	const char *stem_to_use;
 	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
 	uint64_t outputAIbitfield[157] = { 0 };		// Track when an AI is emitted
@@ -1075,9 +1081,9 @@ output:
 	 */
 	p = ctx->outStr;
 	stem_to_use = stem ? stem : CANONICAL_DL_STEM;
-	len = strlen(stem_to_use);
-	assert(len < sizeof(ctx->outStr));
-	memcpy(p, stem_to_use, len);
+	len = (ssize_t)strlen(stem_to_use);
+	assert((size_t)len < sizeof(ctx->outStr));
+	memcpy(p, stem_to_use, (size_t)len);
 	p += len;
 
 	// Trim trailing slash
@@ -1090,19 +1096,18 @@ output:
 	 *
 	 */
 	for (i = 0; i < numQualifiers; i++) {
-		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 		const struct aiValue* const ai = pathAIs[i];
 
 		assert(ai);				// Should not have gaps in the path order
 
-		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-		assert(1 + (size_t)ai->ailen + 1 + len <
-		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
+		len = URIescape(p + 1 + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - 1 - ai->ailen - 1, ai->value, ai->vallen, false);
+		assert(len >= 0);
+		assert(1 + (size_t)ai->ailen + 1 + (size_t)len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
+
 		*p++ = '/';
 		memcpy(p, ai->ai, ai->ailen);
 		p += ai->ailen;
 		*p++ = '/';
-		memcpy(p, encval, len);
 		p += len;
 
 		GS1_SET_AI_OUTPUT(ai);			// Mark as processed
@@ -1117,7 +1122,6 @@ output:
 again:
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
 		const struct aiValue* ai = &ctx->aiData[i];
 		bool emitted;
 
@@ -1142,13 +1146,13 @@ again:
 			return NULL;
 		}
 
-		len = URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-		assert((size_t)ai->ailen + 1 + len + 1 <
-		       sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
+		len = URIescape(p + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - ai->ailen - 1, ai->value, ai->vallen, true);
+		assert(len >= 0);	// URI encoding should not overflow
+		assert((size_t)ai->ailen + 1 + (size_t)len + 1 < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
+
 		memcpy(p, ai->ai, ai->ailen);
 		p += ai->ailen;
 		*p++ = '=';
-		memcpy(p, encval, len);
 		p += len;
 		*p++ = '&';
 
@@ -1645,11 +1649,11 @@ static void do_test_URIunescape(const char* const file, const int line, const ch
 	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
 	TEST_CASE(casename);
 
-	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
+	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == (ssize_t)strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected query component: %s", in, out, expect_path);
 
-	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), true) == strlen(expect_query));
+	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), true) == (ssize_t)strlen(expect_query));
 	TEST_CHECK(strcmp(out, expect_query) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected path component: %s", in, out, expect_query);
 
@@ -1694,13 +1698,11 @@ void test_dl_URIunescape(void) {
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);				// Includes \0
 
 	// Truncated output
-	TEST_CHECK(URIunescape(out, 2, "ABCD", 4, false) == 2);
-	TEST_CHECK(memcmp(out, "AB", 3) == 0);				// Includes \0
+	TEST_CHECK(URIunescape(out, 2, "ABCD", 4, false) == -1);
 
-	TEST_CHECK(URIunescape(out, 1, "ABCD", 4, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);				// Includes \0
+	TEST_CHECK(URIunescape(out, 1, "ABCD", 4, false) == -1);
 
-	TEST_CHECK(URIunescape(out, 0, "ABCD", 4, false) == 0);
+	TEST_CHECK(URIunescape(out, 0, "ABCD", 4, false) == -1);
 	TEST_CHECK(memcmp(out, "", 1) == 0);				// Includes \0
 
 #undef test_URIunescape
@@ -1716,11 +1718,11 @@ static void do_test_URIescape(const char* const file, const int line, const char
 	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
 	TEST_CASE(casename);
 
-	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
+	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == (ssize_t)strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected path component: %s", in, out, expect_path);
 
-	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), true) == strlen(expect_query));
+	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), true) == (ssize_t)strlen(expect_query));
 	TEST_CHECK(strcmp(out, expect_query) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected query component: %s", in, out, expect_query);
 
@@ -1754,25 +1756,20 @@ void test_dl_URIescape(void) {
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
 
 	// Truncated output
-	TEST_CHECK(URIescape(out, 2, "ABCD", 4, false) == 2);
-	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 2, "ABCD", 4, false) == -1);
 
 	TEST_CHECK(URIescape(out, 5, "A!B", 3, false) == 5);
 	TEST_CHECK(memcmp(out, "A%21B", 6) == 0);		// Includes \0
 
-	TEST_CHECK(URIescape(out, 4, "A!B", 3, false) == 4);
-	TEST_CHECK(memcmp(out, "A%21", 5) == 0);		// Includes \0
+	TEST_CHECK(URIescape(out, 4, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 3, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 3, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 2, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 2, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 1, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 1, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 0, "A!B", 3, false) == 0);
+	TEST_CHECK(URIescape(out, 0, "A!B", 3, false) == -1);
 	TEST_CHECK(memcmp(out, "", 1) == 0);			// Includes \0
 
 #undef test_URIescape
