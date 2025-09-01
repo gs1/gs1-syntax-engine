@@ -603,7 +603,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		r = strchr(++p, '/');
 		assert(r);
 
-		// AI is known to be valid since we previously walked over it
+		// Process the AI which is known to be valid since we previously walked over it
 		ai = p;
 		ailen = (size_t)(r-p);
 		if (ctx->permitConvenienceAlphas &&
@@ -619,6 +619,19 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			entry = gs1_lookupAIentry(ctx, ai, ailen);
 		assert(entry);
 
+		DEBUG_PRINT("    Extracted AI: (%.*s)\n", (int)ailen, ai);
+
+		// Write out the AI
+		if (fnc1req)
+			writeDataStr("^", 1, &dataStr_len);			// Write FNC1, if required
+		outai = dataStr + dataStr_len;					// Save start of AI for AI data
+		if (fromAlpha)
+			writeDataStr(entry->ai, entry->ailen, &dataStr_len);	// Resolved from convenience alpha
+		else
+			writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;						// Record if required before next AI
+
+		// Now process the AI value
 		++r;
 		p = r;
 		while (*p && *p != '/') p++;	// Find next '/' or end of string
@@ -646,17 +659,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, aival);
 
-		if (fnc1req)
-			writeDataStr("^", 1, &dataStr_len);			// Write FNC1, if required
-		outai = dataStr + dataStr_len;					// Save start of AI for AI data
-		if (fromAlpha)
-			writeDataStr(entry->ai, entry->ailen, &dataStr_len);	// Resolved from convenience alpha
-		else
-			writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
-		fnc1req = entry->fnc1;						// Record if required before next AI
-
+		// Write out the AI value
 		outval = dataStr + dataStr_len;					// Save start of value for AI data
 		writeDataStr(aival, (size_t)vallen, &dataStr_len);		// Write value
 
@@ -701,6 +706,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		aiValueKind_t kind = alValue_dlign;
 
+		// Process the AI
 		while (*p == '&')				// Jump any & separators
 			p++;
 		r = p;
@@ -730,12 +736,22 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
+		DEBUG_PRINT("    Extracted AI: (%.*s)\n", (int)ailen, ai);
+
+		// Write out the AI
+		if (fnc1req)
+			writeDataStr("^", 1, &dataStr_len);		// Write FNC1, if required
+		outai = dataStr + dataStr_len;				// Save start of AI for AI data
+		writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;					// Record if required before next AI
+
+		// Process the AI value
 		if (r == ++e) {
 			SET_ERR_V(AI_VALUE_QUERY_ELEMENT_IN_EMPTY, (int)entry->ailen, ai);
 			goto fail;
 		}
 
-		// Reverse percent encoding
+		// Reverse percent encoding for the AI value
 		vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true);
 		assert(vallen >= 0);	// URI decoding should not overflow
 		if (vallen == 0) {
@@ -753,14 +769,9 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, aival);
 
-		if (fnc1req)
-			writeDataStr("^", 1, &dataStr_len);		// Write FNC1, if required
-		outai = dataStr + dataStr_len;				// Save start of AI for AI data
-		writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
-		fnc1req = entry->fnc1;					// Record if required before next AI
-
+		// Write out the AI value
 		outval = dataStr + dataStr_len;				// Save start of value for AI data
 		writeDataStr(aival, (size_t)vallen, &dataStr_len);	// Write value
 
