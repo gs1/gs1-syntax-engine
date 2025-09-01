@@ -194,8 +194,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *  key-qualifier sequence
 	 *
 	 */
-	strcpy(buf, key);
-	*addedQualifiers = gs1_strdup_alloc(buf);
+	*addedQualifiers = gs1_strdup_alloc(key);
 	if (!*addedQualifiers)
 		return false;
 	(*pos)++;
