@@ -931,15 +931,11 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 		for (more = gs1_tokenise(ai->aiEntry->attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
 
 			bool satisfied = true;
-			char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
 			gs1_tok_t tok2;
 			bool more2;
 
 			if (strncmp(tok.ptr, "req=", 4) != 0)
 				continue;
-
-			memcpy(reqErr, tok.ptr + 4, tok.len - 4);
-			reqErr[tok.len - 4] = '\0';
 
 			tok2 = (gs1_tok_t) { .len = tok.len - 4 };
 			for (more2 = gs1_tokenise(tok.ptr + 4, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
@@ -964,7 +960,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 			}
 
 			if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
-				SET_ERR_V(REQUIRED_AIS_NOT_SATISFIED, ai->ailen, ai->ai, reqErr);
+				SET_ERR_V(REQUIRED_AIS_NOT_SATISFIED, ai->ailen, ai->ai, (int)(tok.len - 4), tok.ptr + 4);
 				return false;
 			}
 

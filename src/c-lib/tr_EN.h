@@ -45,7 +45,7 @@
 #define TR_EN_NO_AI_FOR_PREFIX "No known AI is a prefix of: %.4s..."
 #define TR_EN_AI_DATA_IS_TOO_LONG "AI (%.*s) data is too long"
 #define TR_EN_INVALID_AI_PAIRS "It is invalid to pair AI (%.*s) with AI (%.*s)"
-#define TR_EN_REQUIRED_AIS_NOT_SATISFIED "Required AIs for AI (%.*s) are not satisfied: %s"
+#define TR_EN_REQUIRED_AIS_NOT_SATISFIED "Required AIs for AI (%.*s) are not satisfied: %.*s"
 #define TR_EN_INSTANCES_OF_AI_HAVE_DIFFERENT_VALUES "Multiple instances of AI (%.*s) have different values"
 #define TR_EN_SERIAL_NOT_PRESENT "Serial component must be present for AI (%.*s) when used with AI (8030)"
 #define TR_EN_FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS "Failed to reallocate memory for key-qualifiers"
