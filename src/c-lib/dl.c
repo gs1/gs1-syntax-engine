@@ -904,14 +904,13 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	const char *key = NULL;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
-	char *saveptr = NULL;
-	const char *token;
-	char tmp[256];
 	bool emitFixed;
 	size_t len;
 	const char *stem_to_use;
 	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
 	uint64_t outputAIbitfield[157] = { 0 };		// Track when an AI is emitted
+	gs1_tok_t tok;
+	bool more;
 
 #define GS1_AI_OUTPUT_VAL(ai, val) do {								\
 	uint8_t k;										\
@@ -1003,16 +1002,27 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	bestKeyEntry = keyEntry;
 	maxQualifiers = 0;
 	while (++keyEntry < ctx->numDLkeyQualifiers) {
-		bool satisfied = true;
 
-		strcpy(tmp, ctx->dlKeyQualifiers[keyEntry]);
-		token = strtok_r(tmp, " ", &saveptr);
-		if (strcmp(token, key) != 0)
+		bool satisfied = true;
+		gs1_tok_t tok2;
+		bool more2;
+		size_t key_len = strlen(key);
+
+		tok2 = (gs1_tok_t) { .len = 0 };
+		more2 = gs1_tokenise(ctx->dlKeyQualifiers[keyEntry], ' ', &tok2);
+		assert(more2);
+		if (tok2.len != key_len || strncmp(tok2.ptr, key, key_len) != 0)
 			break;
 
 		numQualifiers = 0;
-		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL) {
-			if (!existsInAIdata(ctx, token, NULL, NULL)) {
+		while ((more2 = gs1_tokenise(NULL, ' ', &tok2))) {
+
+			char ai_buf[MAX_AI_LEN+1];
+
+			assert(tok2.len <= MAX_AI_LEN);
+			memcpy(ai_buf, tok2.ptr, tok2.len);
+			ai_buf[tok2.len] = '\0';
+			if (!existsInAIdata(ctx, ai_buf, NULL, NULL)) {
 				satisfied = false;
 				break;
 			}
@@ -1032,11 +1042,16 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *  Apply the path order from the sequence to the AI elements
 	 *
 	 */
-	strcpy(tmp, ctx->dlKeyQualifiers[bestKeyEntry]);
-	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr)) {
+	tok = (gs1_tok_t) { .len = 0 };
+	for (more = gs1_tokenise(ctx->dlKeyQualifiers[bestKeyEntry], ' ', &tok), i = 0; more; more = gs1_tokenise(NULL, ' ', &tok), i++) {
 		const struct aiValue *match = NULL;
+		char ai_buf[MAX_AI_LEN+1];
 
-		existsInAIdata(ctx, token, NULL, &match);
+		assert(tok.len <= MAX_AI_LEN);		/* Should be validated already */
+		memcpy(ai_buf, tok.ptr, tok.len);
+		ai_buf[tok.len] = '\0';
+
+		existsInAIdata(ctx, ai_buf, NULL, &match);
 		assert(match);		// Should never fail since key-qualifier selection ensures all present
 
 		pathAIs[i] = match;
