@@ -149,12 +149,10 @@ static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char
  */
 static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
 
-	int i, j, num, qualifiers_len;
+	int i, j, num;
 	size_t req;
 	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
-	char qualifiersbuf[MAX_AI_ATTR_LEN + 1] = { 0 };
-	char *saveptr = NULL;
-	const char *token;
+	gs1_tok_t tok;
 	char **addedQualifiers;
 
 	/*
@@ -166,7 +164,6 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 			num++;
 	if (*qualifiers != '\0')
 		num++;
-	qualifiers_len = i;
 
 	/*
 	 *  Grow dlKeyQualifiers if necessary
@@ -174,7 +171,9 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 */
 	for (i = 0, req = 1; i < num; i++, req *= 2);
 	if (*pos + req >= *cap) {
+
 		char **reallocDLkeyQualifiers = GS1_ENCODERS_REALLOC(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
+
 		if (!reallocDLkeyQualifiers) {
 			SET_ERR(FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS);
 			return false;
@@ -201,25 +200,27 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		return false;
 	(*pos)++;
 
-	memcpy(qualifiersbuf, qualifiers, (size_t)qualifiers_len + 1);		// Includes NULL
-	for (i = 0, j = 1, token = strtok_r(qualifiersbuf, ",", &saveptr);
+	tok = (gs1_tok_t) { .len = 0 };
+	for (i = 0, j = 1, gs1_tokenise(qualifiers, ',', &tok);
 	     i < num;
-	     i++, j *= 2, token = strtok_r(NULL, ",", &saveptr)) {
+	     i++, j *= 2, gs1_tokenise(NULL, ',', &tok)) {
 
 		int k;
-		size_t token_len = strlen(token);
 
 		for (k = 0; k < j; k++) {
+
 			size_t q_len = strlen(addedQualifiers[k]);
-			assert(q_len + 1 + token_len < sizeof(buf));		// "<Q> <token>"
+
+			assert(q_len + 1 + tok.len < sizeof(buf));		// "<Q> <token>"
 			memcpy(buf, addedQualifiers[k], q_len);
 			buf[q_len] = ' ';
-			memcpy(buf + q_len + 1, token, token_len);
-			buf[q_len + 1 + token_len] = '\0';
+			memcpy(buf + q_len + 1, tok.ptr, tok.len);
+			buf[q_len + 1 + tok.len] = '\0';
 			addedQualifiers[k + j] = gs1_strdup_alloc(buf);
 			if (!addedQualifiers[k + j])
 				return false;
 			(*pos)++;
+
 		}
 
 	}
