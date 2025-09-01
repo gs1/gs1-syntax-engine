@@ -902,6 +902,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 	int i, maxQualifiers, numQualifiers = -1;
 	const char *key = NULL;
+	size_t key_len;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
 	bool emitFixed;
@@ -982,6 +983,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1)) != -1) {
 			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
+			key_len = strlen(key);
 			break;
 		}
 
@@ -1006,7 +1008,6 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		bool satisfied = true;
 		gs1_tok_t tok2;
 		bool more2;
-		size_t key_len = strlen(key);
 
 		tok2 = (gs1_tok_t) { .len = 0 };
 		more2 = gs1_tokenise(ctx->dlKeyQualifiers[keyEntry], ' ', &tok2);
