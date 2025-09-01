@@ -147,7 +147,7 @@ static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char
  *  array of space-separated AI sequences which we can efficiently search.
  *
  */
-static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
+static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers, size_t qualifiers_len) {
 
 	int i, j, num;
 	size_t req;
@@ -158,10 +158,10 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *  Count number of qualifiers passed in
 	 *
 	 */
-	for (i = 0, num = 0; qualifiers[i]; i++)
+	for (i = 0, num = 0; i < (int)qualifiers_len; i++)
 		if (qualifiers[i] == ',')
 			num++;
-	if (*qualifiers != '\0')
+	if (qualifiers_len > 0)
 		num++;
 
 	/*
@@ -198,7 +198,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		return false;
 	(*pos)++;
 
-	tok = (gs1_tok_t) { .len = 0 };
+	tok = (gs1_tok_t) { .len = qualifiers_len };
 	for (i = 0, j = 1, gs1_tokenise(qualifiers, ',', &tok);
 	     i < num;
 	     i++, j *= 2, gs1_tokenise(NULL, ',', &tok)) {
@@ -263,7 +263,7 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 			if (tok.len == 6 && strncmp(tok.ptr, "dlpkey", 6) == 0) {
 
 				if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
-							&pos, &cap, ctx->aiTable[i].ai, ""))
+							&pos, &cap, ctx->aiTable[i].ai, "", 0))
 					goto fail;
 
 			} else if (tok.len > 7 && strncmp(tok.ptr, "dlpkey=", 7) == 0) {
@@ -274,12 +274,8 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 				tok2 = (gs1_tok_t) { .len = tok.len - 7 };
 				for (more2 = gs1_tokenise(tok.ptr + 7, '|', &tok2); more2; more2 = gs1_tokenise(NULL, '|', &tok2)) {
 
-					char qual_buf[MAX_AI_ATTR_LEN + 1];
-
-					memcpy(qual_buf, tok2.ptr, tok2.len);
-					qual_buf[tok2.len] = '\0';
 					if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
-							&pos, &cap, ctx->aiTable[i].ai, qual_buf))
+							&pos, &cap, ctx->aiTable[i].ai, tok2.ptr, tok2.len))
 						goto fail;
 
 				}
