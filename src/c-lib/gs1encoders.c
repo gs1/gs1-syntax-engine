@@ -653,7 +653,7 @@ __ATTR_PURE char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
  *      of buffer.
  *
  */
-inline bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok) {
+bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok) {
 
 #define IN_BOUNDS(tok, p) ( !(tok)->end || (p) < (tok)->end )
 

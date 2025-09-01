@@ -251,7 +251,7 @@ typedef struct {
 	const char *end;	// End boundary (NULL for null-terminated strings)
 } gs1_tok_t;
 
-bool gs1_tokenise(const char *data, char delim, gs1_tok_t *t);
+bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok);
 
 bool gs1_allDigits(const uint8_t *str, size_t len);
 
