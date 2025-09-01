@@ -250,30 +250,38 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	 */
 	for (i = 0; i < (int)ctx->aiTableEntries; i++) {
 
-		const char *token;
-		char *saveptr = NULL;
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+		gs1_tok_t tok;
+		bool more;
 
-		strcpy(attrs, ctx->aiTable[i].attrs);
-		for (token = strtok_r(attrs, " ", &saveptr);
-		     token;
-		     token = strtok_r(NULL, " ", &saveptr)) {
-			if (strcmp(token, "dlpkey") == 0) {
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ctx->aiTable[i].attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
+
+			if (tok.len == 6 && strncmp(tok.ptr, "dlpkey", 6) == 0) {
+
 				if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
 							&pos, &cap, ctx->aiTable[i].ai, ""))
 					goto fail;
-			} else if (strncmp(token, "dlpkey=", 7) == 0) {
 
-				char *saveptr2 = NULL;
+			} else if (tok.len > 7 && strncmp(tok.ptr, "dlpkey=", 7) == 0) {
 
-				for (token = strtok_r((char*)(token+7), "|", &saveptr2);
-				     token;
-				     token = strtok_r(NULL, " ", &saveptr2))
+				gs1_tok_t tok2;
+				bool more2;
+
+				tok2 = (gs1_tok_t) { .len = tok.len - 7 };
+				for (more2 = gs1_tokenise(tok.ptr + 7, '|', &tok2); more2; more2 = gs1_tokenise(NULL, '|', &tok2)) {
+
+					char qual_buf[MAX_AI_ATTR_LEN + 1];
+
+					memcpy(qual_buf, tok2.ptr, tok2.len);
+					qual_buf[tok2.len] = '\0';
 					if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
-							&pos, &cap, ctx->aiTable[i].ai, token))
+							&pos, &cap, ctx->aiTable[i].ai, qual_buf))
 						goto fail;
 
+				}
+
 			}
+
 		}
 
 	}
