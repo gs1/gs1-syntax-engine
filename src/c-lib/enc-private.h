@@ -34,8 +34,12 @@
 
 
 #ifdef _MSC_VER
+#include <malloc.h>
 #define strtok_r strtok_s
 #define ssize_t ptrdiff_t
+#define alloca _alloca
+#else
+#include <alloca.h>
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
