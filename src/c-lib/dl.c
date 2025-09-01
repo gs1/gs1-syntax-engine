@@ -594,7 +594,6 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		const struct aiEntry* entry = NULL;
 		size_t ailen;
 		ssize_t vallen;
-		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai, *outval;
 		const char *ai;
 		bool fromAlpha = false;
@@ -641,8 +640,11 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto fail;
 		}
 
+		// Save start of value for AI value
+		outval = dataStr + dataStr_len;
+
 		// Reverse percent encoding
-		vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false);
+		vallen = URIunescape(dataStr + dataStr_len, MAX_DATA - dataStr_len, r, (size_t)(p-r), false);
 		assert(vallen >= 0);	// URI decoding should not overflow
 		if (vallen == 0) {
 			SET_ERR_V(DECODED_AI_FROM_DL_PATH_INFO_CONTAINS_ILLEGAL_NULL, (int)ailen, ai);
@@ -653,21 +655,22 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t i;
+			char *v = dataStr + dataStr_len;
 			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= (ssize_t)(i+1) ? aival[(size_t)vallen-i-1] : '0';
-			aival[14] = '\0';
+				v[13-i] = vallen >= (ssize_t)(i+1) ? v[(size_t)vallen-i-1] : '0';
+			v[14] = '\0';
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, aival);
+		// Update dataStr length and NULL terminate
+		dataStr_len += (size_t)vallen;
+		dataStr[dataStr_len] = '\0';
 
-		// Write out the AI value
-		outval = dataStr + dataStr_len;					// Save start of value for AI data
-		writeDataStr(aival, (size_t)vallen, &dataStr_len);		// Write value
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, outval);
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, (size_t)vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, (size_t)vallen))
 			goto fail;
 
 		// Update the AI data
@@ -701,7 +704,6 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		const struct aiEntry* entry = NULL;
 		size_t ailen = 0;
 		ssize_t vallen;
-		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
 		const char *outai = NULL, *outval, *ai, *e;
 
 		aiValueKind_t kind = alValue_dlign;
@@ -751,8 +753,11 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto fail;
 		}
 
-		// Reverse percent encoding for the AI value
-		vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true);
+		// Save start of value for AI data
+		outval = dataStr + dataStr_len;
+
+		// Reverse percent encoding
+		vallen = URIunescape(dataStr + dataStr_len, MAX_DATA - dataStr_len, e, (size_t)(r-e), true);
 		assert(vallen >= 0);	// URI decoding should not overflow
 		if (vallen == 0) {
 			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)entry->ailen, ai);
@@ -763,21 +768,22 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t i;
+			char *v = dataStr + dataStr_len;
 			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= (ssize_t)(i+1) ? aival[(size_t)vallen-i-1] : '0';
-			aival[14] = '\0';
+				v[13-i] = vallen >= (ssize_t)(i+1) ? v[(size_t)vallen-i-1] : '0';
+			v[14] = '\0';
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, aival);
+		// Update dataStr length and NULL terminate
+		dataStr_len += (size_t)vallen;
+		dataStr[dataStr_len] = '\0';
 
-		// Write out the AI value
-		outval = dataStr + dataStr_len;				// Save start of value for AI data
-		writeDataStr(aival, (size_t)vallen, &dataStr_len);	// Write value
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, outval);
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, (size_t)vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, (size_t)vallen))
 			goto fail;
 
 		kind = aiValue_aival;
