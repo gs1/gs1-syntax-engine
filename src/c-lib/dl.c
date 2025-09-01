@@ -1015,7 +1015,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 			break;
 
 		numQualifiers = 0;
-		while ((more2 = gs1_tokenise(NULL, ' ', &tok2))) {
+		while (gs1_tokenise(NULL, ' ', &tok2)) {
 
 			assert(tok2.len <= MAX_AI_LEN);
 			if (!existsInAIdata(ctx, tok2.ptr, tok2.len, NULL, NULL)) {
