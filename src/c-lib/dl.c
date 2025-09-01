@@ -1017,12 +1017,8 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		numQualifiers = 0;
 		while ((more2 = gs1_tokenise(NULL, ' ', &tok2))) {
 
-			char ai_buf[MAX_AI_LEN+1];
-
 			assert(tok2.len <= MAX_AI_LEN);
-			memcpy(ai_buf, tok2.ptr, tok2.len);
-			ai_buf[tok2.len] = '\0';
-			if (!existsInAIdata(ctx, ai_buf, NULL, NULL)) {
+			if (!existsInAIdata(ctx, tok2.ptr, tok2.len, NULL, NULL)) {
 				satisfied = false;
 				break;
 			}
@@ -1045,13 +1041,10 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	tok = (gs1_tok_t) { .len = 0 };
 	for (more = gs1_tokenise(ctx->dlKeyQualifiers[bestKeyEntry], ' ', &tok), i = 0; more; more = gs1_tokenise(NULL, ' ', &tok), i++) {
 		const struct aiValue *match = NULL;
-		char ai_buf[MAX_AI_LEN+1];
 
 		assert(tok.len <= MAX_AI_LEN);		/* Should be validated already */
-		memcpy(ai_buf, tok.ptr, tok.len);
-		ai_buf[tok.len] = '\0';
 
-		existsInAIdata(ctx, ai_buf, NULL, &match);
+		existsInAIdata(ctx, tok.ptr, tok.len, NULL, &match);
 		assert(match);		// Should never fail since key-qualifier selection ensures all present
 
 		pathAIs[i] = match;

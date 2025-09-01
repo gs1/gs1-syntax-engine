@@ -355,10 +355,10 @@ __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx
  *
  */
 struct aiDataLookupKey {
-	const char* const ai;
+	const char* ai;
 	size_t ailen;
 	size_t prefixlen;
-	const char* const ignoreAI;
+	const char* ignoreAI;
 };
 
 static inline __ATTR_PURE int compareAIdataTemplate(const void* const needle, const void* const haystack, const size_t index) {
@@ -425,12 +425,17 @@ static __ATTR_PURE int compareAIPointers(const void *a, const void *b) {
  *  itself when matching by a self-referencing pattern.
  *
  */
-bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
+bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const size_t ailen, const char* const ignoreAI, struct aiValue const **matchedAI) {
 
-	const size_t ailen = strlen(ai);
-	const size_t prefixlen = strspn(ai, "0123456789");	// Fixed digits in a template such as "35nn" (2) or "310n" (3)
-	struct aiDataLookupKey searchKey = { ai, ailen, prefixlen, ignoreAI };
+	size_t prefixlen = 0;
+	struct aiDataLookupKey searchKey;
 	ssize_t index;
+
+	/* Count fixed digits in a template such as "35nn" (2) or "310n" (3) */
+	while (prefixlen < ailen && ai[prefixlen] >= '0' && ai[prefixlen] <= '9')
+		prefixlen++;
+
+	searchKey = (struct aiDataLookupKey) { ai, ailen, prefixlen, ignoreAI };
 
 	assert(ailen >= MIN_AI_LEN && ailen <= MAX_AI_LEN);
 
@@ -881,14 +886,10 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 			for (more2 = gs1_tokenise(tok.ptr + 3, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
 
 				const struct aiValue *matchedAI;
-				char ai_buf[MAX_AI_LEN+1];
 
 				assert(tok2.len <= MAX_AI_LEN);
 
-				memcpy(ai_buf, tok2.ptr, tok2.len);
-				ai_buf[tok2.len] = '\0';
-
-				if (!existsInAIdata(ctx, ai_buf, ai->ai, &matchedAI))
+				if (!existsInAIdata(ctx, tok2.ptr, tok2.len, ai->ai, &matchedAI))
 					continue;
 
 				SET_ERR_V(INVALID_AI_PAIRS, ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
@@ -952,12 +953,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 				tok3 = (gs1_tok_t) { .len = tok2.len };
 				for (more3 = gs1_tokenise(tok2.ptr, '+', &tok3); more3; more3 = gs1_tokenise(NULL, '+', &tok3)) {
 
-					char ai_buf[MAX_AI_LEN+1];
-
-					memcpy(ai_buf, tok3.ptr, tok3.len);
-					ai_buf[tok3.len] = '\0';
-
-					if (!existsInAIdata(ctx, ai_buf, ai->ai, NULL))
+					if (!existsInAIdata(ctx, tok3.ptr, tok3.len, ai->ai, NULL))
 						satisfied = false;
 
 				}
@@ -1030,14 +1026,14 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
 
-	if (!existsInAIdata(ctx, "8030", NULL, NULL))
+	if (!existsInAIdata(ctx, "8030", 4, NULL, NULL))
 		return true;
 
 	for (i = 0; i < sizeof(serialAIs)/sizeof(serialAIs[0]); i++) {
 
 		const struct aiValue *ai = NULL;
 
-		if (existsInAIdata(ctx, serialAIs[i], NULL, &ai) && ai &&	// Matching entry
+		if (existsInAIdata(ctx, serialAIs[i], strlen(serialAIs[i]), NULL, &ai) && ai &&	// Matching entry
 		    ai->vallen == aiEntryMinLength(ai->aiEntry)) {
 			SET_ERR_V(SERIAL_NOT_PRESENT, ai->ailen, ai->ai);
 			return false;
@@ -1157,7 +1153,7 @@ static void do_test_existsInAIdata(gs1_encoder* const ctx, const char* const fil
 	ctx->numSortedAIs = 0;
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, dataStr));
 
-	TEST_CHECK(existsInAIdata(ctx, needle, ignore, (expect != NULL ? &match : NULL)) ^ !should_succeed);
+	TEST_CHECK(existsInAIdata(ctx, needle, strlen(needle), ignore, (expect != NULL ? &match : NULL)) ^ !should_succeed);
 
 	if (expect != NULL) {
 		TEST_ASSERT(match != NULL);
