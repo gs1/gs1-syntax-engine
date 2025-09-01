@@ -643,6 +643,75 @@ __ATTR_PURE char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
  *
  */
 
+/*
+ *  In place tokenisation of a buffer using a single delimeter character
+ *
+ *  Will always stop when encountering a NULL byte.
+ *
+ *    - Set data = <buffer> on first call, and subsequently data = NULL
+ *    - Set tok.len = 0 for NULL-terminated C string, otherwise set to length
+ *      of buffer.
+ *
+ */
+inline bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok) {
+
+#define IN_BOUNDS(tok, p) ( !(tok)->end || (p) < (tok)->end )
+
+	const char *p, *q;
+
+	/*
+	 *  Initial call: Seed next, and (optional) end bound from len
+	 *
+	 */
+	if (data) {
+		tok->next = data;
+		tok->end  = tok->len ? (data + tok->len) : NULL;
+	}
+
+	if (!tok->next)
+		return false;
+
+	p = tok->next;
+
+	/*
+	 *  Skip leading delimiters
+	 *
+	 */
+	while (IN_BOUNDS(tok, p) && *p == delim)
+		p++;
+
+	/*
+	 *  No tokens left
+	 *
+	 */
+	if (!IN_BOUNDS(tok, p) || *p == '\0') {
+		tok->next = NULL;
+		return false;
+	}
+
+	/*
+	 *  Scan to end of token
+	 *
+	 */
+	q = p;
+	while (IN_BOUNDS(tok, p) && *p && *p != delim)
+		p++;
+
+	/*
+	 *  Refresh token
+	 *
+	 */
+	tok->ptr = q;
+	tok->len = (size_t)(p - q);
+	tok->next = IN_BOUNDS(tok, p) && *p ? p + 1 : NULL;
+
+	return true;
+
+#undef IN_BOUNDS
+
+}
+
+
 __ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
 
 	size_t i;

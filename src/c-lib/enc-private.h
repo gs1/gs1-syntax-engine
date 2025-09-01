@@ -244,6 +244,15 @@ struct gs1_encoder {
  *  Utility functions
  *
  */
+typedef struct {
+	const char *ptr;
+	size_t len;
+	const char *next;	// Resume position for next call, or NULL if done
+	const char *end;	// End boundary (NULL for null-terminated strings)
+} gs1_tok_t;
+
+bool gs1_tokenise(const char *data, char delim, gs1_tok_t *t);
+
 bool gs1_allDigits(const uint8_t *str, size_t len);
 
 char* gs1_strdup_alloc(const char *s);
