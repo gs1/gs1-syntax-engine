@@ -151,7 +151,6 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 
 	int i, j, num;
 	size_t req;
-	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
 	gs1_tok_t tok;
 	char **addedQualifiers;
 
@@ -209,15 +208,21 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 		for (k = 0; k < j; k++) {
 
 			size_t q_len = strlen(addedQualifiers[k]);
+			size_t total_len = q_len + 1 + tok.len + 1;	// "<Q> <token>\0"
+			char *q_new;
 
-			assert(q_len + 1 + tok.len < sizeof(buf));		// "<Q> <token>"
-			memcpy(buf, addedQualifiers[k], q_len);
-			buf[q_len] = ' ';
-			memcpy(buf + q_len + 1, tok.ptr, tok.len);
-			buf[q_len + 1 + tok.len] = '\0';
-			addedQualifiers[k + j] = gs1_strdup_alloc(buf);
-			if (!addedQualifiers[k + j])
+			assert(total_len <= MAX_AI_ATTR_LEN + 1);		// Must fit in original buf size
+
+			q_new = GS1_ENCODERS_MALLOC(total_len);
+			if (!q_new)
 				return false;
+
+			memcpy(q_new, addedQualifiers[k], q_len);
+			q_new[q_len] = ' ';
+			memcpy(q_new + q_len + 1, tok.ptr, tok.len);
+			q_new[q_len + 1 + tok.len] = '\0';
+
+			addedQualifiers[k + j] = q_new;
 			(*pos)++;
 
 		}
