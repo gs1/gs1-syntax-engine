@@ -469,7 +469,7 @@ void gs1_sortAIs(gs1_encoder* const ctx) {
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
-	
+
 	if (ctx->numSortedAIs > 0)
 		return;
 
@@ -863,25 +863,32 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numSortedAIs; i++) {
 
 		const struct aiValue* const ai = ctx->sortedAIs[i];
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		const char *token;
-		char *saveptr = NULL;
+		gs1_tok_t tok;
+		bool more;
 
 		assert(ai->aiEntry);
 
-		strcpy(attrs, ai->aiEntry->attrs);
-		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ai->aiEntry->attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
 
-			char *saveptr2 = NULL;
+			gs1_tok_t tok2;
+			bool more2;
 
-			if (strncmp(token, "ex=", 3) != 0)
+			if (strncmp(tok.ptr, "ex=", 3) != 0)
 				continue;
 
-			for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+			tok2 = (gs1_tok_t) { .len = tok.len - 3 };
+			for (more2 = gs1_tokenise(tok.ptr + 3, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
 
 				const struct aiValue *matchedAI;
+				char ai_buf[MAX_AI_LEN+1];
 
-				if (!existsInAIdata(ctx, token, ai->ai, &matchedAI))
+				assert(tok2.len <= MAX_AI_LEN);
+
+				memcpy(ai_buf, tok2.ptr, tok2.len);
+				ai_buf[tok2.len] = '\0';
+
+				if (!existsInAIdata(ctx, ai_buf, ai->ai, &matchedAI))
 					continue;
 
 				SET_ERR_V(INVALID_AI_PAIRS, ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
@@ -914,34 +921,46 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numSortedAIs; i++) {
 
 		const struct aiValue* const ai = ctx->sortedAIs[i];
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		const char *token;
-		char *saveptr = NULL;
+		gs1_tok_t tok;
+		bool more;
 
 		assert(ai->aiEntry);
 
-		strcpy(attrs, ai->aiEntry->attrs);
-
-		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ai->aiEntry->attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
 
 			bool satisfied = true;
-			char *saveptr2 = NULL;
 			char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
+			gs1_tok_t tok2;
+			bool more2;
 
-			if (strncmp(token, "req=", 4) != 0)
+			if (strncmp(tok.ptr, "req=", 4) != 0)
 				continue;
 
-			strcpy(reqErr, token+4);
+			memcpy(reqErr, tok.ptr + 4, tok.len - 4);
+			reqErr[tok.len - 4] = '\0';
 
-			for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+			tok2 = (gs1_tok_t) { .len = tok.len - 4 };
+			for (more2 = gs1_tokenise(tok.ptr + 4, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
 
-				char *saveptr3 = NULL;
+				gs1_tok_t tok3;
+				bool more3;
+
 				satisfied = true;
 
 				// All members of a group (e.g. "01+21") must be present
-				for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
-					if (!existsInAIdata(ctx, token, ai->ai, NULL))
+				tok3 = (gs1_tok_t) { .len = tok2.len };
+				for (more3 = gs1_tokenise(tok2.ptr, '+', &tok3); more3; more3 = gs1_tokenise(NULL, '+', &tok3)) {
+
+					char ai_buf[MAX_AI_LEN+1];
+
+					memcpy(ai_buf, tok3.ptr, tok3.len);
+					ai_buf[tok3.len] = '\0';
+
+					if (!existsInAIdata(ctx, ai_buf, ai->ai, NULL))
 						satisfied = false;
+
+				}
 
 				if (satisfied)		// Any wholly satisfied group is sufficient for req
 					break;
@@ -980,6 +999,7 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 		return true;
 
 	for (i = 0; i < ctx->numSortedAIs - 1; i++) {
+
 		const struct aiValue* const ai = ctx->sortedAIs[i];
 		const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
 
@@ -989,6 +1009,7 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 			SET_ERR_V(INSTANCES_OF_AI_HAVE_DIFFERENT_VALUES, ai->ailen, ai->ai);
 			return false;
 		}
+
 	}
 
 	return true;
@@ -1013,6 +1034,7 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 		return true;
 
 	for (i = 0; i < sizeof(serialAIs)/sizeof(serialAIs[0]); i++) {
+
 		const struct aiValue *ai = NULL;
 
 		if (existsInAIdata(ctx, serialAIs[i], NULL, &ai) && ai &&	// Matching entry
@@ -1020,6 +1042,7 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 			SET_ERR_V(SERIAL_NOT_PRESENT, ai->ailen, ai->ai);
 			return false;
 		}
+
 	}
 
 	return true;
