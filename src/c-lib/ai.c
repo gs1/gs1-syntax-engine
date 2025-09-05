@@ -407,7 +407,7 @@ static inline __ATTR_PURE bool validateAIdataTemplate(const void* const needle, 
  *  Compare function for sorting AI pointers by their lexical value
  *
  */
-static __ATTR_PURE int compareAIPointers(const void *a, const void *b) {
+static inline __ATTR_PURE int compareAIPointers(const void* const a, const void* const b) {
 
 	const struct aiValue * const *ai1 = (const struct aiValue * const *)a;
 	const struct aiValue * const *ai2 = (const struct aiValue * const *)b;
