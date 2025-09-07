@@ -244,7 +244,7 @@ namespace GS1.Encoders
          *
          */
 
-        // This C# wrapper library throws an excpetion containing the error message whenever
+        // This C# wrapper library throws an exception containing the error message whenever
         // an error is returned by the native library. Therefore direct access to the native
         // error message is not necessary.
         private string ErrMsg
@@ -268,7 +268,7 @@ namespace GS1.Encoders
         {
             ctx = gs1_encoder_init(IntPtr.Zero);
             if (ctx == IntPtr.Zero)
-                throw new GS1EncoderGeneralException("Failed to initalise the native library");
+                throw new GS1EncoderGeneralException("Failed to initialise the native library");
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace GS1.EncodersApp
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool FreeConsole();
 
-        const uint ATTACH_PARENT_PROCESS = 0x0ffffffff;  // default value if not specifing a process ID
+        const uint ATTACH_PARENT_PROCESS = 0x0ffffffff;  // default value if not specifying a process ID
 
         private void App_Startup(object sender, StartupEventArgs e)
         {

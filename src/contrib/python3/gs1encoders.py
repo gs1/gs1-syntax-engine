@@ -63,7 +63,7 @@ class GS1Encoder:
     def __init__(self):
         self.__ctx = self.__api.gs1_encoder_init(None)
         if self.__ctx == None:
-            raise GS1EncoderGeneralException('Failed to initalise the native library')
+            raise GS1EncoderGeneralException('Failed to initialise the native library')
 
     def __del__(self):
         self.free()

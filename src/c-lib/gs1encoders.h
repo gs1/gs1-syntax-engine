@@ -409,7 +409,7 @@ typedef enum gs1_encoder_validations gs1_encoder_validations_t;
  * This is an opaque struct that represents an instance of the library.
  *
  * This context maintains all state required for an instance. Any number of
- * instances of the library can be created, each operating seperately and
+ * instances of the library can be created, each operating separately and
  * equivalently to the others.
  *
  * This library does not introduce any global variables. All runtime state
@@ -597,7 +597,7 @@ GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
  * marked up instance of the AI that failed will be generated which can be read
  * using this function.
  *
- * Where it is meaningful to identify offending charaters in the input data,
+ * Where it is meaningful to identify offending characters in the input data,
  * these characters will be surrounded by `|` characters. Otherwise the
  * entire AI value will be surrounded by `|` characters.
  *
@@ -796,7 +796,7 @@ GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, gs1_enc
 /**
  * @brief Enable or disable the given AI validation procedure of type
  * ::gs1_encoder_validations, that determines whether certain checks are
- * enfored when data is provided using gs1_encoder_setAIdataStr(),
+ * enforced when data is provided using gs1_encoder_setAIdataStr(),
  * gs1_encoder_setDataStr() or gs1_encoder_setScanData().
  *
  *   * If enabled is true (default), then the corresponding validation will be enforced.
@@ -845,7 +845,7 @@ GS1_ENCODERS_API DEPRECATED bool gs1_encoder_getValidateAIassociations(gs1_encod
 /**
  * @brief Provided for backwards compatibility to enable or disable the
  * ::gs1_encoder_vREQUISITE_AIS validation procedure, that determines whether
- * mandatory AI pairings are enfored when data is provided using
+ * mandatory AI pairings are enforced when data is provided using
  * gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or
  * gs1_encoder_setScanData().
  *

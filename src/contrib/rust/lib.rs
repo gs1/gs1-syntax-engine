@@ -55,7 +55,7 @@ impl GS1Encoder {
         let mut gs1encoder = GS1Encoder { ctx: ptr::null_mut() };
         gs1encoder.ctx = unsafe { gs1_encoder_init(ptr::null()) as *mut u32 };
         if gs1encoder.ctx.is_null() {
-            return Err(GS1EncoderError::GS1GeneralError("Failed to initalise the native library".to_string()));
+            return Err(GS1EncoderError::GS1GeneralError("Failed to initialise the native library".to_string()));
         }
         Ok(gs1encoder)
     }

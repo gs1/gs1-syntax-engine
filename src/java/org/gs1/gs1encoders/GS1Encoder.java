@@ -224,7 +224,7 @@ public class GS1Encoder {
      *
      */
 
-    // This Java wrapper library throws an excpetion containing the error message whenever
+    // This Java wrapper library throws an exception containing the error message whenever
     // an error is returned by the native library. Therefore direct access to the native
     // error message is not necessary.
     private String getErrMsg() {

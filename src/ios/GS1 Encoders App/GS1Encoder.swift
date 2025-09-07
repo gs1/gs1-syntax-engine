@@ -135,7 +135,7 @@ class GS1Encoder {
     private(set) var ctx :OpaquePointer? = nil
 
     /*
-     * This Swift wrapper library throws an exeception containing the error message whenever
+     * This Swift wrapper library throws an exception containing the error message whenever
      * an error is returned by the native library. Therefore direct access to the native
      * error message is not necessary.
      *
@@ -156,7 +156,7 @@ class GS1Encoder {
     init() throws {
         ctx = gs1_encoder_init(nil)
         if (ctx == nil) {
-            throw GS1EncoderError.generalError(msg: "Failed to initalise the native library")
+            throw GS1EncoderError.generalError(msg: "Failed to initialise the native library")
         }
     }
 

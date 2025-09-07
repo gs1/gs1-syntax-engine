@@ -1583,13 +1583,13 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(false, "^011234567890123");				// Too short
 	test_processAIdata(false, "^01123456789012312");			// No such AI (2). Can't be "too long" since FNC1 not required
 
-	test_processAIdata(true,  "^0112345678901231^");			// Tolerate superflous FNC1
-	test_processAIdata(false, "^011234567890123^");				// Short, with superflous FNC1
-	test_processAIdata(false, "^01123456789012345^");			// Long, with superflous FNC1 (no following AIs)
-	test_processAIdata(false, "^01123456789012345^991234");			// Long, with superflous FNC1 and meaningless AI (5^..)
+	test_processAIdata(true,  "^0112345678901231^");			// Tolerate superfluous FNC1
+	test_processAIdata(false, "^011234567890123^");				// Short, with superfluous FNC1
+	test_processAIdata(false, "^01123456789012345^");			// Long, with superfluous FNC1 (no following AIs)
+	test_processAIdata(false, "^01123456789012345^991234");			// Long, with superfluous FNC1 and meaningless AI (5^..)
 
 	test_processAIdata(true,  "^0112345678901231991234");			// Fixed-length, run into next AI (01)...(99)...
-	test_processAIdata(true,  "^0112345678901231^991234");			// Tolerate superflous FNC1
+	test_processAIdata(true,  "^0112345678901231^991234");			// Tolerate superfluous FNC1
 
 	test_processAIdata(true,  "^2421");					// N1..6; FNC1 required
 	test_processAIdata(true,  "^24212");

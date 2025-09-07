@@ -143,7 +143,7 @@ export class GS1encoder {
 
         this.ctx = this.api.gs1_encoder_init(null);
         if (this.ctx === null)
-            throw new GS1encoderGeneralException("Failed to initalise GS1 Barcode Syntax Engine");
+            throw new GS1encoderGeneralException("Failed to initialise GS1 Barcode Syntax Engine");
 
     }
 
@@ -250,7 +250,7 @@ export class GS1encoder {
 
 
     /**
-     * Get/set the status of the "permit zero-supressed GTIN in GS1 DL URIs" mode.
+     * Get/set the status of the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
      *
      * @throws {GS1encoderParameterException}
      *
