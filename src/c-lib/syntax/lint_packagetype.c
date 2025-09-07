@@ -120,11 +120,11 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_packagetype(const char *data, 
 		"MA", "MB", "MC", "ME", "MPE", "MR", "MS", "MT", "MW", "MX",
 		"NA", "NE", "NF", "NG", "NS", "NT", "NU", "NV",
 		"OA", "OB", "OC", "OD", "OE", "OF", "OK", "OPE", "OT", "OU",
-		"P2", "PA", "PAE", "PB", "PC", "PD", "PE", "PF", "PG", "PH", "PI", "PJ", "PK", "PL", "PLP", "ON", "PO", "POP", "PP", "PPE", "PR", "PT", "PU", "PUE", "PV", "PX", "PY", "PZ",
+		"P2", "PA", "PAE", "PB", "PC", "PD", "PE", "PF", "PG", "PH", "PI", "PJ", "PK", "PL", "PLP", "PN", "PO", "POP", "PP", "PPE", "PR", "PT", "PU", "PUE", "PV", "PX", "PY", "PZ",
 		"QA", "QB", "QC", "QD", "QF", "QG", "QH", "QJ", "QK", "QL", "QM", "QN", "QP", "QQ", "QR", "QS",
 		"RB1", "RB2", "RB3", "RCB", "RD", "RG", "RJ", "RK", "RL", "RO", "RT", "RZ",
 		"S1", "SA", "SB", "SC", "SD", "SE", "SEC", "SH", "SI", "SK", "SL", "SM", "SO", "SP", "SS", "ST", "STL", "SU", "SV", "SW", "SX", "SY", "SZ",
-		"T1", "TB", "TC", "TD", "TE", "TEV", "TG", "THE", "TI", "TK", "TL", "TN", "TO", "TR", "TREE", "TS", "TT", "TTE", "TU", "TV", "TW", "TWE", "TY", "TZ",
+		"T1", "TB", "TC", "TD", "TE", "TEV", "TG", "THE", "TI", "TK", "TL", "TN", "TO", "TR", "TRE", "TS", "TT", "TTE", "TU", "TV", "TW", "TWE", "TY", "TZ",
 		"UC", "UN", "UUE",
 		"VA", "VG", "VI", "VK", "VL", "VN", "VO", "VP", "VQ", "VR", "VS", "VY",
 		"WA", "WB", "WC", "WD", "WF", "WG", "WH", "WJ", "WK", "WL", "WM", "WN", "WP", "WQ", "WR", "WRP", "WS", "WT", "WU", "WV", "WW", "WX", "WY", "WZ",
@@ -424,7 +424,7 @@ void test_lint_packagetype(void)
 	UNIT_TEST_PASS(gs1_lint_packagetype, "PK");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "PL");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "PLP");
-	UNIT_TEST_PASS(gs1_lint_packagetype, "ON");
+	UNIT_TEST_PASS(gs1_lint_packagetype, "PN");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "PO");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "POP");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "PP");
@@ -502,7 +502,7 @@ void test_lint_packagetype(void)
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TN");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TO");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TR");
-	UNIT_TEST_PASS(gs1_lint_packagetype, "TREE");
+	UNIT_TEST_PASS(gs1_lint_packagetype, "TRE");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TS");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TT");
 	UNIT_TEST_PASS(gs1_lint_packagetype, "TTE");
