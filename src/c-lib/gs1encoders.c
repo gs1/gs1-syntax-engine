@@ -286,7 +286,7 @@ bool gs1_encoder_setDataStr(gs1_encoder* const ctx, const char* const dataStr) {
 		if (!gs1_processAIdata(ctx, cc + 1, true))
 			goto fail;
 
-		*cc = '|';						// Restore orginal "|"
+		*cc = '|';						// Restore original "|"
 
 	}
 	else {								// Linear-only symbol
@@ -345,7 +345,7 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 		if (!gs1_parseAIdata(ctx, cc+1, p))
 			goto fail;
 
-		*cc = '|';					// Restore orginal "|"
+		*cc = '|';					// Restore original "|"
 
 	}
 	else {							// Linear-only symbol
@@ -644,7 +644,7 @@ __ATTR_PURE char* gs1_encoder_getErrMarkup(gs1_encoder* const ctx) {
  */
 
 /*
- *  In place tokenisation of a buffer using a single delimeter character
+ *  In place tokenisation of a buffer using a single delimiter character
  *
  *  Will always stop when encountering a NULL byte.
  *
@@ -1043,7 +1043,7 @@ void test_api_dataStr(void) {
 	TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));  // Too long
 
 	bigbuffer[MAX_DATA]='\0';
-	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximun length
+	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximum length
 
 	gs1_encoder_free(ctx);
 
@@ -1343,7 +1343,7 @@ void test_api_getDLignoredQueryParams(void) {
 	assert(qp);
 	TEST_CHECK(strcmp(qp[0], "compound1=QWERTY") == 0);
 
-	// Singleton and compond non-numeric query parameters before and after
+	// Singleton and compound non-numeric query parameters before and after
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333/22/TESTING?singleton1&compound1=QWERTY&99=ABC%2d123&singleton2&98=XYZ&compound2=12345"));
 	TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 4);
 	TEST_ASSERT(qp != NULL);

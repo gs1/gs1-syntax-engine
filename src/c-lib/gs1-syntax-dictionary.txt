@@ -50,7 +50,7 @@
 #
 #       "N5"    - length == 5
 #       "N..20" - 1 <= length <= 20
-#               - Note: Only the final compoment may have variable length
+#               - Note: Only the final component may have variable length
 #       "[...]" - Optional components
 #               - Note: No mandatory components may follow optional components
 #
@@ -58,7 +58,7 @@
 #     validation of the component.
 #
 #     Note: Each component of the format specification is applied to the given
-#     data, comsuming prefixes of the prescribed length. Any optional
+#     data, consuming prefixes of the prescribed length. Any optional
 #     components may be ignored after the given data is exhausted, otherwise
 #     they must be applied.
 #

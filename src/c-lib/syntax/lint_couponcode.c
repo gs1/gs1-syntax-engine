@@ -60,15 +60,15 @@
  *         Save Value VLI.
  * @return #GS1_LINTER_COUPON_INVALID_SAVE_VALUE_LENGTH if the data contains a
  *         Save Value VLI with an invalid length.
- * @return #GS1_LINTER_COUPON_TRUNCATED_SAVE_VALUE if the data comtains a Save
+ * @return #GS1_LINTER_COUPON_TRUNCATED_SAVE_VALUE if the data contains a Save
  *         Value that is shorter than is indicated by its VLI.
  * @return #GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_VLI if the data
- *         is missing a primary purchace Requirement VLI.
+ *         is missing a primary purchase Requirement VLI.
  * @return #GS1_LINTER_COUPON_INVALID_1ST_PURCHASE_REQUIREMENT_LENGTH if the
  *         data contains a primary purchase Requirement VLI with an invalid
  *         length.
  * @return #GS1_LINTER_COUPON_TRUNCATED_1ST_PURCHASE_REQUIREMENT if the data
- *         comtains a primary purchase Requirement that is shorter than is
+ *         contains a primary purchase Requirement that is shorter than is
  *         indicated by its VLI.
  * @return #GS1_LINTER_COUPON_MISSING_1ST_PURCHASE_REQUIREMENT_CODE if the
  *         data is missing a primary purchase Requirement Code.
@@ -746,7 +746,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 
 		/*
 		 * If an expiration date has been set, then ensure that it does
-		 * not preceed the start date.
+		 * not precede the start date.
 		 *
 		 */
 		if (GS1_LINTER_UNLIKELY(expiry_set && strcmp(start_date, expiry_date) > 0))

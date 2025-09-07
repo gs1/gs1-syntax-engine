@@ -78,7 +78,7 @@ struct aiEntry {
 typedef enum {
 	aiValue_undef = 0,
 	aiValue_aival,				// Extracted AI value pair
-	aiValue_ccsep,				// Separater between linear and composite component AIs
+	aiValue_ccsep,				// Separator between linear and composite component AIs
 	alValue_dlign,				// An ignored (non-numeric) query parameter of a DL URI (stored undecoded in aiValue.value)
 } aiValueKind_t;
 

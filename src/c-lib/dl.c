@@ -1243,9 +1243,9 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(false, "http://", "");
 	test_parseDLuri(false, "http:///", "");			// No domain
 	test_parseDLuri(false, "http://a", "");			// No path info
-	test_parseDLuri(false, "http://a/", "");		// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/", "");		// Pathological minimal domain but no AI info
 	test_parseDLuri(false, "http://a/b", "");		// No path info
-	test_parseDLuri(false, "http://a/b/", "");		// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http://a/b/", "");		// Pathological minimal domain but no AI info
 
 	test_parseDLuri(true,					// http
 		"http://a/00/006141411234567890",

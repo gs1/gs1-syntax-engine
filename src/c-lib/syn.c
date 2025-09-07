@@ -204,7 +204,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 			error(AI_HAS_WRONG_WIDTH);
 
 		if (strspn(token, "0123456789") != len)
-			error(AI_MUST_BE_NUMBERIC);
+			error(AI_MUST_BE_NUMERIC);
 
 		memcpy((*entry)->ai, token, len);
 		(*entry)->ai[len] = '\0';
