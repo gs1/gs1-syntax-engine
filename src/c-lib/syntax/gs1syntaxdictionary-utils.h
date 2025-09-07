@@ -53,7 +53,7 @@
 
 /**
  * @def GS1_LINTER_LIKELY
- * @brief Implemention may provide hint to the compiler that the expression is
+ * @brief Implementation may provide hint to the compiler that the expression is
  * likely to be true.
  *
  */
@@ -66,7 +66,7 @@
 
 /**
  * @def GS1_LINTER_UNLIKELY
- * @brief Implemention may provide hint to the compiler that the expression is
+ * @brief Implementation may provide hint to the compiler that the expression is
  * likely to be false.
  *
  */
@@ -114,7 +114,7 @@ do {								\
  * @param [in] bit The bit position in the field to lookup. The position
  *                 must be in the field otherwise the behaviour is undefined.
  * @param [in] field An array whose elements (of type with arbitrary size) when
- *                   concatinated produce a single bit field whose positions
+ *                   concatenated produce a single bit field whose positions
  *                   are numbered from left to right (MSB of first element to
  *                   LSB of last element).
  * @param [out] valid Set to `1` if the position numbered `bit` is set in the

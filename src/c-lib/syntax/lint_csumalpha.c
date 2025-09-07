@@ -60,7 +60,7 @@
  *         are not in CSET 82.
  *
  * @note The return value `GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION`
- * represents exceeding an implementation-specific limit. Some implmenetations
+ * represents exceeding an implementation-specific limit. Some implementations
  * may choose to support longer data inputs.
  *
  */

@@ -227,7 +227,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"The coupon's expiration date is invalid.",
 	"The coupon's start date is too short to YYMMDD format.",
 	"The coupon's start date is invalid.",
-	"The coupon's expiration date preceed the start date.",
+	"The coupon's expiration date precede the start date.",
 	"The coupon's Retailer GCP/GLN VLI is missing.",
 	"The coupon's Retailer GCP/GLN VLI must be \"1\" to \"7\".",
 	"The coupon's Retailer GCP/GLN is shorter than what is indicated by its VLI.",

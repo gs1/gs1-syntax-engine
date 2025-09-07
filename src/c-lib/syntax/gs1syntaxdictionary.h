@@ -164,7 +164,7 @@ typedef enum
 	GS1_LINTER_COUPON_INVALID_EXIPIRATION_DATE,			///< The coupon's expiration date is invalid.
 	GS1_LINTER_COUPON_TOO_SHORT_FOR_START_DATE,			///< The coupon's start date is too short to YYMMDD format.
 	GS1_LINTER_COUPON_INVALID_START_DATE,				///< The coupon's start date is invalid.
-	GS1_LINTER_COUPON_EXPIRATION_BEFORE_START,			///< The coupon's expiration date preceed the start date.
+	GS1_LINTER_COUPON_EXPIRATION_BEFORE_START,			///< The coupon's expiration date precede the start date.
 	GS1_LINTER_COUPON_MISSING_RETAILER_GCP_OR_GLN_VLI,		///< The coupon's Retailer GCP/GLN VLI is missing.
 	GS1_LINTER_COUPON_INVALID_RETAILER_GCP_OR_GLN_LENGTH,		///< The coupon's Retailer GCP/GLN VLI must be "1" to "7".
 	GS1_LINTER_COUPON_TRUNCATED_RETAILER_GCP_OR_GLN,		///< The coupon's Retailer GCP/GLN is shorter than what is indicated by its VLI.

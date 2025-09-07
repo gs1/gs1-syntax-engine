@@ -206,7 +206,7 @@ void test_lint_yyyymmd0(void)
 	UNIT_TEST_PASS(gs1_lint_yyyymmd0, "20240229");
 	UNIT_TEST_FAIL(gs1_lint_yyyymmd0, "20240230", GS1_LINTER_ILLEGAL_DAY, "202402*30*");
 
-	// Not leap year (divisable by 100 but not 400)
+	// Not leap year (divisible by 100 but not 400)
 	UNIT_TEST_PASS(gs1_lint_yyyymmd0, "21000228");
 	UNIT_TEST_FAIL(gs1_lint_yyyymmd0, "21000229", GS1_LINTER_ILLEGAL_DAY, "210002*29*");
 	UNIT_TEST_PASS(gs1_lint_yyyymmd0, "22000228");
@@ -214,7 +214,7 @@ void test_lint_yyyymmd0(void)
 	UNIT_TEST_PASS(gs1_lint_yyyymmd0, "23000228");
 	UNIT_TEST_FAIL(gs1_lint_yyyymmd0, "23000229", GS1_LINTER_ILLEGAL_DAY, "230002*29*");
 
-	// Leap year (divisable by 400)
+	// Leap year (divisible by 400)
 	UNIT_TEST_PASS(gs1_lint_yyyymmd0, "24000229");
 	UNIT_TEST_FAIL(gs1_lint_yyyymmd0, "24000230", GS1_LINTER_ILLEGAL_DAY, "240002*30*");
 
