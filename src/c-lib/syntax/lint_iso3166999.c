@@ -37,7 +37,8 @@
  * Used to validate that an AI component is an ISO 3166 "num-3" country code or
  * the string "999".
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -49,7 +50,7 @@
  *         country code or the string "999".
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	gs1_lint_err_t ret;
@@ -60,14 +61,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166999(const char* const d
 	 * The data may contain the string "999".
 	 *
 	 */
-	if (strcmp(data, "999") == 0)
+	if (data_len == 3 && data[0] == '9' && data[1] == '9' && data[2] == '9')
 		GS1_LINTER_RETURN_OK;
 
 	/*
 	 * Validate the data with the iso3166 linter.
 	 *
 	 */
-	ret = gs1_lint_iso3166(data, err_pos, err_len);
+	ret = gs1_lint_iso3166(data, data_len, err_pos, err_len);
 
 	assert(ret == GS1_LINTER_OK || ret == GS1_LINTER_NOT_ISO3166);
 

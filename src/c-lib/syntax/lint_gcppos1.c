@@ -61,15 +61,16 @@
  *       `GS1_LINTER_CUSTOM_GCP_LOOKUP` macro.
  * @note If provided, the GS1_LINTER_CUSTOM_GCP_LOOKUP macro shall invoke whatever
  *       API is defined by the user-provided GCP lookup service using the first
- *       argument, then using the result must assign to second and third
+ *       and second arguments, then using the result must assign to third and fourth
  *       (output) arguments as follows:
  *         - `valid`: Set to 1 if the GCP is valid (or should be treated as
  *           such). Otherwise 0.
  *         - `offline`: Set to 1 to indicate that the GCP data source is
  *           offline and the linter must fail.  Otherwise 0.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
+ * @param [in] data_len Length of the data parameter.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -99,7 +100,7 @@
  *       of service outage.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t i;
@@ -111,13 +112,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data
 	 * the range '0' to '9' is illegal.
 	 *
 	 */
+	if (GS1_LINTER_UNLIKELY(data_len < GCP_MIN_LENGTH))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_GCP,
+			0,
+			data_len
+		);
+
 	for (i = 0; i < GCP_MIN_LENGTH; i++) {
-		if (GS1_LINTER_UNLIKELY(!data[i]))
-			GS1_LINTER_RETURN_ERROR(
-				GS1_LINTER_TOO_SHORT_FOR_GCP,
-				0,
-				i
-			);
 		if (GS1_LINTER_UNLIKELY(data[i] < '0' || data[i] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_GCP_PREFIX,
@@ -133,7 +135,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos1(const char* const data
 #ifdef GS1_LINTER_CUSTOM_GCP_LOOKUP
 {
 	int valid, offline;
-	GS1_LINTER_CUSTOM_GCP_LOOKUP(data, valid, offline);
+	GS1_LINTER_CUSTOM_GCP_LOOKUP(data, data_len, valid, offline);
 	if (GS1_LINTER_UNLIKELY(offline))
 		GS1_LINTER_RETURN_ERROR(GS1_LINTER_GCP_DATASOURCE_OFFLINE, 0, 0);
 	else if (GS1_LINTER_UNLIKELY(!valid))

@@ -35,7 +35,8 @@
  * Used to validate that an AI component represents the longitude component of a
  * WGS84 coordinate expressed as a 10-digit number.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -47,41 +48,41 @@
  * @return #GS1_LINTER_INVALID_LONGITUDE if the longitude is outside the range `0000000000` - `3600000000`.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_longitude(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t pos;
+	unsigned long value;
 
 	assert(data);
 
 	/*
-	 * Data must consist of all digits.
+	 * Data must be 10 characters.
 	 *
 	 */
-	for (pos = 0; pos < 10 && data[pos]; pos++)
+	if (GS1_LINTER_UNLIKELY(data_len != 10))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_LONGITUDE_INVALID_LENGTH,
+			0,
+			data_len
+		);
+
+	/*
+	 * Data must consist of all digits and longitude must be within
+	 * 0000000000 to 3600000000.
+	 *
+	 */
+	for (pos = 0, value = 0; pos < 10; pos++) {
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,
 				pos,
 				1
 			);
+		value = value * 10 + (unsigned long)(data[pos] - '0');
+	}
 
-	/*
-	 * Data must be 10 characters.
-	 *
-	 */
-	if (GS1_LINTER_UNLIKELY(pos != 10 || data[10]))
-		GS1_LINTER_RETURN_ERROR(
-			GS1_LINTER_LONGITUDE_INVALID_LENGTH,
-			0,
-			pos + (data[pos] ? 1 : 0)
-		);
-
-	/*
-	 * The longitude must be within the range 0000000000 to 3600000000.
-	 *
-	 */
-	if (GS1_LINTER_UNLIKELY(strtoul(data, NULL, 10) > 3600000000))
+	if (GS1_LINTER_UNLIKELY(value > 3600000000))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_LONGITUDE,
 			0,

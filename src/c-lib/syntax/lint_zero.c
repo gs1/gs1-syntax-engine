@@ -33,7 +33,8 @@
 /**
  * Used to validate that an AI component has a zero value.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -44,14 +45,14 @@
  * @return #GS1_LINTER_NOT_ZERO if the data does not contain a zero value.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	const char *p;
+	size_t pos;
 
 	assert(data);
 
-	if (GS1_LINTER_UNLIKELY(*data == '\0'))
+	if (GS1_LINTER_UNLIKELY(data_len == 0))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_NOT_ZERO,
 			0,
@@ -62,13 +63,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_zero(const char* const data, s
 	 * Data must not contain a non-zero character
 	 *
 	 */
-	for (p = data; *p; p++) {
-		if (GS1_LINTER_UNLIKELY(*p != '0')) {
-			while (*p) p++;
+	for (pos = 0; pos < data_len; pos++) {
+		if (GS1_LINTER_UNLIKELY(data[pos] != '0')) {
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NOT_ZERO,
 				0,
-				(size_t)(p - data)
+				data_len
 			);
 		}
 	}

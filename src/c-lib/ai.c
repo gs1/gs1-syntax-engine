@@ -514,17 +514,14 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 
 	for (part = entry->parts; part->cset; part++) {
 
-		char compval[MAX_AI_VALUE_LEN+1];
 		gs1_linter_t cset_linter;
 		const gs1_linter_t *l;
+		size_t complen = (size_t)(r-p);		// Until given FNC1 or end...
 
-		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
 		if (part->max < r-p)
-			complen = part->max;	// ... reduced to max length of component
-		memcpy(compval, p, complen);
-		compval[complen] = '\0';
+			complen = part->max;		// ... reduced to max length of component
 
-		DEBUG_PRINT("    Validating component: %s\n", compval);
+		DEBUG_PRINT("    Validating component: %.*s\n", (int)complen, p);
 
 		if (part->opt == OPT && complen == 0)	// Nothing to be done for an empty optional component
 			continue;
@@ -553,7 +550,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 			gs1_lint_err_t err;
 			size_t errpos, errlen;
 
-			err = (*l)(compval, &errpos, &errlen);
+			err = (*l)(p, complen, &errpos, &errlen);
 			if (err) {
 				char *m = ctx->linterErrMarkup;
 				size_t rem = sizeof(ctx->linterErrMarkup);

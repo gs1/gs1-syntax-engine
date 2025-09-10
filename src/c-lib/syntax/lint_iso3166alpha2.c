@@ -57,12 +57,14 @@
  *       `GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP` macro.
  * @note If provided, the GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP macro shall invoke
  *       whatever functionality is available in the user-provided lookup
- *       function using the first argument, then using the result must assign
- *       to second (output) argument as follows:
+ *       function using the first argument (data) and second argument (data length),
+ *       then using the result must assign to third (output) argument as follows:
  *         - `valid`: Set to 1 if the lookup was successful. Otherwise 0.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
+ * @param [in] data_len Length of the data parameter.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -72,7 +74,7 @@
  * @return #GS1_LINTER_NOT_ISO3166_ALPHA2 if the data is not a alpha-2 country code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -80,7 +82,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 	 *
 	 */
 #ifdef GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP
-#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc, valid) GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP(cc, valid)
+#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc, cc_len, valid) GS1_LINTER_CUSTOM_ISO3166ALPHA2_LOOKUP(cc, cc_len, valid)
 #else
 
 	/*
@@ -122,9 +124,9 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 	};
 
 /// \cond
-#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc, valid) do {						\
+#define GS1_LINTER_ISO3166ALPHA2_LOOKUP(cc, cc_len, valid) do {					\
 	valid = 0;										\
-	if (strlen(cc) == 2 && cc[0] >= 'A' && cc[0] <= 'Z' && cc[1] >= 'A' && cc[1] <= 'Z') {	\
+	if (cc_len == 2 && cc[0] >= 'A' && cc[0] <= 'Z' && cc[1] >= 'A' && cc[1] <= 'Z') {	\
 		int v = (cc[0] - 'A') * 26 + cc[1] - 'A';					\
 		GS1_LINTER_BITFIELD_LOOKUP(v, iso3166alpha2, valid);				\
 	}											\
@@ -141,7 +143,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 	 * Ensure that the data is in the list.
 	 *
 	 */
-	GS1_LINTER_ISO3166ALPHA2_LOOKUP(data, valid);
+	GS1_LINTER_ISO3166ALPHA2_LOOKUP(data, data_len, valid);
 	if (GS1_LINTER_LIKELY(valid))
 		GS1_LINTER_RETURN_OK;
 
@@ -152,7 +154,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso3166alpha2(const char* cons
 	GS1_LINTER_RETURN_ERROR(
 		GS1_LINTER_NOT_ISO3166_ALPHA2,
 		0,
-		strlen(data)
+		data_len
 	);
 
 }

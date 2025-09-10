@@ -42,7 +42,8 @@
  * Used to ensure that the AI component has a valid alphanumeric check
  * character pair.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -64,7 +65,7 @@
  * may choose to support longer data inputs.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -112,44 +113,43 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 		['w'] = 79, ['x'] = 80, ['y'] = 81, ['z'] = 82
 	};
 
-	size_t pos, len;
+	size_t pos;
 	uint32_t sum = 0;	/* Sufficient for 97-prime implementation */
 
 	assert(data);
 
+
 	/*
-	 * Find length constraining data to the number of primes that we have.
+	 * Constrain data to the number of primes that we have.
 	 *
 	 */
-	for (len = 0; data[len] != '\0'; len++) {
-		if (GS1_LINTER_UNLIKELY(len >= sizeof(primes) / sizeof(primes[0]) + 2))
-			GS1_LINTER_RETURN_ERROR(
-				GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
-				0,
-				len + 1
-			);
-	}
+	if (GS1_LINTER_UNLIKELY(data_len > sizeof(primes) / sizeof(primes[0]) + 2))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
+			0,
+			data_len
+		);
 
 	/*
 	 * Data must include at least the check character pair.
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(len < 2))
+	if (GS1_LINTER_UNLIKELY(data_len < 2))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR,
 			0,
-			len
+			data_len
 		);
 
 	/*
 	 * Handling the two-character case now avoids conditionals later.
 	 *
 	 */
-	if (len == 2) {
+	if (data_len == 2) {
 		if (GS1_LINTER_UNLIKELY(data[0] != '2' || data[1] != '2'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INCORRECT_CHECK_PAIR,
-				len - 2,
+				data_len - 2,
 				2
 			);
 		GS1_LINTER_RETURN_OK;
@@ -170,21 +170,21 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * positions in CSET 32.
 	 *
 	 */
-	for (pos = 0; pos < len - 2; pos++) {
+	for (pos = 0; pos < data_len - 2; pos++) {
 		if (GS1_LINTER_UNLIKELY(cset82_weights[(unsigned char)data[pos]] == 0))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_CSET82_CHARACTER,
 				pos,
 				1
 			);
-		sum += (unsigned int)(cset82_weights[(unsigned char)data[pos]] - 1) * primes[len - 3 - pos];
+		sum += (unsigned int)(cset82_weights[(unsigned char)data[pos]] - 1) * primes[data_len - 3 - pos];
 	}
 	sum %= 1021;	/* Overflow not possible with uint32_t */
 
-	if (GS1_LINTER_UNLIKELY(data[len-2] != cset32[sum >> 5] || data[len-1] != cset32[sum & 31]))
+	if (GS1_LINTER_UNLIKELY(data[data_len-2] != cset32[sum >> 5] || data[data_len-1] != cset32[sum & 31]))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INCORRECT_CHECK_PAIR,
-			len - 2,
+			data_len - 2,
 			2
 		);
 

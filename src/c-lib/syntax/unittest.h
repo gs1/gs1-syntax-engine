@@ -30,7 +30,7 @@
 #define UNIT_TEST_PASS(f, g) DO_UNIT_TEST(1, f, g, 0, NULL, __FILE__, __LINE__)
 #define UNIT_TEST_FAIL(f, g, e, h) DO_UNIT_TEST(0, f, g, e, h, __FILE__, __LINE__)
 
-static void DO_UNIT_TEST(int should_succeed, gs1_lint_err_t (*fn)(const char *, size_t *, size_t *), const char *data, gs1_lint_err_t expect_err, const char *expect_highlight, const char *file, int line) {
+static void DO_UNIT_TEST(int should_succeed, gs1_lint_err_t (*fn)(const char *, size_t, size_t *, size_t *), const char *data, gs1_lint_err_t expect_err, const char *expect_highlight, const char *file, int line) {
 
 	gs1_lint_err_t err;
 	size_t err_pos[1], err_len[1];
@@ -41,7 +41,7 @@ static void DO_UNIT_TEST(int should_succeed, gs1_lint_err_t (*fn)(const char *, 
 	snprintf(&casestr[strlen(casestr)], sizeof(casestr) - strlen(casestr), " %s:%d", file, line);
 	TEST_CASE(casestr);
 
-	err = (fn)(data, err_pos, err_len);
+	err = (fn)(data, strlen(data), err_pos, err_len);
 	TEST_ASSERT(err < __GS1_LINTER_NUM_ERRS);
 
 	if (should_succeed) {

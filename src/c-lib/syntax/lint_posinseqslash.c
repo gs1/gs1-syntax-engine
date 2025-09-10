@@ -36,7 +36,8 @@
  * Used to ensure that an AI component conforms to a "`<pos>/<end>`" format for
  * variable width `<pos>` and `<end>`.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -49,7 +50,7 @@
  * @return #GS1_LINTER_POSITION_EXCEEDS_END if the data contains a position number that is larger than the end position.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond
@@ -57,7 +58,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 #define E(i)    data[i + pos + 1]
 /// \endcond
 
-	size_t pos, len, slash_pos;
+	size_t pos, slash_pos;
 
 	assert(data);
 
@@ -65,18 +66,17 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 	 * First non-digit should be '/'
 	 *
 	 */
-	for (pos = 0; data[pos] >= '0' && data[pos] <= '9'; pos++);
+	for (pos = 0; pos < data_len && data[pos] >= '0' && data[pos] <= '9'; pos++);
 
 	/*
 	 * Format so far must be digits + '/'
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(pos == 0 || !data[pos] || data[pos] != '/')) {
-		while (data[pos]) pos++;
+	if (GS1_LINTER_UNLIKELY(pos == 0 || pos >= data_len || data[pos] != '/')) {
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
 			0,
-			pos
+			data_len
 		);
 	}
 
@@ -86,26 +86,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 	 * Validate that remaining characters are digits and measure length
 	 *
 	 */
-	for (pos++; data[pos]; pos++)
+	for (pos++; pos < data_len; pos++)
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9')) {
-			while (data[pos]) pos++;
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
 				0,
-				pos
+				data_len
 			);
 		}
-
-	len = pos;
 
 	/*
 	 * Must have digits after slash
 	 */
-	if (GS1_LINTER_UNLIKELY(slash_pos >= len - 1))
+	if (GS1_LINTER_UNLIKELY(slash_pos >= data_len - 1))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
 			0,
-			len
+			data_len
 		);
 
 	pos = slash_pos;
@@ -129,14 +126,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
 			pos + 1,
-			len - pos - 1
+			data_len - pos - 1
 		);
 
 	/*
 	 * Determine whether the position exceeds the end.
 	 *
 	 */
-	if (pos == len - pos - 1) {
+	if (pos == data_len - pos - 1) {
 		size_t i;
 		int compare = 0;		/* -1:P<E ; 0:P==E ; 1:P>E */
 		for (i = 0; i < pos && !compare; i++)
@@ -146,14 +143,14 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_POSITION_EXCEEDS_END,
 				0,
-				len
+				data_len
 			);
-	} else if (GS1_LINTER_UNLIKELY(pos > len - pos - 1))
+	} else if (GS1_LINTER_UNLIKELY(pos > data_len - pos - 1))
 		/* Non-zero prefix, so a length check is sufficient. */
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_POSITION_EXCEEDS_END,
 			0,
-			len
+			data_len
 		);
 
 	GS1_LINTER_RETURN_OK;

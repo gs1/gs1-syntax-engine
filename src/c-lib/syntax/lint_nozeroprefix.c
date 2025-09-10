@@ -33,7 +33,8 @@
 /**
  * Used to validate that a numeric AI component does not start with zero.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -45,17 +46,18 @@
  * @return #GS1_LINTER_NON_DIGIT_CHARACTER if the data contains non-digit characters.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	size_t pos;
 
 	assert(data);
 
+
 	/*
 	 * Data must not start with a zero
 	 */
-	if (GS1_LINTER_UNLIKELY(*data == '0'))
+	if (GS1_LINTER_UNLIKELY(data_len > 0 && *data == '0'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
 			0,
@@ -65,7 +67,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_nozeroprefix(const char* const
 	/*
 	 * Validate digits using direct range checking
 	 */
-	for (pos = 0; data[pos] != '\0'; pos++) {
+	for (pos = 0; pos < data_len; pos++) {
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,

@@ -37,7 +37,8 @@
  * Used to ensure that an AI component conforms to a PPTT format, where PP and
  * TT have equal width.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -52,15 +53,15 @@
  * @return #GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL if the data contains a piece number that is larger than the total piece count.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond
 #define P(i)	data[i]
-#define T(i)	data[len / 2 + i]
+#define T(i)	data[data_len / 2 + i]
 /// \endcond
 
-	size_t pos, len, i;
+	size_t pos, i;
 	int pieceiszero, totaliszero, compare;
 
 	assert(data);
@@ -69,24 +70,23 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * Data must consist of all digits.
 	 *
 	 */
-	for (pos = 0; data[pos]; pos++)
+	for (pos = 0; pos < data_len; pos++)
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,
 				pos,
 				1
 			);
-	len = pos;
 
 	/*
 	 * Data must be a non-zero, even number of characters.
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(len == 0 || len % 2 != 0))
+	if (GS1_LINTER_UNLIKELY(data_len == 0 || data_len % 2 != 0))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL,
 			0,
-			len
+			data_len
 		);
 
 	/*
@@ -96,7 +96,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 */
 	pieceiszero = totaliszero = 1;
 	compare = 0;				/* -1:P<T ; 0:P==T ; 1:P>T */
-	for (i = 0; i < len / 2; i++) {
+	for (i = 0; i < data_len / 2; i++) {
 		if (pieceiszero && P(i) != '0') pieceiszero = 0;
 		if (totaliszero && T(i) != '0') totaliszero = 0;
 		if (!compare && P(i) != T(i)) compare = P(i) < T(i) ? -1 : 1;
@@ -109,8 +109,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	if (GS1_LINTER_UNLIKELY(pieceiszero || totaliszero))
 		GS1_LINTER_RETURN_ERROR(
 			pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES,
-			pieceiszero ? 0 : len / 2,
-			len / 2
+			pieceiszero ? 0 : data_len / 2,
+			data_len / 2
 		);
 
 	/*
@@ -121,7 +121,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL,
 			0,
-			len
+			data_len
 		);
 
 	GS1_LINTER_RETURN_OK;

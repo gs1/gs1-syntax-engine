@@ -36,7 +36,8 @@
 /**
  * Used to ensure that an AI component conforms to HHMI format.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -51,30 +52,25 @@
  * @return #GS1_LINTER_ILLEGAL_MINUTE if the data contains an invalid minute.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len;
 	gs1_lint_err_t ret;
-	char buf[3] = { 0 };
 
 	assert(data);
-
-	len = strlen(data);
 
 	/*
 	 * Data must be four characters.
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(len != 4))
+	if (GS1_LINTER_UNLIKELY(data_len != 4))
 		GS1_LINTER_RETURN_ERROR(
-			len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,
+			data_len < 4 ? GS1_LINTER_HOUR_WITH_MINUTE_TOO_SHORT : GS1_LINTER_HOUR_WITH_MINUTE_TOO_LONG,
 			0,
-			len
+			data_len
 		);
 
-	memcpy(buf, data, 2);
-	ret = gs1_lint_hh(buf, err_pos, err_len);
+	ret = gs1_lint_hh(data, 2, err_pos, err_len);
 
 	assert(ret == GS1_LINTER_OK ||
 	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||
@@ -83,8 +79,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hhmi(const char* const data, s
 	if (GS1_LINTER_UNLIKELY(ret != GS1_LINTER_OK))
 		GS1_LINTER_RETURN_ERROR(ret, *err_pos, *err_len);
 
-	memcpy(buf, data+2, 2);
-	ret = gs1_lint_mi(buf, err_pos, err_len);
+	ret = gs1_lint_mi(data + 2, 2, err_pos, err_len);
 
 	assert(ret == GS1_LINTER_OK ||
 	       ret == GS1_LINTER_NON_DIGIT_CHARACTER ||

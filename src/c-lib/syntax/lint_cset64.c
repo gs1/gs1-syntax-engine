@@ -44,8 +44,8 @@
  * Note: The length of the component is validated by the framework that calls
  * this function.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -56,7 +56,7 @@
  *         non-CSET 64 character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -74,15 +74,15 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset64(const char* const data,
 
 	assert(data);
 
+
 	/*
 	 * Count padding characters from the end
 	 *
 	 */
-	len = strlen(data);
-	for (pads = 0; pads < len && data[len - pads - 1] == '='; pads++);
-	len -= pads;
+	for (pads = 0; pads < data_len && data[data_len - pads - 1] == '='; pads++);
+	len = data_len - pads;
 
-	if (GS1_LINTER_UNLIKELY(pads > 2 || (pads > 0 && (len + pads) % 3 != 0)))
+	if (GS1_LINTER_UNLIKELY(pads > 2 || (pads > 0 && data_len % 3 != 0)))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INVALID_CSET64_PADDING,
 			len,

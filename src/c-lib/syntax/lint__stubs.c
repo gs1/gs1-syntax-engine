@@ -32,10 +32,12 @@
 #define GS1_LINTER_STUB(linter)					\
 GS1_SYNTAX_DICTIONARY_API DEPRECATED gs1_lint_err_t linter(	\
 				const char* const data,		\
+				size_t data_len,		\
 				size_t* const err_pos,		\
 				size_t* const err_len)		\
 {								\
 	(void)data;						\
+	(void)data_len;						\
 	(void)err_pos;						\
 	(void)err_len;						\
 	GS1_LINTER_RETURN_OK;					\

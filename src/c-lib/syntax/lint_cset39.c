@@ -42,8 +42,8 @@
  * Note: The length of the component is validated by the framework that calls
  * this function.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -54,7 +54,7 @@
  *         non-CSET 39 character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset39(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset39(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -72,11 +72,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_cset39(const char* const data,
 
 	assert(data);
 
+
 	/*
 	 * Validate character set using bitfield lookup
 	 *
 	 */
-	for (pos = 0; data[pos] != '\0'; pos++) {
+	for (pos = 0; pos < data_len; pos++) {
 		int valid;
 		GS1_LINTER_BITFIELD_LOOKUP((unsigned char)data[pos], cset39_bitfield, valid);
 		if (GS1_LINTER_UNLIKELY(!valid))

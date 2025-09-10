@@ -43,7 +43,8 @@
  * Used to ensure that an AI component conforms to the YYMMDD or YYMM00
  * formats.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -58,7 +59,7 @@
  * @return #GS1_LINTER_ILLEGAL_DAY if the data contains an invalid day of the month.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond
@@ -66,16 +67,27 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 /// \endcond
 
 	size_t pos;
-	char yyyymmdd[9] = {0};
+	char yyyymmdd[8];
 	gs1_lint_err_t ret;
 
 	assert(data);
 
 	/*
+	 * Data must be six characters.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(data_len != 6))
+		GS1_LINTER_RETURN_ERROR(
+			(data_len < 6) ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
+			0,
+			data_len
+		);
+
+	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	for (pos = 0; pos < 6 && data[pos]; pos++) {
+	for (pos = 0; pos < 6; pos++) {
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,
@@ -83,17 +95,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 				1
 			);
 	}
-
-	/*
-	 * Data must be six characters.
-	 *
-	 */
-	if (GS1_LINTER_UNLIKELY(pos != 6 || data[6]))
-		GS1_LINTER_RETURN_ERROR(
-			(pos < 6) ? GS1_LINTER_DATE_TOO_SHORT : GS1_LINTER_DATE_TOO_LONG,
-			0,
-			pos + (data[pos] ? 1 : 0)
-		);
 
 	memcpy(yyyymmdd + 2, data, 6);
 
@@ -109,7 +110,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_yymmd0(const char* const data,
 		yyyymmdd[0] = '2'; yyyymmdd[1] = '1';
 	}
 
-	ret = gs1_lint_yyyymmd0(yyyymmdd, err_pos, err_len);
+	ret = gs1_lint_yyyymmd0(yyyymmdd, 8, err_pos, err_len);
 
 	assert(ret == GS1_LINTER_OK ||
 	       ret == GS1_LINTER_ILLEGAL_MONTH ||

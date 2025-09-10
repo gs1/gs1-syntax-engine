@@ -39,8 +39,8 @@
 /**
  * Use to ensure that the AI component has a valid numeric check digit.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -53,23 +53,20 @@
  *         character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	int weight;
+	size_t pos;
 	int parity = 0;
-	const char *p;
-	size_t len;
 
 	assert(data);
-
-	len = strlen(data);
 
 	/*
 	 * Data must include at least the check digit.
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(*data == '\0'))
+	if (GS1_LINTER_UNLIKELY(data_len == 0))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT,
 			0,
@@ -85,22 +82,22 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	 * checksum, makes the overall sum a multiple of 10.
 	 *
 	 */
-	weight = len % 2 == 0 ? 3 : 1;
-	p = data;
-	while (*(p+1)) {
+	weight = data_len % 2 == 0 ? 3 : 1;
+	
+	for (pos = 0; pos < data_len - 1; pos++) {
 
 		/*
 		 * Data must consist of all digits.
 		 *
 		 */
-		if (GS1_LINTER_UNLIKELY(*p < '0' || *p > '9'))
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,
-				(size_t)(p - data),
+				pos,
 				1
 			);
 
-		parity += weight * (*p++ - '0');
+		parity += weight * (data[pos] - '0');
 		weight = 4 - weight;
 	}
 
@@ -108,18 +105,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	 * Check character must also be a digit.
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(*p < '0' || *p > '9'))
+	if (GS1_LINTER_UNLIKELY(data[data_len - 1] < '0' || data[data_len - 1] > '9'))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_NON_DIGIT_CHARACTER,
-			len - 1,
+			data_len - 1,
 			1
 		);
 	parity = (10 - parity % 10) % 10;
 
-	if (GS1_LINTER_UNLIKELY(parity + '0' != *p))
+	if (GS1_LINTER_UNLIKELY(parity + '0' != data[data_len - 1]))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_INCORRECT_CHECK_DIGIT,
-			len - 1,
+			data_len - 1,
 			1
 		);
 

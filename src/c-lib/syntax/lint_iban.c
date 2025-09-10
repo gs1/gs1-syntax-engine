@@ -46,7 +46,8 @@
  * Used to validate that an AI component conforms to the format required for an
  * IBAN.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -64,12 +65,11 @@
  *         are not a valid ISO 3166 alpha-2 country code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	char cc[3] = {0};
 	gs1_lint_err_t ret;
-	size_t len = 0, pos;
+	size_t pos;
 	unsigned int csum = 0;
 	unsigned char weight;
 
@@ -93,19 +93,18 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 	 * Require at least 4 characters before main loop
 	 *
 	 */
-	if (GS1_LINTER_UNLIKELY(!data[0] || !data[1] || !data[2] || !data[3]))
+	if (GS1_LINTER_UNLIKELY(data_len < 4))
 		GS1_LINTER_RETURN_ERROR(
 			GS1_LINTER_IBAN_TOO_SHORT,
 			0,
-			strlen(data)
+			data_len
 		);
 
 	/*
 	 * Validate the leading two-character country code
 	 *
 	 */
-	memcpy(cc, data, 2);
-	ret = gs1_lint_iso3166alpha2(cc, err_pos, err_len);
+	ret = gs1_lint_iso3166alpha2(data, 2, err_pos, err_len);
 	assert(ret == GS1_LINTER_OK || ret == GS1_LINTER_NOT_ISO3166_ALPHA2);
 	if (GS1_LINTER_UNLIKELY(ret == GS1_LINTER_NOT_ISO3166_ALPHA2))
 		GS1_LINTER_RETURN_ERROR(
@@ -114,46 +113,36 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 			2
 		);
 
-	pos = 4;	/* Start at first data character after the check characters */
-	do {
-		if (GS1_LINTER_UNLIKELY(pos > IBAN_MAX_LENGTH)) {
-			while (data[pos]) pos++;
-			GS1_LINTER_RETURN_ERROR(
-				GS1_LINTER_IBAN_TOO_LONG,
-				0,
-				pos
-			);
-		}
+	if (GS1_LINTER_UNLIKELY(data_len > IBAN_MAX_LENGTH))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_IBAN_TOO_LONG,
+			0,
+			data_len
+		);
 
-		/*
-		 * Wrap at end of data and record length
-		 *
-		 */
-		if (!data[pos]) {
-			if (GS1_LINTER_UNLIKELY(pos <= IBAN_MIN_LENGTH))
-				GS1_LINTER_RETURN_ERROR(
-					GS1_LINTER_IBAN_TOO_SHORT,
-					0,
-					pos
-				);
-			len = pos;
-			pos = 0;
-		}
+	if (GS1_LINTER_UNLIKELY(data_len <= IBAN_MIN_LENGTH))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_IBAN_TOO_SHORT,
+			0,
+			data_len
+		);
 
-		weight = iban_weights[(unsigned char)data[pos]];
+	/* Process characters from position 4 to end, then positions 0-3 */
+	for (pos = 4; pos < data_len + 4; pos++) {
+		size_t actual_pos = (pos < data_len) ? pos : (pos - data_len);
+		
+		weight = iban_weights[(unsigned char)data[actual_pos]];
 		if (GS1_LINTER_UNLIKELY(weight == 0))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_IBAN_CHARACTER,
-				pos,
+				actual_pos,
 				1
 			);
 
 		csum *= weight <= 10 ? 10 : 100;
 		csum += weight - 1;
 		csum %= 97;
-		pos++;
-
-	} while (pos < 4 || len == 0);  /* Until we wrap and pass the CC */
+	}
 
 	if (GS1_LINTER_UNLIKELY(csum != 1))
 		GS1_LINTER_RETURN_ERROR(

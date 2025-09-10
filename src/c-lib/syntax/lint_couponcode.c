@@ -1,5 +1,5 @@
 /*
- * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2025 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
  * Used to ensure that an AI component conforms to the North American Coupon
  * Code (NACC) specification, as carried in AI (8110).
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -181,16 +181,15 @@
  *         contains an optional field 9 whose Don't Multiply Flag is invalid.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	gs1_lint_err_t ret;
 	size_t pos;
 	int vli;
 	const char *p, *q;
-	char expiry_date[7] = {0};
+	const char *expiry_date_p = NULL;
 	int expiry_set = 0;
-	char gcp[14] = {0};
 
 	assert(data);
 
@@ -198,7 +197,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Data must consist of all digits.
 	 *
 	 */
-	for (pos = 0; data[pos] != '\0'; pos++) {
+	for (pos = 0; pos < data_len; pos++) {
 		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_NON_DIGIT_CHARACTER,
@@ -208,8 +207,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	}
 
 	p = data;
-	q = data + pos;
-
+	q = data + data_len;
 
 	/*
 	 * Validate that the GCP follows its VLI and has the corresponding
@@ -243,9 +241,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 * Validate the GCP with the "gcppos1" linter.
 	 *
 	 */
-	memcpy(gcp, p, (size_t)vli);
-	gcp[vli] = '\0';
-	ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+	ret = gs1_lint_gcppos1(p, (size_t)vli, err_pos, err_len);
 
 	assert (ret == GS1_LINTER_OK ||
 		ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -507,9 +503,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 *
 		 */
 		if (vli > 0) {
-			memcpy(gcp, p, (size_t)vli);
-			gcp[vli] = '\0';
-			ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+			ret = gs1_lint_gcppos1(p, (size_t)vli, err_pos, err_len);
 
 			assert (ret == GS1_LINTER_OK ||
 				ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -640,9 +634,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 *
 		 */
 		if (vli > 0) {
-			memcpy(gcp, p, (size_t)vli);
-			gcp[vli] = '\0';
-			ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+			ret = gs1_lint_gcppos1(p, (size_t)vli, err_pos, err_len);
 
 			assert (ret == GS1_LINTER_OK ||
 				ret == GS1_LINTER_INVALID_GCP_PREFIX ||
@@ -681,8 +673,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
 			);
 
-		memcpy(expiry_date, p, 6);
-		ret = gs1_lint_yymmdd(expiry_date, err_pos, err_len);
+		expiry_date_p = p;
+		ret = gs1_lint_yymmdd(p, 6, err_pos, err_len);
 
 		assert(ret == GS1_LINTER_OK ||
 		       ret == GS1_LINTER_DATE_TOO_SHORT ||
@@ -714,7 +706,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 	 */
 	if (p < q && *p == '4') {
 
-		char start_date[7] = {0};
+		const char *start_date_p;
 
 		/*
 		 * Validate that the start date is in YYMMDD format.
@@ -727,8 +719,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 				(p == q) ? (size_t)(q - data) : (size_t)(q - p)
 			);
 
-		memcpy(start_date, p, 6);
-		ret = gs1_lint_yymmdd(start_date, err_pos, err_len);
+		start_date_p = p;
+		ret = gs1_lint_yymmdd(p, 6, err_pos, err_len);
 
 		assert(ret == GS1_LINTER_OK ||
 		       ret == GS1_LINTER_DATE_TOO_SHORT ||
@@ -749,7 +741,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * not precede the start date.
 		 *
 		 */
-		if (GS1_LINTER_UNLIKELY(expiry_set && strcmp(start_date, expiry_date) > 0))
+		if (GS1_LINTER_UNLIKELY(expiry_set && memcmp(start_date_p, expiry_date_p, 6) > 0))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_COUPON_EXPIRATION_BEFORE_START,
 				(size_t)(p - data - 8),
@@ -836,9 +828,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_couponcode(const char* const d
 		 * Validate the GCP/GLN with the "gcppos1" linter.
 		 *
 		 */
-		memcpy(gcp, p, (size_t)vli);
-		gcp[vli] = '\0';
-		ret = gs1_lint_gcppos1(gcp, err_pos, err_len);
+		ret = gs1_lint_gcppos1(p, (size_t)vli, err_pos, err_len);
 
 		assert (ret == GS1_LINTER_OK ||
 			ret == GS1_LINTER_INVALID_GCP_PREFIX ||

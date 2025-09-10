@@ -39,7 +39,8 @@
 /**
  * Used to ensure that an AI component conforms with correct percent encoding.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted. Must not
  *                  be `NULL`.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
@@ -51,14 +52,12 @@
  *         invalid percent sequence.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	const char *p;
+	size_t pos;
 
 	assert(data);
-
-	p = data;
 
 	/*
 	 * Find each instance of "%" in the data and ensure that there are at
@@ -66,27 +65,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, 
 	 * represent a hex value.
 	 *
 	 */
-	while ((p = strchr(p, '%')) != NULL) {
+	for (pos = 0; pos < data_len; pos++) {
+		if (data[pos] == '%') {
+			if (GS1_LINTER_UNLIKELY(pos + 2 >= data_len)) {
+				GS1_LINTER_RETURN_ERROR(
+					GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+					pos,
+					data_len - pos
+				);
+			}
 
-		if (GS1_LINTER_UNLIKELY(!p[1] || !p[2])) {
-			size_t remaining = 0;
-			if (p[1]) remaining = p[2] ? 2 : 1;
-			GS1_LINTER_RETURN_ERROR(
-				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
-				(size_t)(p - data),
-				remaining + 1
-			);
+			if (GS1_LINTER_UNLIKELY(!isxdigit(data[pos + 1]) || !isxdigit(data[pos + 2])))
+				GS1_LINTER_RETURN_ERROR(
+					GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+					pos,
+					3
+				);
+
+			pos += 2;  /* Skip the two hex digits, loop will increment past '%' */
 		}
-
-		if (GS1_LINTER_UNLIKELY(!isxdigit(p[1]) || !isxdigit(p[2])))
-			GS1_LINTER_RETURN_ERROR(
-				GS1_LINTER_INVALID_PERCENT_SEQUENCE,
-				(size_t)(p - data),
-				3
-			);
-
-		p += 3;
-
 	}
 
 	GS1_LINTER_RETURN_OK;

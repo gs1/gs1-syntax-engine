@@ -133,29 +133,34 @@ do {										\
  * @brief Perform a binary search for a search term in a sorted set of strings.
  *
  * @param [in] needle A search term string to be exactly matched.
+ * @param [in] needle_len Length of the needle string.
  * @param [in] haystack A array of strings to be searched. The array must be
- *                      otherwise the matching behaviour is undefined.
+ *                      sorted, otherwise the matching behaviour is undefined.
  * @param [out] valid Set to `1` if `needle` is found in `haystack`, otherwise
  *                    set to `0`.
  *
  */
-#define GS1_LINTER_BINARY_SEARCH(needle, haystack, valid)	\
-do {								\
-	size_t s = 0;						\
-	size_t e = sizeof(haystack) / sizeof(haystack[0]);	\
-	valid = 0;						\
-	while (s < e) {						\
-		const size_t m = s + (e - s) / 2;		\
-		const int cmp = strcmp(haystack[m], needle);	\
-		if (cmp < 0)					\
-			s = m + 1;				\
-		else if (cmp > 0)				\
-			e = m;					\
-		else {						\
-			valid = 1;				\
-			break;					\
-		}						\
-	}							\
+#define GS1_LINTER_BINARY_SEARCH(needle, needle_len, haystack, valid)	\
+do {									\
+	size_t s = 0;							\
+	size_t e = sizeof(haystack) / sizeof(haystack[0]);		\
+	valid = 0;							\
+	while (s < e) {							\
+		const size_t m = s + (e - s) / 2;			\
+		const size_t haystack_len = strlen(haystack[m]);	\
+		const size_t min_len = needle_len < haystack_len ?	\
+			needle_len : haystack_len;			\
+		int cmp = memcmp(needle, haystack[m], min_len);		\
+		if (cmp == 0 && needle_len != haystack_len)		\
+			cmp = needle_len < haystack_len ? -1 : 1;	\
+		if (cmp == 0) {						\
+			valid = 1;					\
+			break;						\
+		} else if (cmp < 0)					\
+			e = m;						\
+		else							\
+			s = m + 1;					\
+	}								\
 } while (0)
 
 #endif  /* GS1_SYNTAXDICTIONARY_UTILS_H */
