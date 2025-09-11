@@ -65,8 +65,7 @@
  *         - `valid`: Set to 1 if the lookup was successful. Otherwise 0.
  *
  * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
- * @param [in] data_len Length of the data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [in] data_len Length of the data parameter.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.

@@ -37,8 +37,7 @@
  * Used to ensure that an AI component conforms to the YYYYMMDD or YYYYMM00 formats.
  *
  * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
- * @param [in] data_len Length of the data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
