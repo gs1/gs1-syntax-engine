@@ -74,7 +74,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, 
 				);
 			}
 
-			if (GS1_LINTER_UNLIKELY(!isxdigit(data[pos + 1]) || !isxdigit(data[pos + 2])))
+			if (GS1_LINTER_UNLIKELY(!isxdigit((int)data[pos + 1]) || !isxdigit((int)data[pos + 2])))
 				GS1_LINTER_RETURN_ERROR(
 					GS1_LINTER_INVALID_PERCENT_SEQUENCE,
 					pos,

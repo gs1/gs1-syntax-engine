@@ -124,7 +124,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_mediatype(const char* const da
 /// \cond
 #define GS1_LINTER_MEDIA_TYPE_LOOKUP(cc, cc_len, valid) do {			\
 	valid = 0;								\
-	if (cc_len == 2 && isdigit(cc[0]) && isdigit(cc[1])) {		\
+	if (cc_len == 2 && isdigit((int)cc[0]) && isdigit((int)cc[1])) {	\
 		int v = (cc[0] - '0') * 10 + (cc[1] - '0');			\
 		GS1_LINTER_BITFIELD_LOOKUP(v, mediatypes, valid);		\
 	}									\

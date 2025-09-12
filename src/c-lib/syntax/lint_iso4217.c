@@ -131,12 +131,12 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 	};
 
 /// \cond
-#define GS1_LINTER_ISO4217_LOOKUP(cc, cc_len, valid) do {				\
-	valid = 0;									\
-	if (cc_len == 3 && isdigit(cc[0]) && isdigit(cc[1]) && isdigit(cc[2])) {	\
-		int v = (cc[0] - '0') * 100 + (cc[1] - '0') * 10 + cc[2] - '0';		\
-		GS1_LINTER_BITFIELD_LOOKUP(v, iso4217, valid);				\
-	}										\
+#define GS1_LINTER_ISO4217_LOOKUP(cc, cc_len, valid) do {					\
+	valid = 0;										\
+	if (cc_len == 3 && isdigit((int)cc[0]) && isdigit((int)cc[1]) && isdigit((int)cc[2])) {	\
+		int v = (cc[0] - '0') * 100 + (cc[1] - '0') * 10 + cc[2] - '0';			\
+		GS1_LINTER_BITFIELD_LOOKUP(v, iso4217, valid);					\
+	}											\
 } while (0)
 /// \endcond
 
