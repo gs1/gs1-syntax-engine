@@ -39,7 +39,10 @@
 #define ssize_t ptrdiff_t
 #define alloca _alloca
 #else
-#include <alloca.h>
+#  if (defined(__GNUC__) && !defined(alloca) && !defined(__NetBSD__)) || defined(__NuttX__) || defined(_AIX) \
+        || (defined(__sun) && defined(__SVR4) /*Solaris*/)
+#    include <alloca.h>
+#  endif
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
