@@ -79,12 +79,12 @@ static inline __ATTR_CONST bool isBadDomainChar(char c) {
  *  Convenience alphas (deprecated)
  *
  */
-struct alpha_ai {
+struct alpha_ai_s {
 	char alpha[6];
 	char ai[5];
 };
 
-static const struct alpha_ai alpha_ai_map[] = {
+static const struct alpha_ai_s alpha_ai_map[] = {
 	{ "cpid",  "8010" },
 	{ "cpsn",  "8011" },
 	{ "cpv",   "22"   },
@@ -114,17 +114,36 @@ static const struct alpha_ai alpha_ai_map[] = {
  *  Return the AI entry corresponding to a convenience alpha
  *
  */
+struct alpha_len_s {
+	const char* alpha;
+	size_t len;
+};
+
 static __ATTR_PURE int compareAlphaAI(const void* const needle, const void* const haystack, const size_t index) {
-	const char* const alpha = (const char*)needle;
-	const struct alpha_ai* map = (const struct alpha_ai*)haystack;
-	return strcmp(map[index].alpha, alpha);
+
+	const struct alpha_len_s* const alpha_len = (const struct alpha_len_s*)needle;
+	const struct alpha_ai_s* map = (const struct alpha_ai_s*)haystack;
+	const size_t map_len = strlen(map[index].alpha);
+	const size_t min_len = (alpha_len->len < map_len) ? alpha_len->len : map_len;
+	int cmp;
+
+	cmp = memcmp(map[index].alpha, alpha_len->alpha, min_len);
+	if (cmp != 0)
+		return cmp;
+
+	if (map_len != alpha_len->len)
+		return (map_len > alpha_len->len) ? 1 : -1;
+
+	return 0;
+
 }
 
-static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char* const alpha) {
+static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char* const alpha, const size_t len) {
 
 	const char* ai;
 	const struct aiEntry *entry;
-	const ssize_t index = gs1_binarySearch(alpha, alpha_ai_map, SIZEOF_ARRAY(alpha_ai_map), compareAlphaAI, NULL);
+	struct alpha_len_s alpha_len = { .alpha = alpha, .len = len };
+	const ssize_t index = gs1_binarySearch(&alpha_len, alpha_ai_map, SIZEOF_ARRAY(alpha_ai_map), compareAlphaAI, NULL);
 
 	if (index < 0)
 		return NULL;
@@ -556,9 +575,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (ctx->permitConvenienceAlphas &&
 		    ailen >= 3 && ailen <= 5 &&
 		    !isdigit((int)*(p+1))) {		// Possible convenience alpha
-			char alpha[6] = { 0 };
-			memcpy(alpha, p+1, ailen);
-			entry = aiEntryFromAlpha(ctx, alpha);
+			entry = aiEntryFromAlpha(ctx, p+1, ailen);
 		}
 
 		if (!entry)
@@ -608,9 +625,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (ctx->permitConvenienceAlphas &&
 		    ailen >= 3 && ailen <= 5 &&
 		    !isdigit((int)*p)) {
-			char alpha[6] = { 0 };
-			memcpy(alpha, ai, ailen);
-			entry = aiEntryFromAlpha(ctx, alpha);
+			entry = aiEntryFromAlpha(ctx, ai, ailen);
 		}
 		if (entry)
 			fromAlpha = true;
