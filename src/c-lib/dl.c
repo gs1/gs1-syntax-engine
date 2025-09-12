@@ -555,7 +555,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 		if (ctx->permitConvenienceAlphas &&
 		    ailen >= 3 && ailen <= 5 &&
-		    !isdigit(*(p+1))) {			// Possible convenience alpha
+		    !isdigit((int)*(p+1))) {		// Possible convenience alpha
 			char alpha[6] = { 0 };
 			memcpy(alpha, p+1, ailen);
 			entry = aiEntryFromAlpha(ctx, alpha);
@@ -607,7 +607,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		ailen = (size_t)(r-p);
 		if (ctx->permitConvenienceAlphas &&
 		    ailen >= 3 && ailen <= 5 &&
-		    !isdigit(*p)) {
+		    !isdigit((int)*p)) {
 			char alpha[6] = { 0 };
 			memcpy(alpha, ai, ailen);
 			entry = aiEntryFromAlpha(ctx, alpha);

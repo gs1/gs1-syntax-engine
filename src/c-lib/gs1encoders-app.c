@@ -30,6 +30,9 @@
 static char *inpStr;
 
 // Replacement for the deprecated gets(3) function
+#ifdef gets
+#undef gets
+#endif
 #define gets(i) _gets(i)
 
 static char* _gets(char* const in) {
