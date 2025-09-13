@@ -184,9 +184,12 @@ static bool validateParity(uint8_t *str, size_t len) {
 }
 
 
-static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
+static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr,
+					 char* const outStr, size_t *outStr_len, int length) {
 
 	size_t dataStr_len = strlen(dataStr);
+	char *primary_out;
+
 	if (dataStr_len != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
 		if (ctx->addCheckDigit)
 			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS_WITHOUT_CHECK_DIGIT, length - 1);
@@ -200,15 +203,17 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 		return false;
 	}
 
-	memcpy(primaryStr, dataStr, dataStr_len);
-	primaryStr[dataStr_len] = '\0';
+	primary_out = outStr + *outStr_len;
+	memcpy(primary_out, dataStr, dataStr_len);
+	*outStr_len += dataStr_len;
 
-	if (ctx->addCheckDigit) {
-		primaryStr[dataStr_len++] = '-';
-		primaryStr[dataStr_len] = '\0';
-	}
+	if (ctx->addCheckDigit)
+		outStr[(*outStr_len)++] = '-';
 
-	if (!validateParity((uint8_t*)primaryStr, dataStr_len) && !ctx->addCheckDigit) {
+	outStr[*outStr_len] = '\0';
+
+	if (!validateParity((uint8_t*)primary_out, (size_t)(outStr + *outStr_len - primary_out)) &&
+	    !ctx->addCheckDigit) {
 		SET_ERR(PRIMARY_DATA_CHECK_DIGIT_IS_INCORRECT);
 		return false;
 	}
@@ -221,12 +226,12 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	char* cc = NULL;
-	char primaryStr[15];
 	const char *pad;
 	const char *dataStr;
 	int length, aizeros;
 	char* ret;
 	size_t outStr_len = 0;
+	char* primary_data_out;
 
 	assert(ctx);
 
@@ -319,24 +324,25 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (strncmp(dataStr, "^01", 3) == 0)
 			dataStr += 3;
 
-		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
-			goto fail;
-
-		// GS1 DataBar Limited is restricted to low-valued inputs
-		if (ctx->sym == gs1_encoder_sDataBarLimited) {
-			if (atof((char*)primaryStr) > 19999999999999.) {
-				SET_ERR(PRIMARY_DATA_IS_TOO_LARGE);
-				goto fail;
-			}
-		}
-
 		ctx->outStr[outStr_len++] = ']';
 		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
 		outStr_len += 2;
 		memcpy(ctx->outStr + outStr_len, "01", 2);
 		outStr_len += 2;
 		ctx->outStr[outStr_len] = '\0';
-		outStr_len = scancat(ctx->outStr, primaryStr, outStr_len);
+
+		primary_data_out = ctx->outStr + outStr_len;
+
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, ctx->outStr, &outStr_len, 14))
+			goto fail;
+
+		// GS1 DataBar Limited is restricted to low-valued inputs
+		if (ctx->sym == gs1_encoder_sDataBarLimited) {
+			if (atof(primary_data_out) > 19999999999999.) {
+				SET_ERR(PRIMARY_DATA_IS_TOO_LARGE);
+				goto fail;
+			}
+		}
 
 		if (cc) {
 			if (*cc != '^')
@@ -373,17 +379,16 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		if (strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
 			dataStr += aizeros;
 
-		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
-			goto fail;
-
 		ctx->outStr[outStr_len++] = ']';
 		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
 		outStr_len += 2;
-		if (*pad) {
+		if (*pad)
 			ctx->outStr[outStr_len++] = *pad;
-		}
 		ctx->outStr[outStr_len] = '\0';
-		outStr_len = scancat(ctx->outStr, primaryStr, outStr_len);
+
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, ctx->outStr, &outStr_len, length))
+			goto fail;
+
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
