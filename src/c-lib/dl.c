@@ -856,6 +856,7 @@ add_query_param_to_ai_data:
 	// instead belong within path info
 	if (numPathAIs < MAX_AIS) {
 		int i;
+		char (*seq)[MAX_AI_LEN+1] = alloca((size_t)(numPathAIs + 1) * sizeof(*seq));
 
 		// Sort AIs to enable O(n) duplicate check
 		gs1_sortAIs(ctx);
@@ -897,8 +898,6 @@ add_query_param_to_ai_data:
 			// path info to see if it results in a valid
 			// key-qualifier sequence
 			for (j = 1; j <= numPathAIs; j++) {
-
-				char (*seq)[MAX_AI_LEN+1] = alloca((size_t)(numPathAIs + 1) * sizeof(*seq));
 
 				memcpy(&seq[0], &pathAIseq[0], (size_t)j * sizeof(seq[0]));
 				memcpy(seq[j], ai->aiEntry->ai, ai->aiEntry->ailen + 1);	// Includes NULL
