@@ -338,7 +338,7 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 		// GS1 DataBar Limited is restricted to low-valued inputs
 		if (ctx->sym == gs1_encoder_sDataBarLimited) {
-			if (atof(primary_data_out) > 19999999999999.) {
+			if (primary_data_out[0] >= '2') {	// 14-digits must be less than 2 * 10^13
 				SET_ERR(PRIMARY_DATA_IS_TOO_LARGE);
 				goto fail;
 			}
