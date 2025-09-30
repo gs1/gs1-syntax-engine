@@ -154,7 +154,7 @@ struct validationEntry {
 
 #include "gs1encoders.h"
 
-void gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table);
+bool gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table, bool quiet);
 void gs1_sortAIs(gs1_encoder* ctx);
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder *ctx, const char *ai, size_t ailen);
 bool existsInAIdata(const gs1_encoder *ctx, const char *ai, size_t ailen, const char *ignoreAI, const struct aiValue **matchedAI);

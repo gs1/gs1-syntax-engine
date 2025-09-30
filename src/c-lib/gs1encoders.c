@@ -53,16 +53,59 @@ __ATTR_CONST int gs1_encoder_getMaxDataStrLength(void) {
 }
 
 
-gs1_encoder* gs1_encoder_init(void* const mem) {
+gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts) {
 
-	gs1_encoder *ctx = NULL;
-	struct aiEntry *sd = NULL;
+	gs1_encoder *ctx			= NULL;
+	struct aiEntry *sd			= NULL;
+	bool syndictParseError			= false;
+
+	gs1_encoder_init_flags_t flags		= gs1_encoder_iDEFAULT;
+	gs1_encoder_init_status_t *status	= NULL;
+	char *msgBuf				= NULL;
+	size_t msgBufSize			= 0;
+
+	bool loadSyndict;
+	bool useEmbedded;
+	bool fallbackOnError;
+	bool quiet;
+
+	/*
+	 *  Extract from the part of the struct known by the user, as indicated by struct_size
+	 *
+	 */
+#define EXTRACT_OPT(f) do {										\
+	if (opts && opts->struct_size >= offsetof(gs1_encoder_init_opts_t, f) + sizeof(opts->f))	\
+		f = opts->f;										\
+} while (0)
+
+	EXTRACT_OPT(flags);
+	EXTRACT_OPT(status);
+	EXTRACT_OPT(msgBuf);
+	EXTRACT_OPT(msgBufSize);
+
+#undef EXTRACT_OPT
+
+	loadSyndict	= !(flags & gs1_encoder_iNO_SYNDICT);
+	useEmbedded	= !(flags & gs1_encoder_iNO_EMBEDDED);
+	fallbackOnError	= flags & gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR;
+	quiet		= flags & gs1_encoder_iQUIET;
+
+#define RETURN_FAIL(s, e) do {					\
+	if (status) *status = s;				\
+	if (msgBuf && msgBufSize > 0) {				\
+		strncpy(msgBuf, e, msgBufSize - 1);		\
+		msgBuf[msgBufSize - 1] = '\0';			\
+	}							\
+	if (ctx && !mem) GS1_ENCODERS_FREE(ctx);		\
+	return NULL;						\
+} while (0)
 
 	if (!mem) {  // No storage provided so allocate our own
 #ifndef NOMALLOC
 		ctx = GS1_ENCODERS_MALLOC(sizeof(gs1_encoder));
 #endif
-		if (unlikely(ctx == NULL)) return NULL;
+		if (unlikely(ctx == NULL))
+			RETURN_FAIL(GS1_INIT_FAILED_NO_MEM, "Failed to allocate memory for encoder context");
 	} else {  // Use the provided storage
 		ctx = mem;
 	}
@@ -89,22 +132,78 @@ gs1_encoder* gs1_encoder_init(void* const mem) {
 		.linterErrMarkup = { 0 }
 	}), sizeof(struct gs1_encoder));
 
+	if (status) *status = GS1_INIT_SUCCESS;
+	if (msgBuf && msgBufSize > 0)
+		msgBuf[0] = '\0';
+
+	// Try to load syntax dictionary if not disabled
 #ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
-	sd = gs1_loadSyntaxDictionary(ctx, NULL);
+	if (loadSyndict) {
+		sd = gs1_loadSyntaxDictionary(ctx, NULL, quiet);
+		if (!sd && ctx->err != gs1_encoder_eCANNOT_READ_FILE) {
+			syndictParseError = true;
+			if (!fallbackOnError)
+				RETURN_FAIL(GS1_INIT_FAILED_LOADING_SYNDICT, ctx->errMsg);
+		}
+	}
+#else
+	(void)loadSyndict;  // Suppress unused variable warning
 #endif
 
 	/*
 	 *  If parsing failed or EXCLUDE_SYNTAX_DICTIONARY_LOADER is defined
-	 *  then we will be calling gs1_setAItable with NULL which will load
-	 *  the embedded AI table, if it is available
+	 *  or syndict loading is disabled, then we will be calling gs1_setAItable
+	 *  with NULL which will load the embedded AI table, if it is available
 	 *
 	 */
-	gs1_setAItable(ctx, sd);
+	if (!sd) {
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
+		if (!useEmbedded)		// Disabled by flag
+			RETURN_FAIL(GS1_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table is disabled");
 
+		// Will fall back to embedded table. Set status, but not an error.
+		if (syndictParseError || (!loadSyndict && useEmbedded)) {
+			if (status) *status = GS1_INIT_FALLBACK_TO_EMBEDDED_TABLE;
+			if (msgBuf && msgBufSize > 0) {
+				strncpy(msgBuf, ctx->errMsg, msgBufSize - 1);
+				msgBuf[msgBufSize - 1] = '\0';
+			}
+		}
+#else
+		RETURN_FAIL(GS1_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table not available");
+#endif
+	}
+
+	if (!gs1_setAItable(ctx, sd, quiet)) {
+
+		gs1_encoder_init_status_t localStatus;
+
+		switch (ctx->err) {
+		case gs1_encoder_eFAILED_TO_MALLOC_FOR_KEY_QUALIFIERS:
+		case gs1_encoder_eFAILED_TO_REALLOC_FOR_KEY_QUALIFIERS:
+			localStatus = GS1_INIT_FAILED_NO_MEM;
+			break;
+		case gs1_encoder_eAI_TABLE_BROKEN_PREFIXES_DIFFER_IN_LENGTH:
+			localStatus = GS1_INIT_FAILED_AI_TABLE_CORRUPT;
+			break;
+		default:
+			localStatus = GS1_INIT_FAILED_NO_EMBEDDED_TABLE;
+			break;
+		}
+		RETURN_FAIL(localStatus, ctx->errMsg);
+
+	}
 	gs1_loadValidationTable(ctx);
 
 	return ctx;
 
+#undef RETURN_FAIL
+
+}
+
+
+gs1_encoder* gs1_encoder_init(void* const mem) {
+	return gs1_encoder_init_ex(mem, NULL);
 }
 
 

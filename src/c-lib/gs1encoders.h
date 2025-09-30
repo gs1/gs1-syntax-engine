@@ -403,6 +403,62 @@ enum gs1_encoder_validations {
 typedef enum gs1_encoder_validations gs1_encoder_validations_t;
 
 
+/// Initialisation flags for gs1_encoder_init_ex().
+enum gs1_encoder_init_flags {
+	gs1_encoder_iDEFAULT                   = 0,		///< Default: Use Syntax Dictionary if the file exists, otherwise fallback to the embedded AI table (if compiled in).
+	gs1_encoder_iNO_SYNDICT                = 1 << 0,	///< Disable use of the Syntax Dictionary, even if the file exists.
+	gs1_encoder_iNO_EMBEDDED               = 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
+	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR = 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing error with the Syntax Dictionary.
+	gs1_encoder_iQUIET                     = 1 << 3,	///< Suppress initialization error output to stdout.
+};
+
+
+/**
+ * @brief Equivalent to the `enum gs1_encoder_init_flags` type.
+ *
+ */
+typedef enum gs1_encoder_init_flags gs1_encoder_init_flags_t;
+
+
+/// Initialisation status codes returned by gs1_encoder_init_ex().
+enum gs1_encoder_init_status {
+	GS1_INIT_SUCCESS                    =  0,	///< Initialised successfully
+	GS1_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
+	GS1_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialization.
+	GS1_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
+	GS1_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
+	GS1_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
+};
+
+
+/**
+ * @brief Equivalent to the `enum gs1_encoder_init_status` type.
+ *
+ */
+typedef enum gs1_encoder_init_status gs1_encoder_init_status_t;
+
+
+/**
+ * @brief Initialisation options structure for gs1_encoder_init_ex().
+ *
+ * @note Legacy code will continue to work if new fields are added at the end.
+ */
+struct gs1_encoder_init_opts {
+	size_t struct_size;				///< Must be initialized to sizeof(gs1_encoder_init_opts_t)
+	gs1_encoder_init_flags_t flags;			///< Initialization flags (bitwise OR of gs1_encoder_init_flags values)
+	gs1_encoder_init_status_t *status;		///< Optional pointer to receive initialization status code (may be NULL)
+	char *msgBuf;					///< Optional buffer to receive error message (may be NULL)
+	size_t msgBufSize;				///< Size of msgBuf in bytes (0 if no buffer)
+};
+
+
+/**
+ * @brief Equivalent to the `struct gs1_encoder_init_opts` type.
+ *
+ */
+typedef struct gs1_encoder_init_opts gs1_encoder_init_opts_t;
+
+
 /**
  * @brief A gs1_encoder context.
  *
@@ -524,6 +580,27 @@ GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength(void);
  * @return ::gs1_encoder context on success, else NULL.
  */
 GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
+
+
+/**
+ * @brief Initialise a new ::gs1_encoder context with extended options.
+ *
+ * This is an extended version of gs1_encoder_init() that provides control over
+ * syntax dictionary loading behavior and reports detailed initialization status.
+ *
+ * @param [in] mem buffer to use for storage, or NULL for automatic allocation
+ * @param [in,out] opts Optional pointer to initialization options structure (may be NULL for defaults)
+ * @return ::gs1_encoder context on success, else NULL.
+ *
+ * @note If opts is provided, opts->struct_size must be initialized to sizeof(gs1_encoder_init_opts_t)
+ *
+ * @see gs1_encoder_init()
+ * @see gs1_encoder_instanceSize()
+ * @see gs1_encoder_init_opts
+ * @see gs1_encoder_init_flags
+ * @see gs1_encoder_init_status
+ */
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts);
 
 
 /**

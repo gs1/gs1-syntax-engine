@@ -431,7 +431,7 @@ fail:
 #undef error_v
 
 
-struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname) {
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname, bool quiet) {
 
 	struct aiEntry *sd;
 
@@ -442,8 +442,10 @@ struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fna
 	 *
 	 */
 	if ((sd = parseSyntaxDictionaryFile(ctx, filename)) == NULL) {
-		printf("\n*** Failed to parse Syntax Dictionary file: %s\n", filename);
-		printf("*** %s\n", ctx->errMsg);
+		if (!quiet) {
+			printf("\n*** Failed to parse Syntax Dictionary file: %s\n", filename);
+			printf("*** %s\n", ctx->errMsg);
+		}
 	}
 
 	return sd;

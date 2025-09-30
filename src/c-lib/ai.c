@@ -108,7 +108,7 @@ static inline __ATTR_PURE uint8_t aiLengthByPrefix(const gs1_encoder* const ctx,
 }
 
 
-void gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable) {
+bool gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable, bool quiet) {
 
 	struct aiEntry *e;
 
@@ -134,9 +134,12 @@ redo:
 		aiTable = embedded_ai_table;
 		ctx->aiTableIsDynamic = false;
 #else
-		printf("*** Embedded AI table is not available.\n");
-		printf("***  Unable to continue. STOPPING.\n");
-		abort();
+		if (!quiet) {
+			printf("*** Embedded AI table is not available.\n");
+			printf("***  Unable to continue. STOPPING.\n");
+		}
+		strcpy(ctx->errMsg, "Embedded AI table is not available");
+		return false;
 #endif
 	}
 
@@ -152,23 +155,27 @@ redo:
 	if (!gs1_populateDLkeyQualifiers(ctx))
 		goto fail;
 
-	return;
+	return true;
 
 fail:
 
-	printf("*** Failed to process the AI table.\n");
-	printf("*** %s\n", ctx->errMsg);
+	if (!quiet) {
+		printf("*** Failed to process the AI table.\n");
+		printf("*** %s\n", ctx->errMsg);
+	}
 
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 	if (aiTable != embedded_ai_table) {
-		printf("*** Loading embedded AI table as a fallback!\n");
+		if (!quiet)
+			printf("*** Loading embedded AI table as a fallback!\n");
 		aiTable = embedded_ai_table;
 		goto redo;
 	}
 #endif
 
-	printf("*** Unable to continue. STOPPING.\n");
-	abort();
+	if (!quiet)
+		printf("*** Unable to continue. STOPPING.\n");
+	return false;
 
 }
 
