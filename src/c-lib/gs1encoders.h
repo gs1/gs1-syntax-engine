@@ -79,8 +79,8 @@
  *
  * \note
  * Using the library always begins by initialising the library with
- * gs1_encoder_init() and finishes by releasing the library with
- * gs1_encoder_free().
+ * gs1_encoder_init() or gs1_encoder_init_ex() and finishes by releasing the
+ * library with gs1_encoder_free().
  *
  * \note
  * Unless otherwise specified, the getter functions return pointers to
@@ -409,7 +409,7 @@ enum gs1_encoder_init_flags {
 	gs1_encoder_iNO_SYNDICT                = 1 << 0,	///< Disable use of the Syntax Dictionary, even if the file exists.
 	gs1_encoder_iNO_EMBEDDED               = 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
 	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR = 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing error with the Syntax Dictionary.
-	gs1_encoder_iQUIET                     = 1 << 3,	///< Suppress initialization error output to stdout.
+	gs1_encoder_iQUIET                     = 1 << 3,	///< Suppress initialisation error output to stdout.
 };
 
 
@@ -424,7 +424,7 @@ typedef enum gs1_encoder_init_flags gs1_encoder_init_flags_t;
 enum gs1_encoder_init_status {
 	GS1_INIT_SUCCESS                    =  0,	///< Initialised successfully
 	GS1_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
-	GS1_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialization.
+	GS1_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialisation.
 	GS1_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
 	GS1_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
 	GS1_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
@@ -444,9 +444,9 @@ typedef enum gs1_encoder_init_status gs1_encoder_init_status_t;
  * @note Legacy code will continue to work if new fields are added at the end.
  */
 struct gs1_encoder_init_opts {
-	size_t struct_size;				///< Must be initialized to sizeof(gs1_encoder_init_opts_t)
+	size_t struct_size;				///< Must be initialised to sizeof(gs1_encoder_init_opts_t)
 	gs1_encoder_init_flags_t flags;			///< Initialization flags (bitwise OR of gs1_encoder_init_flags values)
-	gs1_encoder_init_status_t *status;		///< Optional pointer to receive initialization status code (may be NULL)
+	gs1_encoder_init_status_t *status;		///< Optional pointer to receive initialisation status code (may be NULL)
 	char *msgBuf;					///< Optional buffer to receive error message (may be NULL)
 	size_t msgBufSize;				///< Size of msgBuf in bytes (0 if no buffer)
 };
@@ -473,9 +473,9 @@ typedef struct gs1_encoder_init_opts gs1_encoder_init_opts_t;
  * only be modified using the public API functions provided by this library,
  * decorated with GS1_ENCODERS_API.
  *
- * A context is created by calling gs1_encoder_init() and destroyed by calling
- * gs1_encoder_free(), releasing all of the storage allocated by the library
- * for that instance.
+ * A context is created by calling gs1_encoder_init() or gs1_encoder_init_ex()
+ * and destroyed by calling gs1_encoder_free(), releasing all of the storage
+ * allocated by the library for that instance.
  *
  * \note
  * This struct is deliberately opaque and it's layout should be assumed to vary
@@ -583,16 +583,54 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 
 /**
- * @brief Initialise a new ::gs1_encoder context with extended options.
+ * @brief Initialise a new ::gs1_encoder context with the extended interface.
  *
  * This is an extended version of gs1_encoder_init() that provides control over
- * syntax dictionary loading behavior and reports detailed initialization status.
+ * Syntax Dictionary and embedded AI table loading behavior and reports
+ * detailed initialisation status.
  *
- * @param [in] mem buffer to use for storage, or NULL for automatic allocation
- * @param [in,out] opts Optional pointer to initialization options structure (may be NULL for defaults)
+ * Example of an extended initialisation:
+ *
+ * \code{.c}
+ *
+ * gs1_encoder *ctx;
+ * gs1_encoder_init_status_t status;
+ * char msg[256]		// Sufficient, otherwise would truncate
+ *
+ * gs1_encoder_init_opts_t opts = {
+ * 	.struct_size = sizeof(gs1_encoder_init_opts_t),
+ *
+ *	// Silent fallback to the embedded AI table on Syntax Dictionary parse errors
+ * 	.flags       = gs1_encoder_iQUIET|gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+ *
+ * 	.status      = &status,		// What happened?
+ * 	.msgBuf      = msg,		// Description of error or warning
+ * 	.msgBufSize  = sizeof(msg)
+ * };
+ *
+ * ctx = gs1_encoder_init_ex(NULL, &opts);
+ *
+ * // Initialisation failed, so do something with status or simply report the error
+ * if (ctx == NULL) {
+ * 	printf("Failed to initialise GS1 Encoders library!\n");
+ * 	if (*msg)
+ * 		printf("\n!!! Error: %s\n", msg);
+ * 	abort();
+ * }
+ *
+ * // Initialisation worked, but check for warnings
+ * if (status != GS1_INIT_SUCCESS && *msg)
+ * 	printf("\n!!! Warning: %s\n", msg);
+ *
+ * ...
+ * \endcode
+ *
+ * @param [in,out] mem buffer to use for storage, or NULL for automatic allocation
+ * @param [in,out] opts Optional pointer to initialisation options structure (may be NULL for defaults)
  * @return ::gs1_encoder context on success, else NULL.
  *
- * @note If opts is provided, opts->struct_size must be initialized to sizeof(gs1_encoder_init_opts_t)
+ * @note If opts is provided, `opts->struct_size` must be initialised to
+ * `sizeof(gs1_encoder_init_opts_t)`
  *
  * @see gs1_encoder_init()
  * @see gs1_encoder_instanceSize()
