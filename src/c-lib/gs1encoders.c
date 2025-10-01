@@ -105,7 +105,7 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 		ctx = GS1_ENCODERS_MALLOC(sizeof(gs1_encoder));
 #endif
 		if (unlikely(ctx == NULL))
-			RETURN_FAIL(GS1_INIT_FAILED_NO_MEM, "Failed to allocate memory for encoder context");
+			RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_NO_MEM, "Failed to allocate memory for encoder context");
 	} else {  // Use the provided storage
 		ctx = mem;
 	}
@@ -132,7 +132,7 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 		.linterErrMarkup = { 0 }
 	}), sizeof(struct gs1_encoder));
 
-	if (status) *status = GS1_INIT_SUCCESS;
+	if (status) *status = GS1_ENCODERS_INIT_SUCCESS;
 	if (msgBuf && msgBufSize > 0)
 		msgBuf[0] = '\0';
 
@@ -143,7 +143,7 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 		if (!sd && ctx->err != gs1_encoder_eCANNOT_READ_FILE) {
 			syndictParseError = true;
 			if (!fallbackOnError)
-				RETURN_FAIL(GS1_INIT_FAILED_LOADING_SYNDICT, ctx->errMsg);
+				RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT, ctx->errMsg);
 		}
 	}
 #else
@@ -159,18 +159,18 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 	if (!sd) {
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 		if (!useEmbedded)		// Disabled by flag
-			RETURN_FAIL(GS1_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table is disabled");
+			RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table is disabled");
 
 		// Will fall back to embedded table. Set status, but not an error.
 		if (syndictParseError || (!loadSyndict && useEmbedded)) {
-			if (status) *status = GS1_INIT_FALLBACK_TO_EMBEDDED_TABLE;
+			if (status) *status = GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE;
 			if (msgBuf && msgBufSize > 0) {
 				strncpy(msgBuf, ctx->errMsg, msgBufSize - 1);
 				msgBuf[msgBufSize - 1] = '\0';
 			}
 		}
 #else
-		RETURN_FAIL(GS1_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table not available");
+		RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table not available");
 #endif
 	}
 
@@ -181,13 +181,13 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 		switch (ctx->err) {
 		case gs1_encoder_eFAILED_TO_MALLOC_FOR_KEY_QUALIFIERS:
 		case gs1_encoder_eFAILED_TO_REALLOC_FOR_KEY_QUALIFIERS:
-			localStatus = GS1_INIT_FAILED_NO_MEM;
+			localStatus = GS1_ENCODERS_INIT_FAILED_NO_MEM;
 			break;
 		case gs1_encoder_eAI_TABLE_BROKEN_PREFIXES_DIFFER_IN_LENGTH:
-			localStatus = GS1_INIT_FAILED_AI_TABLE_CORRUPT;
+			localStatus = GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT;
 			break;
 		default:
-			localStatus = GS1_INIT_FAILED_NO_EMBEDDED_TABLE;
+			localStatus = GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE;
 			break;
 		}
 		RETURN_FAIL(localStatus, ctx->errMsg);

@@ -422,12 +422,12 @@ typedef enum gs1_encoder_init_flags gs1_encoder_init_flags_t;
 
 /// Initialisation status codes returned by gs1_encoder_init_ex().
 enum gs1_encoder_init_status {
-	GS1_INIT_SUCCESS                    =  0,	///< Initialised successfully
-	GS1_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
-	GS1_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialisation.
-	GS1_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
-	GS1_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
-	GS1_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
+	GS1_ENCODERS_INIT_SUCCESS                    =  0,	///< Initialised successfully
+	GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
+	GS1_ENCODERS_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialisation.
+	GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
+	GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
+	GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
 };
 
 
@@ -619,7 +619,7 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  * }
  *
  * // Initialisation worked, but check for warnings
- * if (status != GS1_INIT_SUCCESS && *msg)
+ * if (status != GS1_ENCODERS_INIT_SUCCESS && *msg)
  * 	printf("\n!!! Warning: %s\n", msg);
  *
  * ...

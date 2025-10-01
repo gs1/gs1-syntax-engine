@@ -189,7 +189,7 @@ int main(int argc, const char* const argv[]) {
 		return 1;
 	}
 
-	if (status != GS1_INIT_SUCCESS && *msg)
+	if (status != GS1_ENCODERS_INIT_SUCCESS && *msg)
 		printf("\n!!! Warning: %s\n", msg);
 
 
