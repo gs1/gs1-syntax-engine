@@ -47,9 +47,9 @@
 
 #ifdef __EMSCRIPTEN__
 #  define GS1_SYNTAX_DICTIONARY_API EMSCRIPTEN_KEEPALIVE
-#elif _WIN32
+#elif defined(_WIN32)
 #  define GS1_SYNTAX_DICTIONARY_API __declspec(dllexport)
-#elif __GNUC__ >= 4
+#elif defined(__GNUC__) && __GNUC__ >= 4
 #  define GS1_SYNTAX_DICTIONARY_API __attribute__((visibility ("default")))
 #else
 #  define GS1_SYNTAX_DICTIONARY_API
