@@ -954,7 +954,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 	int i, maxQualifiers, numQualifiers = -1;
 	const char *key = NULL;
-	size_t key_len;
+	size_t key_len = 0;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
 	bool emitFixed;
