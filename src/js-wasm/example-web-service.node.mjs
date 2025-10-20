@@ -1,10 +1,13 @@
 /*
- *  Basic node.js example web service that uses the JavaScript wrapper around
- *  the WASM build of the GS1 Barcode Syntax Engine.
+ *  Basic Node.js example web service that uses the WASM or JS-only build of
+ *  the GS1 Barcode Syntax Engine.
  *
  *  Requirements:
  *
- *    - Run with Node.js >= v18 for stable ES6 module support
+ *    - WASM or JS-only build of the Syntax Engine in the current directory or
+ *      the gs1encoder package installed via npm
+ *
+ *    - Any maintained version of Node.js
  *
  *  Copyright (c) 2022-2025 GS1 AISBL.
  *
@@ -138,6 +141,13 @@ if (argv.includes('/installservice') || argv.includes('/uninstallservice')) {
 
 // ------ Main processing -------
 
+/*
+ *  To run this example with an instance of gs1encoder that you have installed
+ *  from npm change the following import to:
+ *
+ *    import { GS1encoder } from "gs1encoder";
+ *
+ */
 import { GS1encoder } from "./gs1encoder.mjs";
 
 var gs1encoder = new GS1encoder();

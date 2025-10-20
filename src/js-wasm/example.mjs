@@ -1,6 +1,6 @@
 /*
  *  Event-driven functions for example HTML app. which uses the JavaScript
- *  wrapper around the WASM build of the GS1 Barcode Syntax Engine.
+ *  wrapper around the WASM or JS-only build of the GS1 Barcode Syntax Engine.
  *
  *  Copyright (c) 2022-2024 GS1 AISBL.
  *

@@ -1,18 +1,20 @@
 /*
- *  Basic node.js example for using the JavaScript wrapper around the WASM
- *  build of the GS1 Barcode Syntax Engine.
+ *  Basic node.js example for using the JavaScript wrapper around the WASM or
+ *  JS-only build of the GS1 Barcode Syntax Engine.
  *
  *  Requirements:
  *
- *    - Compile with emsdk >= 3.1.28 for correct ES6 module support
- *    - Run with Node.js >= v18 for stable ES6 module support and readline/promises
+ *    - WASM or JS-only build of the Syntax Engine in the current directory or
+ *      the gs1encoder package installed via npm
+ *
+ *    - Any maintained version of Node.js
  *
  *  The API reference for the native C library is available here:
  *
  *      https://gs1.github.io/gs1-syntax-engine/
  *
  *
- *  Copyright (c) 2022-2024 GS1 AISBL.
+ *  Copyright (c) 2022-2025 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -40,6 +42,13 @@ import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 const rl = readline.createInterface({ input, output });
 
+/*
+ *  To run this example with an instance of gs1encoder that you have installed
+ *  from npm change the following import to:
+ *
+ *    import { GS1encoder } from "gs1encoder";
+ *
+ */
 import { GS1encoder } from "./gs1encoder.mjs";
 
 var gs1encoder = new GS1encoder();
