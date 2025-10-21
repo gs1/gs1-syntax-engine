@@ -25,6 +25,23 @@
  *  limitations under the License.
  *
  *
+ *  Command line arguments:
+ *
+ *    /verbose                  Enable verbose debug logging
+ *    /logfile=<filename>       Write logs to file instead of stdout
+ *
+ *    /(un)installservice       Attempt to install/uninstall this example as a
+ *                              Windows service. Any other arguments (e.g.
+ *                              /verbose, /logfile=<filename>) are passed to
+ *                              the service.
+ *                              See the additional requirements at the bottom
+ *                              of this code.
+ *
+ *  Example startup with verbose logging as terminal output and to a file:
+ *
+ *    $ node example-web-service.node.mjs /verbose
+ *    $ node example-web-service.node.mjs /verbose /logfile=service.log
+ *
  *  Example calls:
  *
  *    $ curl -i 'http://127.0.0.1:3030/aiDataStr?input=(02)12312312312319(99)ASDFEE&includeDataTitlesInHRI'
@@ -57,19 +74,88 @@
 "use strict";
 
 
-// ------ Argument handling -------
+/*
+ *  ------ User-defined tunables ------
+ *
+ */
+const bind = '127.0.0.1';  // "0.0.0.0" to allow remote connections
+const port = 3030;
 
+
+/*
+ *  ------ Argument processing -------
+ *
+ */
 import { argv } from 'process';
 
+// Defer to service processing
 if (argv.includes('/installservice') || argv.includes('/uninstallservice')) {
     await handleWindowsService();
     process.exit();
 }
 
+// Setup logging
+import { createWriteStream } from 'fs';
 
-// ------ Main processing -------
+var verbose = argv.some(arg => arg === '/verbose');
+var logFile = null;
+var logStream = null;
+
+for (const arg of argv) {
+    if (arg.startsWith('/logfile=')) {
+        logFile = arg.substring(9);
+        break;
+    }
+}
+
+if (logFile) {
+    try {
+        logStream = createWriteStream(logFile, { flags: 'a' });
+        logStream.on('error', (err) => {
+            console.error('Error writing to log file:', err);
+        });
+    } catch (err) {
+        console.error('Failed to open log file:', err);
+        process.exit(1);
+    }
+}
+
+var lastLogTime = null;
+var requestCounter = 0;
+
+function log(message) {
+    if (!verbose) return;
+    const now = process.hrtime.bigint();
+    const timestamp = new Date().toISOString();
+    let delta = '';
+    if (lastLogTime !== null) {
+        const diffNanos = now - lastLogTime;
+        const diffSeconds = Number(diffNanos) / 1000000000;
+        delta = ` +${diffSeconds.toFixed(6)}s`;
+    } else {
+        delta = '           ';
+    }
+    lastLogTime = now;
+    const logMessage = `[${timestamp}${delta}] ${message}\n`;
+    if (logStream) {
+        logStream.write(logMessage);
+    } else {
+        process.stdout.write(logMessage);
+    }
+}
+
+function logRequestComplete(requestStartTime) {
+    if (!verbose) return;
+    const totalNanos = process.hrtime.bigint() - requestStartTime;
+    const totalMs = Number(totalNanos) / 1000000;
+    log(`  Request completed in ${totalMs.toFixed(3)}ms`);
+    log('');
+}
+
 
 /*
+ *  ------ Main processing -------
+ *
  *  To run this example with an instance of gs1encoder that you have installed
  *  from npm change the following import to:
  *
@@ -82,35 +168,51 @@ var gs1encoder = new GS1encoder();
 await gs1encoder.init();
 
 import * as http from 'http';
-import * as url from 'url';
-
-
-/*
- *  User-defined tunables
- *
- */
-const bind = '127.0.0.1';  // "0.0.0.0" to allow remote connections
-const port = 3030;
 
 
 http.createServer(function(req, res) {
 
-    var parse = url.parse(req.url, true);
-    var pathname = parse.pathname;
-    var params = parse.query;
+    const requestStartTime = process.hrtime.bigint();
+    lastLogTime = null;
+    requestCounter++;
+    log(`Request #${requestCounter}: ${req.method} ${req.url}`);
+
+    var urlObj = new URL(req.url, `http://${req.headers.host}`);
+
+    var pathname = urlObj.pathname;
+    log(`  Pathname: ${pathname}`);
+
+    var params = Object.fromEntries(urlObj.searchParams);
+    log(`  Query params: ${JSON.stringify(params)}`);
 
     if (req.method !== 'GET') {
+        const responseBody = "Method Not Allowed\n";
+
         res.writeHead(405, {'Content-Type': 'text/plain'});
-        res.write("Method Not Allowed\n");
+        log(`  Response: 405 Method Not Allowed`);
+
+        res.write(responseBody);
+        log(`  Response body: ${responseBody.trimEnd()}`);
+
         res.end();
+        logRequestComplete(requestStartTime);
+
         return;
     }
 
     var inpStr = params.input;
     if (!inpStr) {
+        const responseBody = "Bad Request: 'input' query parameter must be defined\n";
+
         res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.write("Bad Request: 'input' query parameter must be defined\n");
+        log(`  Response: 400 Bad Request`);
+
+        res.write(responseBody);
+        log(`  Response body: ${responseBody.trimEnd()}`);
+
         res.end();
+        logRequestComplete(requestStartTime);
+
         return;
     }
 
@@ -120,10 +222,19 @@ http.createServer(function(req, res) {
          *  Example of setting options
          *
          */
+        log(`  Setting GS1encoder options:`);
+
         gs1encoder.includeDataTitlesInHRI = "includeDataTitlesInHRI" in params;
+        log(`    includeDataTitlesInHRI: ${gs1encoder.includeDataTitlesInHRI}`);
+
         gs1encoder.permitUnknownAIs = "permitUnknownAIs" in params;
+        log(`    permitUnknownAIs: ${gs1encoder.permitUnknownAIs}`);
+
         gs1encoder.permitZeroSuppressedGTINinDLuris = "permitZeroSuppressedGTINinDLuris" in params;
+        log(`    permitZeroSuppressedGTINinDLuris: ${gs1encoder.permitZeroSuppressedGTINinDLuris}`);
+
         gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, !("noValidateRequisiteAIs" in params));
+        log(`    validateRequisiteAIs: ${gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)}`);
 
         /*
          *  Set the data
@@ -131,60 +242,109 @@ http.createServer(function(req, res) {
          */
         switch (pathname) {
             case '/dataStr':
+                log(`  Calling gs1encoder.dataStr = "${inpStr}"`);
                 gs1encoder.dataStr = inpStr;
                 break;
             case '/aiDataStr':
+                log(`  Calling gs1encoder.aiDataStr = "${inpStr}"`);
                 gs1encoder.aiDataStr = inpStr;
                 break;
             default:
+                const responseBody = 'Not Found';
                 res.writeHead(404, {'Context-Type': 'text/plain'});
-                res.end('Not Found');
+                log(`  Response: 404 Not Found`);
+                res.end(responseBody);
+                log(`  Response body: ${responseBody}`);
+                logRequestComplete(requestStartTime);
                 return;
         }
 
     } catch (err) {
-        res.writeHead(422, {'Content-Type': 'text/plain'});
-        res.write(err.message + "\n");
+        log(`  GS1encoder error: ${err.message}`);
+
         var markup = gs1encoder.errMarkup;
+        if (markup) {
+            log(`  Error markup: ${markup}`);
+        }
+
+        var responseBody = err.message + "\n";
         if (markup)
-            res.write(markup.replace(/\|/g, "⧚") + "\n");
+            responseBody += markup.replace(/\|/g, "⧚") + "\n";
+
+        res.writeHead(422, {'Content-Type': 'text/plain'});
+        log(`  Response: 422 Unprocessable Entity`);
+
+        res.write(responseBody);
+        log(`  Response body: ${responseBody.trimEnd()}`);
+
         res.end();
+        logRequestComplete(requestStartTime);
+
         return;
     }
 
+    log(`  GS1encoder results:`);
+
     var dataStr = gs1encoder.dataStr;
+    log(`    dataStr: ${dataStr}`);
+
     var aiDataStr = gs1encoder.aiDataStr;
+    log(`    aiDataStr: ${aiDataStr ?? "(null)"}`);
+
     var dlURI; var dlURIerr;
-    try { dlURI = gs1encoder.getDLuri(null); } catch (err) { dlURI = null; dlURIerr = err; }
+    try {
+        dlURI = gs1encoder.getDLuri(null);
+    } catch (err) {
+        dlURI = null;
+        dlURIerr = err;
+        log(`  getDLuri error: ${err.message}`);
+    }
+    log(`    dlURI: ${dlURI ?? "(error)"}`);
+
     var hri = gs1encoder.hri;
+    log(`    hri: ${JSON.stringify(hri)}`);
+
+    var contentType; var responseBody;
 
     if (params.output === 'json') {
+        contentType = 'application/json';
 
-        res.writeHead(200, {'Content-Type': 'application/json'});
         var ret = {
             dataStr: dataStr,
             aiDataStr: aiDataStr,
             dlURI: dlURI,
             hri: hri
         }
-        res.write(JSON.stringify(ret) + "\n");
-        res.end();
 
-    } else {  // Plaintext response
+        responseBody = JSON.stringify(ret) + "\n";
+    } else {
+        contentType = 'text/plain';
 
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.write("Barcode message:      " + gs1encoder.dataStr + "\n");
-        res.write("AI element string:    " + (aiDataStr ?? "⧚ Not AI-based data ⧚") + "\n");
-        res.write("GS1 Digital Link URI: " + (dlURI ?? "⧚ " + dlURIerr.message + " ⧚") + "\n");
-        res.write("HRI:                  " + (dataStr !== "" && hri.length == 0 ? "⧚ Not AI-based data ⧚": "") + "\n");
-        hri.forEach(ai => res.write("       " + ai + "\n"));
-        res.end();
+        var plaintextLines = [];
+        plaintextLines.push("Barcode message:      " + dataStr);
+        plaintextLines.push("AI element string:    " + (aiDataStr ?? "⧚ Not AI-based data ⧚"));
+        plaintextLines.push("GS1 Digital Link URI: " + (dlURI ?? "⧚ " + dlURIerr.message + " ⧚"));
+        plaintextLines.push("HRI:                  " + (dataStr !== "" && hri.length == 0 ? "⧚ Not AI-based data ⧚": ""));
+        hri.forEach(ai => plaintextLines.push("       " + ai));
 
+        responseBody = plaintextLines.join("\n") + "\n";
     }
+
+    res.writeHead(200, {'Content-Type': contentType});
+    log(`  Response: 200 OK (${contentType})`);
+
+    res.write(responseBody);
+    log(`  Response body:\n${responseBody.trimEnd()}`);
+
+    res.end();
+    logRequestComplete(requestStartTime);
 
 }).listen(port, bind);
 
 console.log("Web service is running on %s:%d", bind, port);
+if (verbose) {
+    console.log("Verbose logging enabled" + (logFile ? ` (output to ${logFile})` : " (output to stdout)"));
+}
 
 
 // ----- Service installation on Windows -------
@@ -207,10 +367,16 @@ async function handleWindowsService() {
     const path = await import('path');
     const scriptPath = path.resolve(process.argv[1]);
 
+    // Collect script arguments to pass to the service (excluding /installservice and /uninstallservice)
+    const scriptArgs = argv.slice(2).filter(arg =>
+        arg !== '/installservice' && arg !== '/uninstallservice'
+    );
+
     const svc = new Service({
         name: 'GS1 Barcode Syntax Engine',
         description: 'GS1 Barcode Syntax Engine HTTP API demo service.',
-        script: scriptPath
+        script: scriptPath,
+        scriptOptions: scriptArgs.join(' ')
     });
 
     if (argv.includes('/installservice')) {
