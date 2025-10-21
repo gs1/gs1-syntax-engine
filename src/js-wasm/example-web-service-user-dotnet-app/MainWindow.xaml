@@ -1,0 +1,68 @@
+﻿<Window x:Class="GS1.ExampleWebServiceUserDotnetApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GS1.ExampleWebServiceUserDotnetApp"
+        mc:Ignorable="d"
+        Title="GS1 Barcode Syntax Engine Example Web Service User .NET app" Height="813" Width="960" MinWidth="960" MinHeight="813">
+    <Grid Margin="0,0,0,21">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="233"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBox x:Name="barcodeMessageTextBox" Margin="233,491,0,0" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" IsReadOnly="True" Height="45" VerticalAlignment="Top" />
+        <Button x:Name="sendHTTPrequestButton" Content="Send HTTP request" Margin="0,237,27,0" VerticalAlignment="Top" Click="SendHTTPrequestButton_Click" Height="26" Grid.Column="1" Width="160" HorizontalAlignment="Right"/>
+        <TextBox x:Name="extractedAisTextBox"  FontFamily="Consolas" IsReadOnly="True" FontSize="14" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="233,665,0,0" VerticalContentAlignment="Top" />
+        <CheckBox x:Name="permitUnknownAIsCheckBox" Content="Permit unknown AIs" FlowDirection="RightToLeft" Margin="37,50,18,0" VerticalAlignment="Top" Height="19" Grid.Row="1" Grid.Column="1" FontWeight="Bold" Click="GenericCheckBox_Click">
+            <CheckBox.Resources>
+                <Style TargetType="{x:Type Path}">
+                    <Setter Property="FlowDirection" Value="LeftToRight"/>
+                </Style>
+            </CheckBox.Resources>
+        </CheckBox>
+        <CheckBox x:Name="validateAIassociationsCheckBox" Content="Validate AI requisites" FlowDirection="RightToLeft" Margin="37,82,18,0" VerticalAlignment="Top" Click="GenericCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1" IsChecked="True" FontWeight="Bold">
+            <CheckBox.Resources>
+                <Style TargetType="{x:Type Path}">
+                    <Setter Property="FlowDirection" Value="LeftToRight"/>
+                </Style>
+            </CheckBox.Resources>
+        </CheckBox>
+        <TextBox x:Name="elementStringTextBox" Margin="233,548,0,0" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" IsReadOnly="True" Height="45" VerticalAlignment="Top"/>
+        <Label x:Name="barcodeMessageLabel" Content="Barcode message (^ = FNC1)" HorizontalAlignment="Left" Margin="18,498,0,0" VerticalAlignment="Top" Height="30" Width="204"/>
+        <Label x:Name="elementStringLabel" Content="GS1 AI element string" HorizontalAlignment="Left" Margin="18,555,0,0" VerticalAlignment="Top" Height="30" Width="204"/>
+        <TextBox x:Name="dlURItextBox" Margin="233,606,0,0" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" IsReadOnly="True" Height="45" VerticalAlignment="Top"/>
+        <Label x:Name="dlURIlabel" Content="GS1 Digital Link URI&#xD;&#xA;(canonical form)" Margin="18,603,505,0" VerticalAlignment="Top" Height="52"/>
+        <Label x:Name="extractedAisLabel" Content="Extracted AIs" Margin="18,670,507,0" Height="29" VerticalAlignment="Top"/>
+        <TextBox x:Name="scanDataTextBox" Margin="233,62,0,0" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" Height="45" VerticalAlignment="Top" TextChanged="GenericTextBox_TextChanged" Text="]Q3011231231231233310ABC123^99TEST"/>
+        <Label x:Name="scanDataLabel" Content="Scan data&#xA;" HorizontalAlignment="Left" Margin="18,66,0,0" VerticalAlignment="Top" Height="30" Width="204" FontWeight="Bold"/>
+        <TextBox x:Name="httpRequestTextBox" Margin="233,123,0,0" TextWrapping="Wrap" IsReadOnly="True" Height="111" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"/>
+        <Label x:Name="httpRequestLabel" Content="HTTP request to send" HorizontalAlignment="Left" Margin="18,126,0,0" VerticalAlignment="Top" Height="30" Width="204"/>
+        <CheckBox x:Name="includeDataTitlesInHRIcheckBox" Content="Include data titles in HRI" FlowDirection="RightToLeft" Margin="13,114,18,0" VerticalAlignment="Top" Click="GenericCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1" FontWeight="Bold">
+            <CheckBox.Resources>
+                <Style TargetType="{x:Type Path}">
+                    <Setter Property="FlowDirection" Value="LeftToRight"/>
+                </Style>
+            </CheckBox.Resources>
+        </CheckBox>
+        <CheckBox x:Name="permitZeroSuppressedGTINinDLurisCheckBox" Content="Permit 0-supp (01) in DL" FlowDirection="RightToLeft" Margin="13,146,18,0" VerticalAlignment="Top" Click="GenericCheckBox_Click" Height="19" Grid.Row="1" Grid.Column="1" FontWeight="Bold">
+            <CheckBox.Resources>
+                <Style TargetType="{x:Type Path}">
+                    <Setter Property="FlowDirection" Value="LeftToRight"/>
+                </Style>
+            </CheckBox.Resources>
+        </CheckBox>
+        <TextBox x:Name="httpResponseTextBox" Margin="233,276,0,0" TextWrapping="Wrap" IsReadOnly="True" Height="168" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"/>
+        <Label x:Name="httpResponseLabel" Content="HTTP response returned" HorizontalAlignment="Left" Margin="18,279,0,0" VerticalAlignment="Top" Height="30" Width="204"/>
+        <TextBox x:Name="endpointTextBox" Margin="233,25,0,0" TextWrapping="Wrap" TextChanged="GenericTextBox_TextChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" Text="http://127.0.0.1:3030/scanData" Height="22" VerticalAlignment="Top"/>
+        <Label x:Name="exnpointURLlabel" Content="Endpoint URL" HorizontalAlignment="Left" Margin="18,23,0,0" VerticalAlignment="Top" Height="30" Width="204" Grid.Row="1" FontWeight="Bold"/>
+        <Label x:Name="infoLabel" Content="Enter scan data to continue" Margin="238,239,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" FontSize="14"/>
+        <TextBox x:Name="fnc1indicatorTextBox" Margin="157,185,18,0" TextWrapping="Wrap" TextChanged="GenericTextBox_TextChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" Text="^" Height="22" VerticalAlignment="Top" Grid.Column="1" TextAlignment="Center"/>
+        <Label x:Name="httpRequestLabel_Copy" Content="FNC1/GS indicator" HorizontalAlignment="Left" Margin="32,182,0,0" VerticalAlignment="Top" Height="30" Width="115" Grid.Column="1" FontWeight="Bold"/>
+        <Label x:Name="extractedDataLabel" Content="Extracted data" Margin="238,460,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" FontSize="14"/>
+    </Grid>
+</Window>

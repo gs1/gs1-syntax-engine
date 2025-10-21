@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
+    <RootNamespace>gs1encoders_example_web_service_user_dotnet_app</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <StartupObject>GS1.ExampleWebServiceUserDotnetApp.App</StartupObject>
+    <Authors>GS1 AISBL</Authors>
+    <Company>GS1 AISBL</Company>
+    <Copyright>GS1 AISBL</Copyright>
+    <Product>C# .NET example web service user application</Product>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

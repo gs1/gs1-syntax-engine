@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gs1encoders-app", "c-lib\gs1encoders-app.vcxproj", "{B0F0267E-C92E-41FD-85C4-7EE5A184AC7D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gs1encoders-dotnet-app", "d
 	ProjectSection(ProjectDependencies) = postProject
 		{9D21C0B1-C696-432D-BF15-CC2921DFAA81} = {9D21C0B1-C696-432D-BF15-CC2921DFAA81}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gs1encoders-example-web-service-user-dotnet-app", "js-wasm\example-web-service-user-dotnet-app\gs1encoders-example-web-service-user-dotnet-app.csproj", "{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +94,18 @@ Global
 		{BD33DF1F-2CFA-4FCF-B659-71DF186C58D8}.Release|x64.Build.0 = Release|Any CPU
 		{BD33DF1F-2CFA-4FCF-B659-71DF186C58D8}.Release|x86.ActiveCfg = Release|Any CPU
 		{BD33DF1F-2CFA-4FCF-B659-71DF186C58D8}.Release|x86.Build.0 = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|x64.Build.0 = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Debug|x86.Build.0 = Debug|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|x64.ActiveCfg = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|x64.Build.0 = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|x86.ActiveCfg = Release|Any CPU
+		{537ADA1A-CCA7-F7E6-5216-1EF7493635A6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

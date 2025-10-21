@@ -28,5 +28,7 @@ src/js-wasm/gs1encoder-wasm.mjs
 src/js-wasm/gs1encoder-wasm.wasm
 src/js-wasm/gs1encoder-wasm.mem
 src/js-wasm/*.tgz
+src/js-wasm/example-web-service-user-dotnet-app/bin/
+src/js-wasm/example-web-service-user-dotnet-app/obj/
 .DS_Store
 **/project.xcworkspace/xcuserdata/*
