@@ -36,7 +36,7 @@ namespace GS1.ExampleWebServiceUserDotnetApp
             barcodeMessageTextBox.Text = "";
             elementStringTextBox.Text = "";
             dlURItextBox.Text = "";
-            extractedAisTextBox.Text = "";            
+            extractedAisTextBox.Text = "";
         }
 
         private async void SendHTTPrequestButton_Click(object sender, RoutedEventArgs e)
