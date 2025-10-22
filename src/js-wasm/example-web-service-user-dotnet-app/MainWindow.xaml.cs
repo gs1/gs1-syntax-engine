@@ -126,20 +126,6 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
         }
 
-        private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (_disableEvents) return;
-            ClearRender();
-            UpdateHTTPrequestText();
-        }
-
-        private void GenericCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            if (_disableEvents) return;
-            ClearRender();
-            UpdateHTTPrequestText();
-        }
-
         private void UpdateHTTPrequestText()
         {
 
@@ -195,5 +181,20 @@ namespace GS1.ExampleWebServiceUserDotnetApp
             infoLabel.Content = "Click 'Send HTTP request' to decode the scan data";
 
         }
+
+        private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_disableEvents) return;
+            ClearRender();
+            UpdateHTTPrequestText();
+        }
+
+        private void GenericCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_disableEvents) return;
+            ClearRender();
+            UpdateHTTPrequestText();
+        }
+
     }
 }
