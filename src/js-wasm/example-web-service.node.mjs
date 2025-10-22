@@ -27,20 +27,42 @@
  *
  *  Command line arguments:
  *
- *    /verbose                  Enable verbose debug logging
- *    /logfile=<filename>       Write logs to file instead of stdout
+ *    /verbose                  Enable verbose debug logging.
+ *    /logfile=<filename>       Write logs to file instead of stdout.
  *
  *    /(un)installservice       Attempt to install/uninstall this example as a
  *                              Windows service. Any other arguments (e.g.
  *                              /verbose, /logfile=<filename>) are passed to
  *                              the service.
- *                              See the additional requirements at the bottom
- *                              of this code.
+ *                              See "Service installation on Windows" section
+ *                              near the end of this file for requirements.
  *
  *  Example startup with verbose logging as terminal output and to a file:
  *
  *    $ node example-web-service.node.mjs /verbose
  *    $ node example-web-service.node.mjs /verbose /logfile=service.log
+ *
+ *  Output format:
+ *
+ *    By default, responses are in plaintext format. JSON output can be requested
+ *    either by adding the query parameter "output=json" or by setting the HTTP
+ *    header "Accept: application/json". Error responses will also be returned as
+ *    JSON when the Accept header is set.
+ *
+ *  Query parameters:
+ *
+ *    input                               Required. The barcode data to process.
+ *    output=json                         Request JSON output format, irrespective of Accept: header.
+ *    includeDataTitlesInHRI              Include AI titles in human-readable output.
+ *    permitUnknownAIs                    Allow processing of unknown AIs.
+ *    permitZeroSuppressedGTINinDLuris    Allow zero-suppressed GTINs in Digital Link URIs.
+ *    noValidateRequisiteAIs              Disable validation of requisite AIs.
+ *
+ *  Endpoints:
+ *
+ *    /dataStr      Process input as a barcode message or Digital Link URI.
+ *    /aiDataStr    Process input as an AI element string.
+ *    /scanData     Process input as raw scan data.
  *
  *  Example calls:
  *
@@ -68,6 +90,18 @@
  *    Content-Type: application/json
  *    ...
  *    {"dataStr":"http://ID.EXAMPLE.ORG/01/12312312312319?99=ASDFEE","aiDataStr":"(01)12312312312319(99)ASDFEE","dlURI":"https://id.gs1.org/01/12312312312319?99=ASDFEE","hri":["(01) 12312312312319","(99) ASDFEE"]}
+ *
+ *    $ curl -i 'http://127.0.0.1:3030/scanData?input=%5Dd2011231231231231910ABC123%1D21SERIAL456'
+ *    HTTP/1.1 200 OK
+ *    Content-Type: text/plain
+ *    ...
+ *    Barcode message:      ^011231231231231910ABC123^21SERIAL456
+ *    AI element string:    (01)12312312312319(10)ABC123(21)SERIAL456
+ *    GS1 Digital Link URI: https://id.gs1.org/01/12312312312319/10/ABC123/21/SERIAL456
+ *    HRI:
+ *           (01) 12312312312319
+ *           (10) ABC123
+ *           (21) SERIAL456
  *
  */
 
@@ -97,9 +131,9 @@ if (argv.includes('/installservice') || argv.includes('/uninstallservice')) {
 // Setup logging
 import { createWriteStream } from 'fs';
 
-var verbose = argv.some(arg => arg === '/verbose');
-var logFile = null;
-var logStream = null;
+const verbose = argv.some(arg => arg === '/verbose');
+let logFile = null;
+let logStream = null;
 
 for (const arg of argv) {
     if (arg.startsWith('/logfile=')) {
@@ -120,8 +154,8 @@ if (logFile) {
     }
 }
 
-var lastLogTime = null;
-var requestCounter = 0;
+let lastLogTime = null;
+let requestCounter = 0;
 
 function log(message) {
     if (!verbose) return;
@@ -152,6 +186,75 @@ function logRequestComplete(requestStartTime) {
     log('');
 }
 
+function formatErrorResponse(message, acceptHeader, markup = null) {
+    const wantsJson = acceptHeader && acceptHeader.includes('application/json');
+    if (wantsJson) {
+        const errorObj = { error: message };
+        if (markup) {
+            errorObj.markup = markup.replace(/\|/g, "⧚");
+        }
+        return {
+            contentType: 'application/json',
+            body: JSON.stringify(errorObj) + "\n"
+        };
+    } else {
+        let body = message + "\n";
+        if (markup) {
+            body += markup.replace(/\|/g, "⧚") + "\n";
+        }
+        return {
+            contentType: 'text/plain',
+            body: body
+        };
+    }
+}
+
+function sendErrorResponse(res, statusCode, statusText, message, acceptHeader, requestStartTime, markup = null) {
+    if (markup) {
+        log(`  Error markup: ${markup}`);
+    }
+    const errorResponse = formatErrorResponse(message, acceptHeader, markup);
+    res.writeHead(statusCode, {'Content-Type': errorResponse.contentType});
+    log(`  Response: ${statusCode} ${statusText}`);
+    res.write(errorResponse.body);
+    log(`  Response body: ${errorResponse.body.trimEnd()}`);
+    res.end();
+    logRequestComplete(requestStartTime);
+}
+
+function buildJsonResponse(dataStr, aiDataStr, dlURI, dlURIerr, hri) {
+    const response = { dataStr, aiDataStr, dlURI, hri };
+    if (dlURIerr) {
+        response.dlURIerror = dlURIerr.message;
+    }
+    return {
+        contentType: 'application/json',
+        body: JSON.stringify(response) + "\n"
+    };
+}
+
+function buildPlaintextResponse(dataStr, aiDataStr, dlURI, dlURIerr, hri) {
+    const plaintextLines = [];
+    plaintextLines.push("Barcode message:      " + dataStr);
+    plaintextLines.push("AI element string:    " + (aiDataStr ?? "⧚ Not AI-based data ⧚"));
+    plaintextLines.push("GS1 Digital Link URI: " + (dlURI ?? "⧚ " + dlURIerr.message + " ⧚"));
+    plaintextLines.push("HRI:                  " + (dataStr !== "" && hri.length === 0 ? "⧚ Not AI-based data ⧚": ""));
+    hri.forEach(ai => plaintextLines.push("       " + ai));
+    return {
+        contentType: 'text/plain',
+        body: plaintextLines.join("\n") + "\n"
+    };
+}
+
+function sendSuccessResponse(res, response, requestStartTime) {
+    res.writeHead(200, {'Content-Type': response.contentType});
+    log(`  Response: 200 OK (${response.contentType})`);
+    res.write(response.body);
+    log(`  Response body:\n${response.body.trimEnd()}`);
+    res.end();
+    logRequestComplete(requestStartTime);
+}
+
 
 /*
  *  ------ Main processing -------
@@ -164,7 +267,7 @@ function logRequestComplete(requestStartTime) {
  */
 import { GS1encoder } from "./gs1encoder.mjs";
 
-var gs1encoder = new GS1encoder();
+const gs1encoder = new GS1encoder();
 await gs1encoder.init();
 
 import * as http from 'http';
@@ -177,42 +280,22 @@ http.createServer(function(req, res) {
     requestCounter++;
     log(`Request #${requestCounter}: ${req.method} ${req.url}`);
 
-    var urlObj = new URL(req.url, `http://${req.headers.host}`);
+    const urlObj = new URL(req.url, `http://${req.headers.host}`);
 
-    var pathname = urlObj.pathname;
+    const pathname = urlObj.pathname;
     log(`  Pathname: ${pathname}`);
 
-    var params = Object.fromEntries(urlObj.searchParams);
+    const params = Object.fromEntries(urlObj.searchParams);
     log(`  Query params: ${JSON.stringify(params)}`);
 
     if (req.method !== 'GET') {
-        const responseBody = "Method Not Allowed\n";
-
-        res.writeHead(405, {'Content-Type': 'text/plain'});
-        log(`  Response: 405 Method Not Allowed`);
-
-        res.write(responseBody);
-        log(`  Response body: ${responseBody.trimEnd()}`);
-
-        res.end();
-        logRequestComplete(requestStartTime);
-
+        sendErrorResponse(res, 405, 'Method Not Allowed', 'Method Not Allowed', req.headers['accept'], requestStartTime);
         return;
     }
 
-    var inpStr = params.input;
+    const inpStr = params.input;
     if (!inpStr) {
-        const responseBody = "Bad Request: 'input' query parameter must be defined\n";
-
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        log(`  Response: 400 Bad Request`);
-
-        res.write(responseBody);
-        log(`  Response body: ${responseBody.trimEnd()}`);
-
-        res.end();
-        logRequestComplete(requestStartTime);
-
+        sendErrorResponse(res, 400, 'Bad Request', "Bad Request: 'input' query parameter must be defined", req.headers['accept'], requestStartTime);
         return;
     }
 
@@ -249,49 +332,32 @@ http.createServer(function(req, res) {
                 log(`  Calling gs1encoder.aiDataStr = "${inpStr}"`);
                 gs1encoder.aiDataStr = inpStr;
                 break;
+            case '/scanData':
+                log(`  Calling gs1encoder.scanData = "${inpStr}"`);
+                gs1encoder.scanData = inpStr;
+                break;
             default:
-                const responseBody = 'Not Found';
-                res.writeHead(404, {'Context-Type': 'text/plain'});
-                log(`  Response: 404 Not Found`);
-                res.end(responseBody);
-                log(`  Response body: ${responseBody}`);
-                logRequestComplete(requestStartTime);
+                sendErrorResponse(res, 404, 'Not Found', 'Not Found', req.headers['accept'], requestStartTime);
                 return;
         }
 
     } catch (err) {
         log(`  GS1encoder error: ${err.message}`);
-
-        var markup = gs1encoder.errMarkup;
-        if (markup) {
-            log(`  Error markup: ${markup}`);
-        }
-
-        var responseBody = err.message + "\n";
-        if (markup)
-            responseBody += markup.replace(/\|/g, "⧚") + "\n";
-
-        res.writeHead(422, {'Content-Type': 'text/plain'});
-        log(`  Response: 422 Unprocessable Entity`);
-
-        res.write(responseBody);
-        log(`  Response body: ${responseBody.trimEnd()}`);
-
-        res.end();
-        logRequestComplete(requestStartTime);
-
+        const markup = gs1encoder.errMarkup;
+        sendErrorResponse(res, 422, 'Unprocessable Entity', err.message, req.headers['accept'], requestStartTime, markup);
         return;
     }
 
     log(`  GS1encoder results:`);
 
-    var dataStr = gs1encoder.dataStr;
+    const dataStr = gs1encoder.dataStr;
     log(`    dataStr: ${dataStr}`);
 
-    var aiDataStr = gs1encoder.aiDataStr;
+    const aiDataStr = gs1encoder.aiDataStr;
     log(`    aiDataStr: ${aiDataStr ?? "(null)"}`);
 
-    var dlURI; var dlURIerr;
+    let dlURI;
+    let dlURIerr;
     try {
         dlURI = gs1encoder.getDLuri(null);
     } catch (err) {
@@ -301,43 +367,18 @@ http.createServer(function(req, res) {
     }
     log(`    dlURI: ${dlURI ?? "(error)"}`);
 
-    var hri = gs1encoder.hri;
+    const hri = gs1encoder.hri;
     log(`    hri: ${JSON.stringify(hri)}`);
 
-    var contentType; var responseBody;
+    // Determine output format from query parameter or Accept header
+    const acceptHeader = req.headers['accept'] || '';
+    const wantsJson = params.output === 'json' || acceptHeader.includes('application/json');
 
-    if (params.output === 'json') {
-        contentType = 'application/json';
+    const response = wantsJson
+        ? buildJsonResponse(dataStr, aiDataStr, dlURI, dlURIerr, hri)
+        : buildPlaintextResponse(dataStr, aiDataStr, dlURI, dlURIerr, hri);
 
-        var ret = {
-            dataStr: dataStr,
-            aiDataStr: aiDataStr,
-            dlURI: dlURI,
-            hri: hri
-        }
-
-        responseBody = JSON.stringify(ret) + "\n";
-    } else {
-        contentType = 'text/plain';
-
-        var plaintextLines = [];
-        plaintextLines.push("Barcode message:      " + dataStr);
-        plaintextLines.push("AI element string:    " + (aiDataStr ?? "⧚ Not AI-based data ⧚"));
-        plaintextLines.push("GS1 Digital Link URI: " + (dlURI ?? "⧚ " + dlURIerr.message + " ⧚"));
-        plaintextLines.push("HRI:                  " + (dataStr !== "" && hri.length == 0 ? "⧚ Not AI-based data ⧚": ""));
-        hri.forEach(ai => plaintextLines.push("       " + ai));
-
-        responseBody = plaintextLines.join("\n") + "\n";
-    }
-
-    res.writeHead(200, {'Content-Type': contentType});
-    log(`  Response: 200 OK (${contentType})`);
-
-    res.write(responseBody);
-    log(`  Response body:\n${responseBody.trimEnd()}`);
-
-    res.end();
-    logRequestComplete(requestStartTime);
+    sendSuccessResponse(res, response, requestStartTime);
 
 }).listen(port, bind);
 
