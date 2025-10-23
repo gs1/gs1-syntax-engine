@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using static System.Net.WebRequestMethods;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace GS1.ExampleWebServiceUserDotnetApp
 {
@@ -18,29 +18,62 @@ namespace GS1.ExampleWebServiceUserDotnetApp
     public partial class MainWindow : Window
     {
 
+        /*
+         *  Barcode scanner input detection
+         * 
+         */
+        private const char SCAN_START_CHAR = ']';                // Scans start with an AIM symbology identifier
+        private const int SCAN_MIN_LENGTH = 4;                   // Minimum valid scan length
+        private const int SCAN_CHAR_GAP_MS = 50;                 // Max transfer delay between characters
+        private const int SCAN_END_TIMEOUT_MS = 100;             // Timeout after last char indicating scan complete
+
+        // --- Visual feedback constants ---
+        private static readonly Color SCAN_FLASH_COLOR = Colors.LightGreen;
+        private const int SCAN_FLASH_DURATION_MS = 300;          // Flash duration
+
+        // --- Barcode detection state ---
+        private readonly StringBuilder _scanBuffer = new();
+        private DateTime _lastKeystroke = DateTime.MinValue;
+        private readonly DispatcherTimer _scaneEndTimer;
+        private bool _scanInProgress = false;
+
         // Events do nothing. For use when updating UI data
         private readonly bool _disableEvents = false;
 
         public MainWindow()
         {
+
             _disableEvents = true;
             InitializeComponent();
             _disableEvents = false;
             UpdateHTTPrequestText();
+
+            // Scanner input detection setup
+            this.PreviewTextInput += MainWindow_PreviewTextInput;
+
+            _scaneEndTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(SCAN_END_TIMEOUT_MS)
+            };
+            _scaneEndTimer.Tick += BarcodeEndTimer_Tick;
+
         }
 
         private void ClearRender()
         {
+
             infoLabel.Content = "";
             httpResponseTextBox.Text = "";
             barcodeMessageTextBox.Text = "";
             elementStringTextBox.Text = "";
             dlURItextBox.Text = "";
             extractedAisTextBox.Text = "";
+
         }
 
         private async void SendHTTPrequestButton_Click(object sender, RoutedEventArgs e)
         {
+
             ClearRender();
 
             if (httpRequestTextBox.Text == "")
@@ -131,7 +164,8 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
             if (scanDataTextBox.Text == "")
             {
-                infoLabel.Content = "Enter scan data to continue";
+                httpRequestTextBox.Text = "";
+                infoLabel.Content = "Enter scan data or scan a barcode to continue";
                 return;
             }
 
@@ -182,18 +216,105 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
         }
 
+        private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+
+            var now = DateTime.Now;
+
+            // Reset buffer if long gap indicative of human typing
+            if ((now - _lastKeystroke).TotalMilliseconds > SCAN_CHAR_GAP_MS)
+            {
+                _scanBuffer.Clear();
+                _scanInProgress = false;
+            }
+
+            _lastKeystroke = now;
+
+            // Start new potential scan input
+            if (e.Text.Length == 1 && e.Text[0] == SCAN_START_CHAR)
+            {
+                _scanBuffer.Clear();
+                _scanInProgress = true;
+            }
+
+            if (_scanInProgress)
+            {
+                _scanBuffer.Append(e.Text);
+
+                // Restart end of scan timer
+                _scaneEndTimer.Stop();
+                _scaneEndTimer.Start();
+            }
+
+        }
+
+        private void BarcodeEndTimer_Tick(object sender, EventArgs e)
+        {
+
+            _scaneEndTimer.Stop();
+
+            if (!_scanInProgress)
+                return;
+
+            _scanInProgress = false;
+            string scanned = _scanBuffer.ToString().Trim();
+            _scanBuffer.Clear();
+
+            if (scanned.Length < SCAN_MIN_LENGTH)
+                return;
+
+            scanDataTextBox.Clear();
+            scanDataTextBox.Text = scanned;
+            scanDataTextBox.Focus();
+            scanDataTextBox.CaretIndex = scanDataTextBox.Text.Length;
+
+            ClearRender();
+            UpdateHTTPrequestText();
+
+            FlashScanFeedback();
+
+            if (AutoSubmitScansCheckBox.IsChecked ?? false)
+            {
+                SendHTTPrequestButton_Click(null, null);
+            }
+
+        }
+
+        private void FlashScanFeedback()
+        {
+
+            var originalBrush = scanDataTextBox.Background as SolidColorBrush ?? new SolidColorBrush(Colors.White);
+            var flashBrush = new SolidColorBrush(originalBrush.Color);
+            scanDataTextBox.Background = flashBrush;
+
+            var flashAnimation = new ColorAnimation
+            {
+                From = SCAN_FLASH_COLOR,
+                To = originalBrush.Color,
+                Duration = TimeSpan.FromMilliseconds(SCAN_FLASH_DURATION_MS),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            flashBrush.BeginAnimation(SolidColorBrush.ColorProperty, flashAnimation);
+
+        }
+
         private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+
             if (_disableEvents) return;
             ClearRender();
             UpdateHTTPrequestText();
+
         }
 
         private void GenericCheckBox_Click(object sender, RoutedEventArgs e)
         {
+
             if (_disableEvents) return;
             ClearRender();
             UpdateHTTPrequestText();
+
         }
 
     }
