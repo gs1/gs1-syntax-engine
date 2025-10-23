@@ -71,6 +71,19 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
         }
 
+        /*
+         *  SendHTTPrequestButton_Click below demonstrates sending raw bytes of the
+         *  HTTP request buffer over a socket for ease of demonstration purposes only.
+         *
+         *  In a real application you might instead simply build a URL and pass it to
+         *  a higher-level API, for example:
+         *
+         *    using var client = new HttpClient();
+         *    var resp = await client.GetAsync(url);
+         *    var http_body = await resp.Content.ReadAsStringAsync();
+         *    ...
+         *         
+         */
         private async void SendHTTPrequestButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -216,6 +229,36 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
         }
 
+
+        /*
+         *  UI event handlers
+         * 
+         */
+
+        private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+            if (_disableEvents) return;
+            ClearRender();
+            UpdateHTTPrequestText();
+
+        }
+
+        private void GenericCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (_disableEvents) return;
+            ClearRender();
+            UpdateHTTPrequestText();
+
+        }
+
+
+        /*
+         *  Barcode scanner input detection logic from here on...
+         * 
+         */
+
         private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
 
@@ -296,24 +339,6 @@ namespace GS1.ExampleWebServiceUserDotnetApp
             };
 
             flashBrush.BeginAnimation(SolidColorBrush.ColorProperty, flashAnimation);
-
-        }
-
-        private void GenericTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-            if (_disableEvents) return;
-            ClearRender();
-            UpdateHTTPrequestText();
-
-        }
-
-        private void GenericCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (_disableEvents) return;
-            ClearRender();
-            UpdateHTTPrequestText();
 
         }
 
