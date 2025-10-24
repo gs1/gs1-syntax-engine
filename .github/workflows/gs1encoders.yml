@@ -438,13 +438,13 @@ jobs:
       run: |
         make -C src/c-lib -j `nproc` wasm
         cd src/js-wasm
-        tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs example-web-service.node.mjs
+        zip gs1encoders-wasm-app.zip gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs example-web-service.node.mjs
 
     - name: Store WASM build
       uses: actions/upload-artifact@v4
       with:
         name: wasm-app
-        path: src/js-wasm/gs1encoders-wasm-app.tgz
+        path: src/js-wasm/gs1encoders-wasm-app.zip
         retention-days: 1
 
 
@@ -465,13 +465,13 @@ jobs:
       run: |
         make -C src/c-lib -j `nproc` wasm JSONLY=yes
         cd src/js-wasm
-        tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs example-web-service.node.mjs
+        zip gs1encoders-jsonly-app.zip gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs example-web-service.node.mjs
 
     - name: Store JSONLY build
       uses: actions/upload-artifact@v4
       with:
         name: jsonly-app
-        path: src/js-wasm/gs1encoders-jsonly-app.tgz
+        path: src/js-wasm/gs1encoders-jsonly-app.zip
         retention-days: 1
 
 
@@ -598,8 +598,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-wasm-app.tgz
-        asset_name: gs1encoders-wasm-app.tgz
+        asset_path: gs1encoders-wasm-app.zip
+        asset_name: gs1encoders-wasm-app.zip
         asset_content_type: application/octet-stream
 
     - name: "Upload asset: JSONLY applications (browser and Node.js)"
@@ -608,6 +608,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-jsonly-app.tgz
-        asset_name: gs1encoders-jsonly-app.tgz
+        asset_path: gs1encoders-jsonly-app.zip
+        asset_name: gs1encoders-jsonly-app.zip
         asset_content_type: application/octet-stream
+
