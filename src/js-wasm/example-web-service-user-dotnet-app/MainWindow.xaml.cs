@@ -143,21 +143,46 @@ namespace GS1.ExampleWebServiceUserDotnetApp
 
             if (http_code != 200)
             {
-                barcodeMessageTextBox.Text = $"⧚ Decoded data not received ⧛";
+                try
+                {
+                    using var doc = JsonDocument.Parse(http_body);
+                    var root = doc.RootElement;
+
+                    // Extract fields from the error JSON response body
+                    string error = root.TryGetProperty("error", out var errElem) ? errElem.GetString() : null;
+                    string markup = root.TryGetProperty("markup", out var markupElem) ? markupElem.GetString() : null;
+
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        var sb = new StringBuilder();
+                        sb.Append("ERROR:\t\t" + error);
+                        if (!string.IsNullOrEmpty(markup))
+                        {
+                            sb.Append("\nMARKUP:\t" + markup);
+                        }
+                        barcodeMessageTextBox.Text = sb.ToString();
+                        return;
+                    }
+                }
+                catch
+                {
+                    // Fall through
+                }
+                barcodeMessageTextBox.Text = $"⧚ Response is not decodable ⧛";
                 return;
             }
 
             // If we reach here, we have a 200 OK response and expect a valid JSON body
-            using var doc = JsonDocument.Parse(http_body);
-            var root = doc.RootElement;
+            using var doc200 = JsonDocument.Parse(http_body);
+            var root200 = doc200.RootElement;
 
             // Extract fields from JSON response body
-            var dataStr = root.TryGetProperty("dataStr", out var dataStrElem) ? dataStrElem.GetString() : null;
-            var aiDataStr = root.TryGetProperty("aiDataStr", out var aiDataStrElem) ? aiDataStrElem.GetString() : null;
-            var dlURI = root.TryGetProperty("dlURI", out var dlURIelem) ? dlURIelem.GetString() : null;
-            var dlURIerror = root.TryGetProperty("dlURIerror", out var dlURIerrorElem) ? dlURIerrorElem.GetString() : null;
+            var dataStr = root200.TryGetProperty("dataStr", out var dataStrElem) ? dataStrElem.GetString() : null;
+            var aiDataStr = root200.TryGetProperty("aiDataStr", out var aiDataStrElem) ? aiDataStrElem.GetString() : null;
+            var dlURI = root200.TryGetProperty("dlURI", out var dlURIelem) ? dlURIelem.GetString() : null;
+            var dlURIerror = root200.TryGetProperty("dlURIerror", out var dlURIerrorElem) ? dlURIerrorElem.GetString() : null;
 
-            string[] hri = root.TryGetProperty("hri", out var hriElem) && hriElem.ValueKind == JsonValueKind.Array
+            string[] hri = root200.TryGetProperty("hri", out var hriElem) && hriElem.ValueKind == JsonValueKind.Array
                 ? hriElem.EnumerateArray()
                     .Select(e => e.ValueKind == JsonValueKind.String ? e.GetString() : e.ToString())
                     .Where(s => !string.IsNullOrEmpty(s))
