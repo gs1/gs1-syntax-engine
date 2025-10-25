@@ -356,6 +356,7 @@ jobs:
       run: |
         msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 /warnaserror src\gs1encoders.sln
         msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\net8.0-windows\win-x86\publish\ /warnaserror src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
+        msbuild /t:Publish /p:Configuration=release /p:Platform="x64" /p:PlatformTarget="x64" /p:PublishSingleFile=True /p:SelfContained=True /p:IncludeNativeLibrariesForSelfExtract=true /p:RuntimeIdentifier=win-x64 /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ /restore /warnaserror src\js-wasm\example-web-service-user-dotnet-app\gs1encoders-example-web-service-user-dotnet-app.csproj
 
     - name: ZIP development libs
       working-directory: src/c-lib/build/library/Win32/Release
@@ -393,6 +394,17 @@ jobs:
         path: src/dotnet-app/bin/Release/net8.0-windows/win-x86/publish/gs1encoders-windows-gui-app.zip
         retention-days: 1
 
+    - name: ZIP Windows Web service user app
+      working-directory: src/js-wasm/example-web-service-user-dotnet-app/bin/Release/net8.0-windows/win-x64/publish
+      run: |
+        7z a example-web-service-user-app.zip gs1encoders-example-web-service-user-dotnet-app.exe
+
+    - name: Store Windows Web service user app
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-web-service-user-app
+        path: src/js-wasm/example-web-service-user-dotnet-app/bin/Release/net8.0-windows/win-x64/publish/example-web-service-user-app.zip
+        retention-days: 1
 
   build-release-linux:
 
@@ -610,5 +622,15 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: gs1encoders-jsonly-app.zip
         asset_name: gs1encoders-jsonly-app.zip
+        asset_content_type: application/octet-stream
+
+    - name: "Upload asset: Example Windows web service user application"
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: example-web-service-and-user-app.zip
+        asset_name: example-web-service-and-user-app.zip
         asset_content_type: application/octet-stream
 
