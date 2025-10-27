@@ -355,7 +355,7 @@ jobs:
     - name: Windows release build
       run: |
         msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 /warnaserror src\gs1encoders.sln
-        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\net8.0-windows\win-x86\publish\ /warnaserror src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
+        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:IncludeNativeLibrariesForSelfExtract=true /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\net8.0-windows\win-x86\publish\ /warnaserror src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
         msbuild /t:Publish /p:Configuration=release /p:Platform="x64" /p:PlatformTarget="x64" /p:PublishSingleFile=True /p:SelfContained=True /p:IncludeNativeLibrariesForSelfExtract=true /p:RuntimeIdentifier=win-x64 /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ /restore /warnaserror src\js-wasm\example-web-service-user-dotnet-app\gs1encoders-example-web-service-user-dotnet-app.csproj
 
     - name: ZIP development libs
