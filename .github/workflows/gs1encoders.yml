@@ -497,6 +497,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     needs:
       - ci-gcc
       - ci-clang
@@ -552,90 +555,20 @@ jobs:
       with:
         name: jsonly-app
 
-    - name: Get version
-      id: get_version
-      run: |
-        VERSION=${GITHUB_REF/refs\/tags\//}
-        echo ::set-output name=VERSION::$VERSION
-
     - name: Create GitHub release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ steps.get_version.outputs.VERSION }}
-        release_name: ${{ steps.get_version.outputs.VERSION }}
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
         draft: false
         prerelease: false
-
-    - name: "Upload asset: Windows development libs"
-      uses: actions/upload-release-asset@v1
+        files: |
+          gs1encoders-windows-libs.zip
+          gs1encoders-windows-console-app.zip
+          gs1encoders-windows-gui-app.zip
+          gs1encoders-linux-app.tgz
+          gs1encoders-wasm-app.zip
+          gs1encoders-jsonly-app.zip
+          example-web-service-user-app.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-libs.zip
-        asset_name: gs1encoders-windows-libs.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Windows console application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-console-app.zip
-        asset_name: gs1encoders-windows-console-app.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Windows GUI application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-gui-app.zip
-        asset_name: gs1encoders-windows-gui-app.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Linux application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-linux-app.tgz
-        asset_name: gs1encoders-linux-app.tgz
-        asset_content_type: application/octet-stream
-
-    - name: "Upload asset: WASM applications (browser and Node.js)"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-wasm-app.zip
-        asset_name: gs1encoders-wasm-app.zip
-        asset_content_type: application/octet-stream
-
-    - name: "Upload asset: JSONLY applications (browser and Node.js)"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-jsonly-app.zip
-        asset_name: gs1encoders-jsonly-app.zip
-        asset_content_type: application/octet-stream
-
-    - name: "Upload asset: Example Windows web service user application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: example-web-service-user-app.zip
-        asset_name: example-web-service-user-app.zip
-        asset_content_type: application/octet-stream
-
