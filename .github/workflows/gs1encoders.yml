@@ -532,6 +532,11 @@ jobs:
       with:
         name: windows-gui-app
 
+    - name: Load Windows Web Service User app
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-web-service-user-app
+
     - name: Load Linux app
       uses: actions/download-artifact@v4
       with:
@@ -630,7 +635,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: example-web-service-and-user-app.zip
-        asset_name: example-web-service-and-user-app.zip
+        asset_path: example-web-service-user-app.zip
+        asset_name: example-web-service-user-app.zip
         asset_content_type: application/octet-stream
 
