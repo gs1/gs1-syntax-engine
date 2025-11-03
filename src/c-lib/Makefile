@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+.DEFAULT_GOAL := default
 
 VERSION := $(shell egrep -m1 '^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$(dollar)' ../../CHANGES)
 
@@ -194,17 +195,9 @@ OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
 
-.PHONY: all clean app app-static lib libshared libstatic install install-static install-shared uninstall test clean-test wasm clean-wasm fuzzer clean-fuzzer docs copyright setversion
-
-default: lib app-static
-all: lib app app-static
-lib: libshared libstatic
-libshared: $(LIB_SHARED)
-libstatic: $(LIB_STATIC)
-app: $(APP)
-app-static: $(APP_STATIC)
-
-
+#
+#  General goals
+#
 $(BUILD_DIR)/syntax/:
 	mkdir -p $@
 
@@ -238,6 +231,7 @@ $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDFLAGS_SO) $(LDLIBS) $^ -o $@
 
 endif
+
 
 #
 #  Static library
@@ -315,9 +309,32 @@ $(BUILD_DIR)/$(FUZZER_PREFIX)syn: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o
 #
 #  Utility targets
 #
+.PHONY: default
+default: lib app-static
+
+.PHONY: all
+all: lib app app-static
+
+.PHONY: lib
+lib: libshared libstatic
+
+.PHONY: libshared
+libshared: $(LIB_SHARED)
+
+.PHONY: libstatic
+libstatic: $(LIB_STATIC)
+
+.PHONY: app
+app: $(APP)
+
+.PHONY: app-static
+app-static: $(APP_STATIC)
+
+.PHONY: .wasm
 wasm: $(WASM_JS)
 	@cp -f $(WASM_OUT_FILES) $(WASM_DIR)/
 
+.PHONY: test
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
@@ -365,6 +382,7 @@ $(addprefix fuzzer-,$(FUZZER_NAMES)): fuzzer-%: $(BUILD_DIR)/$(FUZZER_PREFIX)% f
 	@echo '$(SAN_ENV)' $(BUILD_DIR)/$(FUZZER_PREFIX)$* -jobs=`$(NPROC)` -workers=`$(NPROC)` $(FUZZER_CORPUS_PREFIX)$*
 	@echo
 
+.PHONY: fuzzer
 fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 	@echo
 	@echo "Start fuzzing as follows:"
@@ -374,36 +392,46 @@ fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 	done
 	@echo
 
+.PHONY: clean
 clean:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
+.PHONY: clean-test
 clean-test:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
+.PHONY: clean-fuzzer
 clean-fuzzer:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
+.PHONY: clean-fuzzer-corpus
 clean-fuzzer-corpus:
 	$(RM) -r $(FUZZER_CORPUSES)
 
+.PHONY: clean-wasm
 clean-wasm:
 	$(RM) $(OBJS) $(WASM_JS) $(WASM_WASM) $(WASM_DIST_FILES) $(DEPS)
 
+.PHONY: install
 install: install-static install-shared
 
+.PHONY: .install-headers
 install-headers:
 	install -d $(DESTDIR)$(PREFIX)/include
 	install -m 0644 $(NAME).h $(DESTDIR)$(PREFIX)/include
 
+.PHONY: install-static
 install-static: libstatic install-headers
 	install -d $(DESTDIR)$(LIBDIR)
 	install -m 0644 $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX) $(DESTDIR)$(LIBDIR)
 
+.PHONY: install-shared
 install-shared: libshared install-headers
 	install -d $(DESTDIR)$(LIBDIR)
 	install -m 0644 $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION) $(DESTDIR)$(LIBDIR)
 	-ldconfig
 
+.PHONY: uninstall
 uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/include/$(NAME).h
 	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_DYN_SUFFIX).$(VERSION)
@@ -412,7 +440,8 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/lib/lib$(NAME).$(LIB_STATIC_SUFFIX)
 	-ldconfig
 
-docs:
+.PHONY: docs-clib
+docs-clib:
 	doxygen
 	cp docstmp/gs1encoders_8h.html ../../docs/index.html
 	cp docstmp/gs1encoders_8h.html ../../docs
@@ -436,13 +465,19 @@ docs:
 	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder-wasm.mjs ../../docs/demo
 
+.PHONY: docs
+docs: docs-clib
+
+.PHONY: copyright
 copyright:
 	git ls-files -z .. | xargs -0 -I{} sed -i --follow-symlinks -e "s/Copyright (c) \([[:digit:]]\{4\}\)\(-[[:digit:]]\{4\}\)\{0,1\} GS1 AISBL/Copyright (c) \1-$$(date +'%Y') GS1 AISBL/" {}
 
+.PHONY: setversion
 setversion:
 	(cd ../js-wasm && npm version --allow-same-version $(VERSION))
 	sed -i 's/name="Implementation-Version" value="[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+"/name="Implementation-Version" value="$(VERSION)"/' ../java/build.xml
 
+.PHONY: syncsyntaxdict
 syncsyntaxdict:
 	cp ../../../gs1-syntax-dictionary/gs1-syntax-dictionary.txt .
 	cp ../../../gs1-syntax-dictionary/src/acutest.h syntax/
