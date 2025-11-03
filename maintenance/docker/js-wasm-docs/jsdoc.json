@@ -1,0 +1,16 @@
+{
+  "source": {
+    "include": ["../../../src/js-wasm/gs1encoder.mjs"],
+    "includePattern": ".+\\.mjs$"
+  },
+  "opts": {
+    "destination": "../../../docs/js-wasm",
+    "template": "templates/default"
+  },
+  "templates": {
+    "default": {
+      "includeDate": false,
+      "outputSourceFiles": false
+    }
+  }
+}

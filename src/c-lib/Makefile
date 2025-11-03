@@ -442,22 +442,25 @@ uninstall:
 
 .PHONY: docs-clib
 docs-clib:
-	doxygen
-	cp docstmp/gs1encoders_8h.html ../../docs/index.html
-	cp docstmp/gs1encoders_8h.html ../../docs
-	cp docstmp/doxygen.css ../../docs
-	cp docstmp/doxygen.svg ../../docs
-	cp docstmp/dynsections.js ../../docs
-	cp docstmp/jquery.js ../../docs
-	cp docstmp/menu.js ../../docs
-	cp docstmp/menudata.js ../../docs
-	cp docstmp/nav_f.png ../../docs
-	cp docstmp/nav_g.png ../../docs
-	cp docstmp/nav_h.png ../../docs
-	cp docstmp/tab_a.png ../../docs
-	cp docstmp/tab_b.png ../../docs
-	cp docstmp/tab_s.png ../../docs
-	cp docstmp/tabs.css ../../docs
+	../../maintenance/docker/c-docs/docker-build.sh
+	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs/index.html
+	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs
+	cp ../../maintenance/docker/c-docs/build/doxygen.css ../../docs
+	cp ../../maintenance/docker/c-docs/build/doxygen.svg ../../docs
+	cp ../../maintenance/docker/c-docs/build/dynsections.js ../../docs
+	cp ../../maintenance/docker/c-docs/build/jquery.js ../../docs
+	cp ../../maintenance/docker/c-docs/build/menu.js ../../docs
+	cp ../../maintenance/docker/c-docs/build/menudata.js ../../docs
+	cp ../../maintenance/docker/c-docs/build/nav_f.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/nav_g.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/nav_h.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/tab_a.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/tab_b.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/tab_s.png ../../docs
+	cp ../../maintenance/docker/c-docs/build/tabs.css ../../docs
+
+.PHONY: docs-demo
+docs-demo:
 	(cd ../.. && docker run --rm -v $$(pwd):/src -u $$(id -u):$$(id -g) emscripten/emsdk  make -C src/c-lib wasm JSONLY=yes)
 	mkdir -p ../../docs/demo
 	cp ../js-wasm/example.html ../../docs/demo
@@ -465,8 +468,22 @@ docs-clib:
 	cp ../js-wasm/gs1encoder.mjs ../../docs/demo
 	cp ../js-wasm/gs1encoder-wasm.mjs ../../docs/demo
 
+.PHONY: docs-cs
+docs-cs:
+	../../maintenance/docker/cs-docs/docker-build.sh
+	cp ../../docs/cs/GS1.Encoders.html ../../docs/cs/index.html
+
+.PHONY: docs-java
+docs-java:
+	../../maintenance/docker/java-docs/docker-build.sh
+
+.PHONY: docs-js-wasm
+docs-js-wasm:
+	../../maintenance/docker/js-wasm-docs/docker-build.sh
+	cp ../../docs/js-wasm/GS1encoder.html ../../docs/js-wasm/index.html
+
 .PHONY: docs
-docs: docs-clib
+docs: docs-clib docs-cs docs-java docs-js-wasm docs-demo
 
 .PHONY: copyright
 copyright:

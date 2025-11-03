@@ -1,0 +1,30 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [ "*.csproj" ],
+          "src": "../../../src/dotnet-lib"
+        }
+      ],
+      "dest": "build"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "**.yml" ],
+        "src": "build"
+      }
+    ],
+    "dest": "../../../docs/cs",
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "globalMetadata": {
+      "_disableNavbar": true,
+      "_disableContribution": true,
+      "_docfxVersion": ""
+    },
+    "template": [ "default" ]
+  }
+}
