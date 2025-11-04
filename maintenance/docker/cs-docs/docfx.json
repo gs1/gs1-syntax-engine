@@ -3,7 +3,7 @@
     {
       "src": [
         {
-          "files": [ "*.csproj" ],
+          "files": [ "GS1Encoder.cs" ],
           "src": "../../../src/dotnet-lib"
         }
       ],
