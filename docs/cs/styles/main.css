@@ -1,0 +1,13 @@
+/* Hide inheritance and inherited members sections */
+.inheritance {
+    display: none;
+}
+
+.inheritedMembers {
+    display: none;
+}
+
+/* Hide assembly information - targets h6 after namespace h6 */
+h6 + h6 {
+    display: none;
+}

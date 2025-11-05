@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class GS1Encoder </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class GS1Encoder ">
+    
+    <meta name="description" content="Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.">
+      <link rel="shortcut icon" href="favicon.ico">
+      <link rel="stylesheet" href="styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="styles/docfx.css">
+      <link rel="stylesheet" href="styles/main.css">
+      <meta property="docfx:navrel" content="toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="GS1.Encoders.GS1Encoder">
+
+
+
+  <h1 id="GS1_Encoders_GS1Encoder" data-uid="GS1.Encoders.GS1Encoder" class="text-break">Class GS1Encoder</h1>
+  <div class="markdown level0 summary"><p>Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">GS1Encoder</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="GS1.html">GS1</a>.<a class="xref" href="GS1.Encoders.html">Encoders</a></h6>
+  <h6><strong>Assembly</strong>: .dll</h6>
+  <h5 id="GS1_Encoders_GS1Encoder_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class GS1Encoder</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <a id="GS1_Encoders_GS1Encoder__ctor_" data-uid="GS1.Encoders.GS1Encoder.#ctor*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder__ctor" data-uid="GS1.Encoders.GS1Encoder.#ctor">GS1Encoder()</h4>
+  <div class="markdown level1 summary"><p>Initialises a new instance of the GS1Encoder class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GS1Encoder()</code></pre>
+  </div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderGeneralException.html">GS1EncoderGeneralException</a></td>
+        <td><p>Thrown when the library fails to initialise</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <a id="GS1_Encoders_GS1Encoder_AIdataStr_" data-uid="GS1.Encoders.GS1Encoder.AIdataStr*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_AIdataStr" data-uid="GS1.Encoders.GS1Encoder.AIdataStr">AIdataStr</h4>
+  <div class="markdown level1 summary"><p>Get/set the barcode data input buffer using GS1 Application Identifier syntax.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string AIdataStr { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The barcode data in human-friendly GS1 AI syntax, or <code>null</code> if the input data does not contain AI data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_AIdataStr_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+The input is provided in human-friendly format <strong>without</strong> FNC1 characters
+which are inserted automatically, for example:
+</p>
+<p>
+<code>(01)12345678901231(10)ABC123(11)210630</code>
+</p>
+<p>
+This syntax harmonises the format for the input accepted by all symbologies.
+For example, the following input is acceptable for EAN-13, UPC-A, UPC-E, any
+variant of the GS1 DataBar family, GS1 QR Code and GS1 DataMatrix:
+</p>
+<p>
+<code>(01)00031234000054</code>
+</p>
+<p>
+The input is immediately parsed and validated against certain rules for GS1 AIs, after
+which the resulting encoding for valid inputs is available via <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_DataStr">DataStr</a>.
+If the input is invalid then an exception will be thrown.
+</p>
+<p>
+Any <code>"("</code> characters in AI element values must be escaped as <code>"\\("</code> to avoid
+conflating them with the start of the next AI.
+</p>
+<p>
+For symbologies that support a composite component (all except Data Matrix, QR Code,
+and DotCode), the data for the linear and 2D components can be separated by a
+<code>"|"</code> character, for example:
+</p>
+<p>
+<code>(01)12345678901231|(10)ABC123(11)210630</code>
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_AddCheckDigit_" data-uid="GS1.Encoders.GS1Encoder.AddCheckDigit*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_AddCheckDigit" data-uid="GS1.Encoders.GS1Encoder.AddCheckDigit">AddCheckDigit</h4>
+  <div class="markdown level1 summary"><p>Get/set the &quot;add check digit&quot; mode for EAN/UPC and GS1 DataBar symbols.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool AddCheckDigit { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if check digits will be generated automatically; <code>false</code> if the data must include a valid check digit.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_AddCheckDigit_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+If <code>false</code> (default), then the data string must contain a valid check digit.
+If <code>true</code>, then the data string must not contain a check digit as one will
+be generated automatically.
+</p>
+<p>
+This option is only valid for symbologies that accept fixed-length data,
+specifically EAN/UPC and GS1 DataBar except Expanded (Stacked).
+</p>
+</div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderParameterException.html">GS1EncoderParameterException</a></td>
+        <td><p>Thrown when the setter is provided with an invalid value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="GS1_Encoders_GS1Encoder_DLignoredQueryParams_" data-uid="GS1.Encoders.GS1Encoder.DLignoredQueryParams*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_DLignoredQueryParams" data-uid="GS1.Encoders.GS1Encoder.DLignoredQueryParams">DLignoredQueryParams</h4>
+  <div class="markdown level1 summary"><p>Get the non-numeric (ignored) query parameters from a GS1 Digital Link URI.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string[] DLignoredQueryParams { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><p>An array of strings containing the non-numeric query parameters that were ignored when processing a GS1 Digital Link URI.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_DLignoredQueryParams_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+For example, if the input data buffer contains:
+<code>https://a/01/12312312312333/22/ABC?name=Donald%2dDuck&amp;99=ABC&amp;testing&amp;type=cartoon</code>
+</p>
+<p>
+Then this property returns:
+<code>name=Donald%2dDuck</code>, <code>testing</code>, <code>type=cartoon</code>
+</p>
+<p>
+The returned strings are not URI decoded. The expected use for this property is to
+present which sections of a given GS1 Digital Link URI have been ignored.
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_DataStr_" data-uid="GS1.Encoders.GS1Encoder.DataStr*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_DataStr" data-uid="GS1.Encoders.GS1Encoder.DataStr">DataStr</h4>
+  <div class="markdown level1 summary"><p>Get/set the raw data that would be directly encoded within a GS1 barcode message.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string DataStr { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The raw barcode data input buffer.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_DataStr_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+A <code>"^"</code> character at the start of the input indicates that the data is in GS1
+Application Identifier syntax. In this case, all subsequent instances of the
+<code>"^"</code> character represent the FNC1 non-data characters that are used to
+separate fields that are not specified as being pre-defined length from
+subsequent fields.
+</p>
+<p>
+Inputs beginning with <code>"^"</code> will be validated against certain data syntax
+rules for GS1 AIs. If the input is invalid then this setter will throw
+a <a class="xref" href="GS1.Encoders.GS1EncoderParameterException.html">GS1EncoderParameterException</a>.
+In the case that the data is unacceptable due to invalid AI content then
+a marked up version of the offending AI can be retrieved using <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ErrMarkup">ErrMarkup</a>.
+</p>
+<p>
+<strong>Note:</strong> It is strongly advised that GS1 data input is instead specified using
+<a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_AIdataStr">AIdataStr</a> which takes care of the AI encoding rules
+automatically, including insertion of FNC1 characters where required. This
+can be used for all symbologies that accept GS1 AI syntax data.
+</p>
+<p>
+Inputs beginning with <code>"http://"</code> or <code>"https://"</code> will be parsed as a GS1
+Digital Link URI during which the corresponding AI element string is
+extracted and validated.
+</p>
+<p>
+EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The
+Composite Component must be specified in AI syntax. It must be separated
+from the primary linear components with a <code>"|"</code> character and begin with an
+FNC1 in first position, for example:
+</p>
+<pre><code class="lang-csharp">encoder.DataStr = "^0112345678901231|^10ABC123^11210630";</code></pre>
+<p>
+The above specifies a linear component representing "(01)12345678901231"
+together with a composite component representing "(10)ABC123(11)210630".
+</p>
+<p>
+<strong>Note:</strong> For GS1 data it is simpler and less error prone to specify the input
+in human-friendly GS1 AI syntax using <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_AIdataStr">AIdataStr</a>.
+</p>
+</div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderParameterException.html">GS1EncoderParameterException</a></td>
+        <td><p>Thrown when the setter is provided with invalid data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_DataStr_seealso">See Also</h5>
+  <div class="seealso">
+      <div><a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_AIdataStr">AIdataStr</a></div>
+      <div><a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ErrMarkup">ErrMarkup</a></div>
+  </div>
+  <a id="GS1_Encoders_GS1Encoder_ErrMarkup_" data-uid="GS1.Encoders.GS1Encoder.ErrMarkup*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_ErrMarkup" data-uid="GS1.Encoders.GS1Encoder.ErrMarkup">ErrMarkup</h4>
+  <div class="markdown level1 summary"><p>Get the error markup generated when parsing AI data fails due to a linting failure.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ErrMarkup { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>Marked up instance of the AI that failed validation, or empty string if no linting failure.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_ErrMarkup_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+When a setter function returns <code>false</code> (indicating an error), if that failure is due to
+AI-based data being invalid, a marked up instance of the AI that failed will be generated.
+</p>
+<p>
+Where it is meaningful to identify offending characters in the input data, these characters
+will be surrounded by <code>"|"</code> characters. Otherwise the entire AI value will be surrounded by
+<code>"|"</code> characters.
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_HRI_" data-uid="GS1.Encoders.GS1Encoder.HRI*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_HRI" data-uid="GS1.Encoders.GS1Encoder.HRI">HRI</h4>
+  <div class="markdown level1 summary"><p>Get the Human-Readable Interpretation (&quot;HRI&quot;) text for the current data input buffer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string[] HRI { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><p>An array of null-terminated strings representing the HRI text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_HRI_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+For composite symbols, a separator "--" will be included in the array to distinguish
+between the linear and 2D components.
+</p>
+<p>
+Example output for <code>^011231231231233310ABC123|^99XYZ(TM) CORP</code>:
+</p>
+<p>
+<code>(01) 12312312312333</code><br>
+<code>(10) ABC123</code><br>
+<code>--</code><br>
+<code>(99) XYZ(TM) CORP</code>
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_IncludeDataTitlesInHRI_" data-uid="GS1.Encoders.GS1Encoder.IncludeDataTitlesInHRI*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_IncludeDataTitlesInHRI" data-uid="GS1.Encoders.GS1Encoder.IncludeDataTitlesInHRI">IncludeDataTitlesInHRI</h4>
+  <div class="markdown level1 summary"><p>Get/set the &quot;include data titles in HRI&quot; flag.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IncludeDataTitlesInHRI { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if data titles should be included in HRI; otherwise <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_IncludeDataTitlesInHRI_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+When set to <code>true</code>, data titles from the GS1 General Specification will be
+included in the HRI text.
+</p>
+<p>
+Default: <code>false</code>
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_PermitUnknownAIs_" data-uid="GS1.Encoders.GS1Encoder.PermitUnknownAIs*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_PermitUnknownAIs" data-uid="GS1.Encoders.GS1Encoder.PermitUnknownAIs">PermitUnknownAIs</h4>
+  <div class="markdown level1 summary"><p>Get/set the &quot;permit unknown AIs&quot; mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PermitUnknownAIs { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if unknown AIs are permitted; otherwise <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_PermitUnknownAIs_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+If <code>false</code> (default), then all AIs represented by the input data must be
+known.
+</p>
+<p>
+If <code>true</code>, then unknown AIs (those not in this library's static AI table)
+will be accepted.
+</p>
+<p>
+<strong>Note:</strong> The option only applies to parsed input data, specifically bracketed AI data
+supplied with <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_AIdataStr">AIdataStr</a> and GS1 Digital Link URIs supplied
+with <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_DataStr">DataStr</a>. Unbracketed AI element strings containing
+unknown AIs cannot be parsed because it is not possible to differentiate the
+AI from its data value when the length of the AI is uncertain.
+</p>
+<p>
+Default: <code>false</code>
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_PermitZeroSuppressedGTINinDLuris_" data-uid="GS1.Encoders.GS1Encoder.PermitZeroSuppressedGTINinDLuris*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_PermitZeroSuppressedGTINinDLuris" data-uid="GS1.Encoders.GS1Encoder.PermitZeroSuppressedGTINinDLuris">PermitZeroSuppressedGTINinDLuris</h4>
+  <div class="markdown level1 summary"><p>Get/set the &quot;permit zero-suppressed GTIN in GS1 DL URIs&quot; mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool PermitZeroSuppressedGTINinDLuris { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if zero-suppressed GTINs are permitted in GS1 Digital Link URIs; otherwise <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_PermitZeroSuppressedGTINinDLuris_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+If <code>false</code> (default), then the value of a path component for AI (01) must
+be provided as a full GTIN-14.
+</p>
+<p>
+If <code>true</code>, then the value of a path component for AI (01) may contain the
+GTIN-14 with zeros suppressed, in the format of a GTIN-13, GTIN-12 or GTIN-8.
+</p>
+<p>
+This option only applies to parsed input data, specifically GS1 Digital Link
+URIs. Since zero-suppressed GTINs are deprecated, this option should only be
+enabled when it is necessary to accept legacy GS1 Digital Link URIs having
+zero-suppressed GTIN-14.
+</p>
+<p>
+Default: <code>false</code>
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_ScanData_" data-uid="GS1.Encoders.GS1Encoder.ScanData*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_ScanData" data-uid="GS1.Encoders.GS1Encoder.ScanData">ScanData</h4>
+  <div class="markdown level1 summary"><p>Process scan data received from a barcode reader or return the expected scan data string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string ScanData { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The scan data string that a reader should return when scanning the current data, or <code>null</code> if invalid.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_ScanData_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+<strong>Setting:</strong> Process normalised scan data received from a barcode reader with
+reporting of AIM symbology identifiers enabled to extract the message data and perform
+syntax checks in the case of GS1 Digital Link and AI data input.
+</p>
+<p>
+This function will process scan data (such as the output of a barcode reader) and process
+the received data, setting the data input buffer to the message received and setting the
+selected symbology to something that is able to carry the received data.
+</p>
+<p>
+<strong>Note:</strong> In some instances the symbology determined by this library will not match
+that of the image that was scanned. The AIM symbology identifier prefix of the
+scan data does not always uniquely identify the symbology that was scanned.
+For example GS1-128 Composite symbols share the same symbology identifier as
+the GS1 DataBar family, and will therefore be detected as such.
+</p>
+<p>
+A literal <code>"|"</code> character may be included in the scan data to indicate the
+separation between the first and second messages that would be transmitted
+by a reader that is configured to return the composite component when
+reading EAN/UPC symbols.
+</p>
+<p>
+Example scan data input: <code>]C1011231231231233310ABC123{GS}99TESTING</code>
+where {GS} represents ASCII character 29.
+</p>
+<p>
+<strong>Getting:</strong> Returns the string that should be returned by scanners when reading a
+symbol that is an instance of the selected symbology and contains the same input data.
+</p>
+<p>
+The output will be prefixed with the appropriate AIM symbology identifier.
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_Sym_" data-uid="GS1.Encoders.GS1Encoder.Sym*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_Sym" data-uid="GS1.Encoders.GS1Encoder.Sym">Sym</h4>
+  <div class="markdown level1 summary"><p>Get/set the symbology type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GS1Encoder.Symbology Sym { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a>.<a class="xref" href="GS1.Encoders.GS1Encoder.Symbology.html">Symbology</a></td>
+        <td><p>The current symbology type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_Sym_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+This might be set manually or automatically when processing scan data with <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ScanData">ScanData</a>.
+</p>
+</div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderParameterException.html">GS1EncoderParameterException</a></td>
+        <td><p>Thrown when the setter is provided with an invalid symbology type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_Sym_seealso">See Also</h5>
+  <div class="seealso">
+      <div><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a>.<a class="xref" href="GS1.Encoders.GS1Encoder.Symbology.html">Symbology</a></div>
+      <div><a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ScanData">ScanData</a></div>
+  </div>
+  <a id="GS1_Encoders_GS1Encoder_ValidateAIassociations_" data-uid="GS1.Encoders.GS1Encoder.ValidateAIassociations*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_ValidateAIassociations" data-uid="GS1.Encoders.GS1Encoder.ValidateAIassociations">ValidateAIassociations</h4>
+  <div class="markdown level1 summary"><p>Get/set the &quot;validate AI associations&quot; flag.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Obsolete]
+public bool ValidateAIassociations { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the <a class="xref" href="GS1.Encoders.GS1Encoder.Validation.html#GS1_Encoders_GS1Encoder_Validation_RequisiteAIs">RequisiteAIs</a> validation procedure is enabled; otherwise <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_ValidateAIassociations_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+<strong>Deprecated:</strong> Use <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_SetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_System_Boolean_">SetValidationEnabled(Validation, bool)</a>
+and <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_GetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_">GetValidationEnabled(Validation)</a> instead.
+</p>
+<p>
+This property is equivalent to using the <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_GetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_">GetValidationEnabled(Validation)</a> and
+<a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_SetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_System_Boolean_">SetValidationEnabled(Validation, bool)</a> methods with the
+<a class="xref" href="GS1.Encoders.GS1Encoder.Validation.html#GS1_Encoders_GS1Encoder_Validation_RequisiteAIs">RequisiteAIs</a> validation procedure.
+</p>
+</div>
+  <a id="GS1_Encoders_GS1Encoder_Version_" data-uid="GS1.Encoders.GS1Encoder.Version*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_Version" data-uid="GS1.Encoders.GS1Encoder.Version">Version</h4>
+  <div class="markdown level1 summary"><p>Get the version string of the library.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string Version { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>A string containing the version of the library, typically the build date.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <a id="GS1_Encoders_GS1Encoder_GetDLuri_" data-uid="GS1.Encoders.GS1Encoder.GetDLuri*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_GetDLuri_System_String_" data-uid="GS1.Encoders.GS1Encoder.GetDLuri(System.String)">GetDLuri(string)</h4>
+  <div class="markdown level1 summary"><p>Get a GS1 Digital Link URI that represents the AI-based input data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GetDLuri(string Stem)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">Stem</span></td>
+        <td><p>A URI &quot;stem&quot; used as a prefix for the URI. If <code>null</code>, the GS1 canonical stem (<a href="https://id.gs1.org/">https://id.gs1.org/</a>) will be used.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>A string representing the GS1 Digital Link URI for the input data</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_GetDLuri_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+This method converts AI-based input data into a GS1 Digital Link URI format.
+</p>
+<p>
+Example: <code>(01)12345678901231(10)ABC123(11)210630</code> with stem
+<code>https://id.example.com/stem</code> might produce:
+<code>https://id.example.com/stem/01/12345678901231?10=ABC123&amp;11=210630</code>
+</p>
+</div>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderDigitalLinkException.html">GS1EncoderDigitalLinkException</a></td>
+        <td><p>Thrown when invalid input was provided</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="GS1_Encoders_GS1Encoder_GetValidationEnabled_" data-uid="GS1.Encoders.GS1Encoder.GetValidationEnabled*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_GetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_" data-uid="GS1.Encoders.GS1Encoder.GetValidationEnabled(GS1.Encoders.GS1Encoder.Validation)">GetValidationEnabled(Validation)</h4>
+  <div class="markdown level1 summary"><p>Get the current enabled status of the provided AI validation procedure.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool GetValidationEnabled(GS1Encoder.Validation validation)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a>.<a class="xref" href="GS1.Encoders.GS1Encoder.Validation.html">Validation</a></td>
+        <td><span class="parametername">validation</span></td>
+        <td><p>A validation procedure to check the status of</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the AI validation procedure is currently enabled; <code>false</code> otherwise</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="GS1_Encoders_GS1Encoder_SetValidationEnabled_" data-uid="GS1.Encoders.GS1Encoder.SetValidationEnabled*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_SetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_System_Boolean_" data-uid="GS1.Encoders.GS1Encoder.SetValidationEnabled(GS1.Encoders.GS1Encoder.Validation,System.Boolean)">SetValidationEnabled(Validation, bool)</h4>
+  <div class="markdown level1 summary"><p>Enable or disable the given AI validation procedure.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetValidationEnabled(GS1Encoder.Validation validation, bool enabled)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a>.<a class="xref" href="GS1.Encoders.GS1Encoder.Validation.html">Validation</a></td>
+        <td><span class="parametername">validation</span></td>
+        <td><p>A validation procedure to set the enabled status of</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">enabled</span></td>
+        <td><p><code>true</code> to enable the validation; <code>false</code> to disable</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="GS1_Encoders_GS1Encoder_SetValidationEnabled_GS1_Encoders_GS1Encoder_Validation_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+This determines whether certain checks are enforced when data is provided using
+<a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_AIdataStr">AIdataStr</a>, <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_DataStr">DataStr</a> or <a class="xref" href="GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ScanData">ScanData</a>.
+</p>
+<p>
+If enabled is <code>true</code> (default), then the corresponding validation will be enforced.
+If enabled is <code>false</code>, then the corresponding validation will not be enforced.
+</p>
+<p>
+<strong>Note:</strong> The option only applies to AI input data.
+</p>
+</div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

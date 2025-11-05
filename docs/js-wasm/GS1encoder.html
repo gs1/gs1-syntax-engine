@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: GS1encoder</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: GS1encoder</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>GS1encoder<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="GS1encoder"><span class="type-signature"></span>new GS1encoder<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a new GS1Encoder instance. Call <a href="GS1encoder.html#init">GS1encoder#init</a> to initialise it before use.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="GS1encoder.html">GS1encoder</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="addCheckDigit"><span class="type-signature"></span>addCheckDigit<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the "add check digit" mode for EAN/UPC and GS1 DataBar symbols.
+<p>
+If <code>false</code> (default), then the data string must contain a valid check digit.
+If <code>true</code>, then the data string must not contain a check digit as one will
+be generated automatically.
+<p>
+This option is only valid for symbologies that accept fixed-length data,
+specifically EAN/UPC and GS1 DataBar except Expanded (Stacked).
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="aiDataStr"><span class="type-signature"></span>aiDataStr<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the barcode data input buffer using GS1 Application Identifier syntax.
+<p>
+The input is provided in human-friendly format <strong>without</strong> FNC1 characters
+which are inserted automatically, for example:
+<p>
+<pre>(01)12345678901231(10)ABC123(11)210630</pre>
+<p>
+This syntax harmonises the format for the input accepted by all symbologies.
+For example, the following input is acceptable for EAN-13, UPC-A, UPC-E, any
+variant of the GS1 DataBar family, GS1 QR Code and GS1 DataMatrix:
+<p>
+<pre>(01)00031234000054</pre>
+<p>
+The input is immediately parsed and validated against certain rules for GS1 AIs, after
+which the resulting encoding for valid inputs is available via <a href="GS1encoder.html#dataStr">GS1encoder#dataStr</a>.
+If the input is invalid then an exception will be thrown.
+<p>
+Any <code>"("</code> characters in AI element values must be escaped as <code>"\\("</code> to avoid
+conflating them with the start of the next AI.
+<p>
+For symbologies that support a composite component (all except Data Matrix, QR Code,
+and DotCode), the data for the linear and 2D components can be separated by a
+<code>"|"</code> character, for example:
+<p>
+<pre>(01)12345678901231|(10)ABC123(11)210630</pre>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="dataStr"><span class="type-signature"></span>dataStr<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the raw data that would be directly encoded within a GS1 barcode message.
+<p>
+A <code>"^"</code> character at the start of the input indicates that the data is in GS1
+Application Identifier syntax. In this case, all subsequent instances of the
+<code>"^"</code> character represent the FNC1 non-data characters that are used to
+separate fields that are not specified as being pre-defined length from
+subsequent fields.
+<p>
+Inputs beginning with <code>"^"</code> will be validated against certain data syntax
+rules for GS1 AIs. If the input is invalid then the setter will throw
+a <a href="global.html#GS1encoderParameterException">GS1encoderParameterException</a>. In the case that the data is
+unacceptable due to invalid AI content then a marked up version of the
+offending AI can be retrieved using <a href="GS1encoder.html#errMarkup">GS1encoder#errMarkup</a>.
+<p>
+<strong>Note:</strong> It is strongly advised that GS1 data input is instead specified using
+<a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a> which takes care of the AI encoding rules
+automatically, including insertion of FNC1 characters where required. This
+can be used for all symbologies that accept GS1 AI syntax data.
+<p>
+Inputs beginning with <code>"http://"</code> or <code>"https://"</code> will be parsed as a GS1
+Digital Link URI during which the corresponding AI element string is
+extracted and validated.
+<p>
+EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The
+Composite Component must be specified in AI syntax. It must be separated
+from the primary linear components with a <code>"|"</code> character and begin with an
+FNC1 in first position, for example:
+<pre>
+encoder.dataStr = "^0112345678901231|^10ABC123^11210630";
+</pre>
+<p>
+The above specifies a linear component representing "(01)12345678901231"
+together with a composite component representing "(10)ABC123(11)210630".
+<p>
+<strong>Note:</strong> For GS1 data it is simpler and less error prone to specify the input
+in human-friendly GS1 AI syntax using <a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a>.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a></li>
+        
+            <li><a href="GS1encoder.html#errMarkup">GS1encoder#errMarkup</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="dlIgnoredQueryParams"><span class="type-signature"></span>dlIgnoredQueryParams<span class="type-signature"> :Array.&lt;string></span></h4>
+
+
+
+
+<div class="description">
+    Get the non-numeric (ignored) query parameters from a GS1 Digital Link URI.
+<p>
+For example, if the input data buffer contains:
+<pre>https://a/01/12312312312333/22/ABC?name=Donald%2dDuck&amp;99=ABC&amp;testing&amp;type=cartoon</pre>
+<p>
+Then this property returns: <code>name=Donald%2dDuck</code>, <code>testing</code>, <code>type=cartoon</code>
+<p>
+The returned strings are not URI decoded. The expected use for this property is to
+present which sections of a given GS1 Digital Link URI have been ignored.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="errMarkup"><span class="type-signature"></span>errMarkup<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Get the error markup generated when parsing AI data fails due to a linting failure.
+<p>
+When a setter function returns <code>false</code> (indicating an error), if that failure is due to
+AI-based data being invalid, a marked up instance of the AI that failed will be generated.
+<p>
+Where it is meaningful to identify offending characters in the input data, these characters
+will be surrounded by <code>"|"</code> characters. Otherwise the entire AI value will be surrounded by
+<code>"|"</code> characters.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hri"><span class="type-signature"></span>hri<span class="type-signature"> :Array.&lt;string></span></h4>
+
+
+
+
+<div class="description">
+    Get the Human-Readable Interpretation ("HRI") text for the current data input buffer.
+<p>
+For composite symbols, a separator "--" will be included in the array to distinguish
+between the linear and 2D components.
+<p>
+Example output for <code>^011231231231233310ABC123|^99XYZ(TM) CORP</code>:
+<pre>
+(01) 12312312312333
+(10) ABC123
+--
+(99) XYZ(TM) CORP
+</pre>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;string></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="includeDataTitlesInHRI"><span class="type-signature"></span>includeDataTitlesInHRI<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the "include data titles in HRI" flag.
+<p>
+When set to <code>true</code>, data titles from the GS1 General Specification will be
+included in the HRI text.
+<p>
+Default: <code>false</code>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="permitUnknownAIs"><span class="type-signature"></span>permitUnknownAIs<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the "permit unknown AIs" mode.
+<p>
+If <code>false</code> (default), then all AIs represented by the input data must be
+known.
+<p>
+If <code>true</code>, then unknown AIs (those not in this library's static AI table)
+will be accepted.
+<p>
+<strong>Note:</strong> The option only applies to parsed input data, specifically bracketed AI data
+supplied with <a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a> and GS1 Digital Link URIs supplied
+with <a href="GS1encoder.html#dataStr">GS1encoder#dataStr</a>. Unbracketed AI element strings containing
+unknown AIs cannot be parsed because it is not possible to differentiate the
+AI from its data value when the length of the AI is uncertain.
+<p>
+Default: <code>false</code>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="permitZeroSuppressedGTINinDLuris"><span class="type-signature"></span>permitZeroSuppressedGTINinDLuris<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
+<p>
+If false (default), then the value of a path component for AI (01) must
+be provided as a full GTIN-14.
+<p>
+If true, then the value of a path component for AI (01) may contain the
+GTIN-14 with zeros suppressed, in the format of a GTIN-13, GTIN-12 or GTIN-8.
+<p>
+This option only applies to parsed input data, specifically GS1 Digital Link
+URIs. Since zero-suppressed GTINs are deprecated, this option should only be
+enabled when it is necessary to accept legacy GS1 Digital Link URIs having
+zero-suppressed GTIN-14.
+<p>
+Default: false
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="scanData"><span class="type-signature"></span>scanData<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Process scan data received from a barcode reader or return the expected scan data string.
+<p>
+<strong>Setting:</strong> Process normalised scan data received from a barcode reader with
+reporting of AIM symbology identifiers enabled to extract the message data and perform
+syntax checks in the case of GS1 Digital Link and AI data input.
+<p>
+This function will process scan data (such as the output of a barcode reader) and process
+the received data, setting the data input buffer to the message received and setting the
+selected symbology to something that is able to carry the received data.
+<p>
+<strong>Note:</strong> In some instances the symbology determined by this library will not match
+that of the image that was scanned. The AIM symbology identifier prefix of the
+scan data does not always uniquely identify the symbology that was scanned.
+For example GS1-128 Composite symbols share the same symbology identifier as
+the GS1 DataBar family, and will therefore be detected as such.
+<p>
+A literal <code>"|"</code> character may be included in the scan data to indicate the
+separation between the first and second messages that would be transmitted
+by a reader that is configured to return the composite component when
+reading EAN/UPC symbols.
+<p>
+Example scan data input: <pre>]C1011231231231233310ABC123{GS}99TESTING</pre>
+where {GS} represents ASCII character 29.
+<p>
+<strong>Getting:</strong> Returns the string that should be returned by scanners when reading a
+symbol that is an instance of the selected symbology and contains the same input data.
+<p>
+The output will be prefixed with the appropriate AIM symbology identifier.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="sym"><span class="type-signature"></span>sym<span class="type-signature"> :<a href="GS1encoder.html#.symbology">GS1encoder.symbology</a></span></h4>
+
+
+
+
+<div class="description">
+    Get/set the symbology type.
+<p>
+This might be set manually or automatically when processing scan data with <a href="GS1encoder.html#scanData">GS1encoder#scanData</a>.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="GS1encoder.html#.symbology">GS1encoder.symbology</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="GS1encoder.html#scanData">GS1encoder#scanData</a></li>
+        
+            <li><a href="GS1encoder.html#.symbology">GS1encoder.symbology</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="validateAIassociations"><span class="type-signature"></span>validateAIassociations<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Get/set the "validate AI associations" flag.
+<p>
+<strong>Deprecated:</strong> Use <a href="GS1encoder.html#getValidationEnabled">GS1encoder#getValidationEnabled</a> and
+<a href="GS1encoder.html#setValidationEnabled">GS1encoder#setValidationEnabled</a> instead.
+<p>
+This property is equivalent to using the <a href="GS1encoder.html#getValidationEnabled">GS1encoder#getValidationEnabled</a> and
+<a href="GS1encoder.html#setValidationEnabled">GS1encoder#setValidationEnabled</a> methods with the
+<a href="GS1encoder.html#.validation">RequisiteAIs</a> validation procedure.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>Use <a href="GS1encoder.html#getValidationEnabled">GS1encoder#getValidationEnabled</a> and <a href="GS1encoder.html#setValidationEnabled">GS1encoder#setValidationEnabled</a> instead</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="version"><span class="type-signature"></span>version<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Get the version string of the library.
+<p>
+Returns a string containing the version of the library, typically the build date.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".symbology"><span class="type-signature">(static, constant) </span>symbology<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Recognised GS1 barcode formats ("symbologies") for processing scan data.
+<p>
+This object defines all supported GS1 barcode symbology types that can be used
+with the encoder. Each symbology has specific characteristics and use cases.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>NONE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">None defined</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarOmni</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Omnidirectional</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarTruncated</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Truncated</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarStacked</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Stacked</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarStackedOmni</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Stacked Omnidirectional</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarLimited</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Limited</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarExpanded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Expanded (Stacked)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UPCA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">UPC-A</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UPCE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">UPC-E</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>EAN13</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">EAN-13</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>EAN8</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">EAN-8</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>GS1_128_CCA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1-128 with CC-A or CC-B</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>GS1_128_CCC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1-128 with CC</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>QR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) QR Code</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DM</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) Data Matrix</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DotCode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) DotCode</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>NUMSYMS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value is the number of symbologies</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".validation"><span class="type-signature">(static, constant) </span>validation<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Optional AI validation procedures that may be applied to detect invalid inputs.
+<p>
+These validation procedures are applied when AI data is provided using
+<a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a>, <a href="GS1encoder.html#dataStr">GS1encoder#dataStr</a> or <a href="GS1encoder.html#scanData">GS1encoder#scanData</a>.
+<p>
+Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>MutexAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Mutually exclusive AIs (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>RequisiteAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Mandatory associations between AIs</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>RepeatedAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Repeated AIs having same value (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DigSigSerialKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UnknownAInotDLattr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Unknown AIs not permitted as GS1 DL URI data attributes</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>NUMVALIDATIONS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value is the number of validations</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getDLuri"><span class="type-signature"></span>getDLuri<span class="signature">(stem)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get a GS1 Digital Link URI that represents the AI-based input data.
+<p>
+This method converts AI-based input data into a GS1 Digital Link URI format.
+<p>
+Example: <pre>(01)12345678901231(10)ABC123(11)210630</pre> with stem
+<code>https://id.example.com/stem</code> might produce:
+<pre>https://id.example.com/stem/01/12345678901231?10=ABC123&11=210630</pre>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>stem</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A URI "stem" used as a prefix for the URI. If <code>null</code>, the GS1 canonical stem (https://id.gs1.org/) will be used</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        <a href="global.html#GS1encoderDigitalLinkException">GS1encoderDigitalLinkException</a>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a string representing the GS1 Digital Link URI for the input data
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getValidationEnabled"><span class="type-signature"></span>getValidationEnabled<span class="signature">(validation)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the current enabled status of the provided AI validation procedure.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>validation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GS1encoder.html#.validation">GS1encoder.validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A validation procedure to check the status of</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <code>true</code> if the AI validation procedure is currently enabled; <code>false</code> otherwise
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="init"><span class="type-signature">(async) </span>init<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Initialises a new instance of the GS1Encoder.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        <a href="global.html#GS1encoderGeneralException">GS1encoderGeneralException</a> if the library fails to initialise
+    
+    </div>
+
+
+    
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setValidationEnabled"><span class="type-signature"></span>setValidationEnabled<span class="signature">(validation, value)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Enable or disable the given AI validation procedure.
+<p>
+This determines whether certain checks are enforced when data is provided using
+<a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a>, <a href="GS1encoder.html#dataStr">GS1encoder#dataStr</a> or <a href="GS1encoder.html#scanData">GS1encoder#scanData</a>.
+<p>
+If enabled is <code>true</code> (default), then the corresponding validation will be enforced.
+If enabled is <code>false</code>, then the corresponding validation will not be enforced.
+<p>
+<strong>Note:</strong> The option only applies to AI input data.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>validation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GS1encoder.html#.validation">GS1encoder.validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A validation procedure to set the enabled status of</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><code>true</code> to enable the validation; <code>false</code> to disable</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        <a href="global.html#GS1encoderParameterException">GS1encoderParameterException</a>
+    
+    </div>
+
+
+    
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-gs1encoder.html">gs1encoder</a></li></ul><h3>Classes</h3><ul><li><a href="GS1encoder.html">GS1encoder</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GS1encoderDigitalLinkException">GS1encoderDigitalLinkException</a></li><li><a href="global.html#GS1encoderGeneralException">GS1encoderGeneralException</a></li><li><a href="global.html#GS1encoderParameterException">GS1encoderParameterException</a></li><li><a href="global.html#GS1encoderScanDataException">GS1encoderScanDataException</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a>
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

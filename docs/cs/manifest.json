@@ -1,0 +1,160 @@
+{
+  "source_base_path": "/srv/maintenance/docker/cs-docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1Encoder.Symbology.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1Encoder.Symbology.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1Encoder.Symbology",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1Encoder.Symbology.yml\" sourcestartlinenumber=\"1\">Recognised GS1 barcode formats (&quot;symbologies&quot;) for processing scan data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1Encoder.Validation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1Encoder.Validation.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1Encoder.Validation",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1Encoder.Validation.yml\" sourcestartlinenumber=\"1\">Optional AI validation procedures that may be applied to detect invalid inputs.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1Encoder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1Encoder.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1Encoder",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1Encoder.yml\" sourcestartlinenumber=\"1\">Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1EncoderDigitalLinkException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1EncoderDigitalLinkException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1EncoderDigitalLinkException",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderDigitalLinkException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate an error processing\nGS1 Digital Link data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1EncoderEncodeException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1EncoderEncodeException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1EncoderEncodeException",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderEncodeException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate a problem generating\na barcode symbol.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1EncoderGeneralException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1EncoderGeneralException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1EncoderGeneralException",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderGeneralException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate a general problem\ninitialising the library, such as when the dynamic-link library isn't accessible.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1EncoderParameterException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1EncoderParameterException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1EncoderParameterException",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderParameterException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate a problem with barcode\noptions that are being set.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1EncoderScanDataException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1EncoderScanDataException.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1EncoderScanDataException",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderScanDataException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate an error processing\nbarcode scan data.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders",
+      "Summary": "<p sourcefile=\"GS1.Encoders.md\" sourcestartlinenumber=\"1\">GS1 Barcode Syntax Engine - C# wrapper.</p>\n"
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "build/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "public/main.css",
+      "output": {
+        "resource": {
+          "relative_path": "styles/main.css"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
