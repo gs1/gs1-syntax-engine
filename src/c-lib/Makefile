@@ -443,21 +443,14 @@ uninstall:
 .PHONY: docs-clib
 docs-clib:
 	../../maintenance/docker/c-docs/docker-build.sh
-	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs/index.html
-	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs
-	cp ../../maintenance/docker/c-docs/build/doxygen.css ../../docs
-	cp ../../maintenance/docker/c-docs/build/doxygen.svg ../../docs
-	cp ../../maintenance/docker/c-docs/build/dynsections.js ../../docs
-	cp ../../maintenance/docker/c-docs/build/jquery.js ../../docs
-	cp ../../maintenance/docker/c-docs/build/menu.js ../../docs
-	cp ../../maintenance/docker/c-docs/build/menudata.js ../../docs
-	cp ../../maintenance/docker/c-docs/build/nav_f.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/nav_g.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/nav_h.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/tab_a.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/tab_b.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/tab_s.png ../../docs
-	cp ../../maintenance/docker/c-docs/build/tabs.css ../../docs
+	cp ../../maintenance/docker/c-docs/build/index.html ../../docs/
+	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs/
+	cp ../../maintenance/docker/c-docs/build/structgs1__encoder__init__opts.html ../../docs/
+	cp ../../maintenance/docker/c-docs/build/input_output_buffers.svg ../../docs/
+	cp ../../maintenance/docker/c-docs/build/*.css ../../docs/
+	cp ../../maintenance/docker/c-docs/build/*.js ../../docs/
+	cp ../../maintenance/docker/c-docs/build/*.svg ../../docs/
+	cp ../../maintenance/docker/c-docs/build/*.png ../../docs/
 
 .PHONY: docs-demo
 docs-demo:
