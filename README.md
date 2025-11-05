@@ -25,6 +25,7 @@ This project includes:
     * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper.
     * A browser-based web application that shows how to use the WebAssembly or pure JavaScript build of the library.
     * A Node.js console application that shows how to use the WebAssembly or pure JavaScript build of the library.
+    * An example Node.js web service that provides HTTP access to the library's functionality, together with an example HTTP client application.
     * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
     * An Xcode project that shows how to use the native library from Swift to create an iOS app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
 
@@ -32,8 +33,14 @@ This project includes:
 Documentation
 -------------
 
-The C library API is fully documented in the docs/ directory and is
-available online here: <https://gs1.github.io/gs1-syntax-engine/>
+API documentation is available for each supported language binding:
+
+| Language/binding | Documentation link                                |
+| ---------------- | ------------------------------------------------- |
+| Native C libary  | <https://gs1.github.io/gs1-syntax-engine/>        |
+| C# binding       | <https://gs1.github.io/gs1-syntax-engine/cs>      |
+| Java binding     | <https://gs1.github.io/gs1-syntax-engine/java>    |
+| JS + WebAssembly | <https://gs1.github.io/gs1-syntax-engine/js-wasm> |
 
 Instructions for getting started with the console application are provided in
 the [Console Application User Guide](https://github.com/gs1/gs1-syntax-engine/wiki/Console-Application-User-Guide).
