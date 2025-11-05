@@ -35,12 +35,12 @@ Documentation
 
 API documentation is available for each supported language binding:
 
-| Language/binding | Documentation link                                |
-| ---------------- | ------------------------------------------------- |
-| Native C libary  | <https://gs1.github.io/gs1-syntax-engine/>        |
-| C# .NET binding  | <https://gs1.github.io/gs1-syntax-engine/cs>      |
-| Java binding     | <https://gs1.github.io/gs1-syntax-engine/java>    |
-| JS + WebAssembly | <https://gs1.github.io/gs1-syntax-engine/js-wasm> |
+| Language/binding | Documentation link                                 |
+| ---------------- | -------------------------------------------------- |
+| Native C libary  | <https://gs1.github.io/gs1-syntax-engine/>         |
+| C# .NET binding  | <https://gs1.github.io/gs1-syntax-engine/cs/>      |
+| Java binding     | <https://gs1.github.io/gs1-syntax-engine/java/>    |
+| JS + WebAssembly | <https://gs1.github.io/gs1-syntax-engine/js-wasm/> |
 
 Instructions for getting started with the console application are provided in
 the [Console Application User Guide](https://github.com/gs1/gs1-syntax-engine/wiki/Console-Application-User-Guide).
