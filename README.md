@@ -38,7 +38,7 @@ API documentation is available for each supported language binding:
 | Language/binding | Documentation link                                |
 | ---------------- | ------------------------------------------------- |
 | Native C libary  | <https://gs1.github.io/gs1-syntax-engine/>        |
-| C# binding       | <https://gs1.github.io/gs1-syntax-engine/cs>      |
+| C# .NET binding  | <https://gs1.github.io/gs1-syntax-engine/cs>      |
 | Java binding     | <https://gs1.github.io/gs1-syntax-engine/java>    |
 | JS + WebAssembly | <https://gs1.github.io/gs1-syntax-engine/js-wasm> |
 
