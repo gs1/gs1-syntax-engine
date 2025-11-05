@@ -476,11 +476,12 @@ docs-cs:
 .PHONY: docs-java
 docs-java:
 	../../maintenance/docker/java-docs/docker-build.sh
+	cat ../../maintenance/docker/java-docs/custom.css >> ../../docs/java/stylesheet.css
 
 .PHONY: docs-js-wasm
 docs-js-wasm:
 	../../maintenance/docker/js-wasm-docs/docker-build.sh
-	cp ../../docs/js-wasm/GS1encoder.html ../../docs/js-wasm/index.html
+	cp ../../docs/js-wasm/module-gs1encoder.html ../../docs/js-wasm/index.html
 
 .PHONY: docs
 docs: docs-clib docs-cs docs-java docs-js-wasm docs-demo

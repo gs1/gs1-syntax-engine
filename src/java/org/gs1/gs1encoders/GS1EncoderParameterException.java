@@ -22,6 +22,11 @@ package org.gs1.gs1encoders;
  */
 
 public class GS1EncoderParameterException extends Exception {
+    /**
+     * Constructs a new GS1EncoderParameterException with the specified error message.
+     *
+     * @param msg the error message
+     */
     public GS1EncoderParameterException(String msg) {
         super(msg);
     }

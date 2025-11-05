@@ -22,6 +22,11 @@ package org.gs1.gs1encoders;
  */
 
 public class GS1EncoderGeneralException extends Exception {
+    /**
+     * Constructs a new GS1EncoderGeneralException with the specified error message.
+     *
+     * @param msg the error message
+     */
     public GS1EncoderGeneralException(String msg) {
         super(msg);
     }

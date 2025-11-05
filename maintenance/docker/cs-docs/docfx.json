@@ -17,6 +17,18 @@
         "src": "build"
       }
     ],
+    "overwrite": [
+      {
+        "files": [ "GS1.Encoders.md" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "main.css" ],
+        "src": "public",
+        "dest": "styles"
+      }
+    ],
     "dest": "../../../docs/cs",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],

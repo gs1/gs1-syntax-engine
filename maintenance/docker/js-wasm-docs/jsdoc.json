@@ -1,7 +1,7 @@
 {
   "source": {
-    "include": ["../../../src/js-wasm/gs1encoder.mjs"],
-    "includePattern": ".+\\.mjs$"
+    "include": ["../../../src/js-wasm/module-intro.js", "../../../src/js-wasm/gs1encoder.mjs"],
+    "includePattern": ".+\\.(mjs|js)$"
   },
   "opts": {
     "destination": "../../../docs/js-wasm",

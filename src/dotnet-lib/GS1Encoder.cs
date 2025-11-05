@@ -4,110 +4,122 @@ using System.Runtime.InteropServices;
 namespace GS1.Encoders
 {
 
+    /*
+     * Copyright (c) 2021-2025 GS1 AISBL.
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     *
+     * You may obtain a copy of the License at
+     *
+     *     http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     *
+     */
+
     /// <summary>
-    /// Wrapper class for accessing the GS1 Barcode Syntax Engine native library from C#.
-    ///
-    /// Copyright (c) 2021-2025 GS1 AISBL.
-    ///
-    /// Licensed under the Apache License, Version 2.0 (the "License");
-    /// you may not use this file except in compliance with the License.
-    ///
-    /// You may obtain a copy of the License at
-    ///
-    ///     http://www.apache.org/licenses/LICENSE-2.0
-    ///
-    /// Unless required by applicable law or agreed to in writing, software
-    /// distributed under the License is distributed on an "AS IS" BASIS,
-    /// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    /// See the License for the specific language governing permissions and
-    /// limitations under the License.
-    ///
-    ///
-    /// This class implements a P/Invoke wrapper around the GS1 Barcode Syntax Engine
-    /// native C library that presents its functionality in the form of a
-    /// typical C# object interface.
-    ///
-    /// This class is a very lightweight shim around the native library,
-    /// therefore the C# interface is described here in terms of the public
-    /// API functions of the native library that each method or property
-    /// getter/setter invokes.
-    ///
-    /// The API reference for the native C library is available here:
-    ///
-    /// https://gs1.github.io/gs1-syntax-engine/
-    ///
+    /// Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
     /// </summary>
     public class GS1Encoder
     {
 
         /// <summary>
-        /// List of symbology types, mirroring the corresponding list in the
-        /// C library.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - enum gs1_encoder_symbologies
-        ///
+        /// Recognised GS1 barcode formats ("symbologies") for processing scan data.
         /// </summary>
         public enum Symbology
         {
+
             /// <summary>None defined</summary>
             NONE = -1,
+
             /// <summary>GS1 DataBar Omnidirectional</summary>
             DataBarOmni,
+
             /// <summary>GS1 DataBar Truncated</summary>
             DataBarTruncated,
+
             /// <summary>GS1 DataBar Stacked</summary>
             DataBarStacked,
+
             /// <summary>GS1 DataBar Stacked Omnidirectional</summary>
             DataBarStackedOmni,
+
             /// <summary>GS1 DataBar Limited</summary>
             DataBarLimited,
+
             /// <summary>GS1 DataBar Expanded (Stacked)</summary>
             DataBarExpanded,
+
             /// <summary>UPC-A</summary>
             UPCA,
+
             /// <summary>UPC-E</summary>
             UPCE,
+
             /// <summary>EAN-13</summary>
             EAN13,
+
             /// <summary>EAN-8</summary>
             EAN8,
+
             /// <summary>GS1-128 with CC-A or CC-B</summary>
             GS1_128_CCA,
+
             /// <summary>GS1-128 with CC</summary>
             GS1_128_CCC,
+
             /// <summary>(GS1) QR Code</summary>
             QR,
+
             /// <summary>(GS1) Data Matrix</summary>
             DM,
+
             /// <summary>(GS1) DotCode</summary>
             DotCode,
+
             /// <summary>Value is the number of symbologies</summary>
             NUMSYMS,
+
         };
 
         /// <summary>
-        /// List of validations, mirroring the corresponding list in the
-        /// C library.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - enum gs1_encoder_validations
-        ///
+        /// Optional AI validation procedures that may be applied to detect invalid inputs.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// These validation procedures are applied when AI data is provided using
+        /// <see cref="AIdataStr"/>, <see cref="DataStr"/> or <see cref="ScanData"/>.
+        /// </para>
+        /// <para>
+        /// Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
+        /// </para>
+        /// </remarks>
         public enum Validation
         {
-            /// <summary>Mutually exclusive AIs</summary>
+
+            /// <summary>Mutually exclusive AIs (locked: always enabled)</summary>
             MutexAIs = 0,
+
             /// <summary>Mandatory associations between AIs</summary>
             RequisiteAIs,
-            /// <summary>Repeated AIs having same value</summary>
+
+            /// <summary>Repeated AIs having same value (locked: always enabled)</summary>
             RepeatedAIs,
+
+            /// <summary>Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)</summary>
+            DigSigSerialKey,
+
             /// <summary>Unknown AIs not permitted as GS1 DL URI data attributes</summary>
             UnknownAInotDLattr,
+
             /// <summary>Value is the number of validations</summary>
             NUMVALIDATIONS,
+
         };
 
         /// <summary>
@@ -119,11 +131,6 @@ namespace GS1.Encoders
         /// An opaque pointer used by the native code to represent an
         /// "instance" of the library. It is hidden behind the object
         /// interface that is provided to users of this wrapper.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - typedef struct gs1_encoder
-        ///
         /// </summary>
         private readonly IntPtr ctx;
 
@@ -257,13 +264,9 @@ namespace GS1.Encoders
 
 
         /// <summary>
-        /// Constructor that creates an object wrapping an "instance" of the library managed by the native code.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_init()
-        ///
+        /// Initialises a new instance of the GS1Encoder class.
         /// </summary>
+        /// <exception cref="GS1EncoderGeneralException">Thrown when the library fails to initialise</exception>
         public GS1Encoder()
         {
             ctx = gs1_encoder_init(IntPtr.Zero);
@@ -272,13 +275,11 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Returns the version of the native library.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getVersion()
-        ///
+        /// Get the version string of the library.
         /// </summary>
+        /// <value>
+        /// A string containing the version of the library, typically the build date.
+        /// </value>
         public string Version
         {
             get
@@ -289,13 +290,18 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the symbology type.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getSym()
-        ///   - gs1_encoder_setSym()
-        ///
         /// </summary>
+        /// <value>
+        /// The current symbology type.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// This might be set manually or automatically when processing scan data with <see cref="ScanData"/>.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="GS1EncoderParameterException">Thrown when the setter is provided with an invalid symbology type.</exception>
+        /// <seealso cref="Symbology"/>
+        /// <seealso cref="ScanData"/>
         public Symbology Sym
         {
             get
@@ -311,13 +317,22 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "add check digit" mode for EAN/UPC and GS1 DataBar symbols.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getAddCheckDigit()
-        ///   - gs1_encoder_setAddCheckDigit()
-        ///
         /// </summary>
+        /// <value>
+        /// <c>true</c> if check digits will be generated automatically; <c>false</c> if the data must include a valid check digit.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// If <c>false</c> (default), then the data string must contain a valid check digit.
+        /// If <c>true</c>, then the data string must not contain a check digit as one will
+        /// be generated automatically.
+        /// </para>
+        /// <para>
+        /// This option is only valid for symbologies that accept fixed-length data,
+        /// specifically EAN/UPC and GS1 DataBar except Expanded (Stacked).
+        /// </para>
+        /// </remarks>
+        /// <exception cref="GS1EncoderParameterException">Thrown when the setter is provided with an invalid value.</exception>
         public bool AddCheckDigit
         {
             get
@@ -334,13 +349,19 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "include data titles in HRI" flag.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getIncludeDataTitlesInHRI()
-        ///   - gs1_encoder_setIncludeDataTitlesInHRI()
-        ///
         /// </summary>
+        /// <value>
+        /// <c>true</c> if data titles should be included in HRI; otherwise <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// When set to <c>true</c>, data titles from the GS1 General Specification will be
+        /// included in the HRI text.
+        /// </para>
+        /// <para>
+        /// Default: <c>false</c>
+        /// </para>
+        /// </remarks>
         public bool IncludeDataTitlesInHRI
         {
             get
@@ -357,13 +378,30 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "permit unknown AIs" mode.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getPermitUnknownAIs()
-        ///   - gs1_encoder_setPermitUnknownAIs()
-        ///
         /// </summary>
+        /// <value>
+        /// <c>true</c> if unknown AIs are permitted; otherwise <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// If <c>false</c> (default), then all AIs represented by the input data must be
+        /// known.
+        /// </para>
+        /// <para>
+        /// If <c>true</c>, then unknown AIs (those not in this library's static AI table)
+        /// will be accepted.
+        /// </para>
+        /// <para>
+        /// <strong>Note:</strong> The option only applies to parsed input data, specifically bracketed AI data
+        /// supplied with <see cref="AIdataStr"/> and GS1 Digital Link URIs supplied
+        /// with <see cref="DataStr"/>. Unbracketed AI element strings containing
+        /// unknown AIs cannot be parsed because it is not possible to differentiate the
+        /// AI from its data value when the length of the AI is uncertain.
+        /// </para>
+        /// <para>
+        /// Default: <c>false</c>
+        /// </para>
+        /// </remarks>
         public bool PermitUnknownAIs
         {
             get
@@ -380,13 +418,29 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "permit zero-suppressed GTIN in GS1 DL URIs" mode.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getPermitZeroSuppressedGTINinDLuris()
-        ///   - gs1_encoder_setPermitZeroSuppressedGTINinDLuris()
-        ///
         /// </summary>
+        /// <value>
+        /// <c>true</c> if zero-suppressed GTINs are permitted in GS1 Digital Link URIs; otherwise <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// If <c>false</c> (default), then the value of a path component for AI (01) must
+        /// be provided as a full GTIN-14.
+        /// </para>
+        /// <para>
+        /// If <c>true</c>, then the value of a path component for AI (01) may contain the
+        /// GTIN-14 with zeros suppressed, in the format of a GTIN-13, GTIN-12 or GTIN-8.
+        /// </para>
+        /// <para>
+        /// This option only applies to parsed input data, specifically GS1 Digital Link
+        /// URIs. Since zero-suppressed GTINs are deprecated, this option should only be
+        /// enabled when it is necessary to accept legacy GS1 Digital Link URIs having
+        /// zero-suppressed GTIN-14.
+        /// </para>
+        /// <para>
+        /// Default: <c>false</c>
+        /// </para>
+        /// </remarks>
         public bool PermitZeroSuppressedGTINinDLuris
         {
             get
@@ -402,13 +456,23 @@ namespace GS1.Encoders
 
 
         /// <summary>
-        /// Set the enabled status for an AI validation procedure.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_setValidationEnabled()
-        ///
+        /// Enable or disable the given AI validation procedure.
         /// </summary>
+        /// <param name="validation">A validation procedure to set the enabled status of</param>
+        /// <param name="enabled"><c>true</c> to enable the validation; <c>false</c> to disable</param>
+        /// <remarks>
+        /// <para>
+        /// This determines whether certain checks are enforced when data is provided using
+        /// <see cref="AIdataStr"/>, <see cref="DataStr"/> or <see cref="ScanData"/>.
+        /// </para>
+        /// <para>
+        /// If enabled is <c>true</c> (default), then the corresponding validation will be enforced.
+        /// If enabled is <c>false</c>, then the corresponding validation will not be enforced.
+        /// </para>
+        /// <para>
+        /// <strong>Note:</strong> The option only applies to AI input data.
+        /// </para>
+        /// </remarks>
         public void SetValidationEnabled(Validation validation, bool enabled)
         {
             if (!gs1_encoder_setValidationEnabled(ctx, (int)validation, enabled))
@@ -417,13 +481,10 @@ namespace GS1.Encoders
 
 
         /// <summary>
-        /// Get the checking of mandatory associations is enabled.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getValidationEnabled()
-        ///
+        /// Get the current enabled status of the provided AI validation procedure.
         /// </summary>
+        /// <param name="validation">A validation procedure to check the status of</param>
+        /// <returns><c>true</c> if the AI validation procedure is currently enabled; <c>false</c> otherwise</returns>
         public bool GetValidationEnabled(Validation validation)
         {
             return gs1_encoder_getValidationEnabled(ctx, (int)validation);
@@ -432,13 +493,21 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get/set the "validate AI associations" flag.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getValidateAIassociations()
-        ///   - gs1_encoder_setValidateAIassociations()
-        ///
         /// </summary>
+        /// <value>
+        /// <c>true</c> if the <see cref="Validation.RequisiteAIs"/> validation procedure is enabled; otherwise <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// <strong>Deprecated:</strong> Use <see cref="SetValidationEnabled(Validation, bool)"/>
+        /// and <see cref="GetValidationEnabled(Validation)"/> instead.
+        /// </para>
+        /// <para>
+        /// This property is equivalent to using the <see cref="GetValidationEnabled(Validation)"/> and
+        /// <see cref="SetValidationEnabled(Validation, bool)"/> methods with the
+        /// <see cref="Validation.RequisiteAIs"/> validation procedure.
+        /// </para>
+        /// </remarks>
         [Obsolete]
         public bool ValidateAIassociations
         {
@@ -454,14 +523,58 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Get/set the raw barcode data input buffer.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getDataStr()
-        ///   - gs1_encoder_setDataStr()
-        ///
+        /// Get/set the raw data that would be directly encoded within a GS1 barcode message.
         /// </summary>
+        /// <value>
+        /// The raw barcode data input buffer.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// A <c>"^"</c> character at the start of the input indicates that the data is in GS1
+        /// Application Identifier syntax. In this case, all subsequent instances of the
+        /// <c>"^"</c> character represent the FNC1 non-data characters that are used to
+        /// separate fields that are not specified as being pre-defined length from
+        /// subsequent fields.
+        /// </para>
+        /// <para>
+        /// Inputs beginning with <c>"^"</c> will be validated against certain data syntax
+        /// rules for GS1 AIs. If the input is invalid then this setter will throw
+        /// a <see cref="GS1EncoderParameterException"/>.
+        /// In the case that the data is unacceptable due to invalid AI content then
+        /// a marked up version of the offending AI can be retrieved using <see cref="ErrMarkup"/>.
+        /// </para>
+        /// <para>
+        /// <strong>Note:</strong> It is strongly advised that GS1 data input is instead specified using
+        /// <see cref="AIdataStr"/> which takes care of the AI encoding rules
+        /// automatically, including insertion of FNC1 characters where required. This
+        /// can be used for all symbologies that accept GS1 AI syntax data.
+        /// </para>
+        /// <para>
+        /// Inputs beginning with <c>"http://"</c> or <c>"https://"</c> will be parsed as a GS1
+        /// Digital Link URI during which the corresponding AI element string is
+        /// extracted and validated.
+        /// </para>
+        /// <para>
+        /// EAN/UPC, GS1 DataBar and GS1-128 support a Composite Component. The
+        /// Composite Component must be specified in AI syntax. It must be separated
+        /// from the primary linear components with a <c>"|"</c> character and begin with an
+        /// FNC1 in first position, for example:
+        /// </para>
+        /// <code>
+        /// encoder.DataStr = "^0112345678901231|^10ABC123^11210630";
+        /// </code>
+        /// <para>
+        /// The above specifies a linear component representing "(01)12345678901231"
+        /// together with a composite component representing "(10)ABC123(11)210630".
+        /// </para>
+        /// <para>
+        /// <strong>Note:</strong> For GS1 data it is simpler and less error prone to specify the input
+        /// in human-friendly GS1 AI syntax using <see cref="AIdataStr"/>.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="GS1EncoderParameterException">Thrown when the setter is provided with invalid data.</exception>
+        /// <seealso cref="AIdataStr"/>
+        /// <seealso cref="ErrMarkup"/>
         public string DataStr
         {
             get
@@ -476,14 +589,45 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Get/set the barcode data input buffer using GS1 AI syntax.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getAIdataStr()
-        ///   - gs1_encoder_setAIdataStr()
-        ///
+        /// Get/set the barcode data input buffer using GS1 Application Identifier syntax.
         /// </summary>
+        /// <value>
+        /// The barcode data in human-friendly GS1 AI syntax, or <c>null</c> if the input data does not contain AI data.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// The input is provided in human-friendly format <strong>without</strong> FNC1 characters
+        /// which are inserted automatically, for example:
+        /// </para>
+        /// <para>
+        /// <c>(01)12345678901231(10)ABC123(11)210630</c>
+        /// </para>
+        /// <para>
+        /// This syntax harmonises the format for the input accepted by all symbologies.
+        /// For example, the following input is acceptable for EAN-13, UPC-A, UPC-E, any
+        /// variant of the GS1 DataBar family, GS1 QR Code and GS1 DataMatrix:
+        /// </para>
+        /// <para>
+        /// <c>(01)00031234000054</c>
+        /// </para>
+        /// <para>
+        /// The input is immediately parsed and validated against certain rules for GS1 AIs, after
+        /// which the resulting encoding for valid inputs is available via <see cref="DataStr"/>.
+        /// If the input is invalid then an exception will be thrown.
+        /// </para>
+        /// <para>
+        /// Any <c>"("</c> characters in AI element values must be escaped as <c>"\\("</c> to avoid
+        /// conflating them with the start of the next AI.
+        /// </para>
+        /// <para>
+        /// For symbologies that support a composite component (all except Data Matrix, QR Code,
+        /// and DotCode), the data for the linear and 2D components can be separated by a
+        /// <c>"|"</c> character, for example:
+        /// </para>
+        /// <para>
+        /// <c>(01)12345678901231|(10)ABC123(11)210630</c>
+        /// </para>
+        /// </remarks>
         public string AIdataStr
         {
             get
@@ -498,14 +642,47 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Get/set the barcode data input buffer using barcode scan data format.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getScanData()
-        ///   - gs1_encoder_setScanData()
-        ///
+        /// Process scan data received from a barcode reader or return the expected scan data string.
         /// </summary>
+        /// <value>
+        /// The scan data string that a reader should return when scanning the current data, or <c>null</c> if invalid.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// <strong>Setting:</strong> Process normalised scan data received from a barcode reader with
+        /// reporting of AIM symbology identifiers enabled to extract the message data and perform
+        /// syntax checks in the case of GS1 Digital Link and AI data input.
+        /// </para>
+        /// <para>
+        /// This function will process scan data (such as the output of a barcode reader) and process
+        /// the received data, setting the data input buffer to the message received and setting the
+        /// selected symbology to something that is able to carry the received data.
+        /// </para>
+        /// <para>
+        /// <strong>Note:</strong> In some instances the symbology determined by this library will not match
+        /// that of the image that was scanned. The AIM symbology identifier prefix of the
+        /// scan data does not always uniquely identify the symbology that was scanned.
+        /// For example GS1-128 Composite symbols share the same symbology identifier as
+        /// the GS1 DataBar family, and will therefore be detected as such.
+        /// </para>
+        /// <para>
+        /// A literal <c>"|"</c> character may be included in the scan data to indicate the
+        /// separation between the first and second messages that would be transmitted
+        /// by a reader that is configured to return the composite component when
+        /// reading EAN/UPC symbols.
+        /// </para>
+        /// <para>
+        /// Example scan data input: <c>]C1011231231231233310ABC123{GS}99TESTING</c>
+        /// where {GS} represents ASCII character 29.
+        /// </para>
+        /// <para>
+        /// <strong>Getting:</strong> Returns the string that should be returned by scanners when reading a
+        /// symbol that is an instance of the selected symbology and contains the same input data.
+        /// </para>
+        /// <para>
+        /// The output will be prefixed with the appropriate AIM symbology identifier.
+        /// </para>
+        /// </remarks>
         public string ScanData
         {
             get
@@ -521,14 +698,22 @@ namespace GS1.Encoders
 
 
         /// <summary>
-        /// Read the error markup generated when parsing AI data fails due to a
-        /// linting failure.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getErrMarkup()
-        ///
+        /// Get the error markup generated when parsing AI data fails due to a linting failure.
         /// </summary>
+        /// <value>
+        /// Marked up instance of the AI that failed validation, or empty string if no linting failure.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// When a setter function returns <c>false</c> (indicating an error), if that failure is due to
+        /// AI-based data being invalid, a marked up instance of the AI that failed will be generated.
+        /// </para>
+        /// <para>
+        /// Where it is meaningful to identify offending characters in the input data, these characters
+        /// will be surrounded by <c>"|"</c> characters. Otherwise the entire AI value will be surrounded by
+        /// <c>"|"</c> characters.
+        /// </para>
+        /// </remarks>
         public string ErrMarkup
         {
             get
@@ -540,12 +725,20 @@ namespace GS1.Encoders
 
         /// <summary>
         /// Get a GS1 Digital Link URI that represents the AI-based input data.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getDLuri()
-        ///
         /// </summary>
+        /// <param name="Stem">A URI "stem" used as a prefix for the URI. If <c>null</c>, the GS1 canonical stem (https://id.gs1.org/) will be used.</param>
+        /// <returns>A string representing the GS1 Digital Link URI for the input data</returns>
+        /// <exception cref="GS1EncoderDigitalLinkException">Thrown when invalid input was provided</exception>
+        /// <remarks>
+        /// <para>
+        /// This method converts AI-based input data into a GS1 Digital Link URI format.
+        /// </para>
+        /// <para>
+        /// Example: <c>(01)12345678901231(10)ABC123(11)210630</c> with stem
+        /// <c>https://id.example.com/stem</c> might produce:
+        /// <c>https://id.example.com/stem/01/12345678901231?10=ABC123&amp;11=210630</c>
+        /// </para>
+        /// </remarks>
         public string GetDLuri(string Stem)
         {
             string uri = Marshal.PtrToStringAnsi(gs1_encoder_getDLuri(ctx, Stem));
@@ -555,13 +748,26 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Get the Human-Readable Interpretation ("HRI") text for the current data input buffer as an array of strings.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getHRI()
-        ///
+        /// Get the Human-Readable Interpretation ("HRI") text for the current data input buffer.
         /// </summary>
+        /// <value>
+        /// An array of null-terminated strings representing the HRI text.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// For composite symbols, a separator "--" will be included in the array to distinguish
+        /// between the linear and 2D components.
+        /// </para>
+        /// <para>
+        /// Example output for <c>^011231231231233310ABC123|^99XYZ(TM) CORP</c>:
+        /// </para>
+        /// <para>
+        /// <c>(01) 12312312312333</c><br/>
+        /// <c>(10) ABC123</c><br/>
+        /// <c>--</c><br/>
+        /// <c>(99) XYZ(TM) CORP</c>
+        /// </para>
+        /// </remarks>
         public string[] HRI
         {
             get
@@ -580,13 +786,25 @@ namespace GS1.Encoders
         }
 
         /// <summary>
-        /// Get the non-numeric (ignored) query parameters from a GS1 Digital Link URI in the current data input buffer as an array of strings.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_getDLignoredQueryParams()
-        ///
+        /// Get the non-numeric (ignored) query parameters from a GS1 Digital Link URI.
         /// </summary>
+        /// <value>
+        /// An array of strings containing the non-numeric query parameters that were ignored when processing a GS1 Digital Link URI.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// For example, if the input data buffer contains:
+        /// <c>https://a/01/12312312312333/22/ABC?name=Donald%2dDuck&amp;99=ABC&amp;testing&amp;type=cartoon</c>
+        /// </para>
+        /// <para>
+        /// Then this property returns:
+        /// <c>name=Donald%2dDuck</c>, <c>testing</c>, <c>type=cartoon</c>
+        /// </para>
+        /// <para>
+        /// The returned strings are not URI decoded. The expected use for this property is to
+        /// present which sections of a given GS1 Digital Link URI have been ignored.
+        /// </para>
+        /// </remarks>
         public string[] DLignoredQueryParams
         {
             get
@@ -604,14 +822,7 @@ namespace GS1.Encoders
             }
         }
 
-        /// <summary>
-        /// Destructor that will release the resources allocated by the native library.
-        ///
-        /// See the native library documentation for details:
-        ///
-        ///   - gs1_encoder_free()
-        ///
-        /// </summary>
+        /// <exclude />
         ~GS1Encoder()
         {
             gs1_encoder_free(ctx);

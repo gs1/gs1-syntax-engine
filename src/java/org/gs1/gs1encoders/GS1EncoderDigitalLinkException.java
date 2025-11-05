@@ -22,6 +22,11 @@ package org.gs1.gs1encoders;
  */
 
 public class GS1EncoderDigitalLinkException extends Exception {
+    /**
+     * Constructs a new GS1EncoderDigitalLinkException with the specified error message.
+     *
+     * @param msg the error message
+     */
     public GS1EncoderDigitalLinkException(String msg) {
         super(msg);
     }
