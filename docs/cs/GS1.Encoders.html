@@ -76,13 +76,61 @@ extracted from the input data.</li>
 </ul>
 <p>The main operations of the library involve reading and updating the state of
 these buffers.</p>
-<h2 id="example-uses">Example Uses</h2>
+<h2 id="quick-start">Quick start</h2>
+<p>To use the library you must first build the native library and include the wrapper within your .NET project.</p>
+<h3 id="building-the-native-library">Building the native library</h3>
+<p>You must first build the native library by opening a Developer Command Prompt
+and running:</p>
+<pre><code>msbuild gs1encoders.sln /t:gs1encoders /p:Configuration=Release /p:Platform=x86
+</code></pre>
+<p>This will generate <code>src\c-lib\build\library\Win32\Release\gs1encoders.dll</code>.</p>
+<h3 id="using-the-wrapper-in-your-own-project">Using the wrapper in your own project</h3>
+<p>To use the wrapper in your C# project you must:</p>
+<ol>
+<li>Include the wrapper source within your project</li>
+<li>Ensure <code>gs1encoders.dll</code> (the native library) is in the same directory as your executable or in a location on your system PATH</li>
+</ol>
+<p>For a minimal example, create a console application as follows:</p>
+<pre><code>dotnet new console -n MyApp -f net8.0
+cd MyApp
+</code></pre>
+<p>Edit <code>MyApp.csproj</code> to include the wrapper source and deploy the native
+library:</p>
+<pre><code class="lang-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+  &lt;PropertyGroup&gt;
+    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
+    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+    &lt;PlatformTarget&gt;x86&lt;/PlatformTarget&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;ItemGroup&gt;
+    &lt;Compile Include=&quot;&lt;path\to\src\dotnet-lib\GS1Encoder.cs&gt;&quot; Link=&quot;GS1Encoder.cs&quot; /&gt;
+  &lt;/ItemGroup&gt;
+  &lt;ItemGroup&gt;
+    &lt;None Include=&quot;&lt;path\to\src\c-lib\build\library\Win32\Release\gs1encoders.dll&gt;&quot;&gt;
+      &lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+    &lt;/None&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Project&gt;
+</code></pre>
+<p>Edit <code>Program.cs</code> to contain:</p>
+<pre><code class="lang-csharp">using System;
+using GS1.Encoders;
+
+GS1Encoder gs = new GS1Encoder();
+Console.WriteLine(&quot;GS1 Syntax Engine version: &quot; + gs.Version);
+</code></pre>
+<p>Run your application:</p>
+<pre><code>dotnet run
+</code></pre>
+<p>For a comprehensive example WPF-based desktop application, see
+<a href="https://github.com/gs1/gs1-syntax-engine/tree/main/src/dotnet-app">dotnet-app</a>.</p>
+<h2 id="example-uses">Example uses</h2>
 <p>The following are examples of how to use the library.</p>
-<p><strong>Note:</strong> Unless otherwise specified, the getter properties return library-managed
+<p>Unless otherwise specified, the getter properties return library-managed
 data that must not be modified by the user. If their content must persist
 following a subsequent call to the same instance of the library then they
 must be copied to a user-managed variable.</p>
-<p><strong>Note:</strong> Most of the setter properties and action methods of this library throw exceptions
+<p>Most of the setter properties and action methods of this library throw exceptions
 in the event of failure. Production code should catch these exceptions and
 handle them appropriately, which might include rendering the error message to
 the user.</p>
@@ -118,8 +166,7 @@ catch (Exception e)
 //
 // gs.ScanData = &quot;]Q1011231231231233310ABC123\u001D99TEST&quot;;   // Barcode scan data, containing a &quot;GS&quot; (ASCII 0x1D) separator
 
-string[] hri = gs.HRI;                                  // Display the extracted AI data as HRI text
-foreach (string line in hri)
+foreach (string line in gs.HRI)                         // Display the extracted AI data as HRI text
 {
     Console.WriteLine(line);
 }
@@ -180,8 +227,7 @@ catch (Exception)
     // Handle error and return
 }
 
-string[] hri = gs.HRI;
-foreach (string line in hri)
+foreach (string line in gs.HRI)
 {
     Console.WriteLine(line);
 }
@@ -191,8 +237,7 @@ foreach (string line in hri)
 // description of ScanData
 </code></pre>
 <p><strong>Note:</strong> It is required that AIM Symbology Identifiers are enabled on the barcode
-reader.</p>
-<p><strong>Note:</strong> It is assumed the scanned barcode message &quot;survives the channel&quot; intact,
+reader, and that the scanned barcode message &quot;survives the channel&quot; intact,
 i.e. that no character substitutions have been made by the reader, in
 particular that any embedded FNC1 separator characters are correctly
 represented by GS characters (ASCII 29). If this is not the case then the

@@ -69,21 +69,26 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="package-signature">package <span class="element-name">org.gs1.gs1encoders</span></div>
 <section class="package-description" id="package-description">
-<div class="block">GS1 Barcode Syntax Engine - Java wrapper.
+<div class="block"><h2 id="gs1-barcode-syntax-engine---java-wrapper--heading">GS1 Barcode Syntax Engine - Java wrapper.</h2>
+
  <p>
  The GS1 Barcode Syntax Engine provides routines that support the processing of GS1
  syntax data, including Application Identifier element strings and GS1
  Digital Link URIs, whether these are provided in raw or human-friendly
  format or as normalised scan data received from barcode readers.
+
  <p>
  The implementations are intended for use with GS1 standards and applications
  and do not contain additional features that might be required for more
  general use.
+
  <p>
  Within the GS1 Application Identifier system, structured data is represented
  in different formats depending upon the context.
+
  <p>
  The data formats supported by this library are:
+
  <ul>
  <li><strong>Bracketed AI element strings</strong>: Human-friendly rendition of AI data as a single string using numerical AIs.
  <li><strong>Unbracketed AI element strings</strong>: Rendition of AI data that corresponds most directly to encoded barcode data.
@@ -91,16 +96,20 @@ loadScripts(document, 'script');</script>
  <li><strong>Scan data</strong>: The expected result of scanning a symbol with a barcode reader that has AIM symbologies identifiers enabled.
  <li><strong>Human Readable Interpretation (HRI)</strong>: Human-friendly redition of the AI data contained within a symbol. This may also include Data Titles to present the AI data in the form of "mixed HRI/non-HRI text". (Output only.)
  </ul>
+
  <p>
  The following diagram shows how the library can be used for processing and
  transformation of GS1 data, indicating which formats are accepted as input,
  how barcode message data is generated and AI data extracted from the
  provided input data, and how the given data can be output in various
  formats.
+
  <p>
  <img src="../../../../input_output_buffers.svg" alt="Data transformation: Inputs, outputs and buffers" style="max-width: 100%;">
+
  <p>
  The above diagram highlights that conceptually the library contains two internal "data buffers":
+
  <ul>
  <li><strong>Barcode message buffer:</strong> This is populated with the raw message
      that would be borne by a GS1 barcode symbol that represents the input
@@ -110,28 +119,139 @@ loadScripts(document, 'script');</script>
  <li><strong>Extracted AI buffer:</strong> This contains the in-order AI data that was
      extracted from the input data.
  </ul>
+
  <p>
  The main operations of the library involve reading and updating the state of
  these buffers.
 
- <h2 id="example-uses-heading">Example Uses</h2>
+
+ <h2 id="quick-start-heading">Quick start</h2>
+
+ To use the library you must first build the wrapper for your platform.
+
+ <h3 id="building-the-java-wrapper-heading">Building the Java wrapper</h3>
+
+ <strong>On Unix/macOS:</strong>
+
+ <ol>
+ <li>First, compile the C library as a static library:
+ <pre>
+ make -C src/c-lib -j `nproc` libstatic
+ </pre>
+ </li>
+ <li>Then build the Java wrapper:
+ <pre>
+ ant -f src/java/build.xml
+ </pre>
+ </li>
+ </ol>
+
+ <strong>On Windows:</strong>
+
+ <ol>
+ <li>First, build the C library using Visual Studio or from a Developer Command Prompt:
+ <pre>
+ msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Debug /p:Platform=x64
+ </pre>
+ </li>
+ <li>Then build the Java wrapper:
+ <pre>
+ ant -f src\java\build.xml
+ </pre>
+ </li>
+ </ol>
+
+ This generates two files in <code>src/java/</code>:
+
+ <ul>
+ <li><code>libgs1encoders.jar</code> - The Java class library
+ <li><code>libgs1encodersjni.so</code> (or .dll on Windows, .dylib on macOS) - The native JNI library
+ <li><code>libgs1encoders.so</code> symlink (or .dll on Windows, .dylib on macOS)
+ </ul>
+
+
+ <h3 id="running-the-example-application-heading">Running the example application</h3>
+
+ After building, you can test it by running the interactive example
+ application:
+
+ <pre>
+ ant -f src/java/build.xml test
+ </pre>
+
+ The example application provides an interactive menu for testing different
+ input formats and features.
+
+
+ <h3 id="using-in-your-own-project-heading">Using in Your Own Project</h3>
+
+ To use the wrapper in your Java project you must:
+
+ <ol>
+ <li>Add <code>libgs1encoders.jar</code> to your project's classpath at compile time and runtime
+ <li>Ensure the directory containing the native library (<code>libgs1encodersjni.so</code>) and the symlink (<code>libgs1encoders.so</code>) are in <code>java.library.path</code> at runtime
+ </ol>
+
+ For a minimal example a <code>MyApp.java</code> file as follows:
+
+ <pre>
+ import org.gs1.gs1encoders.*;
+
+ public class MyApp {
+
+     static {
+         System.loadLibrary("gs1encodersjni");
+     }
+
+     public static void main(String[] args) {
+         try {
+             GS1Encoder gs = new GS1Encoder();
+             System.out.println("GS1 Syntax Engine version: " + gs.getVersion());
+             gs.free();
+         } catch (Exception e) {
+             System.err.println("Error: " + e.getMessage());
+         }
+     }
+ }
+ </pre>
+
+ Compile your application as follows:
+
+ <pre>
+ javac -classpath &lt;path/to/libgs1encoders.jar&gt; MyApp.java
+ </pre>
+
+ Run your application as follows:
+
+ <pre>
+ java -classpath &lt;path to libgs1encoders.jar&gt;:. -Djava.library.path=&lt;directory containing libgs1encoders{jni}.{so,dylib,dll}&gt; MyApp
+ </pre>
+
+ For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/java/Example.java">Example.java</a>.
+
+
+ <h2 id="example-uses-heading">Example uses</h2>
 
  The following are examples of how to use the library.
+
  <p>
- <strong>Note:</strong> Unless otherwise specified, the getter methods return library-managed
+ Unless otherwise specified, the getter methods return library-managed
  data that must not be modified by the user. If their content must persist
  following a subsequent call to the same instance of the library then they
  must be copied to a user-managed variable.
+
  <p>
- <strong>Note:</strong> Most of the setter and action methods of this library throw exceptions
+ Most of the setter and action methods of this library throw exceptions
  in the event of failure. Production code should catch these exceptions and
  handle them appropriately, which might include rendering the error message to
  the user.
+
 
  <h3 id="gs1-ai-data-validation-and-extraction-including-gs1-digital-link--heading">GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 
  The following code processes AI data input, validates it (reporting any
  failures) and displays the extracted AIs if the validation succeeds.
+
  <pre>
  GS1Encoder gs = new GS1Encoder();                           // Create a new instance of the library
 
@@ -159,16 +279,17 @@ loadScripts(document, 'script');</script>
  //
  // gs.setScanData("]Q1011231231231233310ABC12399TEST");   // Barcode scan data, containing a "GS" (ASCII 0x1D) separator
 
- String[] hri = gs.getHRI();                                 // Display the extracted AI data as HRI text
- for (String line : hri) {
+ for (String line : gs.getHRI()) {                           // Display the extracted AI data as HRI text
      System.out.println(line);
  }
  </pre>
+
 
  <h3 id="converting-an-ai-element-string-to-barcode-message-data-heading">Converting an AI element string to barcode message data</h3>
 
  In this example we process a bracketed AI element string to convert it into
  barcode message data, suitable for carrying in a GS1 barcode symbol.
+
  <pre>
  GS1Encoder gs = new GS1Encoder();
 
@@ -180,10 +301,12 @@ loadScripts(document, 'script');</script>
 
  System.out.println(gs.getDataStr());                        // Render the barcode message buffer
  </pre>
+
  <p>
  <strong>Note:</strong> The barcode message data read and emitted by this library uses a harmonised
  format that does not concern itself with internal encoding quirks of various
  symbologies. In the harmonised barcode message data:
+
  <ul>
  <li>A leading <code>"^"</code> always indicates GS1 Application Identifier syntax data,
    i.e. a notional FNC1 in first character position. (This is even true for
@@ -196,20 +319,24 @@ loadScripts(document, 'script');</script>
    takes on the AI separator role typically assigned to the FNC1 non-data
    character, depending upon the effectuve encodation mode.)
  </ul>
+
  <p>
  Additionally, barcode image encoder libraries have differing conventions for
  how to input FNC1 characters, extending to whether it is necessary to be
  explicit about the notional FNC1 character in the first position when
  specifying a GS1 Application Identifier syntax symbol.
+
  <p>
  Consequently, the barcode message data emitted by this library may need to
  be post-processed to align to the specific requirements of whatever symbol
  generation library is in use.
 
+
  <h3 id="barcode-scan-data-processing-heading">Barcode scan data processing</h3>
 
  In this example we process scan data from a barcode reader to extract the AI
  data.
+
  <pre>
  GS1Encoder gs = new GS1Encoder();
 
@@ -223,8 +350,7 @@ loadScripts(document, 'script');</script>
      // Handle error and return
  }
 
- String[] hri = gs.getHRI();
- for (String line : hri) {
+ for (String line : gs.getHRI()) {
      System.out.println(line);
  }
 
@@ -232,11 +358,10 @@ loadScripts(document, 'script');</script>
  // be read using getSym(), however note the caveats given in the
  // description of setScanData()
  </pre>
+
  <p>
  <strong>Note:</strong> It is required that AIM Symbology Identifiers are enabled on the barcode
- reader.
- <p>
- <strong>Note:</strong> It is assumed the scanned barcode message "survives the channel" intact,
+ reader, and that the scanned barcode message "survives the channel" intact,
  i.e. that no character substitutions have been made by the reader, in
  particular that any embedded FNC1 separator characters are correctly
  represented by GS characters (ASCII 29). If this is not the case then the
