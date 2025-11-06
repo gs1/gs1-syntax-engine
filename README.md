@@ -29,6 +29,8 @@ This project includes:
     * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
     * An Xcode project that shows how to use the native library from Swift to create an iOS app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
 
+The above make the GS1 Barcode Syntax Resource suitable for a large number of [deployment scenarios](https://github.com/gs1/gs1-syntax-engine/wiki/Deployment-Scenarios).
+
 
 Documentation
 -------------
