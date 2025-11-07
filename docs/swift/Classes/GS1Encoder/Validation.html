@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Validation Enumeration Reference</title>
+    <link rel="stylesheet" type="text/css" href="../../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../../js/jquery.min.js" defer></script>
+    <script src="../../js/jazzy.js" defer></script>
+    
+    <script src="../../js/lunr.min.js" defer></script>
+    <script src="../../js/typeahead.jquery.js" defer></script>
+    <script src="../../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Enum/Validation" class="dashAnchor"></a>
+    <a title="Validation Enumeration Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../../index.html">GS1Encoders Docs</a></p>
+        <p class="header-right"><a href="https://github.com/gs1/gs1-syntax-engine"><img src="../../img/gh.png" alt="GitHub"/>View on GitHub</a></p>
+        <p class="header-right"><a href="dash-feed://https%3A%2F%2Fgs1.github.io%2Fgs1-syntax-engine%2Fswift%2Fdocsets%2FGS1Encoders.xml"><img src="../../img/dash.png" alt="Dash"/>Install in Dash</a></p>
+        <div class="header-right">
+          <form role="search" action="../../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../../index.html">GS1Encoders</a>
+        <img id="carat" src="../../img/carat.png" alt=""/>
+        <a href="../../Classes.html">Classes</a>
+        <img id="carat" src="../../img/carat.png" alt=""/>
+        <a href="../../Classes/GS1Encoder.html">GS1Encoder</a>
+        <img id="carat" src="../../img/carat.png" alt=""/>
+        Validation Enumeration Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../../Classes/GS1Encoder.html">GS1Encoder</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../../Classes/GS1Encoder/Symbology.html">– Symbology</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../../Classes/GS1Encoder/Validation.html">– Validation</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../../Enums/GS1EncoderError.html">GS1EncoderError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>Validation</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Validation</span> <span class="p">:</span> <span class="kt">UInt32</span></code></pre>
+
+                </div>
+              </div>
+            <p>Optional AI validation procedures that may be applied to detect invalid inputs.</p>
+
+<p>These validation procedures are applied when AI data is provided using
+<code><a href="../../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF">setAIdataStr(_:)</a></code>, <code><a href="../../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC10setDataStryySSKF">setDataStr(_:)</a></code> or <code><a href="../../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    Some validation procedures are &ldquo;locked&rdquo; (always enabled and cannot be modified).
+All validation procedures are listed to maintain correct enum value alignment with the native library.
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO8MutexAIsyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/MutexAIs" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO8MutexAIsyA2EmF">MutexAIs</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Mutually exclusive AIs (locked: always enabled)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">MutexAIs</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO12RequisiteAIsyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/RequisiteAIs" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO12RequisiteAIsyA2EmF">RequisiteAIs</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Mandatory associations between AIs</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">RequisiteAIs</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO11RepeatedAIsyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/RepeatedAIs" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO11RepeatedAIsyA2EmF">RepeatedAIs</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Repeated AIs having same value (locked: always enabled)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">RepeatedAIs</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO18UnknownAInotDLattryA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/UnknownAInotDLattr" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO18UnknownAInotDLattryA2EmF">UnknownAInotDLattr</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Unknown AIs not permitted as GS1 DL URI data attributes</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">UnknownAInotDLattr</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO14NUMVALIDATIONSyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/NUMVALIDATIONS" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO14NUMVALIDATIONSyA2EmF">NUMVALIDATIONS</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Value is the number of validations</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">NUMVALIDATIONS</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2025 <a class="link" href="https://www.gs1.org/" target="_blank" rel="external noopener">GS1 AISBL</a>. All rights reserved. (Last updated: 2025-11-07)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GS1Encoder Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/GS1Encoder" class="dashAnchor"></a>
+    <a title="GS1Encoder Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">GS1Encoders Docs</a></p>
+        <p class="header-right"><a href="https://github.com/gs1/gs1-syntax-engine"><img src="../img/gh.png" alt="GitHub"/>View on GitHub</a></p>
+        <p class="header-right"><a href="dash-feed://https%3A%2F%2Fgs1.github.io%2Fgs1-syntax-engine%2Fswift%2Fdocsets%2FGS1Encoders.xml"><img src="../img/dash.png" alt="Dash"/>Install in Dash</a></p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">GS1Encoders</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        <a href="../Classes.html">Classes</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        GS1Encoder Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/GS1Encoder.html">GS1Encoder</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/GS1Encoder/Symbology.html">– Symbology</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/GS1Encoder/Validation.html">– Validation</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/GS1EncoderError.html">GS1EncoderError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>GS1Encoder</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">GS1Encoder</span></code></pre>
+
+                </div>
+              </div>
+            <p>Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC9SymbologyO"></a>
+                    <a name="//apple_ref/swift/Enum/Symbology" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC9SymbologyO">Symbology</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Recognised GS1 barcode formats (&ldquo;symbologies&rdquo;) for processing scan data.</p>
+
+<p>This enum defines all supported GS1 barcode symbology types that can be used
+with the encoder. Each symbology has specific characteristics and use cases.</p>
+
+                        <a href="../Classes/GS1Encoder/Symbology.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Symbology</span> <span class="p">:</span> <span class="kt">Int32</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10ValidationO"></a>
+                    <a name="//apple_ref/swift/Enum/Validation" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10ValidationO">Validation</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Optional AI validation procedures that may be applied to detect invalid inputs.</p>
+
+<p>These validation procedures are applied when AI data is provided using
+<code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF">setAIdataStr(_:)</a></code>, <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC10setDataStryySSKF">setDataStr(_:)</a></code> or <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    Some validation procedures are &ldquo;locked&rdquo; (always enabled and cannot be modified).
+All validation procedures are listed to maintain correct enum value alignment with the native library.
+
+</div>
+
+                        <a href="../Classes/GS1Encoder/Validation.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Validation</span> <span class="p">:</span> <span class="kt">UInt32</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderCACyKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderCACyKcfc">init()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialises a new instance of the GS1Encoder class.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.generalError</code> if the library fails to initialise
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC4freeyyF"></a>
+                    <a name="//apple_ref/swift/Method/free()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC4freeyyF">free()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Release library resources.</p>
+
+<p>This method will release the resources allocated by the native library.
+After calling this method, the GS1Encoder instance should not be used.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">free</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10getVersionSSyF"></a>
+                    <a name="//apple_ref/swift/Method/getVersion()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10getVersionSSyF">getVersion()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the version string of the library.</p>
+
+<p>Returns a string containing the version of the library, typically the build date.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getVersion</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The version of the library</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC6getSymAC9SymbologyOyF"></a>
+                    <a name="//apple_ref/swift/Method/getSym()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC6getSymAC9SymbologyOyF">getSym()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the current symbology type.</p>
+
+<p>This might be set manually via <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC6setSymyyAC9SymbologyOKF">setSym(_:)</a></code> or automatically when
+processing scan data with <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC6setSymyyAC9SymbologyOKF">setSym(_:)</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder/Symbology.html">Symbology</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getSym</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/GS1Encoder/Symbology.html">Symbology</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The current symbology type</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC6setSymyyAC9SymbologyOKF"></a>
+                    <a name="//apple_ref/swift/Method/setSym(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC6setSymyyAC9SymbologyOKF">setSym(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the symbology type.</p>
+
+<p>This allows the symbology to be specified as any one of the <code><a href="../Classes/GS1Encoder/Symbology.html">Symbology</a></code> types.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if an invalid symbology type is provided
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC6getSymAC9SymbologyOyF">getSym()</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder/Symbology.html">Symbology</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setSym</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt"><a href="../Classes/GS1Encoder/Symbology.html">Symbology</a></span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The symbology type to set</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC16getAddCheckDigitSbyF"></a>
+                    <a name="//apple_ref/swift/Method/getAddCheckDigit()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC16getAddCheckDigitSbyF">getAddCheckDigit()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the current status of the &ldquo;add check digit&rdquo; mode for EAN/UPC and GS1 DataBar symbols.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC16setAddCheckDigityySbKF">setAddCheckDigit(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getAddCheckDigit</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>true</code> if check digits will be generated automatically; <code>false</code> if the data must include a valid check digit</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC16setAddCheckDigityySbKF"></a>
+                    <a name="//apple_ref/swift/Method/setAddCheckDigit(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC16setAddCheckDigityySbKF">setAddCheckDigit(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Enable or disable &ldquo;add check digit&rdquo; mode for EAN/UPC and GS1 DataBar symbols.</p>
+
+<p>If <code>false</code> (default), then the data string must contain a valid check digit.
+If <code>true</code>, then the data string must not contain a check digit as one will
+be generated automatically.</p>
+
+<p>This option is only valid for symbologies that accept fixed-length data,
+specifically EAN/UPC and GS1 DataBar except Expanded (Stacked).</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if the value is invalid
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC16getAddCheckDigitSbyF">getAddCheckDigit()</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setAddCheckDigit</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to enable automatic check digit generation; <code>false</code> to require check digit in data</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC25getIncludeDataTitlesInHRISbyF"></a>
+                    <a name="//apple_ref/swift/Method/getIncludeDataTitlesInHRI()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC25getIncludeDataTitlesInHRISbyF">getIncludeDataTitlesInHRI()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the status of the &ldquo;include data titles in HRI&rdquo; flag.</p>
+
+<p>Returns <code>true</code> if data titles should be included in HRI; otherwise <code>false</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getIncludeDataTitlesInHRI</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The status of the &ldquo;include data titles in HRI&rdquo; flag</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC25setIncludeDataTitlesInHRIyySbKF"></a>
+                    <a name="//apple_ref/swift/Method/setIncludeDataTitlesInHRI(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC25setIncludeDataTitlesInHRIyySbKF">setIncludeDataTitlesInHRI(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the &ldquo;include data titles in HRI&rdquo; flag.</p>
+
+<p>When set to <code>true</code>, data titles from the GS1 General Specification will be
+included in the HRI text.</p>
+
+<p>Default: <code>false</code></p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if an error occurs
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setIncludeDataTitlesInHRI</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to include data titles in HRI; <code>false</code> otherwise</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC19getPermitUnknownAIsSbyF"></a>
+                    <a name="//apple_ref/swift/Method/getPermitUnknownAIs()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC19getPermitUnknownAIsSbyF">getPermitUnknownAIs()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the status of the &ldquo;permit unknown AIs&rdquo; mode.</p>
+
+<p>Returns <code>true</code> if unknown AIs are permitted; otherwise <code>false</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getPermitUnknownAIs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The status of the &ldquo;permit unknown AIs&rdquo; mode</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC19setPermitUnknownAIsyySbKF"></a>
+                    <a name="//apple_ref/swift/Method/setPermitUnknownAIs(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC19setPermitUnknownAIsyySbKF">setPermitUnknownAIs(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the &ldquo;permit unknown AIs&rdquo; mode.</p>
+
+<p>When set to <code>true</code>, AIs that are not recognised by the library will not be rejected.
+This can be useful when processing AIs that are not yet supported by the library.</p>
+
+<p>Default: <code>false</code></p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if an error occurs
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setPermitUnknownAIs</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to permit unknown AIs; <code>false</code> to reject them</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC35getPermitZeroSuppressedGTINinDLurisSbyF"></a>
+                    <a name="//apple_ref/swift/Method/getPermitZeroSuppressedGTINinDLuris()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC35getPermitZeroSuppressedGTINinDLurisSbyF">getPermitZeroSuppressedGTINinDLuris()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the status of the &ldquo;permit zero-suppressed GTIN in GS1 DL URIs&rdquo; mode.</p>
+
+<p>Returns <code>true</code> if zero-suppressed GTINs are permitted in Digital Link URIs; otherwise <code>false</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getPermitZeroSuppressedGTINinDLuris</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The status of the &ldquo;permit zero-suppressed GTIN in GS1 DL URIs&rdquo; mode</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC35setPermitZeroSuppressedGTINinDLurisyySbKF"></a>
+                    <a name="//apple_ref/swift/Method/setPermitZeroSuppressedGTINinDLuris(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC35setPermitZeroSuppressedGTINinDLurisyySbKF">setPermitZeroSuppressedGTINinDLuris(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the status of the &ldquo;permit zero-suppressed GTIN in GS1 DL URIs&rdquo; mode.</p>
+
+<p>When set to <code>true</code>, zero-suppressed GTINs (such as GTIN-8, GTIN-12, GTIN-13)
+will be permitted in Digital Link URIs. When <code>false</code>, GTINs must be expressed
+in their canonical GTIN-14 form.</p>
+
+<p>Default: <code>false</code></p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if an error occurs
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setPermitZeroSuppressedGTINinDLuris</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to permit zero-suppressed GTINs; <code>false</code> to require canonical form</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC20getValidationEnabledySbAC0E0OF"></a>
+                    <a name="//apple_ref/swift/Method/getValidationEnabled(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC20getValidationEnabledySbAC0E0OF">getValidationEnabled(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get whether a specific validation procedure is enabled.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC20setValidationEnabled10validation7enabledyAC0E0O_SbtKF">setValidationEnabled(validation:enabled:)</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder/Validation.html">Validation</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getValidationEnabled</span><span class="p">(</span><span class="n">_</span> <span class="nv">validation</span><span class="p">:</span> <span class="kt"><a href="../Classes/GS1Encoder/Validation.html">Validation</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>validation</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The validation procedure to query</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>true</code> if the validation is enabled; <code>false</code> otherwise</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC20setValidationEnabled10validation7enabledyAC0E0O_SbtKF"></a>
+                    <a name="//apple_ref/swift/Method/setValidationEnabled(validation:enabled:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC20setValidationEnabled10validation7enabledyAC0E0O_SbtKF">setValidationEnabled(validation:<wbr>enabled:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Enable or disable a specific validation procedure.</p>
+
+<p>Validation procedures can be selectively enabled or disabled to control
+which checks are applied to AI data.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if the validation cannot be changed (e.g., it is locked)
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC20getValidationEnabledySbAC0E0OF">getValidationEnabled(_:)</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder/Validation.html">Validation</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setValidationEnabled</span><span class="p">(</span><span class="nv">validation</span><span class="p">:</span> <span class="kt"><a href="../Classes/GS1Encoder/Validation.html">Validation</a></span><span class="p">,</span> <span class="nv">enabled</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>validation</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The validation procedure to configure</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>enabled</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to enable the validation; <code>false</code> to disable it</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC25getValidateAIassociationsSbyF"></a>
+                    <a name="//apple_ref/swift/Method/getValidateAIassociations()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC25getValidateAIassociationsSbyF">getValidateAIassociations()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the &ldquo;validate AI associations&rdquo; flag.</p>
+
+<p>Returns <code>true</code> if mandatory associations between AIs are being validated; otherwise <code>false</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@available</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="s">"Use getValidationEnabled(_:﹚ with Validation.RequisiteAIs instead"</span><span class="p">)</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">getValidateAIassociations</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The status of the &ldquo;validate AI associations&rdquo; flag</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC25setValidateAIassociationsyySbKF"></a>
+                    <a name="//apple_ref/swift/Method/setValidateAIassociations(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC25setValidateAIassociationsyySbKF">setValidateAIassociations(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the &ldquo;validate AI associations&rdquo; flag.</p>
+
+<p>When set to <code>true</code>, the library will check for mandatory associations between AIs.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if an error occurs
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@available</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="s">"Use setValidationEnabled(validation:enabled:﹚ with Validation.RequisiteAIs instead"</span><span class="p">)</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">setValidateAIassociations</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p><code>true</code> to enable validation of AI associations; <code>false</code> to disable</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10getDataStrSSyF"></a>
+                    <a name="//apple_ref/swift/Method/getDataStr()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10getDataStrSSyF">getDataStr()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the raw barcode message data.</p>
+
+<p>The data string represents the raw message that would be encoded in a barcode symbol,
+using a harmonised format where FNC1 characters are represented by <code>^</code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC10setDataStryySSKF">setDataStr(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDataStr</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The barcode message data</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC10setDataStryySSKF"></a>
+                    <a name="//apple_ref/swift/Method/setDataStr(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC10setDataStryySSKF">setDataStr(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the raw barcode message data.</p>
+
+<p>This accepts barcode message data in a harmonised format where:</p>
+
+<ul>
+<li>A leading <code>^</code> indicates GS1 Application Identifier syntax data</li>
+<li><p>A <code>^</code> at any other position represents an FNC1 separator character</p></li>
+</ul><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <p><code>GS1EncoderError.parameterError</code> if the data is invalid</p>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <p><code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC10getDataStrSSyF">getDataStr()</a></code></p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setDataStr</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The barcode message data to set</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC12getAIdataStrSSSgyF"></a>
+                    <a name="//apple_ref/swift/Method/getAIdataStr()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC12getAIdataStrSSSgyF">getAIdataStr()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the AI data as a bracketed AI element string.</p>
+
+<p>Returns the AI data in human-friendly format using numerical AIs in brackets,
+e.g., <code>(01)12345678901231(10)ABC123</code>.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF">setAIdataStr(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getAIdataStr</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The bracketed AI element string, or <code>nil</code> if no AI data is available</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF"></a>
+                    <a name="//apple_ref/swift/Method/setAIdataStr(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF">setAIdataStr(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the AI data using a bracketed AI element string.</p>
+
+<p>This accepts AI data in human-friendly format using numerical AIs in brackets,
+e.g., <code>(01)12345678901231(10)ABC123</code>.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.parameterError</code> if the data is invalid
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC12getAIdataStrSSSgyF">getAIdataStr()</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setAIdataStr</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The bracketed AI element string</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC11getScanDataSSyF"></a>
+                    <a name="//apple_ref/swift/Method/getScanData()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC11getScanDataSSyF">getScanData()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the scan data.</p>
+
+<p>Returns the scan data in the format that would be output by a barcode reader
+with AIM Symbology Identifiers enabled.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getScanData</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The scan data</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF"></a>
+                    <a name="//apple_ref/swift/Method/setScanData(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set the scan data.</p>
+
+<p>This accepts scan data in the format that would be output by a barcode reader
+with AIM Symbology Identifiers enabled. The symbology is extracted from the
+AIM Symbology Identifier and the AI data is extracted from the message.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.scanDataError</code> if the scan data is invalid
+
+</div><div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    Requires that AIM Symbology Identifiers are enabled on the barcode reader,
+and that any embedded FNC1 separator characters are represented by GS characters (ASCII 29)
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11getScanDataSSyF">getScanData()</a></code>
+
+</div><div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC6getSymAC9SymbologyOyF">getSym()</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setScanData</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The scan data to process</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC12getErrMarkupSSyF"></a>
+                    <a name="//apple_ref/swift/Method/getErrMarkup()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC12getErrMarkupSSyF">getErrMarkup()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the error markup generated when parsing AI data fails due to a linting failure.</p>
+
+<p>When a setter function throws an error due to invalid AI-based data, a marked up
+instance of the AI that failed will be generated. Where it is meaningful to identify
+offending characters in the input data, these characters will be surrounded by <code>|</code>
+characters. Otherwise the entire AI value will be surrounded by <code>|</code> characters.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getErrMarkup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The error markup showing the location of the error in the input data</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC8getDLuriyS2SSgKF"></a>
+                    <a name="//apple_ref/swift/Method/getDLuri(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC8getDLuriyS2SSgKF">getDLuri(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get a GS1 Digital Link URI that represents the AI-based input data.</p>
+
+<p>This generates a GS1 Digital Link URI from the current AI data. An optional
+stem can be provided to specify the domain and path prefix for the URI.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>GS1EncoderError.digitalLinkError</code> if the Digital Link URI cannot be generated
+
+</div><div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    AI data must be set using <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC12setAIdataStryySSKF">setAIdataStr(_:)</a></code>, <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC10setDataStryySSKF">setDataStr(_:)</a></code> or <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code> before calling this method
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDLuri</span><span class="p">(</span><span class="n">_</span> <span class="nv">stem</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>stem</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional URI stem (e.g., <code>https://example.com/</code>). If not provided, a default stem is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The GS1 Digital Link URI</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC6getHRISaySSGyF"></a>
+                    <a name="//apple_ref/swift/Method/getHRI()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC6getHRISaySSGyF">getHRI()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the Human-Readable Interpretation (HRI) text for the current AI data as an array of strings.</p>
+
+<p>The HRI provides a human-friendly representation of the AI data, with each array
+element representing a separate line of text. If data titles are enabled via
+<code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC25setIncludeDataTitlesInHRIyySbKF">setIncludeDataTitlesInHRI(_:)</a></code>, they will be included in the output.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC25setIncludeDataTitlesInHRIyySbKF">setIncludeDataTitlesInHRI(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getHRI</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Array</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Array of strings representing the HRI text lines</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC23getDLignoredQueryParamsSaySSGyF"></a>
+                    <a name="//apple_ref/swift/Method/getDLignoredQueryParams()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC23getDLignoredQueryParamsSaySSGyF">getDLignoredQueryParams()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get the non-numeric (ignored) query parameters from a GS1 Digital Link URI as an array of strings.</p>
+
+<p>When a GS1 Digital Link URI is processed via <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>, any non-numeric
+query parameters (those not representing AI data) are extracted and made available
+through this method.</p>
+<div class="aside aside-see-also">
+    <p class="aside-title">See also</p>
+    <code><a href="../Classes/GS1Encoder.html#/s:11GS1Encoders0A7EncoderC11setScanDatayySSKF">setScanData(_:)</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDLignoredQueryParams</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Array</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Array of strings representing the ignored query parameters</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2025 <a class="link" href="https://www.gs1.org/" target="_blank" rel="external noopener">GS1 AISBL</a>. All rights reserved. (Last updated: 2025-11-07)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

@@ -1270,8 +1270,3 @@ pre.snippet .highlighted {
     background-color: var(--snippet-highlight-color);
     border-radius: 10%;
 }
-
-/* Hide inherited methods from java.lang.Object */
-.inherited-list {
-    display: none;
-}

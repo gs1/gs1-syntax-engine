@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GS1Encoders  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a title="GS1Encoders  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">GS1Encoders Docs</a></p>
+        <p class="header-right"><a href="https://github.com/gs1/gs1-syntax-engine"><img src="img/gh.png" alt="GitHub"/>View on GitHub</a></p>
+        <p class="header-right"><a href="dash-feed://https%3A%2F%2Fgs1.github.io%2Fgs1-syntax-engine%2Fswift%2Fdocsets%2FGS1Encoders.xml"><img src="img/dash.png" alt="Dash"/>Install in Dash</a></p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">GS1Encoders</a>
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/GS1Encoder.html">GS1Encoder</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/GS1Encoder/Symbology.html">– Symbology</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/GS1Encoder/Validation.html">– Validation</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/GS1EncoderError.html">GS1EncoderError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='gs1-barcode-syntax-engine-swift-package' class='heading'>GS1 Barcode Syntax Engine - Swift Package</h1>
+
+<p>The GS1 Barcode Syntax Engine provides routines that support the processing of GS1 syntax data, including Application Identifier element strings and GS1 Digital Link URIs, whether these are provided in raw or human-friendly format or as normalised scan data received from barcode readers.</p>
+
+<p>The implementations are intended for use with GS1 standards and applications and do not contain additional features that might be required for more general use.</p>
+
+<p>Within the GS1 Application Identifier system, structured data is represented in different formats depending upon the context.</p>
+
+<p>The data formats supported by this library are:</p>
+
+<ul>
+<li><strong>Bracketed AI element strings</strong>: Human-friendly rendition of AI data as a single string using numerical AIs.</li>
+<li><strong>Unbracketed AI element strings</strong>: Rendition of AI data that corresponds most directly to encoded barcode data.</li>
+<li><strong>GS1 Digital Link URIs</strong></li>
+<li><strong>Scan data</strong>: The expected result of scanning a symbol with a barcode reader that has AIM symbologies identifiers enabled.</li>
+<li><strong>Human Readable Interpretation (HRI)</strong>: Human-friendly redition of the AI data contained within a symbol. This may also include Data Titles to present the AI data in the form of &ldquo;mixed HRI/non-HRI text&rdquo;. (Output only.)</li>
+</ul>
+
+<p>The following diagram shows how the library can be used for processing and transformation of GS1 data, indicating which formats are accepted as input, how barcode message data is generated and AI data extracted from the provided input data, and how the given data can be output in various formats.</p>
+
+<p><img src="../input_output_buffers.svg" alt="Data transformation: Inputs, outputs and buffers"></p>
+
+<p>The above diagram highlights that conceptually the library contains two internal &ldquo;data buffers&rdquo;:</p>
+
+<ul>
+<li><strong>Barcode message buffer:</strong> This is populated with the raw message that would be borne by a GS1 barcode symbol that represents the input data, e.g. unbracketed AI syntax with FNC1 in first for regular AI element strings; plain string for a plain data or a GS1 Digital Link URI.</li>
+<li><strong>Extracted AI buffer:</strong> This contains the in-order AI data that was extracted from the input data.</li>
+</ul>
+
+<p>The main operations of the library involve reading and updating the state of these buffers.</p>
+<h2 id='quick-start' class='heading'>Quick start</h2>
+<h3 id='building-the-swift-package' class='heading'>Building the Swift Package</h3>
+
+<p>To build the package:</p>
+<pre class="highlight shell"><code><span class="nb">cd </span>src/swift
+swift build
+</code></pre>
+
+<p>To build for release:</p>
+<pre class="highlight shell"><code>swift build <span class="nt">-c</span> release
+</code></pre>
+<h3 id='running-the-example-application' class='heading'>Running the Example Application</h3>
+
+<p>After building, you can test it by running the interactive example application:</p>
+<pre class="highlight shell"><code>swift run Example
+</code></pre>
+
+<p>Or to see the version:</p>
+<pre class="highlight shell"><code>swift run Example <span class="nt">--version</span>
+</code></pre>
+
+<p>The example application provides an interactive menu for testing different input formats and features.</p>
+<h3 id='using-in-your-own-project' class='heading'>Using in Your Own Project</h3>
+
+<p>To use the wrapper in your Swift project, add it as a dependency in your <code>Package.swift</code>:</p>
+<pre class="highlight swift"><code><span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
+    <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">path</span><span class="p">:</span> <span class="s">"path/to/src/swift"</span><span class="p">)</span>
+<span class="p">]</span>
+</code></pre>
+
+<p>Then add it to your target:</p>
+<pre class="highlight swift"><code><span class="nv">targets</span><span class="p">:</span> <span class="p">[</span>
+    <span class="o">.</span><span class="nf">target</span><span class="p">(</span>
+        <span class="nv">name</span><span class="p">:</span> <span class="s">"MyApp"</span><span class="p">,</span>
+        <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span><span class="s">"GS1Encoders"</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="p">]</span>
+</code></pre>
+
+<p>For a minimal example, create a <code>main.swift</code> file as follows:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">GS1Encoders</span>
+
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"GS1 Syntax Engine version: </span><span class="se">\(</span><span class="n">gs</span><span class="o">.</span><span class="nf">getVersion</span><span class="p">()</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Error: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Build and run:</p>
+<pre class="highlight shell"><code>swift run
+</code></pre>
+
+<p>For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Example.swift">Example.swift</a>.</p>
+<h3 id='ios-mobile-app-quick-start' class='heading'>iOS Mobile App Quick Start</h3>
+
+<p>To use the GS1 Barcode Syntax Engine in an iOS application:</p>
+
+<ol>
+<li><p>Create a new iOS App project in Xcode (File → New → Project → iOS → App)</p></li>
+<li><p>Add the Swift package as a local dependency:</p>
+
+<ul>
+<li>In Xcode, select File → Add Package Dependencies&hellip;</li>
+<li>Click &ldquo;Add Local&hellip;&rdquo; button at the bottom</li>
+<li>Navigate to and select the <code>gs1-syntax-engine/src/swift</code> directory</li>
+<li>Click &ldquo;Add Package&rdquo;</li>
+<li>In the dialog, ensure &ldquo;GS1Encoders&rdquo; is selected and click &ldquo;Add Package&rdquo;</li>
+</ul></li>
+<li><p>In your SwiftUI view or view controller, import and use the library:</p></li>
+</ol>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">SwiftUI</span>
+<span class="kd">import</span> <span class="kt">GS1Encoders</span>
+
+<span class="kd">struct</span> <span class="kt">ContentView</span><span class="p">:</span> <span class="kt">View</span> <span class="p">{</span>
+    <span class="kd">@State</span> <span class="kd">private</span> <span class="k">var</span> <span class="nv">version</span> <span class="o">=</span> <span class="s">""</span>
+
+    <span class="k">var</span> <span class="nv">body</span><span class="p">:</span> <span class="kd">some</span> <span class="kt">View</span> <span class="p">{</span>
+        <span class="kt">VStack</span> <span class="p">{</span>
+            <span class="kt">Text</span><span class="p">(</span><span class="s">"GS1 Encoders Library"</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">font</span><span class="p">(</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="kt">Text</span><span class="p">(</span><span class="s">"Version: </span><span class="se">\(</span><span class="n">version</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">padding</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="o">.</span><span class="n">onAppear</span> <span class="p">{</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="nf">getVersion</span><span class="p">()</span>
+                <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="s">"Error: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>For a UIKit-based app:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">UIKit</span>
+<span class="kd">import</span> <span class="kt">GS1Encoders</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLoad</span><span class="p">()</span>
+
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s">"GS1 Encoders library: </span><span class="se">\(</span><span class="n">gs</span><span class="o">.</span><span class="nf">getVersion</span><span class="p">()</span><span class="se">)</span><span class="s">"</span>
+            <span class="c1">// Use gs to process barcode data...</span>
+            <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Error: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>For a comprehensive iOS app example with barcode scanning and full UI, see the <a href="https://github.com/gs1/gs1-syntax-engine/tree/main/src/ios">GS1 Encoders iOS App</a>.</p>
+<h2 id='example-uses' class='heading'>Example uses</h2>
+
+<p>The following are examples of how to use the library.</p>
+
+<p>Unless otherwise specified, the getter methods return library-managed data that must not be modified by the user. If their content must persist following a subsequent call to the same instance of the library then they must be copied to a user-managed variable.</p>
+
+<p>Most of the setter and action methods of this library throw exceptions in the event of failure. Production code should catch these exceptions and handle them appropriately, which might include rendering the error message to the user.</p>
+<h3 id='gs1-ai-data-validation-and-extraction-including-gs1-digital-link' class='heading'>GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
+
+<p>The following code processes AI data input, validates it (reporting any failures) and displays the extracted AIs if the validation succeeds.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try!</span> <span class="kt">GS1Encoder</span><span class="p">()</span>                              <span class="c1">// Create a new instance of the library</span>
+<span class="k">defer</span> <span class="p">{</span> <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span> <span class="p">}</span>
+
+<span class="c1">// gs.setPermitUnknownAIs(true)                         // Uncomment only if it is necessary to handle AIs</span>
+                                                        <span class="c1">// that are not known to the library</span>
+
+<span class="c1">// Input provided as a bracketed AI element string</span>
+<span class="c1">//</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="n">gs</span><span class="o">.</span><span class="nf">setAIdataStr</span><span class="p">(</span><span class="s">"(01)12312312312333(10)ABC123(99)TEST"</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="kt">GS1EncoderError</span><span class="o">.</span><span class="nf">parameterError</span><span class="p">(</span><span class="k">let</span> <span class="nv">msg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"ERROR: </span><span class="se">\(</span><span class="n">msg</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>                              <span class="c1">// Display a descriptive error message</span>
+    <span class="k">let</span> <span class="nv">errMarkup</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="nf">getErrMarkup</span><span class="p">()</span>
+    <span class="k">if</span> <span class="o">!</span><span class="n">errMarkup</span><span class="o">.</span><span class="n">isEmpty</span> <span class="p">{</span>                             <span class="c1">// Display the invalid AI in the case of a Linting failure</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Bad AI data: </span><span class="se">\(</span><span class="n">errMarkup</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="c1">// Finally, handle the error in an application-specific way</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"ERROR: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// Alternatively, the input may be given in the following formats:</span>
+<span class="c1">//</span>
+<span class="c1">// try gs.setDataStr("^011231231231233310ABC123^99TEST")       // Unbracketed element string, "^" = FNC1</span>
+<span class="c1">//</span>
+<span class="c1">// try gs.setDataStr("https://example.com/01/12312312312333/10/ABC123/99/TEST")   // GS1 Digital Link URI</span>
+<span class="c1">//</span>
+<span class="c1">// try gs.setScanData("]Q1011231231231233310ABC123\u{001D}99TEST")   // Barcode scan data, containing a "GS" (ASCII 0x1D) separator</span>
+
+<span class="k">for</span> <span class="n">line</span> <span class="k">in</span> <span class="n">gs</span><span class="o">.</span><span class="nf">getHRI</span><span class="p">()</span> <span class="p">{</span>                               <span class="c1">// Display the extracted AI data as HRI text</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='converting-an-ai-element-string-to-barcode-message-data' class='heading'>Converting an AI element string to barcode message data</h3>
+
+<p>In this example we process a bracketed AI element string to convert it into barcode message data, suitable for carrying in a GS1 barcode symbol.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try!</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
+<span class="k">defer</span> <span class="p">{</span> <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span> <span class="p">}</span>
+
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="n">gs</span><span class="o">.</span><span class="nf">setAIdataStr</span><span class="p">(</span><span class="s">"(01)12312312312333(10)ABC123(99)TEST"</span><span class="p">)</span>    <span class="c1">// Accept a bracketed AI element string</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="c1">// Handle error and return</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="nf">getDataStr</span><span class="p">())</span>                                  <span class="c1">// Render the barcode message buffer</span>
+</code></pre>
+
+<p><strong>Note:</strong> The barcode message data read and emitted by this library uses a harmonised format that does not concern itself with internal encoding quirks of various symbologies. In the harmonised barcode message data:</p>
+
+<ul>
+<li>A leading <code>&quot;^&quot;</code> always indicates GS1 Application Identifier syntax data, i.e. a notional FNC1 in first character position. (This is even true for DotCode in whose <em>internal encoding</em> the literal FNC1 non-data character may have an inverted meaning for certain messages depending upon their regular data content.)</li>
+<li>A <code>&quot;^&quot;</code> at any other position represents a notional FNC1 non-data Application Identifier separator character. (This is even the case for QR Code in whose <em>internal encoding</em> a <code>&quot;%&quot;</code> character or <code>&quot;{GS}&quot;</code> character takes on the AI separator role typically assigned to the FNC1 non-data character, depending upon the effectuve encodation mode.)</li>
+</ul>
+
+<p>Additionally, barcode image encoder libraries have differing conventions for how to input FNC1 characters, extending to whether it is necessary to be explicit about the notional FNC1 character in the first position when specifying a GS1 Application Identifier syntax symbol.</p>
+
+<p>Consequently, the barcode message data emitted by this library may need to be post-processed to align to the specific requirements of whatever symbol generation library is in use.</p>
+<h3 id='barcode-scan-data-processing' class='heading'>Barcode scan data processing</h3>
+
+<p>In this example we process scan data from a barcode reader to extract the AI data.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try!</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
+<span class="k">defer</span> <span class="p">{</span> <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span> <span class="p">}</span>
+
+<span class="c1">// Disable validation of mandatory association between AIs if the symbol may</span>
+<span class="c1">// be one of multiple on a label</span>
+<span class="k">try!</span> <span class="n">gs</span><span class="o">.</span><span class="nf">setValidationEnabled</span><span class="p">(</span><span class="nv">validation</span><span class="p">:</span> <span class="o">.</span><span class="kt">RequisiteAIs</span><span class="p">,</span> <span class="nv">enabled</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="n">gs</span><span class="o">.</span><span class="nf">setScanData</span><span class="p">(</span><span class="s">"]Q1011231231231233310ABC123</span><span class="se">\u{001D}</span><span class="s">99TEST"</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="c1">// Handle error and return</span>
+<span class="p">}</span>
+
+<span class="k">for</span> <span class="n">line</span> <span class="k">in</span> <span class="n">gs</span><span class="o">.</span><span class="nf">getHRI</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// If it is necessary to know the "symbology" that was scanned then this can</span>
+<span class="c1">// be read using getSym(), however note the caveats given in the</span>
+<span class="c1">// description of setScanData()</span>
+</code></pre>
+
+<p><strong>Note:</strong> It is required that AIM Symbology Identifiers are enabled on the barcode reader, and that the scanned barcode message &ldquo;survives the channel&rdquo; intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement.</p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2025 <a class="link" href="https://www.gs1.org/" target="_blank" rel="external noopener">GS1 AISBL</a>. All rights reserved. (Last updated: 2025-11-07)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

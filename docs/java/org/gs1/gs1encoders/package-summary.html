@@ -230,6 +230,84 @@ loadScripts(document, 'script');</script>
  For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/java/Example.java">Example.java</a>.
 
 
+ <h3 id="android-mobile-app-quick-start-heading">Android Mobile App Quick Start</h3>
+
+ To use the GS1 Barcode Syntax Engine in an Android application:
+
+ <ol>
+ <li>Create a new Android project in Android Studio (File → New → New Project)
+ <li>Enable NDK support in <code>app/build.gradle</code>:
+   <pre>
+ android {
+     ...
+     externalNativeBuild {
+         cmake {
+             path file('src/main/cpp/CMakeLists.txt')
+             version '3.22.1'
+         }
+     }
+ }
+   </pre>
+ <li>Create symlinks to the Java and C library source:
+   <pre>
+ cd app/src/main/java/org/gs1
+ ln -s ../../../../../../../path/to/gs1-syntax-engine/src/java/org/gs1/gs1encoders gs1encoders
+
+ cd app/src/main/cpp
+ ln -s ../../../../../path/to/gs1-syntax-engine/src/c-lib gs1encoders
+   </pre>
+ <li>Create <code>app/src/main/cpp/CMakeLists.txt</code>:
+   <pre>
+ cmake_minimum_required(VERSION 3.22)
+ project(gs1encoders)
+
+ file(GLOB LIB_SOURCE_FILES
+     gs1encoders/ai.c
+     gs1encoders/dl.c
+     gs1encoders/scandata.c
+     gs1encoders/syn.c
+     gs1encoders/gs1encoders.c
+     gs1encoders/syntax/gs1syntaxdictionary.c
+     gs1encoders/syntax/lint_*.c
+ )
+
+ add_compile_definitions(GS1_LINTER_ERR_STR_EN)
+ add_library(gs1encoders SHARED ${LIB_SOURCE_FILES})
+   </pre>
+ <li>In your Activity, load the native library and create an encoder instance:
+   <pre>
+ import org.gs1.gs1encoders.GS1Encoder;
+
+ public class MainActivity extends AppCompatActivity {
+
+     static {
+         System.loadLibrary("gs1encoders");
+     }
+
+     &#64;Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_main);
+
+         GS1Encoder gs = new GS1Encoder();
+         String version = gs.getVersion();
+         setTitle("GS1 Encoders library: " + version);
+         // Use gs to process barcode data...
+     }
+
+     &#64;Override
+     protected void onDestroy() {
+         super.onDestroy();
+         gs.free();
+     }
+ }
+   </pre>
+ </ol>
+
+ For a comprehensive Android app example with barcode scanning and full UI, see the
+ <a href="https://github.com/gs1/gs1-syntax-engine/tree/main/src/android">GS1 Encoders Android App</a>.
+
+
  <h2 id="example-uses-heading">Example uses</h2>
 
  The following are examples of how to use the library.
