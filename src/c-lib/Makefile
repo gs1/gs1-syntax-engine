@@ -471,13 +471,17 @@ docs-java:
 	../../maintenance/docker/java-docs/docker-build.sh
 	cat ../../maintenance/docker/java-docs/custom.css >> ../../docs/java/stylesheet.css
 
+.PHONY: docs-swift
+docs-java:
+	../../maintenance/docker/swift-docs/docker-build.sh
+
 .PHONY: docs-js-wasm
 docs-js-wasm:
 	../../maintenance/docker/js-wasm-docs/docker-build.sh
 	cp ../../docs/js-wasm/module-gs1encoder.html ../../docs/js-wasm/index.html
 
 .PHONY: docs
-docs: docs-clib docs-cs docs-java docs-js-wasm docs-demo
+docs: docs-clib docs-cs docs-java docs-swift docs-js-wasm docs-demo
 
 .PHONY: copyright
 copyright:

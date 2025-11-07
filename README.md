@@ -19,15 +19,17 @@ This project includes:
     * Compiled to WebAssembly or pure JavaScript for use in a browser-based web application or Node.js application.
   * A C# .NET wrapper class that provides an object interface to the native library from managed code, using Platform Invoke (P/Invoke).
   * A Java wrapper class that provides an object interface to the native library from managed code, using Java Native Interface.
+  * A Swift module that provides a Swift-friendly wrapper around a native C library using Swift’s C interoperability.
   * Several example applications:
     * A console application whose C code shows how to use the native library.
     * A console application whose Java code shows how to use the Java Native Interface wrapper.
+    * A console application whose Swift code shows how to use the Swift wrapper.
     * A desktop application using Windows Presentation Foundation (WPF) whose code shows how to use the C# .NET wrapper.
     * A browser-based web application that shows how to use the WebAssembly or pure JavaScript build of the library.
     * A Node.js console application that shows how to use the WebAssembly or pure JavaScript build of the library.
     * An example Node.js web service that provides HTTP access to the library's functionality, together with an example HTTP client application.
     * An Android Studio project that shows how to use the Java wrapper from Kotlin to create an Android app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
-    * An Xcode project that shows how to use the native library from Swift to create an iOS app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
+    * An Xcode project that shows how to use the Swift wrapper to create an iOS app that includes support for decoding GS1 data in barcodes scanned using ML Kit.
 
 The above make the GS1 Barcode Syntax Resource suitable for a large number of [deployment scenarios](https://github.com/gs1/gs1-syntax-engine/wiki/Deployment-Scenarios).
 
@@ -45,8 +47,9 @@ This repository layout is as follows:
 | src/dotnet-app | A demo C# .NET desktop application (WPF) that uses the wrappers and native library                                                              |
 | src/js-wasm    | A JavaScript wrapper that provides an developer-friendly interface to the WASM or pure JavaScript build, with demo web and console applications |
 | src/java       | A Java wrapper that provides a managed code interface to the native library using Java Native interface                                         |
+| src/swift      | A Swift module that provides a Swift-friendly wrapper around a native library using Swift’s C interoperability.                                 |
 | src/android    | An Android Studio project that demonstrates how to use the Java wrapper from Kotlin to create an Android app                                    |
-| src/ios        | An Xcode project that demonstrates how to use the native library from Swift to create an iOS app                                                |
+| src/ios        | An Xcode project that demonstrates how to use the Swift wrapper to create an iOS app                                                            |
 
 
 Documentation
@@ -59,6 +62,7 @@ API documentation and Quick Start guides are available for each supported langua
 | Native C libary  | <https://gs1.github.io/gs1-syntax-engine/>         |
 | C# .NET binding  | <https://gs1.github.io/gs1-syntax-engine/cs/>      |
 | Java binding     | <https://gs1.github.io/gs1-syntax-engine/java/>    |
+| Swift            | <https://gs1.github.io/gs1-syntax-engine/swift/>   |
 | JS + WebAssembly | <https://gs1.github.io/gs1-syntax-engine/js-wasm/> |
 
 Instructions for getting started with the console application are provided in
