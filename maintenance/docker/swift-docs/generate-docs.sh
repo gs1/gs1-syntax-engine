@@ -21,3 +21,6 @@ jazzy \
     --clean \
     --skip-undocumented \
     --hide-documentation-coverage
+
+# Remove docsets directory containing binary assets
+rm -rf "$OUTPUT_DIR/docsets"

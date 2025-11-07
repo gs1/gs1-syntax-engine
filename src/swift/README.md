@@ -102,6 +102,72 @@ swift run
 
 For a comprehensive example, see [Example.swift](https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Example.swift).
 
+### iOS Mobile App Quick Start
+
+To use the GS1 Barcode Syntax Engine in an iOS application:
+
+1. Create a new iOS App project in Xcode (File → New → Project → iOS → App)
+
+2. Add the Swift package as a local dependency:
+   - In Xcode, select File → Add Package Dependencies...
+   - Click "Add Local..." button at the bottom
+   - Navigate to and select the `gs1-syntax-engine/src/swift` directory
+   - Click "Add Package"
+   - In the dialog, ensure "GS1Encoders" is selected and click "Add Package"
+
+3. In your SwiftUI view or view controller, import and use the library:
+
+```swift
+import SwiftUI
+import GS1Encoders
+
+struct ContentView: View {
+    @State private var version = ""
+
+    var body: some View {
+        VStack {
+            Text("GS1 Encoders Library")
+                .font(.title)
+            Text("Version: \(version)")
+                .padding()
+        }
+        .onAppear {
+            do {
+                let gs = try GS1Encoder()
+                version = gs.getVersion()
+                gs.free()
+            } catch {
+                version = "Error: \(error)"
+            }
+        }
+    }
+}
+```
+
+For a UIKit-based app:
+
+```swift
+import UIKit
+import GS1Encoders
+
+class ViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        do {
+            let gs = try GS1Encoder()
+            title = "GS1 Encoders library: \(gs.getVersion())"
+            // Use gs to process barcode data...
+            gs.free()
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+}
+```
+
+For a comprehensive iOS app example with barcode scanning and full UI, see the [GS1 Encoders iOS App](https://github.com/gs1/gs1-syntax-engine/tree/main/src/ios).
+
 ## Example uses
 
 The following are examples of how to use the library.
