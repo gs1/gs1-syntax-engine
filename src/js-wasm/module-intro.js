@@ -59,7 +59,7 @@
  * these buffers.
  *
  *
- * <h2>Quick start</h2>
+ * <h2 id="quick-start">Quick start</h2>
  *
  * <h3>Library installation</h3>
  *
@@ -98,9 +98,10 @@
  * <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.node.mjs">example.node.mjs</a>.
  *
  *
- * <h3>Minimal browser example</h3>
+ * <h3 id="quick-start-browser">Minimal browser example</h3>
  *
- * For browser usage, create a <code>index.html</code> file as follows:
+ * For browser usage in addition to initialising the library, create a
+ * <code>index.html</code> file as follows:
  *
  * <pre>
  * &lt;!DOCTYPE html&gt;
