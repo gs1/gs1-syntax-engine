@@ -29,11 +29,13 @@
  *
  *    /verbose                  Enable verbose debug logging.
  *    /logfile=<filename>       Write logs to file instead of stdout.
+ *    /bind=<address>           Bind address (default: 127.0.0.1). Use 0.0.0.0 for all interfaces.
+ *    /port=<number>            Port number (default: 3030).
  *
  *    /(un)installservice       Attempt to install/uninstall this example as a
  *                              Windows service. Any other arguments (e.g.
- *                              /verbose, /logfile=<filename>) are passed to
- *                              the service.
+ *                              /verbose, /logfile=<filename>, /bind=<address>,
+ *                              /port=<number>) are passed to the service.
  *                              See "Service installation on Windows" section
  *                              near the end of this file for requirements.
  *
@@ -41,6 +43,7 @@
  *
  *    $ node example-web-service.node.mjs /verbose
  *    $ node example-web-service.node.mjs /verbose /logfile=service.log
+ *    $ node example-web-service.node.mjs /bind=0.0.0.0 /port=8080
  *
  *  Output format:
  *
@@ -112,8 +115,8 @@
  *  ------ User-defined tunables ------
  *
  */
-const bind = '127.0.0.1';  // "0.0.0.0" to allow remote connections
-const port = 3030;
+let bind = '127.0.0.1';  // "0.0.0.0" to allow remote connections
+let port = 3030;
 
 
 /*
@@ -128,9 +131,7 @@ if (argv.includes('/installservice') || argv.includes('/uninstallservice')) {
     process.exit();
 }
 
-// Setup logging
-import { createWriteStream } from 'fs';
-
+// Parse command line arguments
 const verbose = argv.some(arg => arg === '/verbose');
 let logFile = null;
 let logStream = null;
@@ -138,9 +139,20 @@ let logStream = null;
 for (const arg of argv) {
     if (arg.startsWith('/logfile=')) {
         logFile = arg.substring(9);
-        break;
+    } else if (arg.startsWith('/bind=')) {
+        bind = arg.substring(6);
+    } else if (arg.startsWith('/port=')) {
+        const portNum = parseInt(arg.substring(6), 10);
+        if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+            console.error('Error: Invalid port number. Must be between 1 and 65535.');
+            process.exit(1);
+        }
+        port = portNum;
     }
 }
+
+// Setup logging
+import { createWriteStream } from 'fs';
 
 if (logFile) {
     try {
@@ -396,6 +408,12 @@ if (verbose) {
  *      npm install -g node-windows
  *      npm link node-windows
  *      node example-web-service.node.mjs /installservice
+ *
+ *  To install with custom options (bind address, port, logging):
+ *
+ *      node example-web-service.node.mjs /installservice /bind=0.0.0.0 /port=8080 /verbose /logfile=service.log
+ *
+ *  All arguments except /installservice and /uninstallservice are passed to the service.
  *
  *  To uninstall the service:
  *
