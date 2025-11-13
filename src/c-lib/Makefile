@@ -472,7 +472,7 @@ docs-java:
 	cat ../../maintenance/docker/java-docs/custom.css >> ../../docs/java/stylesheet.css
 
 .PHONY: docs-swift
-docs-java:
+docs-swift:
 	../../maintenance/docker/swift-docs/docker-build.sh
 
 .PHONY: docs-js-wasm
