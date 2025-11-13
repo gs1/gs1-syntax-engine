@@ -169,14 +169,14 @@
  * <li>When prompted to select a template, choose Phone and Tablet → Native C++.
  * <li>Within a terminal create symlinks to the Java, wrapper and C library sources:
  *   <pre>
- * cd <project-root>/app/src/main/java
+ * cd &lt;project-root&gt;/app/src/main/java
  * mkdir -p org/gs1
  * cd org/gs1
- * ln -s <path-to-gs1-syntax-engine>/src/java/org/gs1/gs1encoders gs1encoders
+ * ln -s &lt;path-to-gs1-syntax-engine&gt;/src/java/org/gs1/gs1encoders gs1encoders
  *
- * cd <project-root>/app/src/main/cpp
- * ln -s <path-to-gs1-syntax-engine>/src/c-lib gs1encoders
- * ln -s <path-to-gs1-syntax-engine>/src/java/gs1encoders_wrap.c gs1encoders_wrap.c
+ * cd &lt;project-root&gt;/app/src/main/cpp
+ * ln -s &lt;path-to-gs1-syntax-engine&gt;/src/c-lib gs1encoders
+ * ln -s &lt;path-to-gs1-syntax-engine&gt;/src/java/gs1encoders_wrap.c gs1encoders_wrap.c
  *   </pre>
  * <li>Append the following to {@code app/src/main/cpp/CMakeLists.txt}:
  *   <pre>

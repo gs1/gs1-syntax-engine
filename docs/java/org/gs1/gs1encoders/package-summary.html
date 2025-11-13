@@ -235,32 +235,21 @@ loadScripts(document, 'script');</script>
  To use the GS1 Barcode Syntax Engine in an Android application:
 
  <ol>
- <li>Create a new Android project in Android Studio (File → New → New Project)
- <li>Enable NDK support in <code>app/build.gradle</code>:
+ <li>Create a new Android project in Android Studio (File → New → New Project).
+ <li>When prompted to select a template, choose Phone and Tablet → Native C++.
+ <li>Within a terminal create symlinks to the Java, wrapper and C library sources:
    <pre>
- android {
-     ...
-     externalNativeBuild {
-         cmake {
-             path file('src/main/cpp/CMakeLists.txt')
-             version '3.22.1'
-         }
-     }
- }
-   </pre>
- <li>Create symlinks to the Java and C library source:
-   <pre>
- cd app/src/main/java/org/gs1
- ln -s ../../../../../../../path/to/gs1-syntax-engine/src/java/org/gs1/gs1encoders gs1encoders
+ cd &lt;project-root&gt;/app/src/main/java
+ mkdir -p org/gs1
+ cd org/gs1
+ ln -s &lt;path-to-gs1-syntax-engine&gt;/src/java/org/gs1/gs1encoders gs1encoders
 
- cd app/src/main/cpp
- ln -s ../../../../../path/to/gs1-syntax-engine/src/c-lib gs1encoders
+ cd &lt;project-root&gt;/app/src/main/cpp
+ ln -s &lt;path-to-gs1-syntax-engine&gt;/src/c-lib gs1encoders
+ ln -s &lt;path-to-gs1-syntax-engine&gt;/src/java/gs1encoders_wrap.c gs1encoders_wrap.c
    </pre>
- <li>Create <code>app/src/main/cpp/CMakeLists.txt</code>:
+ <li>Append the following to <code>app/src/main/cpp/CMakeLists.txt</code>:
    <pre>
- cmake_minimum_required(VERSION 3.22)
- project(gs1encoders)
-
  file(GLOB LIB_SOURCE_FILES
      gs1encoders/ai.c
      gs1encoders/dl.c
@@ -269,39 +258,49 @@ loadScripts(document, 'script');</script>
      gs1encoders/gs1encoders.c
      gs1encoders/syntax/gs1syntaxdictionary.c
      gs1encoders/syntax/lint_*.c
+     gs1encoders_wrap.c
  )
 
+ include_directories(gs1encoders)
  add_compile_definitions(GS1_LINTER_ERR_STR_EN)
  add_library(gs1encoders SHARED ${LIB_SOURCE_FILES})
    </pre>
- <li>In your Activity, load the native library and create an encoder instance:
+ <li>Amend your Activity to import the gs1encoders package, load the native library, and then use it:
    <pre>
- import org.gs1.gs1encoders.GS1Encoder;
+ ...
+ import org.gs1.gs1encoders.GS1Encoder
 
- public class MainActivity extends AppCompatActivity {
+ class MainActivity : AppCompatActivity() {
 
-     static {
-         System.loadLibrary("gs1encoders");
+     companion object {
+         init {
+             System.loadLibrary("gs1encoders")
+         }
      }
 
-     &#64;Override
-     protected void onCreate(Bundle savedInstanceState) {
-         super.onCreate(savedInstanceState);
-         setContentView(R.layout.activity_main);
+     private lateinit var gs: GS1Encoder
 
-         GS1Encoder gs = new GS1Encoder();
-         String version = gs.getVersion();
-         setTitle("GS1 Encoders library: " + version);
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         setContentView(R.layout.activity_main)
+
+         gs = GS1Encoder()
+         val version = gs.version
+         title = "GS1 Encoders library: $version"
+
          // Use gs to process barcode data...
+
      }
 
-     &#64;Override
-     protected void onDestroy() {
-         super.onDestroy();
-         gs.free();
+     override fun onDestroy() {
+         super.onDestroy()
+         gs.free()
      }
  }
    </pre>
+ <li>In Android Studio, reload the Gradle configuration by clicking <strong>File → Sync Project with Gradle Files</strong> (or click the "Sync" icon in the toolbar).
+ <li>Build the project by clicking <strong>Build → Make Project</strong> (or press Ctrl+F9 / Cmd+F9).
+ <li>Run the app by clicking <strong>Run → Run 'app'</strong> (or click the green play button, or press Shift+F10).
  </ol>
 
  For a comprehensive Android app example with barcode scanning and full UI, see the
