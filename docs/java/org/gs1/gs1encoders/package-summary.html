@@ -215,16 +215,34 @@ loadScripts(document, 'script');</script>
  }
  </pre>
 
- Compile your application as follows:
+ <strong>On Unix/macOS:</strong>
+
+ <p>
+ Compile your application:
 
  <pre>
- javac -classpath &lt;path/to/libgs1encoders.jar&gt; MyApp.java
+ javac -classpath &lt;path-to-gs1-syntax-engine&gt;/src/java/libgs1encoders.jar MyApp.java
  </pre>
 
- Run your application as follows:
+ Run your application:
 
  <pre>
- java -classpath &lt;path to libgs1encoders.jar&gt;:. -Djava.library.path=&lt;directory containing libgs1encoders{jni}.{so,dylib,dll}&gt; MyApp
+ java -classpath &lt;path-to-gs1-syntax-engine&gt;/src/java/libgs1encoders.jar:. -Djava.library.path=&lt;path-to-gs1-syntax-engine&gt;/src/java MyApp
+ </pre>
+
+ <strong>On Windows:</strong>
+
+ <p>
+ Compile your application:
+
+ <pre>
+ javac -classpath &lt;path-to-gs1-syntax-engine&gt;\src\java\libgs1encoders.jar MyApp.java
+ </pre>
+
+ Run your application:
+
+ <pre>
+ java -classpath &lt;path-to-gs1-syntax-engine&gt;\src\java\libgs1encoders.jar;. -Djava.library.path=&lt;path-to-gs1-syntax-engine&gt;\src\java MyApp
  </pre>
 
  For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/java/Example.java">Example.java</a>.
@@ -237,7 +255,9 @@ loadScripts(document, 'script');</script>
  <ol>
  <li>Create a new Android project in Android Studio (File → New → New Project).
  <li>When prompted to select a template, choose Phone and Tablet → Native C++.
- <li>Within a terminal create symlinks to the Java, wrapper and C library sources:
+ <li>Create symlinks to the Java sources, wrapper source, and C library sources:
+   <p>
+   <strong>On Unix/macOS:</strong>
    <pre>
  cd &lt;project-root&gt;/app/src/main/java
  mkdir -p org/gs1
@@ -248,6 +268,21 @@ loadScripts(document, 'script');</script>
  ln -s &lt;path-to-gs1-syntax-engine&gt;/src/c-lib gs1encoders
  ln -s &lt;path-to-gs1-syntax-engine&gt;/src/java/gs1encoders_wrap.c gs1encoders_wrap.c
    </pre>
+   <strong>On Windows:</strong>
+   <p>
+   Open Command Prompt, then:
+   <pre>
+ cd &lt;project-root&gt;\app\src\main\java
+ mkdir org\gs1
+ cd org\gs1
+ mklink /D gs1encoders &lt;path-to-gs1-syntax-engine&gt;\src\java\org\gs1\gs1encoders
+
+ cd &lt;project-root&gt;\app\src\main\cpp
+ mklink /D gs1encoders &lt;path-to-gs1-syntax-engine&gt;\src\c-lib
+ mklink gs1encoders_wrap.c &lt;path-to-gs1-syntax-engine&gt;\src\java\gs1encoders_wrap.c
+   </pre>
+   <p>
+   <em>Ensure that Window's Developer Mode is enabled unless you are running as Administrator.</em>
  <li>Append the following to <code>app/src/main/cpp/CMakeLists.txt</code>:
    <pre>
  file(GLOB LIB_SOURCE_FILES
