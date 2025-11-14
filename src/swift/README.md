@@ -65,7 +65,7 @@ To use the wrapper in your Swift project, add it as a dependency in your `Packag
 
 ```swift
 dependencies: [
-    .package(path: "path/to/src/swift")
+    .package(path: "<path-to-gs1-syntax-engine>/src/swift")
 ]
 ```
 

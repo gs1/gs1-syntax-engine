@@ -86,10 +86,10 @@ library:
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="<path\to\src\dotnet-lib\GS1Encoder.cs>" Link="GS1Encoder.cs" />
+    <Compile Include="&lt;path-to-gs1-syntax-engine&gt;\src\dotnet-lib\GS1Encoder.cs" Link="GS1Encoder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="<path\to\src\c-lib\build\library\Win32\Release\gs1encoders.dll>">
+    <None Include="&lt;path-to-gs1-syntax-engine&gt;\src\c-lib\build\library\Win32\Release\gs1encoders.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
