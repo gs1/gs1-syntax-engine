@@ -65,10 +65,10 @@ There is a large corpus of example code.
 
 API documentation and Quick Start guides are available for each supported language binding:
 
-| Language/binding/platform  | Documentation link                                 |
+| Language/binding/platform  | Documentation links                                |
 | -------------------------- | -------------------------------------------------- |
 | Native C library           | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#autotoc_md1), [Examples](https://gs1.github.io/gs1-syntax-engine/#autotoc_md5), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html) |
-| C# .NET binding            | <https://gs1.github.io/gs1-syntax-engine/cs/>      |
+| C# .NET binding            | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html) |
 | Java binding (and Android) | <https://gs1.github.io/gs1-syntax-engine/java/>    |
 | Swift binding (and iOS)    | <https://gs1.github.io/gs1-syntax-engine/swift/>   |
 | JS + WebAssembly build     | <https://gs1.github.io/gs1-syntax-engine/js-wasm/> |
