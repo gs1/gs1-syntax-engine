@@ -47,6 +47,89 @@ internal "data buffers":
 The main operations of the library involve reading and updating the state of
 these buffers.
 
+### Quick Start
+
+#### Building the C library
+
+**On Unix/macOS:**
+
+Build as a shared library:
+
+    make -C src/c-lib -j `nproc` libshared
+
+Or build as a static library:
+
+    make -C src/c-lib -j `nproc` libstatic
+
+**On Windows:**
+
+Build using Visual Studio or from a Developer Command Prompt:
+
+    msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Release /p:Platform=x64
+
+This generates the library in `src\c-lib\build\library\x64\Release\gs1encoders.dll`.
+
+#### Running the example application
+
+After building, you can test the library by running the interactive console application:
+
+**On Unix/macOS:**
+
+    make -C src/c-lib -j `nproc` app
+    LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin
+
+**On Windows:**
+
+    msbuild src\gs1encoders.sln /t:gs1encoders-app /p:Configuration=Release /p:Platform=x64
+    src\c-lib\build\bin\x64\Release\gs1encoders-app.exe
+
+The example application provides an interactive menu for testing different input formats and features.
+
+#### Using in your own C/C++ project
+
+To use the library in your C/C++ project you must:
+
+  1. Include `gs1encoders.h` in your source files
+  2. Link against the library (`libgs1encoders.so`, `libgs1encoders.a`, `gs1encoders.dll`, or `gs1encoders.lib`)
+
+For a minimal example, create a `myapp.c` file as follows:
+
+\code
+#include <stdio.h>
+#include "gs1encoders.h"
+
+int main(void) {
+    gs1_encoder *gs = gs1_encoder_init(NULL);
+    if (!gs) return 1;
+
+    printf("GS1 Syntax Engine version: %s\n", gs1_encoder_getVersion());
+
+    gs1_encoder_free(gs);
+    return 0;
+}
+\endcode
+
+**On Unix/macOS:**
+
+Compile and link:
+
+    gcc myapp.c -I<path-to-gs1-syntax-engine>/src/c-lib -L<path-to-gs1-syntax-engine>/src/c-lib/build -lgs1encoders -o myapp
+
+Run:
+
+    LD_LIBRARY_PATH=<path-to-gs1-syntax-engine>/src/c-lib/build ./myapp
+
+**On Windows:**
+
+Compile and link:
+
+    cl myapp.c /I<path-to-gs1-syntax-engine>\src\c-lib <path-to-gs1-syntax-engine>\src\c-lib\build\library\x64\Release\gs1encoders.lib
+
+Run (ensure `gs1encoders.dll` is in the same directory or on PATH):
+
+    myapp.exe
+
+
 ### Example Uses
 
 The following are examples of how to use the library.
