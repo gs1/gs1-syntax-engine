@@ -107,16 +107,15 @@ For detailed build instructions, see the documentation for your specific languag
 
 ### Repository Layout
 
-| Directory      | Purpose                                                                           |
-| -------------- | --------------------------------------------------------------------------------- |
-| src/c-lib      | Source for the native C library, unit tests, fuzzers and demo console application |
-| src/dotnet-lib | C# .NET wrapper source                                                            |
-| src/dotnet-app | Demo C# .NET desktop application (WPF)                                            |
-| src/java       | Java wrapper source and demo console application                                  |
-| src/swift      | Swift package with demo console application                                       |
-| src/js-wasm    | JavaScript wrapper with demo web and Node.js applications                         |
-| src/android    | Android Studio project demonstrating mobile integration                           |
-| src/ios        | Xcode project demonstrating iOS integration                                       |
-| docs           | Generated API documentation for all language bindings                             |
-| maintenance    | Build scripts and tools for maintainers                                           |
-
+| Directory        | Purpose                                                                           |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `src/c-lib`      | Source for the native C library, unit tests, fuzzers and demo console application |
+| `src/dotnet-lib` | C# .NET wrapper source                                                            |
+| `src/dotnet-app` | Demo C# .NET desktop application (WPF)                                            |
+| `src/java`       | Java wrapper source and demo console application                                  |
+| `src/swift`      | Swift package with demo console application                                       |
+| `src/js-wasm`    | JavaScript wrapper with demo web and Node.js applications                         |
+| `src/android`    | Android Studio project demonstrating mobile integration                           |
+| `src/ios`        | Xcode project demonstrating iOS integration                                       |
+| `docs`           | Generated API documentation for all language bindings                             |
+| `maintenance`    | Build scripts and tools for maintainers                                            |
