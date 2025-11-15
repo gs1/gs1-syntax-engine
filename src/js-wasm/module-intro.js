@@ -144,7 +144,7 @@
  * <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.mjs">example.mjs</a>.
  *
  *
- * <h2>Example uses</h2>
+ * <h2 id="example-uses">Example uses</h2>
  *
  * The following are examples of how to use the library.
  *
