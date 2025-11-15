@@ -67,7 +67,7 @@ API documentation and Quick Start guides are available for each supported langua
 
 | Language/binding/platform  | Documentation link                                 |
 | -------------------------- | -------------------------------------------------- |
-| Native C library           | <https://gs1.github.io/gs1-syntax-engine/>         |
+| Native C library           | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#autotoc_md1), [Examples](https://gs1.github.io/gs1-syntax-engine/#autotoc_md5), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html) |
 | C# .NET binding            | <https://gs1.github.io/gs1-syntax-engine/cs/>      |
 | Java binding (and Android) | <https://gs1.github.io/gs1-syntax-engine/java/>    |
 | Swift binding (and iOS)    | <https://gs1.github.io/gs1-syntax-engine/swift/>   |
