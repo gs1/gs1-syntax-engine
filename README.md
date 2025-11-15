@@ -81,15 +81,15 @@ library to be redistributed with an application.
 
 ## Repository Layout
 
-| Directory        | Purpose                                                                           |
-| ---------------- | --------------------------------------------------------------------------------- |
-| [`src/c-lib`](src/c-lib)      | Source for the native C library, unit tests, fuzzers and demo console application |
-| `src/dotnet-lib` | C# .NET wrapper source                                                            |
-| `src/dotnet-app` | Demo C# .NET desktop application (WPF)                                            |
-| `src/java`       | Java wrapper source and demo console application                                  |
-| `src/swift`      | Swift package with demo console application                                       |
-| `src/js-wasm`    | JavaScript wrapper with demo web and Node.js applications                         |
-| `src/android`    | Android Studio project demonstrating mobile integration                           |
-| `src/ios`        | Xcode project demonstrating iOS integration                                       |
-| `docs`           | Generated API documentation for all language bindings                             |
-| `maintenance`    | Build scripts and tools for maintainers                                            |
+| Directory                          | Purpose                                                                           |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| [`src/c-lib`](src/c-lib)           | Source for the native C library, unit tests, fuzzers and demo console application |
+| [`src/dotnet-lib`](src/dotnet-lib) | C# .NET wrapper source                                                            |
+| [`src/dotnet-app`](src/dotnet-app) | Demo C# .NET desktop application (WPF)                                            |
+| [`src/java`](src/java)             | Java wrapper source and demo console application                                  |
+| [`src/swift`](src/swift)           | Swift package with demo console application                                       |
+| [`src/js-wasm`](src/js-wasm)       | JavaScript wrapper with demo web and Node.js applications                         |
+| [`src/android`](src/android)       | Android Studio project demonstrating mobile integration                           |
+| [`src/ios`](src/ios)               | Xcode project demonstrating iOS integration                                       |
+| [`docs`](docs)                     | Generated API documentation for all language bindings                             |
+| [`maintenance`](maintenance)       | Build scripts and tools for maintainers                                           |
