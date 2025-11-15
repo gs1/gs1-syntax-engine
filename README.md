@@ -79,15 +79,11 @@ application codebase (Open Source or proprietary) or for the pre-built shared
 library to be redistributed with an application.
 
 
-## Building from Source
-
-For detailed build instructions, see the documentation for your specific language binding above.
-
-### Repository Layout
+## Repository Layout
 
 | Directory        | Purpose                                                                           |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `src/c-lib`      | Source for the native C library, unit tests, fuzzers and demo console application |
+| [`src/c-lib`](src/c-lib)      | Source for the native C library, unit tests, fuzzers and demo console application |
 | `src/dotnet-lib` | C# .NET wrapper source                                                            |
 | `src/dotnet-app` | Demo C# .NET desktop application (WPF)                                            |
 | `src/java`       | Java wrapper source and demo console application                                  |
