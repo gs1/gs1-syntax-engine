@@ -71,7 +71,7 @@ API documentation and Quick Start guides are available for each supported langua
 | C# .NET binding            | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html) |
 | Java binding (and Android) | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start-heading), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses-heading), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
 | Swift binding (and iOS)    | [Overview](https://gs1.github.io/gs1-syntax-engine/swift/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/swift/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/swift/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/swift/Classes/GS1Encoder.html) |
-| JS + WebAssembly build     | <https://gs1.github.io/gs1-syntax-engine/js-wasm/> |
+| JS + WebAssembly build     | [Overview](https://gs1.github.io/gs1-syntax-engine/js-wasm/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/js-wasm/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/js-wasm/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/js-wasm/GS1encoder.html) |
 
 
 ## Getting Started with Pre-built Demos
