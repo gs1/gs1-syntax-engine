@@ -69,7 +69,7 @@ API documentation and Quick Start guides are available for each supported langua
 | -------------------------- | -------------------------------------------------- |
 | Native C library           | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#autotoc_md1), [Examples](https://gs1.github.io/gs1-syntax-engine/#autotoc_md5), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html) |
 | C# .NET binding            | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html) |
-| Java binding (and Android) | <https://gs1.github.io/gs1-syntax-engine/java/>    |
+| Java binding (and Android) | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start-heading), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses-heading), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
 | Swift binding (and iOS)    | <https://gs1.github.io/gs1-syntax-engine/swift/>   |
 | JS + WebAssembly build     | <https://gs1.github.io/gs1-syntax-engine/js-wasm/> |
 
