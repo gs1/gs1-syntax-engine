@@ -52,7 +52,7 @@ There is a large corpus of example code.
 
 
 
-## Getting Started with Pre-built Demos
+## Pre-built Demos
 
 Pre-built demonstration applications are available for quick evaluation without needing to build from source. All demos can be [downloaded from the latest release](https://github.com/gs1/gs1-syntax-engine/releases/latest).
 
