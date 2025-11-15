@@ -17,25 +17,23 @@ and its subordinate [GS1 Barcode Syntax Tests](https://ref.gs1.org/tools/gs1-bar
 
 ## What's Included
 
-### Core Library
-
-The GS1 Barcode Syntax Engine is a C library that can be deployed as:
+The GS1 Barcode Syntax Engine is fundamentally a C library that can be deployed as:
 
 - **Vendored source** - Integrated directly into third-party code
 - **Native shared library** - `.so` (Linux/Unix), `.dylib` (macOS), or `.dll` (Windows)
 - **WebAssembly/JavaScript** - For browser and Node.js applications
 
-### Language Bindings
+The project provides language-specific wrappers that provide idiomatic interfaces to
+the native library from a variety of high-level programming languages:
 
-Language-specific wrappers provide idiomatic interfaces to the native library
-from a variety of high-level programming languages:
+| Language/binding   | Technology         | Platforms                | Documentation links |
+| ------------------ | ------------------ | ------------------------ | ------------------- |
+| Native C library   | -                  | Cross-platform, embedded | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#autotoc_md1), [Examples](https://gs1.github.io/gs1-syntax-engine/#autotoc_md5), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html) |
+| C# .NET            |  P/Invoke wrapper  | Windows, Linux, macOS    | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html) |
+| Java (and Android) | JNI wrapper        | Cross-platform, Android  | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start-heading), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses-heading), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
+| Swift (and iOS)    | C interoperability | macOS, iOS               | [Overview](https://gs1.github.io/gs1-syntax-engine/swift/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/swift/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/swift/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/swift/Classes/GS1Encoder.html) |
+| JavaScript         | WebAssembly        | Browser, Node.js         | [Overview](https://gs1.github.io/gs1-syntax-engine/js-wasm/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/js-wasm/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/js-wasm/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/js-wasm/GS1encoder.html) |
 
-| Language   | Technology         | Platform                |
-| ---------- | ------------------ | ----------------------- |
-| C# .NET    | P/Invoke wrapper   | Windows, Linux, macOS   |
-| Java       | JNI wrapper        | Cross-platform, Android |
-| Swift      | C interoperability | macOS, iOS              |
-| JavaScript | WebAssembly        | Browser, Node.js        |
 
 ### Example Applications
 
@@ -61,17 +59,6 @@ There is a large corpus of example code.
 - Node.js HTTP web service with example client ([source](src/js-wasm/example-web-service.node.mjs))
 
 
-## Documentation
-
-API documentation and Quick Start guides are available for each supported language binding:
-
-| Language/binding/platform  | Documentation links                                |
-| -------------------------- | -------------------------------------------------- |
-| Native C library           | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#autotoc_md1), [Examples](https://gs1.github.io/gs1-syntax-engine/#autotoc_md5), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html) |
-| C# .NET binding            | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html) |
-| Java binding (and Android) | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start-heading), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses-heading), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
-| Swift binding (and iOS)    | [Overview](https://gs1.github.io/gs1-syntax-engine/swift/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/swift/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/swift/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/swift/Classes/GS1Encoder.html) |
-| JS + WebAssembly build     | [Overview](https://gs1.github.io/gs1-syntax-engine/js-wasm/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/js-wasm/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/js-wasm/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/js-wasm/GS1encoder.html) |
 
 
 ## Getting Started with Pre-built Demos
