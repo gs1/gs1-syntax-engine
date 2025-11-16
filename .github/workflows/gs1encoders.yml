@@ -259,6 +259,11 @@ jobs:
         npm install
         node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
 
+    - name: TypeScript type checking
+      working-directory: src/js-wasm
+      run: |
+        npx tsc --noEmit -p ../../maintenance/ci/js-wasm/tsconfig.json
+
     - name: Node.js run
       working-directory: src/js-wasm
       run: |
@@ -288,6 +293,11 @@ jobs:
       run: |
         npm install
         node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
+
+    - name: TypeScript type checking
+      working-directory: src/js-wasm
+      run: |
+        npx tsc --noEmit -p ../../maintenance/ci/js-wasm/tsconfig.json
 
     - name: Node.js run
       working-directory: src/js-wasm

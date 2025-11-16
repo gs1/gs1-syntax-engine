@@ -17,13 +17,14 @@ ENV NVM_DIR=/root/.nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$NVM_VERSION/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && \
     nvm install $NODE_VERSION && \
-    npm i -g jsdoc
+    npm i -g jsdoc typescript
 
 ENV PATH="${PATH}:${NVM_DIR}/versions/node/v${NODE_VERSION}/bin"
 
 COPY --chmod=755 docker-entrypoint.sh /docker-entrypoint.sh
+COPY --chmod=755 generate-docs.sh /generate-docs.sh
 
 WORKDIR /srv
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["jsdoc","-c","jsdoc.json"]
+CMD ["/generate-docs.sh"]

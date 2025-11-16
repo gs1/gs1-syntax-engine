@@ -9,6 +9,7 @@
     "gs1-symtax"
   ],
   "main": "gs1encoder.mjs",
+  "types": "gs1encoder.d.ts",
   "type": "module",
   "engines": {
     "node": ">= 14",
@@ -31,10 +32,12 @@
   },
   "homepage": "https://github.com/gs1/gs1-syntax-engine#readme",
   "files": [
+    "gs1encoder.d.ts",
     "gs1encoder-wasm.mjs",
     "gs1encoder-wasm.wasm"
   ],
   "devDependencies": {
-    "jest-cli": "^29.7.0"
+    "jest-cli": "^29.7.0",
+    "typescript": "^5.0.0"
   }
 }
