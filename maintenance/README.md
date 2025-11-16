@@ -63,6 +63,7 @@ make -C src/c-lib setversion
 Build and publish the npm package:
 
 ```
+make -C src/c-lib docs-js-wasm       # Regenerate .d.ts
 make -C src/c-lib clean-wasm
 docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk make -C src/c-lib wasm
 cd src/js-wasm
