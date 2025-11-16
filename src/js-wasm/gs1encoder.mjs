@@ -714,9 +714,11 @@ GS1encoder.validation = validation;
  */
 function GS1encoderGeneralException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderGeneralException';
     return error;
 }
 GS1encoderGeneralException.prototype = Object.create(Error.prototype);
+GS1encoderGeneralException.prototype.name = 'GS1encoderGeneralException';
 
 
 /**
@@ -727,9 +729,11 @@ GS1encoderGeneralException.prototype = Object.create(Error.prototype);
  */
 function GS1encoderParameterException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderParameterException';
     return error;
 }
 GS1encoderParameterException.prototype = Object.create(Error.prototype);
+GS1encoderParameterException.prototype.name = 'GS1encoderParameterException';
 
 
 /**
@@ -740,9 +744,11 @@ GS1encoderParameterException.prototype = Object.create(Error.prototype);
  */
 function GS1encoderDigitalLinkException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderDigitalLinkException';
     return error;
 }
 GS1encoderDigitalLinkException.prototype = Object.create(Error.prototype);
+GS1encoderDigitalLinkException.prototype.name = 'GS1encoderDigitalLinkException';
 
 
 /**
@@ -753,6 +759,10 @@ GS1encoderDigitalLinkException.prototype = Object.create(Error.prototype);
  */
 function GS1encoderScanDataException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderScanDataException';
     return error;
 }
 GS1encoderScanDataException.prototype = Object.create(Error.prototype);
+GS1encoderScanDataException.prototype.name = 'GS1encoderScanDataException';
+
+export { GS1encoderGeneralException, GS1encoderParameterException, GS1encoderDigitalLinkException, GS1encoderScanDataException };
