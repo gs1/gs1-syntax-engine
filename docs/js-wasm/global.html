@@ -94,83 +94,26 @@
     
 
     
-
-    
-        <h3 class="subsection-title">Methods</h3>
+        <h3 class="subsection-title">Members</h3>
 
         
             
-
-    
-
-    
-    <h4 class="name" id="GS1encoderDigitalLinkException"><span class="type-signature"></span>GS1encoderDigitalLinkException<span class="signature">(message)</span><span class="type-signature"> &rarr; {Error}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Exception thrown when an error occurs during GS1 Digital Link URI processing.
-</div>
+<h4 class="name" id="symbology"><span class="type-signature">(constant) </span>symbology<span class="type-signature"> :<a href="global.html#SymbologyEnum">SymbologyEnum</a></span></h4>
 
 
 
 
 
 
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
+    <h5>Type:</h5>
+    <ul>
+        <li>
             
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#SymbologyEnum">SymbologyEnum</a></span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The error message</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        </li>
+    </ul>
 
 
 
@@ -216,115 +159,24 @@
 
 
 
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    An Error object with the specified message
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Error</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
         
             
-
-    
-
-    
-    <h4 class="name" id="GS1encoderGeneralException"><span class="type-signature"></span>GS1encoderGeneralException<span class="signature">(message)</span><span class="type-signature"> &rarr; {Error}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Exception thrown when a general library error occurs, such as initialisation failure.
-</div>
+<h4 class="name" id="validation"><span class="type-signature">(constant) </span>validation<span class="type-signature"> :<a href="global.html#ValidationEnum">ValidationEnum</a></span></h4>
 
 
 
 
 
 
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
+    <h5>Type:</h5>
+    <ul>
+        <li>
             
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#ValidationEnum">ValidationEnum</a></span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The error message</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        </li>
+    </ul>
 
 
 
@@ -370,115 +222,39 @@
 
 
 
+        
+    
 
+    
 
-
-
-
-
-
-
-
-<h5>Returns:</h5>
+    
+        <h3 class="subsection-title">Type Definitions</h3>
 
         
-<div class="param-desc">
-    An Error object with the specified message
-</div>
+                
+<h4 class="name" id="Symbology">Symbology</h4>
 
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Error</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="GS1encoderParameterException"><span class="type-signature"></span>GS1encoderParameterException<span class="signature">(message)</span><span class="type-signature"> &rarr; {Error}</span></h4>
-    
-
-    
 
 
 
 <div class="description">
-    Exception thrown when an invalid parameter is provided to a method or property setter.
+    Recognised GS1 barcode formats ("symbologies") for processing scan data.
+<p>
+This object defines all supported GS1 barcode symbology types that can be used
+with the encoder. Each symbology has specific characteristics and use cases.
 </div>
 
 
 
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
+    <h5>Type:</h5>
+    <ul>
+        <li>
             
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The error message</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        </li>
+    </ul>
 
 
 
@@ -524,71 +300,34 @@
 
 
 
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    An Error object with the specified message
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Error</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
             
+                
+<h4 class="name" id="SymbologyEnum">SymbologyEnum</h4>
+
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
 
     
 
-    
-    <h4 class="name" id="GS1encoderScanDataException"><span class="type-signature"></span>GS1encoderScanDataException<span class="signature">(message)</span><span class="type-signature"> &rarr; {Error}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Exception thrown when an error occurs during scan data processing.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
+<table class="props">
     <thead>
     <tr>
         
@@ -610,13 +349,13 @@
 
         <tr>
             
-                <td class="name"><code>message</code></td>
+                <td class="name"><code>NONE</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
 
 
             
@@ -626,13 +365,451 @@
 
             
 
-            <td class="description last">The error message</td>
+            <td class="description last">None defined</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarOmni</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Omnidirectional</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarTruncated</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Truncated</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarStacked</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Stacked</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarStackedOmni</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Stacked Omnidirectional</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarLimited</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Limited</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DataBarExpanded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1 DataBar Expanded (Stacked)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UPCA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">UPC-A</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UPCE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">UPC-E</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>EAN13</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">EAN-13</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>EAN8</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">EAN-8</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>GS1_128_CCA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1-128 with CC-A or CC-B</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>GS1_128_CCC</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">GS1-128 with CC-C</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>QR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) QR Code</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DM</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) Data Matrix</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DotCode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">(GS1) DotCode</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>NUMSYMS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Symbology">Symbology</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value is the number of symbologies</td>
         </tr>
 
     
     </tbody>
 </table>
 
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Validation">Validation</h4>
+
+
+
+
+<div class="description">
+    Optional AI validation procedures that may be applied to detect invalid inputs.
+<p>
+These validation procedures are applied when AI data is provided using
+<a href="GS1encoder.html#aiDataStr">GS1encoder#aiDataStr</a>, <a href="GS1encoder.html#dataStr">GS1encoder#dataStr</a> or <a href="GS1encoder.html#scanData">GS1encoder#scanData</a>.
+<p>
+Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -678,45 +855,237 @@
 
 
 
+            
+                
+<h4 class="name" id="ValidationEnum">ValidationEnum</h4>
 
 
 
 
 
 
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
 
 
 
-<h5>Returns:</h5>
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
 
         
-<div class="param-desc">
-    An Error object with the specified message
-</div>
 
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
         
-<span class="param-type">Error</span>
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>MutexAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
 
 
-    </dd>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Mutually exclusive AIs (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>RequisiteAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Mandatory associations between AIs</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>RepeatedAIs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Repeated AIs having same value (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DigSigSerialKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>UnknownAInotDLattr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Unknown AIs not permitted as GS1 DL URI data attributes</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>NUMVALIDATIONS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validation">Validation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value is the number of validations</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dl>
 
-    
 
 
 
 
 
-        
-    
-
+            
     
 
     
@@ -730,7 +1099,7 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-gs1encoder.html">gs1encoder</a></li></ul><h3>Classes</h3><ul><li><a href="GS1encoder.html">GS1encoder</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GS1encoderDigitalLinkException">GS1encoderDigitalLinkException</a></li><li><a href="global.html#GS1encoderGeneralException">GS1encoderGeneralException</a></li><li><a href="global.html#GS1encoderParameterException">GS1encoderParameterException</a></li><li><a href="global.html#GS1encoderScanDataException">GS1encoderScanDataException</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-gs1encoder.html">gs1encoder</a></li></ul><h3>Classes</h3><ul><li><a href="GS1encoder.html">GS1encoder</a></li><li><a href="GS1encoderDigitalLinkException.html">GS1encoderDigitalLinkException</a></li><li><a href="GS1encoderGeneralException.html">GS1encoderGeneralException</a></li><li><a href="GS1encoderParameterException.html">GS1encoderParameterException</a></li><li><a href="GS1encoderScanDataException.html">GS1encoderScanDataException</a></li></ul><h3>Global</h3><ul><li><a href="global.html#symbology">symbology</a></li><li><a href="global.html#validation">validation</a></li></ul>
 </nav>
 
 <br class="clear">
