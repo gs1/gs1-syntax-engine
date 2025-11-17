@@ -56,3 +56,11 @@ Canonical GS1 Digital Link URI: https://id.gs1.org/01/09521234543213?99=TESTING1
 
 An comprehensive, interactive example is provided here:
 <https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.node.mjs>
+
+
+TypeScript Support
+------------------
+
+This library includes type definitions (`.d.ts` file) for the wrapper that
+provide compile time type checking in TypeScript projects and autocompletion in
+many IDEs.
