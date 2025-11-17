@@ -43,27 +43,31 @@ export class GS1encoder {
      * Creates a new GS1Encoder instance. Call {@link GS1encoder#init} to initialise it before use.
      */
     constructor() {
+        /**
+         * @private
+         */
         this.ctx = null;
     }
 
     /**
      * Initialises a new instance of the GS1Encoder.
      *
-     * @throws {@link GS1encoderGeneralException} if the library fails to initialise
+     * @returns {Promise<void>}
+     * @throws {GS1encoderGeneralException} if the library fails to initialise
      * @async
      */
     async init() {
 
-        /*
+        /**
          *  Load the WASM
-         *
+         *  @private
          */
         this.module = await createGS1encoderModule();
 
-        /*
+        /**
          *  Public API functions implemented by the WASM build of the GS1
          *  Syntax Engine library
-         *
+         *  @private
          */
         this.api = {
             gs1_encoder_getVersion:
@@ -132,7 +136,8 @@ export class GS1encoder {
 
 
     /**
-     * @ignore
+     * Frees the resources associated with this encoder instance.
+     * @returns {void}
      */
     free() {
         this.api.gs1_encoder_free(this.ctx);
@@ -146,6 +151,7 @@ export class GS1encoder {
      * Returns a string containing the version of the library, typically the build date.
      *
      * @type {string}
+     * @returns {string}
      */
     get version() {
         return this.api.gs1_encoder_getVersion();
@@ -163,6 +169,7 @@ export class GS1encoder {
      * <code>"|"</code> characters.
      *
      * @type {string}
+     * @returns {string}
      */
     get errMarkup() {
         return this.api.gs1_encoder_getErrMarkup(this.ctx);
@@ -174,14 +181,18 @@ export class GS1encoder {
      * <p>
      * This might be set manually or automatically when processing scan data with {@link GS1encoder#scanData}.
      *
-     * @type {GS1encoder.symbology}
-     * @throws {@link GS1encoderParameterException} if the setter is provided with an invalid symbology type
+     * @type {Symbology}
+     * @returns {Symbology}
+     * @throws {GS1encoderParameterException} if the setter is provided with an invalid symbology type
      * @see {@link GS1encoder#scanData}
      * @see GS1encoder.symbology
      */
     get sym() {
         return this.api.gs1_encoder_getSym(this.ctx);
     }
+    /**
+     * @param {Symbology} value
+     */
     set sym(value) {
         if (!this.api.gs1_encoder_setSym(this.ctx, value))
             throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
@@ -199,11 +210,15 @@ export class GS1encoder {
      * specifically EAN/UPC and GS1 DataBar except Expanded (Stacked).
      *
      * @type {boolean}
-     * @throws {@link GS1encoderParameterException} if the value is invalid
+     * @returns {boolean}
+     * @throws {GS1encoderParameterException} if the value is invalid
      */
     get addCheckDigit() {
         return this.api.gs1_encoder_getAddCheckDigit(this.ctx) != 0;
     }
+    /**
+     * @param {boolean} value
+     */
     set addCheckDigit(value) {
         if (!this.api.gs1_encoder_setAddCheckDigit(this.ctx, value ? 1 : 0))
             throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
@@ -290,8 +305,8 @@ export class GS1encoder {
     /**
      * Get the current enabled status of the provided AI validation procedure.
      *
-     * @param {GS1encoder.validation} validation - A validation procedure to check the status of
-     * @return {boolean} <code>true</code> if the AI validation procedure is currently enabled; <code>false</code> otherwise
+     * @param {Validation} validation - A validation procedure to check the status of
+     * @returns {boolean} <code>true</code> if the AI validation procedure is currently enabled; <code>false</code> otherwise
      */
     getValidationEnabled(validation) {
         return this.api.gs1_encoder_getValidationEnabled(this.ctx, validation) != 0;
@@ -309,9 +324,10 @@ export class GS1encoder {
      * <p>
      * <strong>Note:</strong> The option only applies to AI input data.
      *
-     * @param {GS1encoder.validation} validation - A validation procedure to set the enabled status of
+     * @param {Validation} validation - A validation procedure to set the enabled status of
      * @param {boolean} value - <code>true</code> to enable the validation; <code>false</code> to disable
-     * @throws {@link GS1encoderParameterException}
+     * @returns {void}
+     * @throws {GS1encoderParameterException}
      */
     setValidationEnabled(validation, value) {
         if (!this.api.gs1_encoder_setValidationEnabled(this.ctx, validation, value ? 1 : 0))
@@ -444,9 +460,9 @@ export class GS1encoder {
      * <code>https://id.example.com/stem</code> might produce:
      * <pre>https://id.example.com/stem/01/12345678901231?10=ABC123&11=210630</pre>
      *
-     * @param {string} stem - A URI "stem" used as a prefix for the URI. If <code>null</code>, the GS1 canonical stem (https://id.gs1.org/) will be used
-     * @return {string} a string representing the GS1 Digital Link URI for the input data
-     * @throws {@link GS1encoderDigitalLinkException}
+     * @param {string|null} stem - A URI "stem" used as a prefix for the URI. If <code>null</code>, the GS1 canonical stem (https://id.gs1.org/) will be used
+     * @returns {string} a string representing the GS1 Digital Link URI for the input data
+     * @throws {GS1encoderDigitalLinkException}
      */
     getDLuri(stem) {
         var uri = this.api.gs1_encoder_getDLuri(this.ctx, stem);
@@ -513,6 +529,7 @@ export class GS1encoder {
      * </pre>
      *
      * @type {string[]}
+     * @returns {string[]}
      */
     get hri() {
         var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
@@ -539,6 +556,7 @@ export class GS1encoder {
      * present which sections of a given GS1 Digital Link URI have been ignored.
      *
      * @type {string[]}
+     * @returns {string[]}
      */
     get dlIgnoredQueryParams() {
         var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
@@ -561,97 +579,50 @@ export class GS1encoder {
  * This object defines all supported GS1 barcode symbology types that can be used
  * with the encoder. Each symbology has specific characteristics and use cases.
  *
- * @enum {number}
- * @memberof GS1encoder
- * @constant
+ * @typedef {number} Symbology - Numeric symbology identifier
  */
+
+/**
+ * @typedef {object} SymbologyEnum
+ * @property {Symbology} NONE None defined
+ * @property {Symbology} DataBarOmni GS1 DataBar Omnidirectional
+ * @property {Symbology} DataBarTruncated GS1 DataBar Truncated
+ * @property {Symbology} DataBarStacked GS1 DataBar Stacked
+ * @property {Symbology} DataBarStackedOmni GS1 DataBar Stacked Omnidirectional
+ * @property {Symbology} DataBarLimited GS1 DataBar Limited
+ * @property {Symbology} DataBarExpanded GS1 DataBar Expanded (Stacked)
+ * @property {Symbology} UPCA UPC-A
+ * @property {Symbology} UPCE UPC-E
+ * @property {Symbology} EAN13 EAN-13
+ * @property {Symbology} EAN8 EAN-8
+ * @property {Symbology} GS1_128_CCA GS1-128 with CC-A or CC-B
+ * @property {Symbology} GS1_128_CCC GS1-128 with CC-C
+ * @property {Symbology} QR (GS1) QR Code
+ * @property {Symbology} DM (GS1) Data Matrix
+ * @property {Symbology} DotCode (GS1) DotCode
+ * @property {Symbology} NUMSYMS Value is the number of symbologies
+ * @readonly
+ */
+
+/** @type {SymbologyEnum} */
 const symbology = {
-
-    /**
-     * None defined
-     */
     NONE: -1,
-
-    /**
-     * GS1 DataBar Omnidirectional
-     */
     DataBarOmni: 0,
-
-    /**
-     * GS1 DataBar Truncated
-     */
     DataBarTruncated: 1,
-
-    /**
-     * GS1 DataBar Stacked
-     */
     DataBarStacked: 2,
-
-    /**
-     * GS1 DataBar Stacked Omnidirectional
-     */
     DataBarStackedOmni: 3,
-
-    /**
-     * GS1 DataBar Limited
-     */
     DataBarLimited: 4,
-
-    /**
-     * GS1 DataBar Expanded (Stacked)
-     */
     DataBarExpanded: 5,
-
-    /**
-     * UPC-A
-     */
     UPCA: 6,
-
-    /**
-     * UPC-E
-     */
     UPCE: 7,
-
-    /**
-     * EAN-13
-     */
     EAN13: 8,
-
-    /**
-     * EAN-8
-     */
     EAN8: 9,
-
-    /**
-     * GS1-128 with CC-A or CC-B
-     */
     GS1_128_CCA: 10,
-
-    /**
-     * GS1-128 with CC
-     */
     GS1_128_CCC: 11,
-
-    /**
-     * (GS1) QR Code
-     */
     QR: 12,
-
-    /**
-     * (GS1) Data Matrix
-     */
     DM: 13,
-
-    /**
-     * (GS1) DotCode
-     */
     DotCode: 14,
-
-    /**
-     * Value is the number of symbologies
-     */
     NUMSYMS: 15,
-
 };
 
 GS1encoder.symbology = symbology;
@@ -665,42 +636,28 @@ GS1encoder.symbology = symbology;
  * <p>
  * Only AI validation procedures whose "enabled" status can be updated (i.e. not "locked") are described.
  *
- * @enum {number}
- * @memberof GS1encoder
- * @constant
+ * @typedef {number} Validation - Numeric validation identifier
  */
+
+/**
+ * @typedef {object} ValidationEnum
+ * @property {Validation} MutexAIs Mutually exclusive AIs (locked: always enabled)
+ * @property {Validation} RequisiteAIs Mandatory associations between AIs
+ * @property {Validation} RepeatedAIs Repeated AIs having same value (locked: always enabled)
+ * @property {Validation} DigSigSerialKey Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)
+ * @property {Validation} UnknownAInotDLattr Unknown AIs not permitted as GS1 DL URI data attributes
+ * @property {Validation} NUMVALIDATIONS Value is the number of validations
+ * @readonly
+ */
+
+/** @type {ValidationEnum} */
 const validation = {
-
-    /**
-     * Mutually exclusive AIs (locked: always enabled)
-     */
     MutexAIs: 0,
-
-    /**
-     * Mandatory associations between AIs
-     */
     RequisiteAIs: 1,
-
-    /**
-     * Repeated AIs having same value (locked: always enabled)
-     */
     RepeatedAIs: 2,
-
-    /**
-     * Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)
-     */
     DigSigSerialKey: 3,
-
-    /**
-     * Unknown AIs not permitted as GS1 DL URI data attributes
-     */
     UnknownAInotDLattr: 4,
-
-    /**
-     * Value is the number of validations
-     */
     NUMVALIDATIONS: 5,
-
 };
 
 GS1encoder.validation = validation;
@@ -708,51 +665,61 @@ GS1encoder.validation = validation;
 
 /**
  * Exception thrown when a general library error occurs, such as initialisation failure.
- *
+ * @class
+ * @extends Error
  * @param {string} message - The error message
- * @returns {Error} An Error object with the specified message
  */
 function GS1encoderGeneralException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderGeneralException';
     return error;
 }
 GS1encoderGeneralException.prototype = Object.create(Error.prototype);
+GS1encoderGeneralException.prototype.name = 'GS1encoderGeneralException';
 
 
 /**
  * Exception thrown when an invalid parameter is provided to a method or property setter.
- *
+ * @class
+ * @extends Error
  * @param {string} message - The error message
- * @returns {Error} An Error object with the specified message
  */
 function GS1encoderParameterException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderParameterException';
     return error;
 }
 GS1encoderParameterException.prototype = Object.create(Error.prototype);
+GS1encoderParameterException.prototype.name = 'GS1encoderParameterException';
 
 
 /**
  * Exception thrown when an error occurs during GS1 Digital Link URI processing.
- *
+ * @class
+ * @extends Error
  * @param {string} message - The error message
- * @returns {Error} An Error object with the specified message
  */
 function GS1encoderDigitalLinkException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderDigitalLinkException';
     return error;
 }
 GS1encoderDigitalLinkException.prototype = Object.create(Error.prototype);
+GS1encoderDigitalLinkException.prototype.name = 'GS1encoderDigitalLinkException';
 
 
 /**
  * Exception thrown when an error occurs during scan data processing.
- *
+ * @class
+ * @extends Error
  * @param {string} message - The error message
- * @returns {Error} An Error object with the specified message
  */
 function GS1encoderScanDataException(message) {
     const error = new Error(message);
+    error.name = 'GS1encoderScanDataException';
     return error;
 }
 GS1encoderScanDataException.prototype = Object.create(Error.prototype);
+GS1encoderScanDataException.prototype.name = 'GS1encoderScanDataException';
+
+export { GS1encoderGeneralException, GS1encoderParameterException, GS1encoderDigitalLinkException, GS1encoderScanDataException, symbology as Symbology, validation as Validation };

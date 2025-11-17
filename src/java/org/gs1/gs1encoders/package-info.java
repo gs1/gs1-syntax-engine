@@ -55,7 +55,7 @@
  * these buffers.
  *
  *
- * <h2>Quick start</h2>
+ * <h2 id="quick-start">Quick start</h2>
  *
  * To use the library you must first build the wrapper for your platform.
  *
@@ -178,7 +178,7 @@
  * For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/java/Example.java">Example.java</a>.
  *
  *
- * <h3>Android Mobile App Quick Start</h3>
+ * <h3 id="android-mobile-app-quick-start">Android Mobile App Quick Start</h3>
  *
  * To use the GS1 Barcode Syntax Engine in an Android application:
  *
@@ -272,7 +272,7 @@
  * <a href="https://github.com/gs1/gs1-syntax-engine/tree/main/src/android">GS1 Encoders Android App</a>.
  *
  *
- * <h2>Example uses</h2>
+ * <h2 id="example-uses">Example uses</h2>
  *
  * The following are examples of how to use the library.
  *

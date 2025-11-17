@@ -73,9 +73,9 @@ Overview</h2>
 <li><b>Extracted AI buffer:</b> This contains the in-order AI data that was extracted from the input data.</li>
 </ul>
 <p>The main operations of the library involve reading and updating the state of these buffers.</p>
-<h2><a class="anchor" id="autotoc_md1"></a>
+<h2><a class="anchor" id="quick-start"></a>
 Quick Start</h2>
-<h3><a class="anchor" id="autotoc_md2"></a>
+<h3><a class="anchor" id="autotoc_md1"></a>
 Building the C library</h3>
 <p><b>On Unix/macOS:</b></p>
 <p>Build as a shared library: </p><pre class="fragment">make -C src/c-lib -j `nproc` libshared
@@ -83,7 +83,7 @@ Building the C library</h3>
 </pre><p> <b>On Windows:</b></p>
 <p>Build using Visual Studio or from a Developer Command Prompt: </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Release /p:Platform=x64
 </pre><p> This generates the library in <code>src\c-lib\build\library\x64\Release\gs1encoders.dll</code>.</p>
-<h3><a class="anchor" id="autotoc_md3"></a>
+<h3><a class="anchor" id="autotoc_md2"></a>
 Running the example application</h3>
 <p>After building, you can test the library by running the interactive console application:</p>
 <p><b>On Unix/macOS:</b> </p><pre class="fragment">make -C src/c-lib -j `nproc` app
@@ -91,7 +91,7 @@ LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin
 </pre><p> <b>On Windows:</b> </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders-app /p:Configuration=Release /p:Platform=x64
 src\c-lib\build\bin\x64\Release\gs1encoders-app.exe
 </pre><p> The example application provides an interactive menu for testing different input formats and features.</p>
-<h3><a class="anchor" id="autotoc_md4"></a>
+<h3><a class="anchor" id="autotoc_md3"></a>
 Using in your own C/C++ project</h3>
 <p>To use the library in your C/C++ project you must:</p>
 <ol type="1">
@@ -117,7 +117,7 @@ Using in your own C/C++ project</h3>
 </pre><p> <b>On Windows:</b></p>
 <p>Compile and link: </p><pre class="fragment">cl myapp.c /I&lt;path-to-gs1-syntax-engine&gt;\src\c-lib &lt;path-to-gs1-syntax-engine&gt;\src\c-lib\build\library\x64\Release\gs1encoders.lib
 </pre><p> Run (ensure <code>gs1encoders.dll</code> is in the same directory or on PATH): </p><pre class="fragment">myapp.exe
-</pre><h2><a class="anchor" id="autotoc_md5"></a>
+</pre><h2><a class="anchor" id="example-uses"></a>
 Example Uses</h2>
 <p>The following are examples of how to use the library.</p>
 <dl class="section note"><dt>Note</dt><dd>Using the library always begins by initialising the library with <a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init()</a> or <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex()</a> and finishes by releasing the library with <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free()</a>.</dd>
@@ -126,7 +126,7 @@ Unless otherwise specified, the getter functions return pointers to per-instance
 <dd>
 Most of the setter and action functions of this library return a boolean indicating whether the function was successful and write an error message that can be accessed with <a class="el" href="gs1encoders_8h.html#af5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg()</a> in the event of failure. Production code should check the output of the functions and where relevant do something appropriate which might include rendering the error message to the user. Error message string are provided in the English language in a single file that can be replaced at compile time.</dd></dl>
 <p>Refer to the example console application (<code>gs1encoders-app.c</code>) for a comprehensive example of how to use this library.</p>
-<h3><a class="anchor" id="autotoc_md6"></a>
+<h3><a class="anchor" id="autotoc_md4"></a>
 GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <p>The following code processes AI data input, validates it (reporting any failures) and displays the extracted AIs if the validation succeeds.</p>
 <div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);              // Create a new instance of the library</div>
@@ -164,7 +164,7 @@ GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line">gs1_encoder_free(ctx);                                  // Release the instance of the library</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md7"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md5"></a>
 Converting an AI element string to barcode message data</h3>
 <p>In this example we process a bracketed AI element string to convert it into barcode message data, suitable for carrying in a GS1 barcode symbol.</p>
 <div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);</div>
@@ -190,7 +190,7 @@ Converting an AI element string to barcode message data</h3>
 Additionally, barcode image encoder libraries have differing conventions for how to input FNC1 characters, extending to whether it is necessary to be explicit about the notional FNC1 character in the first position when specifying a GS1 Application Identifier syntax symbol. </dd>
 <dd>
 Consequently, the barcode message data emitted by this library may need to be post-processed to align to the specific requirements of whatever symbol generation library is in use.</dd></dl>
-<h3><a class="anchor" id="autotoc_md8"></a>
+<h3><a class="anchor" id="autotoc_md6"></a>
 Barcode scan data processing</h3>
 <p>In this example we process scan data from a barcode reader to extract the AI data.</p>
 <div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);</div>
@@ -220,14 +220,14 @@ Barcode scan data processing</h3>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is required that AIM Symbology Identifiers are enabled on the barcode reader.</dd>
 <dd>
 It is assumed the scanned barcode message "survives the channel" intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement.</dd></dl>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Compile-Time Configuration Macros</h2>
 <p>The following macros may be defined at compile time to enable or disable optional features:</p>
 <p><code>GS1_ENCODERS_ERR_LANG=&lt;LANG&gt;</code> : Used to specify alternative translation strings for error messages. Create a new header file named <code>tr_&lt;LANG&gt;.h</code> based on the existing <code>tr_EN.h</code> file.</p>
 <p><code>EXCLUDE_EMBEDDED_AI_TABLE</code> : Excludes the embedding a table of AI properties in order to reduce the size of the library. The table of AI definitions must be populated by parsing from the GS1 Syntax Dictionary instead, without falling back to the embedded instance.</p>
 <p><code>EXCLUDE_SYNTAX_DICTIONARY_LOADER</code> : Excludes functions for populating the table of AIs by parsing the GS1 Syntax Dictionary. The AI definitions must be embedded for the library to function, i.e. this option is mutually exclusive of <code>EXCLUDE_EMBEDDED_AI_TABLE</code>.</p>
 <p><code>GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=&lt;CUSTOM_HEADER.h&gt;</code> : Points to a file that declares alternative heap management routines via the <code>GS1_ENCODERS_CUSTOM_MALLOC</code>, <code>GS1_ENCODERS_CUSTOM_CALLOC</code>, <code>GS1_ENCODERS_CUSTOM_REALLOC</code> and <code>GS1_ENCODERS_CUSTOM_FREE</code> macros. See below for implementation details.</p>
-<h3><a class="anchor" id="autotoc_md10"></a>
+<h3><a class="anchor" id="autotoc_md8"></a>
 Custom heap management routines example</h3>
 <p>Define <code>GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=my_alloc.h</code>.</p>
 <p>Example declarations in <code>my_alloc.h</code>:</p>

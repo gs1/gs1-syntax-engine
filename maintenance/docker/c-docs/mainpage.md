@@ -47,7 +47,7 @@ internal "data buffers":
 The main operations of the library involve reading and updating the state of
 these buffers.
 
-### Quick Start
+### Quick Start {#quick-start}
 
 #### Building the C library
 
@@ -130,7 +130,7 @@ Run (ensure `gs1encoders.dll` is in the same directory or on PATH):
     myapp.exe
 
 
-### Example Uses
+### Example Uses {#example-uses}
 
 The following are examples of how to use the library.
 
