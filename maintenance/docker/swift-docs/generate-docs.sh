@@ -16,6 +16,7 @@ jazzy \
     --author_url "https://www.gs1.org/" \
     --github_url "https://github.com/gs1/gs1-syntax-engine" \
     --root-url "https://gs1.github.io/gs1-syntax-engine/swift/" \
+    --copyright "&copy; <a class=\"link\" href=\"https://www.gs1.org/\" target=\"_blank\" rel=\"external noopener\">GS1 AISBL</a>. All rights reserved." \
     --output "$OUTPUT_DIR" \
     --readme README.md \
     --clean \
