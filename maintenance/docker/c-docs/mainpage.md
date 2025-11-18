@@ -30,7 +30,7 @@ formats.
 
 | Data transformation: Inputs, outputs and buffers |
 | :----------------------------------------------- |
-| \image html input_output_buffers.svg             |
+| \image html input_output_buffers.svg width=1000px |
 
 The above diagram highlights that conceptually the library contains two
 internal "data buffers":
