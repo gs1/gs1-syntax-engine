@@ -17,7 +17,7 @@ The data formats supported by this library are:
 
 The following diagram shows how the library can be used for processing and transformation of GS1 data, indicating which formats are accepted as input, how barcode message data is generated and AI data extracted from the provided input data, and how the given data can be output in various formats.
 
-![Data transformation: Inputs, outputs and buffers](../input_output_buffers.svg)
+![Data transformation: Inputs, outputs and buffers](input_output_buffers.svg)
 
 The above diagram highlights that conceptually the library contains two internal "data buffers":
 

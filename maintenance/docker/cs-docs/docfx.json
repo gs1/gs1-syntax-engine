@@ -27,6 +27,9 @@
         "files": [ "main.css" ],
         "src": "public",
         "dest": "styles"
+      },
+      {
+        "files": [ "input_output_buffers.svg" ]
       }
     ],
     "dest": "../../../docs/cs",

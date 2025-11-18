@@ -39,7 +39,7 @@
  * formats.
  *
  * <p>
- * <img src="../input_output_buffers.svg" alt="Data transformation: Inputs, outputs and buffers" style="max-width: 100%;">
+ * <img src="input_output_buffers.svg" alt="Data transformation: Inputs, outputs and buffers" style="max-width: 1000px; width: 100%;">
  *
  * <p>
  * The above diagram highlights that conceptually the library contains two internal "data buffers":

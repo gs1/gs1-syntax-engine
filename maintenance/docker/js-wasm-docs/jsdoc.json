@@ -10,7 +10,10 @@
   "templates": {
     "default": {
       "includeDate": false,
-      "outputSourceFiles": false
+      "outputSourceFiles": false,
+      "staticFiles": {
+        "include": ["input_output_buffers.svg"]
+      }
     }
   }
 }

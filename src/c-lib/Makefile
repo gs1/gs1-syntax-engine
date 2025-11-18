@@ -470,10 +470,12 @@ docs-cs:
 docs-java:
 	../../maintenance/docker/java-docs/docker-build.sh
 	cat ../../maintenance/docker/java-docs/custom.css >> ../../docs/java/stylesheet.css
+	cp ../../maintenance/docker/java-docs/input_output_buffers.svg ../../docs/java/
 
 .PHONY: docs-swift
 docs-swift:
 	../../maintenance/docker/swift-docs/docker-build.sh
+	cp ../../maintenance/docker/swift-docs/input_output_buffers.svg ../../docs/swift/
 
 .PHONY: docs-js-wasm
 docs-js-wasm:
