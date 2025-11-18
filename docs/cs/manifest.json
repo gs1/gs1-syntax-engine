@@ -143,6 +143,16 @@
     },
     {
       "type": "Resource",
+      "source_relative_path": "input_output_buffers.svg",
+      "output": {
+        "resource": {
+          "relative_path": "input_output_buffers.svg"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
       "source_relative_path": "public/main.css",
       "output": {
         "resource": {
