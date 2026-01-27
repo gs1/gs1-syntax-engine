@@ -9,9 +9,8 @@ Release Procedure
 
 Sync with latest Syntax Dictionary release
 
+  - make -C src/c-lib syncsyntaxdict
   - Ensure that a version is tagged in the gs1-syntax-dictionary.txt file.
-  - Freshen the embedded AI table.
-    - `cd src/c-lib && cat gs1-syntax-dictionary | ./build-embedded-ai-table.pl > aitable.inc`
 
 
 Sanity checks:
@@ -20,7 +19,7 @@ Sanity checks:
 make -C src/c-lib clean-test
 make -C src/c-lib test SANITIZE=yes
 make -C src/c-lib fuzzer
-[ Run them. ]
+[ Run fuzzers. ]
 ```
 
 
