@@ -100,7 +100,7 @@
 #
 # Copyright (c) 2020-2021 BWIPP project. https://bwipp.terryburton.co.uk/
 # Copyright (c) 2020-2021 Zint Project. https://zint.org.uk/
-# Copyright (c) 2021-2025 GS1 AISBL
+# Copyright (c) 2021-2026 GS1 AISBL
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -1,7 +1,7 @@
 /**
  * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2000-2024 GS1 AISBL.
+ * @author Copyright (c) 2000-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ int main(int argc, const char* const argv[]) {
 	}
 
 	printf("\nGS1 Barcode Syntax Engine Console Demo (Built " RELEASE "):");
-	printf("\n\nCopyright (c) 2020-2024 GS1 AISBL. License: Apache-2.0");
+	printf("\n\nCopyright (c) 2020-2026 GS1 AISBL. License: Apache-2.0");
 
 	while (userInt(ctx));
 

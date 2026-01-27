@@ -2,7 +2,7 @@
  * Wrapper class for accessing the functions exported by the GS1 Barcode Syntax
  * Engine native library from Swift
  *
- * Copyright (c) 2022-2025 GS1 AISBL.
+ * Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

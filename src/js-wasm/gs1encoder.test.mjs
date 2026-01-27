@@ -2,7 +2,7 @@
  *  Basic tests for the JavaScript wrapper for the GS1 Barcode Syntax Engine compiled
  *  as a WASM by Emscripten.
  *
- *  Copyright (c) 2024 GS1 AISBL.
+ *  Copyright (c) 2024-2026 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.

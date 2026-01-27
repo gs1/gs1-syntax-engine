@@ -5,7 +5,7 @@ namespace GS1.Encoders
 {
 
     /*
-     * Copyright (c) 2021-2025 GS1 AISBL.
+     * Copyright (c) 2021-2026 GS1 AISBL.
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.

@@ -1,7 +1,7 @@
 #
 # GS1 Barcode Syntax Engine
 #
-# @author Copyright (c) 2021-2024 GS1 AISBL.
+# @author Copyright (c) 2021-2026 GS1 AISBL.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
