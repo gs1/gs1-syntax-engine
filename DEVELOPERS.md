@@ -29,7 +29,7 @@ Barcode Syntax Dictionary and its associated Linters.
 - Match existing code style and idioms
 - Ensure unit tests cover new functionality and error conditions
 - Document code that works around compiler bugs or satiates static analysers with a comment explaining why
-- Don't create breaking changes affecting the public API, i.e. don't force code changes upon users of the library or require re-linking
+- Don't create breaking changes affecting the public API, i.e. don't force code changes upon users of the library or require re-linking. Use `GS1_ENCODERS_DEPRECATED` macro for functions being phased out
 - Avoid deeply nested code by exiting blocks early with `return`, `continue`, `break`, etc.
 - Regenerate documentation, including API references and examples, whenever there are changes.
 
@@ -98,7 +98,7 @@ allocating new memory.
 
 **Heap allocation**:
 - Don't heap allocate after init is complete.
-- Always use the `GS1_ENCODERS_*` macros, never direct `malloc`/`free`, to enable users to use their preferred heap management framework.
+- Always use the `GS1_ENCODERS_*` macros, never direct `malloc`/`free`, to enable users to use their preferred heap management framework. See the [C API documentation](https://gs1.github.io/gs1-syntax-engine/) for a custom heap management example.
 
 **Stack allocation** (`alloca`):
 - Use only when necessary to avoid large extensions to the context structure or to avoid runtime heap allocation
@@ -160,6 +160,7 @@ Use prefixes to avoid collisions with user code:
 | `src/js-wasm/`       | JavaScript wrapper with demo web and Node.js applications         |
 | `src/android/`       | Android Studio project for mobile integration demo                |
 | `src/ios/`           | Xcode project for iOS integration demo                            |
+| `src/contrib/`       | Community-contributed bindings (Rust, Python) - proof of concept  |
 
 ### Key C Library Files
 
@@ -174,7 +175,13 @@ Use prefixes to avoid collisions with user code:
 | `syn.c`                      | Syntax Dictionary file parsing                       |
 | `gs1-syntax-dictionary.txt`  | Vendored copy of GS1 Barcode Syntax Dictionary       |
 | `aitable.inc`                | Embedded AI table (generated from Syntax Dictionary) |
-| `syntax/*`                   | Vendored copy of Syntax Dictionary test routines     |
+| `syntax/*`                   | Vendored copy of Syntax Dictionary linter routines   |
+| `debug.h`                    | Debugging macros (`DEBUG_PRINT`)                     |
+| `tr.h`, `tr_EN.h`            | Error message translation system                     |
+| `gs1encoders-app.c`          | Console demo application source                      |
+| `gs1encoders-test.c`         | Unit test harness                                    |
+| `gs1encoders-fuzzer-*.c`     | Fuzzer entry points (ais, data, dl, scandata, syn)   |
+| `build-embedded-ai-table.pl` | Generates `aitable.inc` from Syntax Dictionary       |
 
 
 ## Documentation
@@ -192,7 +199,17 @@ Wiki pages to update when demo application behavior changes:
 - Desktop Application User Guide
 - Example Web Service And User Application
 
-Hosted API reference documentation is rebuild with `make docs`.
+### API Reference
+
+The `docs/` directory contains generated API documentation:
+
+- **C**: Doxygen (HTML)
+- **C#**: DocFX
+- **Java**: Javadoc
+- **JavaScript**: JSDoc
+- **Swift**: DocC
+
+Rebuild with `make docs`.
 
 
 ## Code Structure
@@ -478,15 +495,30 @@ git checkout gs1-syntax-dictionary.txt  # Restore it
 
 ### Fuzzing
 
-Coverage-guided fuzzing is provided by LLVM's LibFuzzer.
+Coverage-guided fuzzing is provided by LLVM's LibFuzzer. Five fuzzers target
+different entry points: `ais`, `data`, `dl`, `scandata`, and `syn`.
 
 ```bash
 cd src/c-lib
+
+# Build all fuzzers
 make -j $(nproc) fuzzer
 
-# Then run the printed commands, e.g.:
+# Build a specific fuzzer
+make -j $(nproc) fuzzer-ais
+```
+
+The build automatically seeds empty corpus directories by extracting quoted
+strings from test source files and merging them via LibFuzzer's `-merge=1`
+mode. This provides meaningful starting inputs derived from unit tests.
+
+Run a fuzzer (command printed after build):
+
+```bash
 ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais -jobs=$(nproc) -workers=$(nproc) corpus-ais
 ```
+
+To regenerate seeds for an existing corpus, delete the corpus directory first.
 
 ### JavaScript Tests
 
