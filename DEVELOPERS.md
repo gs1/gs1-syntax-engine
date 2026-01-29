@@ -9,6 +9,10 @@ library. It is authoritative for both human contributors and automated tools.
 The GS1 Barcode Syntax Engine is a native C library with bindings for C#/.NET,
 Java (JNI), Swift, and JavaScript/WebAssembly.
 
+It is part of the [GS1 Barcode Syntax Resource](https://www.gs1.org/standards/gs1-barcodes/gs1-barcode-syntax-resource),
+a suite of tools for implementing GS1 standards that also includes the
+[GS1 Barcode Syntax Dictionary](https://github.com/gs1/gs1-syntax-dictionary).
+
 It processes GS1 syntax data including:
 
 - Application Identifier (AI) element strings (bracketed and unbracketed)
@@ -171,6 +175,24 @@ Use prefixes to avoid collisions with user code:
 | `gs1-syntax-dictionary.txt`  | Vendored copy of GS1 Barcode Syntax Dictionary       |
 | `aitable.inc`                | Embedded AI table (generated from Syntax Dictionary) |
 | `syntax/*`                   | Vendored copy of Syntax Dictionary test routines     |
+
+
+## Documentation
+
+### User Documentation
+
+| Location                                        | Content                                                 |
+|-------------------------------------------------|---------------------------------------------------------|
+| <https://github.com/gs1/gs1-syntax-engine/wiki> | User guides for demo applications, deployment scenarios |
+| <https://gs1.github.io/gs1-syntax-engine/>      | Hosted API reference (C, C#, Java, JavaScript, Swift)   |
+
+Wiki pages to update when demo application behavior changes:
+
+- Console Application User Guide
+- Desktop Application User Guide
+- Example Web Service And User Application
+
+Hosted API reference documentation is rebuild with `make docs`.
 
 
 ## Code Structure
