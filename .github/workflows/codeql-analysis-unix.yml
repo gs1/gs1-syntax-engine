@@ -54,7 +54,7 @@ jobs:
           rm -rf src/ios
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           config: |
@@ -91,7 +91,7 @@ jobs:
           matrix.language == 'swift'
           || matrix.language == 'javascript-typescript'
         name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
