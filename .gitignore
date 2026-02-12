@@ -11,6 +11,7 @@ lib*.so.*
 .jshintrc
 src/c-lib/build/
 src/c-lib/build-test/
+src/c-lib/build-fuzzer/
 src/c-lib/build-wasm/
 src/c-lib/docstmp/
 src/c-lib/corpus-*/
