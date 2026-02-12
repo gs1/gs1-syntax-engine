@@ -49,7 +49,7 @@ jobs:
         run: |
           msbuild /t:Restore,Build `
             /p:Configuration=release `
-            /p:Platform="x86" `
+            /p:Platform="x64" `
             /p:UseSharedCompilation=false `
             gs1encoders.sln
 

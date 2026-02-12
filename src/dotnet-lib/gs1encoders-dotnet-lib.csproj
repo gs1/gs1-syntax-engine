@@ -8,18 +8,19 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y /d &quot;..\c-lib\build\library\Win32\$(Configuration)\gs1encoders.dll&quot; &quot;.&quot;" />
-  </Target>
+  <PropertyGroup>
+    <NativePlatformDir Condition="'$(PlatformTarget)' == 'x86'">Win32</NativePlatformDir>
+    <NativePlatformDir Condition="'$(NativePlatformDir)' == ''">x64</NativePlatformDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\c-lib\build\library\$(NativePlatformDir)\$(Configuration)\gs1encoders.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="gs1encoders.dll" />
+  </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <RootNamespace>gs1encoders_example_web_service_user_dotnet_app</RootNamespace>
     <UseWPF>true</UseWPF>
     <StartupObject>GS1.ExampleWebServiceUserDotnetApp.App</StartupObject>

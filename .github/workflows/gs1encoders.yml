@@ -105,19 +105,19 @@ jobs:
         run: |
           msbuild /t:Restore,Build `
             /p:Configuration=release `
-            /p:Platform="x86" `
+            /p:Platform="x64" `
             /warnaserror src\gs1encoders.sln
 
           # Load AI table from external Syntax Dictionary
           copy src\c-lib\gs1-syntax-dictionary.txt .
-          src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+          src\c-lib\build\test\x64\Release\gs1encoders-test.exe
 
           # Re-run using the embedded AI table
           del gs1-syntax-dictionary.txt
-          src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+          src\c-lib\build\test\x64\Release\gs1encoders-test.exe
           copy src\c-lib\gs1-syntax-dictionary.txt .
 
-          src\c-lib\build\console-app\Win32\Release\gs1encoders-app.exe `
+          src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
             --version
           src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
             --version
@@ -461,17 +461,22 @@ jobs:
         run: |
           msbuild /t:Restore,Build `
             /p:Configuration=release `
-            /p:Platform="x86" `
-            /p:RuntimeIdentifier=win-x86 `
+            /p:Platform="x64" `
+            /p:RuntimeIdentifier=win-x64 `
             /warnaserror src\gs1encoders.sln
-          msbuild `
+          msbuild /t:Build `
             /p:Configuration=release `
             /p:Platform="x86" `
+            /warnaserror `
+            src\c-lib\gs1encoders.vcxproj
+          msbuild `
+            /p:Configuration=release `
+            /p:Platform="x64" `
             /p:PublishSingleFile=True `
             /p:SelfContained=True `
             /p:IncludeNativeLibrariesForSelfExtract=true `
-            /p:RuntimeIdentifier=win-x86 `
-            /p:PublishDir=bin\Release\net8.0-windows\win-x86\publish\ `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ `
             /warnaserror src\gs1encoders.sln `
             -target:gs1encoders-dotnet-app:Publish
           msbuild /t:Publish `
@@ -480,34 +485,48 @@ jobs:
             /p:PlatformTarget="x64" `
             /p:PublishSingleFile=True `
             /p:SelfContained=True `
-            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:IncludeNativeLibrariesForSelfExtract=True `
             /p:RuntimeIdentifier=win-x64 `
             /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ `
             /restore /warnaserror `
             src\js-wasm\example-web-service-user-dotnet-app\gs1encoders-example-web-service-user-dotnet-app.csproj
 
-      - name: ZIP development libs
+      - name: ZIP development libs (x64)
         working-directory: >-
-          src/c-lib/build/library/Win32/Release
+          src/c-lib/build/library/x64/Release
         run: |
-          7z a gs1encoders-windows-libs.zip `
+          7z a gs1encoders-windows-libs-x64.zip `
             gs1encoders.h gs1encoders.lib `
             gs1encoders.dll `
             ../../../../gs1-syntax-dictionary.txt
+
+      - name: ZIP development libs (x86)
+        working-directory: >-
+          src/c-lib/build/library/Win32/Release
+        run: |
+          7z a gs1encoders-windows-libs-x86.zip `
+            gs1encoders.h gs1encoders.lib `
+            gs1encoders.dll `
+            ../../../../gs1-syntax-dictionary.txt
+
+      - name: Stage Windows development libs
+        run: |
+          mkdir windows-libs
+          copy src\c-lib\build\library\x64\Release\gs1encoders-windows-libs-x64.zip `
+            windows-libs\
+          copy src\c-lib\build\library\Win32\Release\gs1encoders-windows-libs-x86.zip `
+            windows-libs\
 
       - name: Store Windows development libs
         uses: actions/upload-artifact@v4
         with:
           name: windows-libs
-          path: "\
-            src/c-lib/build/library/\
-            Win32/Release/\
-            gs1encoders-windows-libs.zip"
+          path: windows-libs/
           retention-days: 1
 
       - name: ZIP console application
         working-directory: >-
-          src/c-lib/build/console-app/Win32/Release
+          src/c-lib/build/console-app/x64/Release
         run: |
           7z a gs1encoders-windows-console-app.zip `
             gs1encoders-app.exe gs1encoders.dll `
@@ -519,17 +538,16 @@ jobs:
           name: windows-console-app
           path: "\
             src/c-lib/build/console-app/\
-            Win32/Release/\
+            x64/Release/\
             gs1encoders-windows-console-app.zip"
           retention-days: 1
 
       - name: ZIP GUI application
         working-directory: >-
-          src/dotnet-app/bin/Release/net8.0-windows/win-x86/publish
+          src/dotnet-app/bin/Release/net8.0-windows/win-x64/publish
         run: |
           7z a gs1encoders-windows-gui-app.zip `
             gs1encoders-dotnet-app.exe `
-            ../../gs1encoders.dll `
             ../../../../../../c-lib/gs1-syntax-dictionary.txt
 
       - name: Store Windows GUI app
@@ -538,7 +556,7 @@ jobs:
           name: windows-gui-app
           path: "\
             src/dotnet-app/bin/Release/\
-            net8.0-windows/win-x86/publish/\
+            net8.0-windows/win-x64/publish/\
             gs1encoders-windows-gui-app.zip"
           retention-days: 1
 
@@ -559,6 +577,29 @@ jobs:
             bin/Release/net8.0-windows/\
             win-x64/publish/\
             example-web-service-user-app.zip"
+          retention-days: 1
+
+      - name: ZIP .NET wrapper library
+        run: |
+          mkdir dotnet-lib-release
+          mkdir dotnet-lib-release\runtimes\win-x64\native
+          mkdir dotnet-lib-release\runtimes\win-x86\native
+          copy src\dotnet-lib\bin\Release\net8.0\gs1encoders-dotnet.dll `
+            dotnet-lib-release\
+          copy src\c-lib\build\library\x64\Release\gs1encoders.dll `
+            dotnet-lib-release\runtimes\win-x64\native\
+          copy src\c-lib\build\library\Win32\Release\gs1encoders.dll `
+            dotnet-lib-release\runtimes\win-x86\native\
+          copy src\c-lib\gs1-syntax-dictionary.txt `
+            dotnet-lib-release\
+          cd dotnet-lib-release
+          7z a ..\gs1encoders-windows-dotnet-lib.zip *
+
+      - name: Store .NET wrapper library
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dotnet-lib
+          path: gs1encoders-windows-dotnet-lib.zip
           retention-days: 1
 
   build-release-linux:
@@ -704,6 +745,11 @@ jobs:
         with:
           name: windows-libs
 
+      - name: Load Windows .NET wrapper library
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-dotnet-lib
+
       - name: Load Windows console app
         uses: actions/download-artifact@v4
         with:
@@ -742,7 +788,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            gs1encoders-windows-libs.zip
+            gs1encoders-windows-libs-x64.zip
+            gs1encoders-windows-libs-x86.zip
+            gs1encoders-windows-dotnet-lib.zip
             gs1encoders-windows-console-app.zip
             gs1encoders-windows-gui-app.zip
             gs1encoders-linux-app.tgz
