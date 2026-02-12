@@ -1,9 +1,14 @@
-GS1 Barcode Syntax Engine - Swift Package
-==========================================
+# GS1 Barcode Syntax Engine - Swift Package
 
-The GS1 Barcode Syntax Engine provides routines that support the processing of GS1 syntax data, including Application Identifier element strings and GS1 Digital Link URIs, whether these are provided in raw or human-friendly format or as normalised scan data received from barcode readers.
+The GS1 Barcode Syntax Engine provides routines that support the
+processing of GS1 syntax data, including Application Identifier element
+strings and GS1 Digital Link URIs, whether these are provided in raw or
+human-friendly format or as normalised scan data received from barcode
+readers.
 
-The implementations are intended for use with GS1 standards and applications and do not contain additional features that might be required for more general use.
+The implementations are intended for use with GS1 standards and
+applications and do not contain additional features that might be
+required for more general use.
 
 Within the GS1 Application Identifier system, structured data is represented in different formats depending upon the context.
 
@@ -13,15 +18,26 @@ The data formats supported by this library are:
 - **Unbracketed AI element strings**: Rendition of AI data that corresponds most directly to encoded barcode data.
 - **GS1 Digital Link URIs**
 - **Scan data**: The expected result of scanning a symbol with a barcode reader that has AIM symbologies identifiers enabled.
-- **Human Readable Interpretation (HRI)**: Human-friendly redition of the AI data contained within a symbol. This may also include Data Titles to present the AI data in the form of "mixed HRI/non-HRI text". (Output only.)
+- **Human Readable Interpretation (HRI)**: Human-friendly redition
+  of the AI data contained within a symbol. This may also include Data
+  Titles to present the AI data in the form of "mixed HRI/non-HRI
+  text". (Output only.)
 
-The following diagram shows how the library can be used for processing and transformation of GS1 data, indicating which formats are accepted as input, how barcode message data is generated and AI data extracted from the provided input data, and how the given data can be output in various formats.
+The following diagram shows how the library can be used for processing
+and transformation of GS1 data, indicating which formats are accepted
+as input, how barcode message data is generated and AI data extracted
+from the provided input data, and how the given data can be output in
+various formats.
 
 ![Data transformation: Inputs, outputs and buffers](input_output_buffers.svg)
 
 The above diagram highlights that conceptually the library contains two internal "data buffers":
 
-- **Barcode message buffer:** This is populated with the raw message that would be borne by a GS1 barcode symbol that represents the input data, e.g. unbracketed AI syntax with FNC1 in first for regular AI element strings; plain string for a plain data or a GS1 Digital Link URI.
+- **Barcode message buffer:** This is populated with the raw message
+  that would be borne by a GS1 barcode symbol that represents the
+  input data, e.g. unbracketed AI syntax with FNC1 in first for
+  regular AI element strings; plain string for a plain data or a GS1
+  Digital Link URI.
 - **Extracted AI buffer:** This contains the in-order AI data that was extracted from the input data.
 
 The main operations of the library involve reading and updating the state of these buffers.
@@ -166,15 +182,22 @@ class ViewController: UIViewController {
 }
 ```
 
-For a comprehensive iOS app example with barcode scanning and full UI, see the [GS1 Encoders iOS App](https://github.com/gs1/gs1-syntax-engine/tree/main/src/ios).
+For a comprehensive iOS app example with barcode scanning and full
+UI, see the [GS1 Encoders iOS App](https://github.com/gs1/gs1-syntax-engine/tree/main/src/ios).
 
 ## Example uses
 
 The following are examples of how to use the library.
 
-Unless otherwise specified, the getter methods return library-managed data that must not be modified by the user. If their content must persist following a subsequent call to the same instance of the library then they must be copied to a user-managed variable.
+Unless otherwise specified, the getter methods return library-managed
+data that must not be modified by the user. If their content must
+persist following a subsequent call to the same instance of the library
+then they must be copied to a user-managed variable.
 
-Most of the setter and action methods of this library throw exceptions in the event of failure. Production code should catch these exceptions and handle them appropriately, which might include rendering the error message to the user.
+Most of the setter and action methods of this library throw exceptions
+in the event of failure. Production code should catch these exceptions
+and handle them appropriately, which might include rendering the error
+message to the user.
 
 ### GS1 AI data validation and extraction (including GS1 Digital Link)
 
@@ -234,14 +257,32 @@ do {
 print(gs.getDataStr())                                  // Render the barcode message buffer
 ```
 
-**Note:** The barcode message data read and emitted by this library uses a harmonised format that does not concern itself with internal encoding quirks of various symbologies. In the harmonised barcode message data:
+**Note:** The barcode message data read and emitted by this library
+uses a harmonised format that does not concern itself with internal
+encoding quirks of various symbologies. In the harmonised barcode
+message data:
 
-- A leading `"^"` always indicates GS1 Application Identifier syntax data, i.e. a notional FNC1 in first character position. (This is even true for DotCode in whose *internal encoding* the literal FNC1 non-data character may have an inverted meaning for certain messages depending upon their regular data content.)
-- A `"^"` at any other position represents a notional FNC1 non-data Application Identifier separator character. (This is even the case for QR Code in whose *internal encoding* a `"%"` character or `"{GS}"` character takes on the AI separator role typically assigned to the FNC1 non-data character, depending upon the effectuve encodation mode.)
+- A leading `"^"` always indicates GS1 Application Identifier syntax
+  data, i.e. a notional FNC1 in first character position. (This is
+  even true for DotCode in whose *internal encoding* the literal FNC1
+  non-data character may have an inverted meaning for certain messages
+  depending upon their regular data content.)
+- A `"^"` at any other position represents a notional FNC1 non-data
+  Application Identifier separator character. (This is even the case
+  for QR Code in whose *internal encoding* a `"%"` character or
+  `"{GS}"` character takes on the AI separator role typically assigned
+  to the FNC1 non-data character, depending upon the effectuve
+  encodation mode.)
 
-Additionally, barcode image encoder libraries have differing conventions for how to input FNC1 characters, extending to whether it is necessary to be explicit about the notional FNC1 character in the first position when specifying a GS1 Application Identifier syntax symbol.
+Additionally, barcode image encoder libraries have differing
+conventions for how to input FNC1 characters, extending to whether it
+is necessary to be explicit about the notional FNC1 character in the
+first position when specifying a GS1 Application Identifier syntax
+symbol.
 
-Consequently, the barcode message data emitted by this library may need to be post-processed to align to the specific requirements of whatever symbol generation library is in use.
+Consequently, the barcode message data emitted by this library may
+need to be post-processed to align to the specific requirements of
+whatever symbol generation library is in use.
 
 ### Barcode scan data processing
 
@@ -270,4 +311,10 @@ for line in gs.getHRI() {
 // description of setScanData()
 ```
 
-**Note:** It is required that AIM Symbology Identifiers are enabled on the barcode reader, and that the scanned barcode message "survives the channel" intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement.
+**Note:** It is required that AIM Symbology Identifiers are enabled on
+the barcode reader, and that the scanned barcode message "survives the
+channel" intact, i.e. that no character substitutions have been made by
+the reader, in particular that any embedded FNC1 separator characters
+are correctly represented by GS characters (ASCII 29). If this is not
+the case then the scanned data should be pre-processed to meet this
+requirement.

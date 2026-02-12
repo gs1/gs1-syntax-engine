@@ -28,28 +28,33 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 
-class GS1BarcodeImageAnalyzer(private val result: (String) -> Unit) : ImageAnalysis.Analyzer {
+class GS1BarcodeImageAnalyzer(
+    private val result: (String) -> Unit,
+) : ImageAnalysis.Analyzer {
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val image = imageProxy.image ?: return
-        val inputImage = InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                Barcode.FORMAT_CODE_128,
-                Barcode.FORMAT_EAN_13,
-                Barcode.FORMAT_EAN_8,
-                Barcode.FORMAT_UPC_A,
-                Barcode.FORMAT_UPC_E,
-                Barcode.FORMAT_QR_CODE,
-                Barcode.FORMAT_DATA_MATRIX)
-            .build()
+        val inputImage =
+            InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
+        val options =
+            BarcodeScannerOptions
+                .Builder()
+                .setBarcodeFormats(
+                    Barcode.FORMAT_CODE_128,
+                    Barcode.FORMAT_EAN_13,
+                    Barcode.FORMAT_EAN_8,
+                    Barcode.FORMAT_UPC_A,
+                    Barcode.FORMAT_UPC_E,
+                    Barcode.FORMAT_QR_CODE,
+                    Barcode.FORMAT_DATA_MATRIX,
+                ).build()
         val scanner = BarcodeScanning.getClient(options)
-        scanner.process(inputImage)
+        scanner
+            .process(inputImage)
             .addOnSuccessListener { barcodes ->
                 // Return the first scanned barcode
                 if (barcodes.isNotEmpty()) {
                     with(barcodes.first()) {
-
                         /*
                          *  We do our best to harmonise the result of scanning, but the output of
                          *  ML Kit leaves a lot to be desired in terms of consistency!
@@ -60,18 +65,21 @@ class GS1BarcodeImageAnalyzer(private val result: (String) -> Unit) : ImageAnaly
                         var inputData: String
 
                         when (this.format) {
-
                             // Good: GS1 symbols are returned with AIM symbol identifier ]C1
                             Barcode.FORMAT_CODE_128 -> {
-                                inputData = if (raw.startsWith("]C1")) {
-                                    raw
-                                } else {
-                                    "Non-GS1 Code 128, without FNC1 in first!"
-                                }
+                                inputData =
+                                    if (raw.startsWith("]C1")) {
+                                        raw
+                                    } else {
+                                        "Non-GS1 Code 128, without FNC1 in first!"
+                                    }
                             }
 
                             // Questionable: Returned without AIM symbology identifiers
-                            Barcode.FORMAT_EAN_13, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E -> {
+                            Barcode.FORMAT_EAN_13,
+                            Barcode.FORMAT_UPC_A,
+                            Barcode.FORMAT_UPC_E,
+                            -> {
                                 inputData = "]E0$raw"
                             }
 
@@ -84,44 +92,49 @@ class GS1BarcodeImageAnalyzer(private val result: (String) -> Unit) : ImageAnaly
                             // for GS1 symbols we at least have a proxy in the form of GS in
                             // first position!
                             Barcode.FORMAT_DATA_MATRIX -> {
-                                inputData = if (raw.startsWith("http://") or raw.startsWith("HTTP://") or raw.startsWith("https://") or raw.startsWith("HTTPS://")) {
-                                    "]d1$raw"
-                                } else if (raw.startsWith("\u001D")) {
-                                    "]d2" + raw.drop(1)
-                                } else {
-                                    "Non-GS1 Data Matrix, without FNC1 in first!"
-                                }
+                                inputData =
+                                    if (raw.startsWith("http://") or
+                                        raw.startsWith("HTTP://") or
+                                        raw.startsWith("https://") or
+                                        raw.startsWith("HTTPS://")
+                                    ) {
+                                        "]d1$raw"
+                                    } else if (raw.startsWith("\u001D")) {
+                                        "]d2" + raw.drop(1)
+                                    } else {
+                                        "Non-GS1 Data Matrix, without FNC1 in first!"
+                                    }
                             }
 
                             // Really bad: Returned without AIM symbology identifiers, and
                             // worst of all for GS1 symbols there isn't even a proxy since there
                             // is no reported GS in first position
                             Barcode.FORMAT_QR_CODE -> {
-                                inputData = if (raw.startsWith("http://") or raw.startsWith("HTTP://") or raw.startsWith("https://") or raw.startsWith("HTTPS://")) {
-                                    "]Q1$raw"
-                                } else {  // Best we can do is to assume GS1 format
-                                    "]Q3$raw"
-                                }
+                                inputData =
+                                    if (raw.startsWith("http://") or
+                                        raw.startsWith("HTTP://") or
+                                        raw.startsWith("https://") or
+                                        raw.startsWith("HTTPS://")
+                                    ) {
+                                        "]Q1$raw"
+                                    } else { // Best we can do is to assume GS1 format
+                                        "]Q3$raw"
+                                    }
                             }
 
                             else -> {
                                 inputData = "Unrecognised format"
                             }
-
                         }
 
                         result.invoke(inputData)
-
                     }
                 }
                 imageProxy.close()
-            }
-            .addOnFailureListener {
+            }.addOnFailureListener {
+                imageProxy.close()
+            }.addOnCompleteListener {
                 imageProxy.close()
             }
-            .addOnCompleteListener {
-                imageProxy.close()
-            }
-
     }
 }

@@ -494,6 +494,19 @@ setversion:
 	(cd ../js-wasm && npm version --allow-same-version $(VERSION))
 	sed -i 's/name="Implementation-Version" value="[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+"/name="Implementation-Version" value="$(VERSION)"/' ../java/build.xml
 
+.PHONY: superlinter
+superlinter:
+	docker run --rm \
+		-e RUN_LOCAL=true \
+		-e VALIDATE_ALL_CODEBASE=true \
+		-e DEFAULT_BRANCH=master \
+		-e IGNORE_GITIGNORED_FILES=true \
+		-e LINTER_RULES_PATH=.github/linters \
+		-e 'FILTER_REGEX_EXCLUDE=(src/c-lib/syntax/|src/c-lib/aitable\.|docs/|maintenance/docker/.*/build/|node_modules/|\.gradle/|Pods/|\.build/|src/c-lib/build|src/android/gradlew|corpus-|src/android/app/src/main/cpp/gs1encoders(/|$$)|src/swift/Sources/CGS1Encoders/(c-lib|include)(/|$$))' \
+		$(shell grep -v '^\#' ../../.github/linters/superlinter-disabled.env | grep '=' | sed 's/^/-e /') \
+		-v `pwd`/../..:/tmp/lint \
+		ghcr.io/super-linter/super-linter:v8
+
 .PHONY: syncsyntaxdict
 syncsyntaxdict:
 	cp ../../../gs1-syntax-dictionary/gs1-syntax-dictionary.txt .

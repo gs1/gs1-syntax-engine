@@ -1,13 +1,17 @@
+---
 name: "CodeQL Windows"
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches: [main]
   schedule:
     - cron: '27 9 * * 0'
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
@@ -21,27 +25,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'csharp' ]
+        language: ['csharp']
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
 
-    - if: matrix.language == 'csharp'
-      name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - if: matrix.language == 'csharp'
+        name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - if: matrix.language == 'csharp'
-      name: Build C#
-      working-directory: src
-      run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:UseSharedCompilation=false gs1encoders.sln
+      - if: matrix.language == 'csharp'
+        name: Build C#
+        working-directory: src
+        run: |
+          msbuild /t:Restore,Build `
+            /p:Configuration=release `
+            /p:Platform="x86" `
+            /p:UseSharedCompilation=false `
+            gs1encoders.sln
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

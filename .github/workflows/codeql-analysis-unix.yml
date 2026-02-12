@@ -1,19 +1,26 @@
+---
 name: "CodeQL Unix"
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches: [main]
   schedule:
     - cron: '27 9 * * 0'
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
     name: Analyze
 
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: >-
+      ${{ (matrix.language == 'swift'
+      && 'macos-latest')
+      || 'ubuntu-latest' }}
 
     permissions:
       actions: read
@@ -23,59 +30,68 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'c-cpp', 'javascript-typescript', 'swift', 'java-kotlin' ]
+        language:
+          - 'c-cpp'
+          - 'javascript-typescript'
+          - 'swift'
+          - 'java-kotlin'
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    #
-    #  Remove "bridging" files not compiled as part of C library builds so that
-    #  the coverage reports are clean
-    #
-    - if: matrix.language == 'c-cpp'
-      name: Prune for C build
-      run: |
-        rm -rf src/java
-        rm -rf src/ios
+      #
+      #  Remove "bridging" files not compiled as part of
+      #  C library builds so that the coverage reports
+      #  are clean
+      #
+      - if: matrix.language == 'c-cpp'
+        name: Prune for C build
+        run: |
+          rm -rf src/java
+          rm -rf src/ios
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        config: |
-          paths:
-            - src
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          config: |
+            paths:
+              - src
 
-    - if: matrix.language == 'c-cpp'
-      name: Build C
-      run: |
-        make -C src/c-lib -j `nproc`
-        make -C src/c-lib -j `nproc` test
-        make -C src/c-lib -j `nproc` fuzzer
+      - if: matrix.language == 'c-cpp'
+        name: Build C
+        run: |
+          make -C src/c-lib -j "$(nproc)"
+          make -C src/c-lib -j "$(nproc)" test
+          make -C src/c-lib -j "$(nproc)" fuzzer
 
-    - if: matrix.language == 'java-kotlin'
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'gradle'
+      - if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-    - if: matrix.language == 'java-kotlin'
-      name: Build Android app
-      working-directory: src/android
-      run: |
-        ./gradlew build --no-daemon
+      - if: matrix.language == 'java-kotlin'
+        name: Build Android app
+        working-directory: src/android
+        run: |
+          ./gradlew build --no-daemon
 
-    - if: matrix.language == 'java-kotlin'
-      name: Build Java
-      run: |
-        make -C src/c-lib -j `nproc` libstatic
-        ant -f src/java/build.xml test
+      - if: matrix.language == 'java-kotlin'
+        name: Build Java
+        run: |
+          make -C src/c-lib -j "$(nproc)" libstatic
+          ant -f src/java/build.xml test
 
-    - if: matrix.language == 'swift' || matrix.language == 'javascript-typescript'
-      name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+      - if: >-
+          matrix.language == 'swift'
+          || matrix.language == 'javascript-typescript'
+        name: Autobuild
+        uses: github/codeql-action/autobuild@v3
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

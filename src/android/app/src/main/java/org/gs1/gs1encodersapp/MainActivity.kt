@@ -35,9 +35,7 @@ import org.gs1.gs1encoders.GS1EncoderParameterException
 import org.gs1.gs1encoders.GS1EncoderScanDataException
 import org.gs1.gs1encodersapp.databinding.ActivityMainBinding
 
-
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var gs1encoder: GS1Encoder
 
@@ -48,19 +46,36 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Must add this listener ourselves because there is no corresponding binding
-        binding.inputData.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {}
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                clearRender()
-            }
-        })
+        binding.inputData.addTextChangedListener(
+            object : TextWatcher {
+                override fun afterTextChanged(s: Editable) {}
+
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {}
+
+                override fun onTextChanged(
+                    p0: CharSequence?,
+                    p1: Int,
+                    p2: Int,
+                    p3: Int,
+                ) {
+                    clearRender()
+                }
+            },
+        )
 
         // Load the Syntax Engine
         gs1encoder = GS1Encoder()
 
-        (this as? AppCompatActivity)?.supportActionBar?.title = "GS1 Encoders library: " + gs1encoder.version
-        binding.inputData.setText("https://example.com/01/12312312312333/10/ABC123?99=TESTING")
+        (this as? AppCompatActivity)?.supportActionBar?.title =
+            "GS1 Encoders library: " + gs1encoder.version
+        binding.inputData.setText(
+            "https://example.com/01/12312312312333/10/ABC123?99=TESTING",
+        )
 
         loadDataValues()
     }
@@ -87,13 +102,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDataValues() {
-
         binding.unknownAIsCheckBox.isChecked = gs1encoder.permitUnknownAIs
-        binding.associationsCheckBox.isChecked = gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs);
+        binding.associationsCheckBox.isChecked =
+            gs1encoder.getValidationEnabled(GS1Encoder.Validation.RequisiteAIs)
         binding.dataTitlesCheckBox.isChecked = gs1encoder.includeDataTitlesInHRI
 
-        if (gs1encoder.dataStr == "")
+        if (gs1encoder.dataStr == "") {
             return
+        }
 
         binding.datastrTextBox.setText(gs1encoder.dataStr)
 
@@ -117,78 +133,98 @@ class MainActivity : AppCompatActivity() {
         if (qps.isNotEmpty()) {
             binding.infoTextBox.setText(
                 "Warning: Non-numeric query parameters ignored: ⧚" +
-                        qps.joinToString("&") + "⧚"
+                    qps.joinToString("&") + "⧚",
             )
             binding.infoTextBox.visibility = View.VISIBLE
             binding.infoTextInputLayout.visibility = View.VISIBLE
         }
-
     }
 
-    fun processInputButtonClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-
+    fun processInputButtonClicked(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         clearRender()
 
         val data = binding.inputData.text.toString()
-        if (data == "")
+        if (data == "") {
             return
+        }
 
         try {
-
             if (data.startsWith('(')) {
                 binding.syntaxTextBox.setText("Bracketed AI element string")
                 gs1encoder.aIdataStr = data
             } else if (data.startsWith(']')) {
-                binding.syntaxTextBox.setText("Barcode scan data with AIM symbology identifier")
+                binding.syntaxTextBox.setText(
+                    "Barcode scan data with AIM symbology identifier",
+                )
                 gs1encoder.scanData = data.replace("{GS}", "\u001d")
             } else if (data.startsWith('^')) {
                 binding.syntaxTextBox.setText("Unbracketed AI element string")
                 gs1encoder.dataStr = data
-            } else if (data.startsWith("http://") || data.startsWith("HTTP://") || data.startsWith("https://") || data.startsWith("HTTPS://")) {
+            } else if (
+                data.startsWith("http://") ||
+                data.startsWith("HTTP://") ||
+                data.startsWith("https://") ||
+                data.startsWith("HTTPS://")
+            ) {
                 binding.syntaxTextBox.setText("GS1 Digital Link URI")
                 gs1encoder.dataStr = data
             } else if (data.matches("^\\d+$".toRegex())) {
                 binding.syntaxTextBox.setText("Plain data")
 
-                if (data.length != 8 && data.length != 12 && data.length != 13 && data.length != 14) {
-                        binding.errmsgTextBox.setText("Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14")
-                        binding.errmsgTextBox.visibility = View.VISIBLE
-                        binding.errmsgTextInputLayout.visibility = View.VISIBLE
-                        return
+                if (data.length != 8 &&
+                    data.length != 12 &&
+                    data.length != 13 &&
+                    data.length != 14
+                ) {
+                    binding.errmsgTextBox.setText(
+                        "Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14",
+                    )
+                    binding.errmsgTextBox.visibility = View.VISIBLE
+                    binding.errmsgTextInputLayout.visibility = View.VISIBLE
+                    return
                 }
 
                 // Perform a checksum validation here, since the Syntax Engine validates only AI-based data
                 var parity = 0
                 var weight: Int = if (data.length % 2 == 0) 3 else 1
                 for (d in data.dropLast(1)) {
-                        parity += weight * d.digitToInt()
-                        weight = 4 - weight
+                    parity += weight * d.digitToInt()
+                    weight = 4 - weight
                 }
                 parity = (10 - parity % 10) % 10
 
                 if (parity != data.last().digitToInt()) {
-                        binding.errmsgTextBox.setText("Incorrect numeric check digit")
-                        binding.errmsgTextBox.visibility = View.VISIBLE
-                        binding.errmsgTextInputLayout.visibility = View.VISIBLE
+                    binding.errmsgTextBox.setText("Incorrect numeric check digit")
+                    binding.errmsgTextBox.visibility = View.VISIBLE
+                    binding.errmsgTextInputLayout.visibility = View.VISIBLE
 
-                        binding.infoTextBox.setText("Plain data validation failed: " + data.dropLast(1) + "⧚" + data.last() + "⧛")
-                        binding.infoTextBox.visibility = View.VISIBLE
-                        binding.infoTextInputLayout.visibility = View.VISIBLE
-                        return
+                    binding.infoTextBox.setText(
+                        "Plain data validation failed: " +
+                            data.dropLast(1) + "⧚" + data.last() + "⧛",
+                    )
+                    binding.infoTextBox.visibility = View.VISIBLE
+                    binding.infoTextInputLayout.visibility = View.VISIBLE
+                    return
                 }
 
-                binding.syntaxTextBox.setText("Plain GTIN-" + data.length + " - converted to AI (01)...")
+                binding.syntaxTextBox.setText(
+                    "Plain GTIN-" + data.length + " - converted to AI (01)...",
+                )
                 gs1encoder.dataStr = "^01" + data.padStart(14, '0')
             } else {
-                binding.syntaxTextBox.setText("Non-numeric plain data is not a valid GS1 syntax")
+                binding.syntaxTextBox.setText(
+                    "Non-numeric plain data is not a valid GS1 syntax",
+                )
                 return
             }
-
         } catch (e: Exception) {
             when (e) {
                 is GS1EncoderParameterException,
                 is GS1EncoderScanDataException,
-                is GS1EncoderDigitalLinkException -> {
+                is GS1EncoderDigitalLinkException,
+                -> {
                     binding.errmsgTextBox.setText("Error: " + e.message)
                     binding.errmsgTextBox.visibility = View.VISIBLE
                     binding.errmsgTextInputLayout.visibility = View.VISIBLE
@@ -196,29 +232,33 @@ class MainActivity : AppCompatActivity() {
                     val markup = gs1encoder.errMarkup
                     if (markup != "") {
                         binding.infoTextBox.setText(
-                            "AI content validation failed: " + markup.replace("|","⧚")
+                            "AI content validation failed: " +
+                                markup.replace("|", "⧚"),
                         )
                         binding.infoTextBox.visibility = View.VISIBLE
                         binding.infoTextInputLayout.visibility = View.VISIBLE
                     }
                     return
                 }
-                else -> throw e
+
+                else -> {
+                    throw e
+                }
             }
         }
 
         // Release the input field and hide the keyboard
         binding.inputData.clearFocus()
-        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm: InputMethodManager =
+            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
 
         loadDataValues()
-
     }
 
     private val scanInputDataLauncher =
         registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
+            ActivityResultContracts.StartActivityForResult(),
         ) {
             if (it.resultCode != Activity.RESULT_OK) {
                 binding.inputData.setText("Scan failed")
@@ -228,25 +268,35 @@ class MainActivity : AppCompatActivity() {
             binding.inputData.setText(value.replace("\u001D", "{GS}"))
         }
 
-    fun scanBarcodeButtonClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun scanBarcodeButtonClicked(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         clearRender()
         val intent = Intent(this, GS1BarcodeScannerActivity::class.java)
         scanInputDataLauncher.launch(intent)
     }
 
-    fun unknownAIsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun unknownAIsCheckBoxClicked(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         clearRender()
         gs1encoder.permitUnknownAIs = binding.unknownAIsCheckBox.isChecked
     }
 
-    fun associationsCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun associationsCheckBoxClicked(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         clearRender()
-        gs1encoder.setValidationEnabled(GS1Encoder.Validation.RequisiteAIs, binding.associationsCheckBox.isChecked);
+        gs1encoder.setValidationEnabled(
+            GS1Encoder.Validation.RequisiteAIs,
+            binding.associationsCheckBox.isChecked,
+        )
     }
 
-    fun dataTitlesCheckBoxClicked(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun dataTitlesCheckBoxClicked(
+        @Suppress("UNUSED_PARAMETER") view: View,
+    ) {
         clearRender()
         gs1encoder.includeDataTitlesInHRI = binding.dataTitlesCheckBox.isChecked
     }
-
 }

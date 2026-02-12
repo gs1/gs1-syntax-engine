@@ -23,6 +23,7 @@
 
 from gs1encoders import GS1Encoder
 
+
 def main():
 
     data_str = "^010952123454321310ABC123^99TEST"
@@ -41,7 +42,7 @@ def main():
     print("\nHRI{}:".format(" (including data titles)" if data_titles else ""))
 
     for h in gs1encoder.get_hri():
-      print("    {}".format(h))
+        print("    {}".format(h))
 
 
 if __name__ == "__main__":

@@ -211,7 +211,8 @@ namespace GS1.ExampleWebServiceUserDotnetApp
             try
             {
                 uri = new Uri(endpointTextBox.Text);
-            } catch (UriFormatException E)
+            }
+            catch (UriFormatException E)
             {
                 infoLabel.Content = "Error: Invalid endpoint URI - " + E.Message;
                 return;

@@ -25,28 +25,38 @@
 use gs1encoders::GS1Encoder;
 
 fn main() {
-
     let data_str = "^010952123454321310ABC123^99TEST";
     let data_titles = true;
 
-    let gs1encoder = GS1Encoder::new().unwrap_or_else(|error| {
-        panic!("{}", error)
-    });
+    let gs1encoder = GS1Encoder::new().unwrap_or_else(|error| panic!("{}", error));
 
     println!("\nVersion: {}\n", gs1encoder.get_version());
 
-    gs1encoder.set_data_str(data_str).unwrap_or_else(|error| {
-        panic!("{}", error)
-    });
+    gs1encoder
+        .set_data_str(data_str)
+        .unwrap_or_else(|error| panic!("{}", error));
 
     println!("IN: {}", gs1encoder.get_data_str());
-    println!("AI: {}", gs1encoder.get_ai_data_str().unwrap_or("Not AI data".to_string()));
+    println!(
+        "AI: {}",
+        gs1encoder
+            .get_ai_data_str()
+            .unwrap_or("Not AI data".to_string())
+    );
 
-    gs1encoder.set_include_data_titles_in_hri(data_titles).unwrap();
-    println!("\nHRI{}:", if gs1encoder.get_include_data_titles_in_hri() { " (including data titles)" } else { "" });
+    gs1encoder
+        .set_include_data_titles_in_hri(data_titles)
+        .unwrap();
+    println!(
+        "\nHRI{}:",
+        if gs1encoder.get_include_data_titles_in_hri() {
+            " (including data titles)"
+        } else {
+            ""
+        }
+    );
 
     for h in gs1encoder.get_hri() {
         println!("    {}", h);
     }
-
 }

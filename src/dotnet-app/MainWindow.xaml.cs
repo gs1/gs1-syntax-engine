@@ -46,7 +46,8 @@ namespace GS1.EncodersApp
             {
                 dlURItextBox.Text = App.gs1Encoder.GetDLuri(null);
             }
-            catch (GS1EncoderDigitalLinkException e) {
+            catch (GS1EncoderDigitalLinkException e)
+            {
                 dlURItextBox.Text = "⧚ " + e.Message + " ⧛";
             }
 
@@ -107,7 +108,8 @@ namespace GS1.EncodersApp
                 {  // Plain number
                     syntaxTextBox.Text = "Plain data";
 
-                    if (inputTextBox.Text.Length != 8 && inputTextBox.Text.Length != 12 && inputTextBox.Text.Length != 13 && inputTextBox.Text.Length != 14) {
+                    if (inputTextBox.Text.Length != 8 && inputTextBox.Text.Length != 12 && inputTextBox.Text.Length != 13 && inputTextBox.Text.Length != 14)
+                    {
                         errorMessageLabel.Content = "Invalid length for a GTIN-8, GTIN-12, GTIN-13 or GTIN-14";
                         return;
                     }
@@ -146,7 +148,8 @@ namespace GS1.EncodersApp
 
                 errorMessageLabel.Content = "Error: " + E.Message;
                 string markup = App.gs1Encoder.ErrMarkup;
-                if (!markup.Equals("")) {
+                if (!markup.Equals(""))
+                {
                     var regex = new Regex(Regex.Escape("|"));
                     markup = regex.Replace(markup, "⧚", 1);
                     markup = regex.Replace(markup, "⧛", 1);

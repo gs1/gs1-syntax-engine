@@ -23,47 +23,54 @@
 
 import ctypes
 
-class GS1Encoder:
 
+class GS1Encoder:
     __ctx = None
     __api = ctypes.cdll.LoadLibrary("libgs1encoders.so")
 
-
     __api.gs1_encoder_getVersion.argtypes = []
-    __api.gs1_encoder_getVersion.restype  = ctypes.c_char_p
+    __api.gs1_encoder_getVersion.restype = ctypes.c_char_p
 
-    __api.gs1_encoder_init.argtypes = [ ctypes.POINTER(ctypes.c_void_p) ]
-    __api.gs1_encoder_init.restype  = ctypes.POINTER(ctypes.c_void_p)
+    __api.gs1_encoder_init.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    __api.gs1_encoder_init.restype = ctypes.POINTER(ctypes.c_void_p)
 
-    __api.gs1_encoder_free.argtypes = [ ctypes.POINTER(ctypes.c_void_p) ]
-    __api.gs1_encoder_free.restype  = None
+    __api.gs1_encoder_free.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    __api.gs1_encoder_free.restype = None
 
-    __api.gs1_encoder_getErrMsg.argtypes = [ ctypes.POINTER(ctypes.c_void_p) ]
-    __api.gs1_encoder_getErrMsg.restype  = ctypes.c_char_p
+    __api.gs1_encoder_getErrMsg.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    __api.gs1_encoder_getErrMsg.restype = ctypes.c_char_p
 
-    __api.gs1_encoder_setIncludeDataTitlesInHRI.argtypes = [ ctypes.POINTER(ctypes.c_void_p), ctypes.c_bool ]
-    __api.gs1_encoder_setIncludeDataTitlesInHRI.restype  = ctypes.c_bool
+    __api.gs1_encoder_setIncludeDataTitlesInHRI.argtypes = [
+        ctypes.POINTER(ctypes.c_void_p),
+        ctypes.c_bool,
+    ]
+    __api.gs1_encoder_setIncludeDataTitlesInHRI.restype = ctypes.c_bool
 
-    __api.gs1_encoder_getDataStr.argtypes = [ ctypes.POINTER(ctypes.c_void_p) ]
-    __api.gs1_encoder_getDataStr.restype  = ctypes.c_char_p
+    __api.gs1_encoder_getDataStr.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    __api.gs1_encoder_getDataStr.restype = ctypes.c_char_p
 
-    __api.gs1_encoder_setDataStr.argtypes = [ ctypes.POINTER(ctypes.c_void_p), ctypes.c_char_p ]
-    __api.gs1_encoder_setDataStr.restype  = ctypes.c_bool
+    __api.gs1_encoder_setDataStr.argtypes = [
+        ctypes.POINTER(ctypes.c_void_p),
+        ctypes.c_char_p,
+    ]
+    __api.gs1_encoder_setDataStr.restype = ctypes.c_bool
 
-    __api.gs1_encoder_getAIdataStr.argtypes = [ ctypes.POINTER(ctypes.c_void_p) ]
-    __api.gs1_encoder_getAIdataStr.restype  = ctypes.c_char_p
+    __api.gs1_encoder_getAIdataStr.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+    __api.gs1_encoder_getAIdataStr.restype = ctypes.c_char_p
 
-    __api.gs1_encoder_getHRI.argtypes = [ ctypes.POINTER(ctypes.c_void_p), ctypes.POINTER(ctypes.POINTER(ctypes.c_char_p)) ]
-    __api.gs1_encoder_getHRI.restype  = ctypes.c_int
-
+    __api.gs1_encoder_getHRI.argtypes = [
+        ctypes.POINTER(ctypes.c_void_p),
+        ctypes.POINTER(ctypes.POINTER(ctypes.c_char_p)),
+    ]
+    __api.gs1_encoder_getHRI.restype = ctypes.c_int
 
     def get_err_msg(self):
         return self.__api.gs1_encoder_getErrMsg(self.__ctx).decode("utf-8")
 
     def __init__(self):
         self.__ctx = self.__api.gs1_encoder_init(None)
-        if self.__ctx == None:
-            raise GS1EncoderGeneralException('Failed to initialise the native library')
+        if self.__ctx is None:
+            raise GS1EncoderGeneralException("Failed to initialise the native library")
 
     def __del__(self):
         self.free()
@@ -109,12 +116,14 @@ class GS1Encoder:
 class GS1EncoderGeneralException(Exception):
     pass
 
+
 class GS1EncoderParameterException(Exception):
     pass
+
 
 class GS1EncoderDigitalLinkException(Exception):
     pass
 
+
 class GS1EncoderScanDataException(Exception):
     pass
-

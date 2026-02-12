@@ -3,7 +3,6 @@
 This document is for developers contributing to the library, not users of the
 library. It is authoritative for both human contributors and automated tools.
 
-
 ## Background
 
 The GS1 Barcode Syntax Engine is a native C library with bindings for C#/.NET,
@@ -22,14 +21,15 @@ It processes GS1 syntax data including:
 The project is a reference implementation of a framework for processing the GS1
 Barcode Syntax Dictionary and its associated Linters.
 
-
 ### Contribution Rules and Constraints
 
 - Create atomic, logical commits that complete one task
 - Match existing code style and idioms
 - Ensure unit tests cover new functionality and error conditions
 - Document code that works around compiler bugs or satiates static analysers with a comment explaining why
-- Don't create breaking changes affecting the public API, i.e. don't force code changes upon users of the library or require re-linking. Use `GS1_ENCODERS_DEPRECATED` macro for functions being phased out
+- Don't create breaking changes affecting the public API, i.e. don't force
+  code changes upon users of the library or require re-linking. Use
+  `GS1_ENCODERS_DEPRECATED` macro for functions being phased out
 - Avoid deeply nested code by exiting blocks early with `return`, `continue`, `break`, etc.
 - Regenerate documentation, including API references and examples, whenever there are changes.
 
@@ -42,7 +42,6 @@ These files are automatically generated or synced from external sources - do not
 | `src/c-lib/syntax/*`    | GS1 Syntax Dictionary project | `make syncsyntaxdict` |
 | `src/c-lib/aitable.inc` | gs1-syntax-dictionary.txt     | `make syncsyntaxdict` |
 
-
 ## LLM Rules
 
 - Do not push commits or rewrite history
@@ -50,7 +49,6 @@ These files are automatically generated or synced from external sources - do not
 - Backup work before running irreversible commands
 - Plan complex tasks; interview the user regarding significant design choices
 - Always search for and follow pre-existing patterns before writing code
-
 
 ## C Programming Goals
 
@@ -74,17 +72,20 @@ how users must structure their applications.
 ### Error Handling
 
 **Error state pattern:**
+
 - Public API functions begin with `reset_error(ctx)` to clear previous error state
 - Setter functions return `bool` (true=success, false=failure)
 - Error details stored in context, retrieved via `gs1_encoder_getErrMsg(ctx)`
 - Use `SET_ERR()` and `SET_ERR_V()` macros for consistent error reporting with optional format arguments
 
 **Appropriate use of goto is encouraged:**
+
 - Jumping to a common cleanup/exit block (e.g., `goto fail`, `goto out`)
 - Retry logic with backward jumps (e.g., `goto again`, `goto redo`)
 - Skipping forward to avoid a long nested block
 
 **Assertions for preconditions:**
+
 - Use `assert()` for internal function contracts and invariants
 - Document assumptions about parameters (e.g., valid pointers, length constraints)
 - Assertions are for programmer errors, not user input validation
@@ -97,10 +98,15 @@ struct, avoiding per-call heap allocation. Prefer using context buffers over
 allocating new memory.
 
 **Heap allocation**:
+
 - Don't heap allocate after init is complete.
-- Always use the `GS1_ENCODERS_*` macros, never direct `malloc`/`free`, to enable users to use their preferred heap management framework. See the [C API documentation](https://gs1.github.io/gs1-syntax-engine/) for a custom heap management example.
+- Always use the `GS1_ENCODERS_*` macros, never direct `malloc`/`free`, to
+  enable users to use their preferred heap management framework. See the
+  [C API documentation](https://gs1.github.io/gs1-syntax-engine/) for a
+  custom heap management example.
 
 **Stack allocation** (`alloca`):
+
 - Use only when necessary to avoid large extensions to the context structure or to avoid runtime heap allocation
 - Hoist out of loops to avoid repeated stack growth
 
@@ -110,6 +116,7 @@ The codebase prioritises performance and minimal allocations. Follow these
 patterns:
 
 **Avoid redundant work and temporary buffers:**
+
 - Write directly to output rather than intermediate buffers
 - For internal purposes, pass position and length rather than building C strings
 - Use in-place tokenization (`gs1_tokenise` utility) to avoid allocations during parsing
@@ -120,6 +127,7 @@ patterns:
 - Internal functions should accept pointer and length rather than NUL-terminated strings - the caller typically already knows the length
 
 **Efficient lookups and avoiding expensive functions:**
+
 - Use lookup tables for character validation instead of walking lists
 - Use binary search for sorted data (see `gs1_bsearch` utility)
 - Use bitfields to track sets efficiently (e.g., emitted AIs)
@@ -130,6 +138,7 @@ patterns:
 - Prefer `memcpy` over `strcpy`/`strncpy` when length is already known
 
 **Compiler hints:**
+
 - Mark functions as `pure` or `const` where applicable
 - Use `likely`/`unlikely` to hint that error paths are unlikely
 
@@ -143,7 +152,6 @@ Use prefixes to avoid collisions with user code:
 | Public types         | `gs1_encoder_`  | `gs1_encoder_symbologies_t` |
 | Public macros        | `GS1_ENCODERS_` | `GS1_ENCODERS_API`          |
 | Internal functions   | `gs1_`          | `gs1_parseAIdata()`         |
-
 
 ## Directory Structure
 
@@ -183,7 +191,6 @@ Use prefixes to avoid collisions with user code:
 | `gs1encoders-fuzzer-*.c`     | Fuzzer entry points (ais, data, dl, scandata, syn)   |
 | `build-embedded-ai-table.pl` | Generates `aitable.inc` from Syntax Dictionary       |
 
-
 ## Documentation
 
 ### User Documentation
@@ -210,7 +217,6 @@ The `docs/` directory contains generated API documentation:
 - **Swift**: DocC
 
 Rebuild with `make docs`.
-
 
 ## Code Structure
 
@@ -374,6 +380,7 @@ updated together.
 Tests use the Acutest framework.
 
 **Test function structure:**
+
 - Test functions are defined in `.c` files, guarded by `#ifdef UNIT_TESTS`
 - Declarations go in corresponding `.h` files, also guarded by `#ifdef UNIT_TESTS`
 - Functions follow the naming convention `test_<module>_<description>(void)`
@@ -388,7 +395,6 @@ void test_ai_lookupAIentry(void) {
     gs1_encoder_free(ctx);
 }
 ```
-
 
 ## Build
 
@@ -467,7 +473,6 @@ cd src/android
 ./gradlew build --no-daemon
 ```
 
-
 ## Testing
 
 ### Unit Tests
@@ -528,7 +533,6 @@ npm install
 node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
 ```
 
-
 ## Maintenance Tasks
 
 ### Sync Linters from gs1-syntax-dictionary
@@ -572,7 +576,6 @@ make -C src/c-lib copyright
 make -C src/c-lib docs           # All documentation
 ```
 
-
 ## CI/CD
 
 GitHub Actions workflow (`.github/workflows/gs1encoders.yml`) runs:
@@ -586,4 +589,3 @@ GitHub Actions workflow (`.github/workflows/gs1encoders.yml`) runs:
 - iOS and Android app builds
 
 Releases are created automatically when version tags are pushed.
-

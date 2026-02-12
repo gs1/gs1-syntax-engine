@@ -40,7 +40,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class GS1BarcodeScannerActivity : AppCompatActivity() {
-
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var binding: ActivityBarcodeScannerBinding
 
@@ -62,7 +61,7 @@ class GS1BarcodeScannerActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         checkIfCameraPermissionIsGranted()
@@ -78,16 +77,20 @@ class GS1BarcodeScannerActivity : AppCompatActivity() {
     }
 
     private fun checkIfCameraPermissionIsGranted() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA,
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             startCamera()
         } else {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Permission required")
-                .setMessage("This application needs to access the camera to process barcodes")
-                .setPositiveButton("Ok") { _, _ ->
+                .setMessage(
+                    "This application needs to access the camera to process barcodes",
+                ).setPositiveButton("Ok") { _, _ ->
                     checkCameraPermission()
-                }
-                .setCancelable(false)
+                }.setCancelable(false)
                 .create()
                 .apply {
                     setCanceledOnTouchOutside(false)
@@ -102,33 +105,42 @@ class GS1BarcodeScannerActivity : AppCompatActivity() {
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
-                }
+            val preview =
+                Preview
+                    .Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(binding.previewView.surfaceProvider)
+                    }
 
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, GS1BarcodeImageAnalyzer() { result ->
-                        val intent = intent.putExtra("INPUT_DATA", result)
-                        setResult(RESULT_OK, intent)
-                        it.clearAnalyzer()
-                        finish()
-                    })
-                }
+            val imageAnalyzer =
+                ImageAnalysis
+                    .Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+                    .also {
+                        it.setAnalyzer(
+                            cameraExecutor,
+                            GS1BarcodeImageAnalyzer { result ->
+                                val intent = intent.putExtra("INPUT_DATA", result)
+                                setResult(RESULT_OK, intent)
+                                it.clearAnalyzer()
+                                finish()
+                            },
+                        )
+                    }
 
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
-                    this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalyzer
+                    this,
+                    CameraSelector.DEFAULT_BACK_CAMERA,
+                    preview,
+                    imageAnalyzer,
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
 }

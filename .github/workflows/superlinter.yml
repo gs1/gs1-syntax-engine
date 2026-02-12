@@ -1,0 +1,57 @@
+---
+name: Super Linter
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+
+  superlinter:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      statuses: write
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Load disabled linters
+        run: >
+          grep -v '^#' .github/linters/superlinter-disabled.env
+          | grep '=' >> "$GITHUB_ENV"
+
+      - name: Super Linter
+        uses: super-linter/super-linter@v8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          VALIDATE_ALL_CODEBASE: true
+          IGNORE_GITIGNORED_FILES: true
+          SAVE_SUPER_LINTER_SUMMARY: true
+          VALIDATE_GIT_COMMITLINT: false
+          FILTER_REGEX_EXCLUDE: "\
+            (src/c-lib/syntax/\
+            |src/c-lib/aitable\\.\
+            |docs/\
+            |maintenance/docker/.*/build/\
+            |node_modules/\
+            |\\.gradle/\
+            |Pods/\
+            |\\.build/\
+            |src/c-lib/build\
+            |src/android/gradlew\
+            |corpus-\
+            |src/android/app/src/main/cpp/gs1encoders(/|$)\
+            |src/swift/Sources/CGS1Encoders/\
+            (c-lib|include)(/|$))"

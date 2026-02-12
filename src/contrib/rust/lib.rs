@@ -22,10 +22,10 @@
  *
  */
 
+use std::ffi::{CStr, CString};
 use std::fmt;
+use std::os::raw::{c_char, c_int};
 use std::ptr;
-use std::os::raw::{c_char,c_int};
-use std::ffi::{CStr,CString};
 
 extern "C" {
     fn gs1_encoder_getVersion() -> *const c_char;
@@ -45,17 +45,20 @@ pub struct GS1Encoder {
 }
 
 impl GS1Encoder {
-
     fn get_err_msg(&self) -> String {
-        let c_str: &CStr = unsafe { CStr::from_ptr( gs1_encoder_getErrMsg(self.ctx) ) };
+        let c_str: &CStr = unsafe { CStr::from_ptr(gs1_encoder_getErrMsg(self.ctx)) };
         c_str.to_str().unwrap().to_owned()
     }
 
     pub fn new() -> Result<Self, GS1EncoderError> {
-        let mut gs1encoder = GS1Encoder { ctx: ptr::null_mut() };
+        let mut gs1encoder = GS1Encoder {
+            ctx: ptr::null_mut(),
+        };
         gs1encoder.ctx = unsafe { gs1_encoder_init(ptr::null()) as *mut u32 };
         if gs1encoder.ctx.is_null() {
-            return Err(GS1EncoderError::GS1GeneralError("Failed to initialise the native library".to_string()));
+            return Err(GS1EncoderError::GS1GeneralError(
+                "Failed to initialise the native library".to_string(),
+            ));
         }
         Ok(gs1encoder)
     }
@@ -83,7 +86,7 @@ impl GS1Encoder {
     }
 
     pub fn get_data_str(&self) -> String {
-        let c_str: &CStr = unsafe { CStr::from_ptr( gs1_encoder_getDataStr(self.ctx) ) };
+        let c_str: &CStr = unsafe { CStr::from_ptr(gs1_encoder_getDataStr(self.ctx)) };
         c_str.to_str().unwrap().to_owned()
     }
 
@@ -98,7 +101,9 @@ impl GS1Encoder {
 
     pub fn get_ai_data_str(&self) -> Option<String> {
         let ptr = unsafe { gs1_encoder_getAIdataStr(self.ctx) };
-        if ptr.is_null() { return None; }
+        if ptr.is_null() {
+            return None;
+        }
         let c_str: &CStr = unsafe { CStr::from_ptr(ptr) };
         Some(c_str.to_str().unwrap().to_owned())
     }
@@ -114,7 +119,6 @@ impl GS1Encoder {
         }
         hri
     }
-
 }
 
 impl Drop for GS1Encoder {

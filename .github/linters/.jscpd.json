@@ -1,0 +1,10 @@
+{
+  "threshold": 5,
+  "noSymlinks": true,
+  "ignore": [
+    "**/src/c-lib/syntax/**",
+    "**/docs/**",
+    "**/maintenance/docker/**/build/**",
+    "**/.build/**"
+  ]
+}
