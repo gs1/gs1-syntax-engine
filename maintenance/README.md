@@ -60,5 +60,6 @@ cd src/js-wasm
 npm install
 npm test
 npm pack
+npm login
 npm publish
 ```
