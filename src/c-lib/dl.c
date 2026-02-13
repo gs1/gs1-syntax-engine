@@ -139,7 +139,7 @@ static __ATTR_PURE int compareAlphaAI(const void* const needle, const void* cons
 
 }
 
-static const struct aiEntry* aiEntryFromAlpha(gs1_encoder* const ctx, const char* const alpha, const size_t len) {
+static const struct aiEntry* aiEntryFromAlpha(const gs1_encoder* const ctx, const char* const alpha, const size_t len) {
 
 	const char* ai;
 	const struct aiEntry *entry;
@@ -361,9 +361,10 @@ static __ATTR_PURE int compareDLKeyQualifier(const void* const key, const void* 
 	return strcmp(qualifiers[index], aiseq);
 }
 
-static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
+static int getDLpathAIseqEntry(const gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
 
 	const size_t bufsize = (size_t)len * (MAX_AI_LEN + 1);
+	// cppcheck-suppress allocaCalled
 	char* aiseq = alloca(bufsize);
 	char *p = aiseq;
 	int i;
@@ -390,11 +391,11 @@ static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char (*ais)[MAX_AI_
 
 }
 
-static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
+static inline bool isValidDLpathAIseq(const gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
 	return getDLpathAIseqEntry(ctx, ais, len) != -1;
 }
 
-static inline bool isDLpkey(gs1_encoder* const ctx, const struct aiEntry* const entry) {
+static inline bool isDLpkey(const gs1_encoder* const ctx, const struct aiEntry* const entry) {
 	char seq[1][MAX_AI_LEN+1];
 	memcpy(seq[0], entry->ai, entry->ailen);
 	seq[0][entry->ailen] = '\0';
@@ -670,10 +671,10 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// Legacy handling of AI (01) to pad up to a GTIN-14, when feature enabled
 		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
-			size_t i;
+			size_t j;
 			char *v = dataStr + dataStr_len;
-			for (i = 0; i <= 13; i++)
-				v[13-i] = vallen >= (ssize_t)(i+1) ? v[(size_t)vallen-i-1] : '0';
+			for (j = 0; j <= 13; j++)
+				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
 			v[14] = '\0';
 			vallen = 14;
 		}
@@ -783,10 +784,10 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// Special handling of AI (01) to pad up to a GTIN-14
 		if (strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
-			size_t i;
+			size_t j;
 			char *v = dataStr + dataStr_len;
-			for (i = 0; i <= 13; i++)
-				v[13-i] = vallen >= (ssize_t)(i+1) ? v[(size_t)vallen-i-1] : '0';
+			for (j = 0; j <= 13; j++)
+				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
 			v[14] = '\0';
 			vallen = 14;
 		}
@@ -837,6 +838,7 @@ add_query_param_to_ai_data:
 	 *  key-qualifier association
 	 *
 	 */
+	// cppcheck-suppress allocaCalled
 	pathAIseq = alloca((size_t)numPathAIs * sizeof(*pathAIseq));
 	for (i = 0; i < numPathAIs; i++) {
 
@@ -856,7 +858,8 @@ add_query_param_to_ai_data:
 	// Validate that attributes in the query params are valid and do not
 	// instead belong within path info
 	if (numPathAIs < MAX_AIS) {
-		int i;
+		int k;
+		// cppcheck-suppress allocaCalled
 		char (*seq)[MAX_AI_LEN+1] = alloca((size_t)(numPathAIs + 1) * sizeof(*seq));
 
 		// Sort AIs to enable O(n) duplicate check
@@ -864,9 +867,9 @@ add_query_param_to_ai_data:
 
 		// First, check for duplicate AIs in attributes using sorted array - O(n) instead of O(n²)
 		// Forbid duplicate AIs
-		for (i = 0; i < ctx->numSortedAIs - 1; i++) {
-			const struct aiValue* const ai = ctx->sortedAIs[i];
-			const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
+		for (k = 0; k < ctx->numSortedAIs - 1; k++) {
+			const struct aiValue* const ai = ctx->sortedAIs[k];
+			const struct aiValue* const ai2 = ctx->sortedAIs[k+1];
 
 			if (ai->ailen == ai2->ailen &&
 			    memcmp(ai->ai, ai2->ai, ai->ailen) == 0) {
@@ -877,9 +880,9 @@ add_query_param_to_ai_data:
 		}
 
 		// Now validate each attribute AI
-		for (i = 0; i < ctx->numSortedAIs; i++) {
+		for (k = 0; k < ctx->numSortedAIs; k++) {
 
-			const struct aiValue* const ai = ctx->sortedAIs[i];
+			const struct aiValue* const ai = ctx->sortedAIs[k];
 			int j;
 
 			if (ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
@@ -2024,13 +2027,14 @@ void test_dl_generateDLuri(void) {
 	 */
 	{
 		const char *uri;
-		const char *expect = "https://example.com/01/12312312312326/235/ABC?10=DEF";
 
 		TEST_CASE("DL URI, having path order: https://example.com/01/12312312312326/235/ABC?10=DEF");
 		TEST_CHECK(gs1_encoder_setDataStr(ctx, "https://example.com/01/12312312312326/235/ABC?10=DEF") == true);
 		TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
 		TEST_CHECK((uri = gs1_generateDLuri(ctx, "https://example.com")) != NULL);
 		if (uri) {
+			const char *expect = "https://example.com/01/12312312312326/235/ABC?10=DEF";
+
 			TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
 			TEST_CHECK(strcmp(uri, expect) == 0);
 			TEST_MSG("Expected: '%s'. Got: '%s'", expect, uri);

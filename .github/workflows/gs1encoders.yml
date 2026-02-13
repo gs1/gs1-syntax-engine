@@ -216,6 +216,7 @@ jobs:
           cppcheck --enable=all --force \
             --error-exitcode=1 \
             --check-level=exhaustive \
+            --inline-suppr \
             --suppress='*:acutest.h' \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP_H \
@@ -229,6 +230,8 @@ jobs:
             -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP \
             -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP_H \
+            -U GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H \
+            -D EXCLUDE_EMBEDDED_AI_TABLE \
             -U CLOCK_MONOTONIC \
             -U RUNNING_ON_VALGRIND \
             -U TEST_FINI \
@@ -236,12 +239,15 @@ jobs:
             -D'DIAG_PUSH=' \
             -D'DIAG_POP=' \
             -D'DIAG_DISABLE_DEPRECATED_DECLARATIONS=' \
+            -i syntax \
             -i gs1encoders-fuzzer-ais.c \
+            -i gs1encoders-fuzzer-data.c \
             -i gs1encoders-fuzzer-dl.c \
             -i gs1encoders-fuzzer-scandata.c \
             -i gs1encoders-fuzzer-syn.c \
             -i gs1syntaxdictionary-fuzzer-linters.c \
-            --suppress=missingIncludeSystem .
+            --suppress=missingIncludeSystem \
+            --suppress=preprocessorErrorDirective:ai.h .
 
   ci-java-linux:
 

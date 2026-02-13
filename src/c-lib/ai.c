@@ -173,6 +173,7 @@ fail:
 	}
 #endif
 
+	// cppcheck-suppress duplicateCondition
 	if (!quiet)
 		printf("*** Unable to continue. STOPPING.\n");
 	return false;
@@ -1143,14 +1144,14 @@ static void do_test_existsInAIdata(gs1_encoder* const ctx, const char* const fil
 	char casename[256];
 	const struct aiValue* match = NULL;
 
-	snprintf(casename, sizeof(casename), "%s:%d: %s | +(%s) | -(%s)", file, line, dataStr, needle, ignore);
+	snprintf(casename, sizeof(casename), "%s:%d: %s | +(%s) | -(%s)", file, line, dataStr, needle, ignore ? ignore : "");
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
 	ctx->numSortedAIs = 0;
 	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, dataStr));
 
-	TEST_CHECK(existsInAIdata(ctx, needle, strlen(needle), ignore, (expect != NULL ? &match : NULL)) ^ !should_succeed);
+	TEST_CHECK((existsInAIdata(ctx, needle, strlen(needle), ignore, (expect != NULL ? &match : NULL))) ^ (!should_succeed));
 
 	if (expect != NULL) {
 		TEST_ASSERT(match != NULL);

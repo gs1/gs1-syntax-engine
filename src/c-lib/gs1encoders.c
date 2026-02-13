@@ -56,7 +56,9 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 
 	gs1_encoder *ctx			= NULL;
 	struct aiEntry *sd			= NULL;
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
 	bool syndictParseError			= false;
+#endif
 
 	gs1_encoder_init_flags_t flags		= gs1_encoder_iDEFAULT;
 	gs1_encoder_init_status_t *status	= NULL;
@@ -140,7 +142,9 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 	if (loadSyndict) {
 		sd = gs1_loadSyntaxDictionary(ctx, NULL, quiet);
 		if (!sd && ctx->err != gs1_encoder_eCANNOT_READ_FILE) {
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
 			syndictParseError = true;
+#endif
 			if (!fallbackOnError)
 				RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT, ctx->errMsg);
 		}
@@ -887,7 +891,7 @@ char bigbuffer[MAX_DATA+2];
 
 
 void test_api_getVersion(void) {
-	char *version = gs1_encoder_getVersion();
+	const char *version = gs1_encoder_getVersion();
 
 	TEST_CHECK(version != NULL && strcmp(version, __DATE__) == 0);
 }
@@ -992,6 +996,7 @@ void test_api_sym(void) {
 
 	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS));      // Too big
 
+	// cppcheck-suppress knownConditionTrueFalse
 	TEST_CHECK(gs1_encoder_sNUMSYMS == 15);  // Remember to change when adding new symbologies
 
 	gs1_encoder_free(ctx);

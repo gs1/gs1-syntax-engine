@@ -161,7 +161,7 @@ int main(int argc, const char* const argv[]) {
 
 	gs1_encoder* ctx;
 	gs1_encoder_init_status_t status;
-	char msg[256];
+	char msg[256] = { 0 };
 
 
 	/*
