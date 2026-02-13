@@ -200,11 +200,12 @@ jobs:
           sudo apt-get -y --no-install-recommends \
             install iwyu
           find . -name '*.c' -exec bash -c \
-            'iwyu -DPRNT \
+            'iwyu -Xiwyu --error \
+              -DPRNT \
               -DSYMBOLOGY=gs1_encoder_sNONE \
               -DUNIT_TESTS \
               -DGS1_LINTER_ERR_STR_EN "$1"; \
-              [[ $? = 2 ]] || false' _ {} \;
+              [[ $? = 0 ]] || false' _ {} \;
 
       - name: cppcheck
         working-directory: src/c-lib
@@ -212,6 +213,9 @@ jobs:
           sudo apt-get -y --no-install-recommends \
             install cppcheck
           cppcheck --enable=all --force \
+            --error-exitcode=1 \
+            --check-level=exhaustive \
+            --suppress='*:acutest.h' \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_ISO4217_LOOKUP \
