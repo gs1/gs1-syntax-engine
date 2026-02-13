@@ -199,7 +199,8 @@ jobs:
         run: |
           sudo apt-get -y --no-install-recommends \
             install iwyu
-          find . -name '*.c' -exec bash -c \
+          find . -name '*.c' -not -path './syntax/*' \
+            -exec bash -c \
             'iwyu -Xiwyu --error \
               -DPRNT \
               -DSYMBOLOGY=gs1_encoder_sNONE \
@@ -226,10 +227,15 @@ jobs:
             -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP \
             -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP_H \
+            -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP \
+            -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP_H \
             -U CLOCK_MONOTONIC \
             -U RUNNING_ON_VALGRIND \
             -U TEST_FINI \
             -U TEST_INIT \
+            -D'DIAG_PUSH=' \
+            -D'DIAG_POP=' \
+            -D'DIAG_DISABLE_DEPRECATED_DECLARATIONS=' \
             -i gs1encoders-fuzzer-ais.c \
             -i gs1encoders-fuzzer-dl.c \
             -i gs1encoders-fuzzer-scandata.c \

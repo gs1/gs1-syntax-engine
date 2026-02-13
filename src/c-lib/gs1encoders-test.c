@@ -46,7 +46,6 @@
 #include "dl.h"
 #include "scandata.h"
 #include "syn.h"
-#include "tr.h"
 
 
 TEST_LIST = {

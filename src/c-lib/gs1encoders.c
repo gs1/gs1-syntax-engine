@@ -21,8 +21,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>					// IWYU pragma: keep
 #include <string.h>
 
 #include "syntax/gs1syntaxdictionary.h"

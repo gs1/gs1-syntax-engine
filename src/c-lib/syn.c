@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h>					// IWYU pragma: keep
 #include <string.h>
 
 #include "gs1encoders.h"

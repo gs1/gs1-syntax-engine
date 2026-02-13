@@ -27,6 +27,8 @@
  *
  */
 
+// IWYU pragma: private, include "tr.h"
+
 #ifndef TR_EN_H
 #define TR_EN_H
 

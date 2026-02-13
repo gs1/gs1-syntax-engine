@@ -18,6 +18,8 @@
  *
  */
 
+// IWYU pragma: no_include <alloca.h>
+
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -31,7 +33,6 @@
 #include "gs1encoders.h"
 #include "enc-private.h"
 #include "debug.h"
-#include "ai.h"
 #include "dl.h"
 #include "tr.h"
 
