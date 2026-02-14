@@ -35,9 +35,10 @@ jobs:
           - 'actions'
           - 'c-cpp'
           - 'javascript-typescript'
-          - 'swift'
           - 'java-kotlin'
           - 'python'
+          - 'rust'
+          - 'swift'
 
     steps:
       - name: Checkout repository
@@ -93,9 +94,10 @@ jobs:
 
       - if: >-
           matrix.language == 'actions'
-          || matrix.language == 'swift'
           || matrix.language == 'javascript-typescript'
           || matrix.language == 'python'
+          || matrix.language == 'rust'
+          || matrix.language == 'swift'
         name: Autobuild
         uses: github/codeql-action/autobuild@v4
 
