@@ -589,3 +589,15 @@ GitHub Actions workflow (`.github/workflows/gs1encoders.yml`) runs:
 - iOS and Android app builds
 
 Releases are created automatically when version tags are pushed.
+
+### Super Linter
+
+A separate workflow (`.github/workflows/superlinter.yml`) runs
+[Super Linter](https://github.com/super-linter/super-linter) across the entire
+codebase. Run it locally via Docker:
+
+```bash
+make -C src/c-lib superlinter
+```
+
+Disabled linters are configured in `.github/linters/superlinter-disabled.env`.
