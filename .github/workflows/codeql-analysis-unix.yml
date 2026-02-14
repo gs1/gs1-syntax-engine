@@ -32,6 +32,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
+          - 'actions'
           - 'c-cpp'
           - 'javascript-typescript'
           - 'swift'
@@ -61,6 +62,7 @@ jobs:
           config: |
             paths:
               - src
+              - .github
 
       - if: matrix.language == 'c-cpp'
         name: Build C
@@ -89,7 +91,8 @@ jobs:
           ant -f src/java/build.xml test
 
       - if: >-
-          matrix.language == 'swift'
+          matrix.language == 'actions'
+          || matrix.language == 'swift'
           || matrix.language == 'javascript-typescript'
         name: Autobuild
         uses: github/codeql-action/autobuild@v4
