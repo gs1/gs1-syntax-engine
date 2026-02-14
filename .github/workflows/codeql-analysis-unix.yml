@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   analyze:
+    if: github.repository == 'gs1/gs1-syntax-engine'
     name: Analyze
 
     runs-on: >-
