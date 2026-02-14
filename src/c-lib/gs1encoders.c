@@ -814,21 +814,6 @@ bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok) {
 }
 
 
-__ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
-
-	size_t i;
-
-	assert(str);
-
-	for (i = 0; i < len; i++) {
-		if (unlikely(str[i] < '0' || str[i] > '9'))
-			return false;
-	}
-	return true;
-
-}
-
-
 char* gs1_strdup_alloc(const char *s) {
 
 	size_t len = strlen(s) + 1;

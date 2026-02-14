@@ -267,6 +267,16 @@ static inline char* gs1_buf_append(char *dst, size_t *rem, const void *src, size
 	return dst;
 }
 
+// Buffer is all digits
+static inline __ATTR_PURE bool gs1_allDigits(const uint8_t* const str, size_t len) {
+	size_t i;
+	for (i = 0; i < len; i++)
+		if (unlikely(str[i] < '0' || str[i] > '9'))
+			return false;
+	return true;
+}
+
+
 /*
  *  Utility functions
  *
@@ -279,8 +289,6 @@ typedef struct {
 } gs1_tok_t;
 
 bool gs1_tokenise(const char *data, char delim, gs1_tok_t *tok);
-
-bool gs1_allDigits(const uint8_t *str, size_t len);
 
 char* gs1_strdup_alloc(const char *s);
 
