@@ -312,7 +312,7 @@ public class GS1Encoder {
     /// - Returns: The status of the "validate AI associations" flag
     @available(*, deprecated, message: "Use getValidationEnabled(_:) with Validation.RequisiteAIs instead")
     public func getValidateAIassociations() -> Bool {
-        return gs1_encoder_getValidateAIassociations(ctx)
+        return getValidationEnabled(.RequisiteAIs)
     }
 
     /// Set the "validate AI associations" flag.
@@ -323,9 +323,7 @@ public class GS1Encoder {
     /// - Throws: `GS1EncoderError.parameterError` if an error occurs
     @available(*, deprecated, message: "Use setValidationEnabled(validation:enabled:) with Validation.RequisiteAIs instead")
     public func setValidateAIassociations(_ value: Bool) throws {
-        if !gs1_encoder_setValidateAIassociations(ctx, value) {
-            throw GS1EncoderError.parameterError(msg: self.getErrMsg())
-        }
+        try setValidationEnabled(validation: .RequisiteAIs, enabled: value)
     }
 
     /// Get the raw barcode message data.

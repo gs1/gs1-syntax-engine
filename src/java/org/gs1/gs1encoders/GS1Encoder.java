@@ -450,7 +450,7 @@ public class GS1Encoder {
      */
     @Deprecated
     public boolean getValidateAIassociations() {
-        return gs1encoderGetValidateAIassociationsJNI(ctx);
+        return getValidationEnabled(Validation.RequisiteAIs);
     }
 
     /**
@@ -467,8 +467,7 @@ public class GS1Encoder {
      */
     @Deprecated
     public void setValidateAIassociations(boolean value) throws GS1EncoderParameterException {
-        if (!gs1encoderSetValidateAIassociationsJNI(ctx, value))
-            throw new GS1EncoderParameterException(this.getErrMsg());
+        setValidationEnabled(Validation.RequisiteAIs, value);
     }
 
     /**

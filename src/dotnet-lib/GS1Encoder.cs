@@ -513,12 +513,11 @@ namespace GS1.Encoders
         {
             get
             {
-                return gs1_encoder_getValidateAIassociations(ctx);
+                return GetValidationEnabled(Validation.RequisiteAIs);
             }
             set
             {
-                if (!gs1_encoder_setValidateAIassociations(ctx, value))
-                    throw new GS1EncoderParameterException(ErrMsg);
+                SetValidationEnabled(Validation.RequisiteAIs, value);
             }
         }
 
