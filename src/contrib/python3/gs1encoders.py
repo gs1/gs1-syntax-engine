@@ -76,8 +76,9 @@ class GS1Encoder:
         self.free()
 
     def free(self):
-        self.__api.gs1_encoder_free(self.__ctx)
-        self.__ctx = None
+        if self.__ctx is not None:
+            self.__api.gs1_encoder_free(self.__ctx)
+            self.__ctx = None
 
     def get_version(self):
         return self.__api.gs1_encoder_getVersion().decode("utf-8")
