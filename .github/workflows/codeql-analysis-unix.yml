@@ -92,6 +92,11 @@ jobs:
           make -C src/c-lib -j "$(nproc)" libstatic
           ant -f src/java/build.xml test
 
+      - if: matrix.language == 'rust'
+        name: Build C library for Rust FFI
+        run: |
+          make -C src/c-lib -j "$(nproc)" libshared
+
       - if: >-
           matrix.language == 'actions'
           || matrix.language == 'javascript-typescript'
