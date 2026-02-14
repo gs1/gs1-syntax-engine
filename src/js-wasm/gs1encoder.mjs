@@ -140,8 +140,10 @@ export class GS1encoder {
      * @returns {void}
      */
     free() {
-        this.api.gs1_encoder_free(this.ctx);
-        this.ctx = null;
+        if (this.ctx !== null) {
+            this.api.gs1_encoder_free(this.ctx);
+            this.ctx = null;
+        }
     }
 
 
