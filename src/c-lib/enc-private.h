@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "gs1encoders.h"
 
@@ -247,6 +248,24 @@ struct gs1_encoder {
 
 };
 
+
+/*
+ *  Inline helpers
+ *
+ */
+// Append up to the remaining length of the destination
+static inline char* gs1_buf_append(char *dst, size_t *rem, const void *src, size_t len) {
+	if (len == 0 || len > SIZE_MAX / 2)	// Prevent underflow of src
+		return dst;
+	if (*rem > 1) {
+		if (len > *rem - 1)
+			len = *rem - 1;
+		memcpy(dst, src, len);
+		dst += len;
+		*rem -= len;
+	}
+	return dst;
+}
 
 /*
  *  Utility functions
