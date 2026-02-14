@@ -137,8 +137,10 @@ public class GS1Encoder {
     /// This method will release the resources allocated by the native library.
     /// After calling this method, the GS1Encoder instance should not be used.
     public func free() {
-        gs1_encoder_free(ctx)
-        ctx = nil
+        if ctx != nil {
+            gs1_encoder_free(ctx)
+            ctx = nil
+        }
     }
 
     /// Get the version string of the library.
