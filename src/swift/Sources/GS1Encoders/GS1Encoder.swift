@@ -390,8 +390,11 @@ public class GS1Encoder {
     ///
     /// - Returns: The scan data
     /// - SeeAlso: `setScanData(_:)`
-    public func getScanData() -> String {
-        return String(cString: gs1_encoder_getScanData(ctx))
+    public func getScanData() -> String? {
+        guard let ptr = gs1_encoder_getScanData(ctx) else {
+            return nil
+        }
+        return String(cString: ptr)
     }
 
     /// Set the scan data.
