@@ -37,8 +37,7 @@ async function init() {
 	 * Use the wrapper to initialise the WASM library
 	 *
 	 */
-	gs1encoder = new GS1encoder();
-	await gs1encoder.init();
+	gs1encoder = await GS1encoder.create();
 
 	document.title = "GS1 Barcode Syntax Engine HTML demo | Library release: " + gs1encoder.version;
 

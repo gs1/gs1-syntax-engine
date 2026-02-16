@@ -50,6 +50,19 @@ export class GS1encoder {
     }
 
     /**
+     * Creates and initialises a new GS1Encoder instance.
+     *
+     * @returns {Promise<GS1encoder>} a fully-initialised GS1encoder instance
+     * @throws {GS1encoderGeneralException} if the library fails to initialise
+     * @async
+     */
+    static async create() {
+        const instance = new GS1encoder();
+        await instance.init();
+        return instance;
+    }
+
+    /**
      * Initialises a new instance of the GS1Encoder.
      *
      * @returns {Promise<void>}

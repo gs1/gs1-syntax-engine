@@ -3,6 +3,14 @@
  */
 export class GS1encoder {
     /**
+     * Creates and initialises a new GS1Encoder instance.
+     *
+     * @returns {Promise<GS1encoder>} a fully-initialised GS1encoder instance
+     * @throws {GS1encoderGeneralException} if the library fails to initialise
+     * @async
+     */
+    static create(): Promise<GS1encoder>;
+    /**
      * @private
      */
     private ctx;

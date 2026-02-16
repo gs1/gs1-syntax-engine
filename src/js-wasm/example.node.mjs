@@ -51,8 +51,7 @@ const rl = readline.createInterface({ input, output });
  */
 import { GS1encoder } from "./gs1encoder.mjs";
 
-var gs1encoder = new GS1encoder();
-await gs1encoder.init();
+const gs1encoder = await GS1encoder.create();
 
 let exit = 0;
 
