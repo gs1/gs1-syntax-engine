@@ -390,7 +390,7 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get aiDataStr() {
-        var c_str = this.api.gs1_encoder_getAIdataStr(this.ctx);
+        const c_str = this.api.gs1_encoder_getAIdataStr(this.ctx);
         if (!c_str)
             return null;
         return this.module.UTF8ToString(c_str);
@@ -466,7 +466,7 @@ export class GS1encoder {
      * @throws {GS1encoderDigitalLinkException}
      */
     getDLuri(stem) {
-        var c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
+        const c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
         if (!c_str)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
         return this.module.UTF8ToString(c_str);
@@ -507,7 +507,7 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get scanData() {
-        var c_str = this.api.gs1_encoder_getScanData(this.ctx);
+        const c_str = this.api.gs1_encoder_getScanData(this.ctx);
         if (!c_str)
             return null;
         return this.module.UTF8ToString(c_str);
@@ -536,10 +536,10 @@ export class GS1encoder {
      * @returns {string[]}
      */
     get hri() {
-        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
-        var size = this.api.gs1_encoder_getHRI(this.ctx, ptr);
-        var hri = Array(size);
-        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+        const ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        const size = this.api.gs1_encoder_getHRI(this.ctx, ptr);
+        const hri = Array(size);
+        for (let i = 0, p = this.module.getValue(ptr, 'i32');
              i < size;
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             hri[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
@@ -564,10 +564,10 @@ export class GS1encoder {
      * @returns {string[]}
      */
     get dlIgnoredQueryParams() {
-        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
-        var size = this.api.gs1_encoder_getDLignoredQueryParams(this.ctx, ptr);
-        var qp = Array(size);
-        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+        const ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        const size = this.api.gs1_encoder_getDLignoredQueryParams(this.ctx, ptr);
+        const qp = Array(size);
+        for (let i = 0, p = this.module.getValue(ptr, 'i32');
              i < size;
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             qp[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
