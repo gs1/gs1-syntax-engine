@@ -381,10 +381,7 @@ mod tests {
             .set_ai_data_str("(01)12312312312319(99)TESTING123")
             .unwrap();
 
-        assert_eq!(
-            gs1encoder.get_data_str(),
-            "^011231231231231999TESTING123"
-        );
+        assert_eq!(gs1encoder.get_data_str(), "^011231231231231999TESTING123");
         assert_eq!(
             gs1encoder.get_dl_uri(None).unwrap(),
             "https://id.gs1.org/01/12312312312319?99=TESTING123"
@@ -432,18 +429,12 @@ mod tests {
             err.to_string().contains("without a primary key"),
             "Expected 'without a primary key' in error: {err}"
         );
-        assert_eq!(
-            gs1encoder.get_ai_data_str().unwrap(),
-            "(02)12312312312319"
-        );
+        assert_eq!(gs1encoder.get_ai_data_str().unwrap(), "(02)12312312312319");
         assert_eq!(gs1encoder.get_hri(), vec!["(02) 12312312312319"]);
 
         gs1encoder.set_sym(Symbology::DataBarExpanded).unwrap();
         assert_eq!(gs1encoder.get_sym(), Symbology::DataBarExpanded);
-        assert_eq!(
-            gs1encoder.get_scan_data().unwrap(),
-            "]e00212312312312319"
-        );
+        assert_eq!(gs1encoder.get_scan_data().unwrap(), "]e00212312312312319");
     }
 
     #[test]
@@ -488,9 +479,13 @@ mod tests {
         assert!(!gs1encoder.get_permit_unknown_ais());
 
         assert!(!gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
-        gs1encoder.set_permit_zero_suppressed_gtin_in_dl_uris(true).unwrap();
+        gs1encoder
+            .set_permit_zero_suppressed_gtin_in_dl_uris(true)
+            .unwrap();
         assert!(gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
-        gs1encoder.set_permit_zero_suppressed_gtin_in_dl_uris(false).unwrap();
+        gs1encoder
+            .set_permit_zero_suppressed_gtin_in_dl_uris(false)
+            .unwrap();
         assert!(!gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
 
         assert!(!gs1encoder.get_include_data_titles_in_hri());
@@ -533,10 +528,7 @@ mod tests {
             .set_scan_data("]e0011231231231233310ABC123\x1D99XYZ")
             .unwrap();
         assert_eq!(gs1encoder.get_sym(), Symbology::DataBarExpanded);
-        assert_eq!(
-            gs1encoder.get_data_str(),
-            "^011231231231233310ABC123^99XYZ"
-        );
+        assert_eq!(gs1encoder.get_data_str(), "^011231231231233310ABC123^99XYZ");
         assert_eq!(
             gs1encoder.get_ai_data_str().unwrap(),
             "(01)12312312312333(10)ABC123(99)XYZ"
@@ -564,12 +556,8 @@ mod tests {
     fn test_get_dl_uri_with_stem() {
         let gs1encoder = GS1Encoder::new().unwrap();
 
-        gs1encoder
-            .set_ai_data_str("(01)12312312312319")
-            .unwrap();
-        let custom_uri = gs1encoder
-            .get_dl_uri(Some("https://example.com"))
-            .unwrap();
+        gs1encoder.set_ai_data_str("(01)12312312312319").unwrap();
+        let custom_uri = gs1encoder.get_dl_uri(Some("https://example.com")).unwrap();
         assert!(
             custom_uri.starts_with("https://example.com/"),
             "Expected custom stem in URI: {custom_uri}"
