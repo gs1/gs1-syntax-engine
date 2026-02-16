@@ -87,6 +87,15 @@ test('requisites', async () => {
   gs1encoder.free();
 });
 
+test('create', async () => {
+  const gs1encoder = await GS1encoder.create();
+
+  expect(gs1encoder).toBeInstanceOf(GS1encoder);
+  expect(gs1encoder.version).toBeTruthy();
+
+  gs1encoder.free();
+});
+
 test('version', async () => {
   const gs1encoder = new GS1encoder();
   await gs1encoder.init();

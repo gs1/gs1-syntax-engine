@@ -19,6 +19,10 @@ import {
 } from '../../../src/js-wasm/gs1encoder';
 
 async function testTypes(): Promise<void> {
+    // Test static async factory method
+    const created: GS1encoder = await GS1encoder.create();
+    created.free();
+
     // Test constructor
     const encoder = new GS1encoder();
 
