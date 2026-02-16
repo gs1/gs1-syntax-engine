@@ -29,14 +29,19 @@ from gs1encoders import (
 
 
 class GS1EncoderTest(unittest.TestCase):
-
     def test_set_dl_uri(self):
         gs1encoder = GS1Encoder()
 
         gs1encoder.data_str = "https://id.example.org/test/01/12312312312319?99=TESTING123"
 
-        self.assertEqual(gs1encoder.data_str, "https://id.example.org/test/01/12312312312319?99=TESTING123")
-        self.assertEqual(gs1encoder.get_dl_uri(), "https://id.gs1.org/01/12312312312319?99=TESTING123")
+        self.assertEqual(
+            gs1encoder.data_str,
+            "https://id.example.org/test/01/12312312312319?99=TESTING123",
+        )
+        self.assertEqual(
+            gs1encoder.get_dl_uri(),
+            "https://id.gs1.org/01/12312312312319?99=TESTING123",
+        )
         self.assertEqual(gs1encoder.ai_data_str, "(01)12312312312319(99)TESTING123")
 
         gs1encoder.include_data_titles_in_hri = True
@@ -44,7 +49,10 @@ class GS1EncoderTest(unittest.TestCase):
 
         gs1encoder.sym = Symbology.DM
         self.assertEqual(gs1encoder.sym, Symbology.DM)
-        self.assertEqual(gs1encoder.scan_data, "]d1https://id.example.org/test/01/12312312312319?99=TESTING123")
+        self.assertEqual(
+            gs1encoder.scan_data,
+            "]d1https://id.example.org/test/01/12312312312319?99=TESTING123",
+        )
 
     def test_set_ai_data_str(self):
         gs1encoder = GS1Encoder()
@@ -52,7 +60,10 @@ class GS1EncoderTest(unittest.TestCase):
         gs1encoder.ai_data_str = "(01)12312312312319(99)TESTING123"
 
         self.assertEqual(gs1encoder.data_str, "^011231231231231999TESTING123")
-        self.assertEqual(gs1encoder.get_dl_uri(), "https://id.gs1.org/01/12312312312319?99=TESTING123")
+        self.assertEqual(
+            gs1encoder.get_dl_uri(),
+            "https://id.gs1.org/01/12312312312319?99=TESTING123",
+        )
         self.assertEqual(gs1encoder.ai_data_str, "(01)12312312312319(99)TESTING123")
         self.assertEqual(gs1encoder.hri, ["(01) 12312312312319", "(99) TESTING123"])
 
@@ -173,7 +184,9 @@ class GS1EncoderTest(unittest.TestCase):
         gs1encoder = GS1Encoder()
 
         gs1encoder.ai_data_str = "(01)12312312312319"
-        self.assertTrue(gs1encoder.get_dl_uri("https://example.com").startswith("https://example.com/"))
+        self.assertTrue(
+            gs1encoder.get_dl_uri("https://example.com").startswith("https://example.com/")
+        )
         self.assertTrue(gs1encoder.get_dl_uri().startswith("https://id.gs1.org/"))
 
     def test_dl_ignored_query_params(self):

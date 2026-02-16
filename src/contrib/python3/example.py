@@ -21,8 +21,12 @@
 #  limitations under the License.
 #
 
-import gs1encoders
-from gs1encoders import *
+from gs1encoders import (
+    GS1Encoder,
+    GS1EncoderDigitalLinkException,
+    Symbology,
+    Validation,
+)
 
 
 def main():
@@ -31,18 +35,18 @@ def main():
     print(f"\nVersion: {gs1encoder.version}\n")
 
     # Set symbology to DataMatrix
-    gs1encoder.sym = gs1encoders.Symbology.DM
+    gs1encoder.sym = Symbology.DM
     print(f"Symbology: {gs1encoder.sym.name}")
 
     # Demonstrate validation control
     print(
         "RequisiteAIs validation enabled: "
-        f"{gs1encoder.get_validation_enabled(gs1encoders.Validation.REQUISITE_AIS)}"
+        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
     )
-    gs1encoder.set_validation_enabled(gs1encoders.Validation.REQUISITE_AIS, False)
+    gs1encoder.set_validation_enabled(Validation.REQUISITE_AIS, False)
     print(
         "RequisiteAIs validation enabled (after disable): "
-        f"{gs1encoder.get_validation_enabled(gs1encoders.Validation.REQUISITE_AIS)}"
+        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
     )
 
     # Set AI data
