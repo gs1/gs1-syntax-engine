@@ -35,6 +35,12 @@ import createGS1encoderModule from './gs1encoder-wasm.mjs';
 
 
 /**
+ * @private
+ */
+const _registry = new FinalizationRegistry(release => release());
+
+
+/**
  * Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
  */
 export class GS1encoder {
@@ -145,6 +151,10 @@ export class GS1encoder {
         if (this.ctx === null)
             throw new GS1encoderGeneralException("Failed to initialise GS1 Barcode Syntax Engine");
 
+        const ctx = this.ctx;
+        const freeFunc = this.api.gs1_encoder_free;
+        _registry.register(this, () => freeFunc(ctx), this);
+
     }
 
 
@@ -154,6 +164,7 @@ export class GS1encoder {
      */
     free() {
         if (this.ctx !== null) {
+            _registry.unregister(this);
             this.api.gs1_encoder_free(this.ctx);
             this.ctx = null;
         }
