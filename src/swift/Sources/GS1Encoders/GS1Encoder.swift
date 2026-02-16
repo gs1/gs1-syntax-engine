@@ -102,6 +102,9 @@ public class GS1Encoder {
         /// Repeated AIs having same value (locked: always enabled)
         case RepeatedAIs
 
+        /// Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)
+        case DigSigSerialKey
+
         /// Unknown AIs not permitted as GS1 DL URI data attributes
         case UnknownAInotDLattr
 
