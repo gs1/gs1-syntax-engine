@@ -10,7 +10,7 @@
 
 Example HTML app that uses the WASM or JS-only build of the GS1 Barcode Syntax Engine.
 
-Copyright (c) 2022-2024 GS1 AISBL.
+Copyright (c) 2022-2026 GS1 AISBL.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ The API reference for the native C library is available here:
 -->
 
 <title>GS1 Barcode Syntax Engine HTML demo | Loading ...</title>
-
-<script type="module" src="example.mjs"></script>
 
 <style>
 body {
@@ -179,7 +177,7 @@ font-weight: bold;
 </tr>
 <tr>
 <td><label for="hri">HRI text</label></td>
-<td><textarea id="hri" readonly class="hritextarea"></textarea>
+<td><textarea id="hri" readonly class="hritextarea"></textarea></td>
 </tr>
 </table>
 </div><!-- maintable -->
@@ -194,6 +192,8 @@ font-weight: bold;
 
 
 </div><!-- container -->
+
+<script type="module" src="example.mjs"></script>
 
 </body>
 

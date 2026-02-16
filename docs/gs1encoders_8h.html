@@ -52,7 +52,7 @@ $(function() {
 <a name="details" id="details"></a><h2 class="groupheader">Introduction</h2>
 <div class="textblock"><p>GS1 Barcode Syntax Engine</p>
 <dl class="section author"><dt>Author</dt><dd>GS1 AISBL</dd></dl>
-<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (c) 2000-2025 GS1 AISBL.</dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (c) 2000-2026 GS1 AISBL.</dd></dl>
 <dl class="section user"><dt>License</dt><dd><p class="startdd"></p>
 <p class="interdd">Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.</p>
 <p class="interdd">You may obtain a copy of the License at </p><pre class="fragment">http://www.apache.org/licenses/LICENSE-2.0
@@ -1133,7 +1133,7 @@ Data validation checks</h3>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology, or NULL if no symbology is selected </dd></dl>
 
 </div>
 </div>
@@ -1896,7 +1896,7 @@ gs1_encoder_vREQUISITE_AIS, enabled)</code>, which should be called instead.</dd
 <li>If enabled is false, then the corresponding validation will not be enforced.</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>The option only applies to AI input data, specifically AI data supplied with <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> or <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, or GS1 Digital Link URIs supplied with <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>. Under certain circumstances it may be necessary to disable certain AI validation procedures in order to satisfy checks when the provided AI data represents only part if the overall AI data on a label.</dd></dl>
-<p>Nevertheless, the full AI data should be validated by concatinating it and verifying it with this library with all relivant AI validation procedures enabled.</p>
+<p>Nevertheless, the full AI data should be validated by concatenating it and verifying it with this library with all relevant AI validation procedures enabled.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> </dd>

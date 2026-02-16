@@ -564,7 +564,7 @@ Default: <code>false</code>
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><p>The scan data string that a reader should return when scanning the current data, or <code>null</code> if invalid.</p>
+        <td><p>The scan data string that a reader should return when scanning the current data, or <code>null</code> if no symbology is set.</p>
 </td>
       </tr>
     </tbody>
@@ -727,7 +727,7 @@ This property is equivalent to using the <a class="xref" href="GS1.Encoders.GS1E
   <div class="markdown level1 conceptual"></div>
   <h5 class="declaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string GetDLuri(string Stem)</code></pre>
+    <pre><code class="lang-csharp hljs">public string GetDLuri(string stem)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-condensed">
@@ -741,7 +741,7 @@ This property is equivalent to using the <a class="xref" href="GS1.Encoders.GS1E
     <tbody>
       <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
-        <td><span class="parametername">Stem</span></td>
+        <td><span class="parametername">stem</span></td>
         <td><p>A URI &quot;stem&quot; used as a prefix for the URI. If <code>null</code>, the GS1 canonical stem (<a href="https://id.gs1.org/">https://id.gs1.org/</a>) will be used.</p>
 </td>
       </tr>

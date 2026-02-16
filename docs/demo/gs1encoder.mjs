@@ -2,7 +2,7 @@
  *  JavaScript wrapper for the GS1 Barcode Syntax Engine compiled as a WASM by
  *  Emscripten.
  *
- *  Copyright (c) 2022-2025 GS1 AISBL.
+ *  Copyright (c) 2022-2026 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -35,6 +35,12 @@ import createGS1encoderModule from './gs1encoder-wasm.mjs';
 
 
 /**
+ * @private
+ */
+const _registry = new FinalizationRegistry(release => release());
+
+
+/**
  * Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
  */
 export class GS1encoder {
@@ -47,6 +53,19 @@ export class GS1encoder {
          * @private
          */
         this.ctx = null;
+    }
+
+    /**
+     * Creates and initialises a new GS1Encoder instance.
+     *
+     * @returns {Promise<GS1encoder>} a fully-initialised GS1encoder instance
+     * @throws {GS1encoderGeneralException} if the library fails to initialise
+     * @async
+     */
+    static async create() {
+        const instance = new GS1encoder();
+        await instance.init();
+        return instance;
     }
 
     /**
@@ -117,11 +136,11 @@ export class GS1encoder {
             gs1_encoder_getDataStr:
                 this.module.cwrap('gs1_encoder_getDataStr', 'string', ['number']),
             gs1_encoder_getDLuri:
-                this.module.cwrap('gs1_encoder_getDLuri', 'string', ['number', 'string']),
+                this.module.cwrap('gs1_encoder_getDLuri', 'number', ['number', 'string']),
             gs1_encoder_setScanData:
                 this.module.cwrap('gs1_encoder_setScanData', 'number', ['number', 'string']),
             gs1_encoder_getScanData:
-                this.module.cwrap('gs1_encoder_getScanData', 'string', ['number']),
+                this.module.cwrap('gs1_encoder_getScanData', 'number', ['number']),
             gs1_encoder_getHRI:
                 this.module.cwrap('gs1_encoder_getHRI', 'number', ['number', 'number']),
             gs1_encoder_getDLignoredQueryParams:
@@ -132,6 +151,10 @@ export class GS1encoder {
         if (this.ctx === null)
             throw new GS1encoderGeneralException("Failed to initialise GS1 Barcode Syntax Engine");
 
+        const ctx = this.ctx;
+        const freeFunc = this.api.gs1_encoder_free;
+        _registry.register(this, () => freeFunc(ctx), this);
+
     }
 
 
@@ -140,8 +163,11 @@ export class GS1encoder {
      * @returns {void}
      */
     free() {
-        this.api.gs1_encoder_free(this.ctx);
-        this.ctx = null;
+        if (this.ctx !== null) {
+            _registry.unregister(this);
+            this.api.gs1_encoder_free(this.ctx);
+            this.ctx = null;
+        }
     }
 
 
@@ -350,11 +376,10 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get validateAIassociations() {
-        return this.api.gs1_encoder_getValidateAIassociations(this.ctx) != 0;
+        return this.getValidationEnabled(GS1encoder.validation.RequisiteAIs);
     }
     set validateAIassociations(value) {
-        if (!this.api.gs1_encoder_setValidateAIassociations(this.ctx, value ? 1 : 0))
-            throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
+        this.setValidationEnabled(GS1encoder.validation.RequisiteAIs, value);
     }
 
 
@@ -389,7 +414,7 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get aiDataStr() {
-        var c_str = this.api.gs1_encoder_getAIdataStr(this.ctx);
+        const c_str = this.api.gs1_encoder_getAIdataStr(this.ctx);
         if (!c_str)
             return null;
         return this.module.UTF8ToString(c_str);
@@ -465,10 +490,10 @@ export class GS1encoder {
      * @throws {GS1encoderDigitalLinkException}
      */
     getDLuri(stem) {
-        var uri = this.api.gs1_encoder_getDLuri(this.ctx, stem);
-        if (!uri)
+        const c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
+        if (!c_str)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
-        return uri;
+        return this.module.UTF8ToString(c_str);
     }
 
 
@@ -506,11 +531,14 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get scanData() {
-        return this.api.gs1_encoder_getScanData(this.ctx);
+        const c_str = this.api.gs1_encoder_getScanData(this.ctx);
+        if (!c_str)
+            return null;
+        return this.module.UTF8ToString(c_str);
     }
     set scanData(value) {
         if (!this.api.gs1_encoder_setScanData(this.ctx, value))
-            throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
+            throw new GS1encoderScanDataException(this.api.gs1_encoder_getErrMsg(this.ctx));
     }
 
 
@@ -532,14 +560,15 @@ export class GS1encoder {
      * @returns {string[]}
      */
     get hri() {
-        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
-        var size = this.api.gs1_encoder_getHRI(this.ctx, ptr);
-        var hri = Array(size);
-        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+        const ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        const size = this.api.gs1_encoder_getHRI(this.ctx, ptr);
+        const hri = Array(size);
+        for (let i = 0, p = this.module.getValue(ptr, 'i32');
              i < size;
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             hri[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
         }
+        this.module._free(ptr);
         return hri;
     }
 
@@ -559,14 +588,15 @@ export class GS1encoder {
      * @returns {string[]}
      */
     get dlIgnoredQueryParams() {
-        var ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
-        var size = this.api.gs1_encoder_getDLignoredQueryParams(this.ctx, ptr);
-        var qp = Array(size);
-        for (var i = 0, p = this.module.getValue(ptr, 'i32');
+        const ptr = this.module._malloc(Uint32Array.BYTES_PER_ELEMENT);
+        const size = this.api.gs1_encoder_getDLignoredQueryParams(this.ctx, ptr);
+        const qp = Array(size);
+        for (let i = 0, p = this.module.getValue(ptr, 'i32');
              i < size;
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             qp[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
         }
+        this.module._free(ptr);
         return qp;
     }
 
@@ -665,61 +695,49 @@ GS1encoder.validation = validation;
 
 /**
  * Exception thrown when a general library error occurs, such as initialisation failure.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderGeneralException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderGeneralException';
-    return error;
+class GS1encoderGeneralException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderGeneralException';
+    }
 }
-GS1encoderGeneralException.prototype = Object.create(Error.prototype);
-GS1encoderGeneralException.prototype.name = 'GS1encoderGeneralException';
 
 
 /**
  * Exception thrown when an invalid parameter is provided to a method or property setter.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderParameterException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderParameterException';
-    return error;
+class GS1encoderParameterException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderParameterException';
+    }
 }
-GS1encoderParameterException.prototype = Object.create(Error.prototype);
-GS1encoderParameterException.prototype.name = 'GS1encoderParameterException';
 
 
 /**
  * Exception thrown when an error occurs during GS1 Digital Link URI processing.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderDigitalLinkException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderDigitalLinkException';
-    return error;
+class GS1encoderDigitalLinkException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderDigitalLinkException';
+    }
 }
-GS1encoderDigitalLinkException.prototype = Object.create(Error.prototype);
-GS1encoderDigitalLinkException.prototype.name = 'GS1encoderDigitalLinkException';
 
 
 /**
  * Exception thrown when an error occurs during scan data processing.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderScanDataException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderScanDataException';
-    return error;
+class GS1encoderScanDataException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderScanDataException';
+    }
 }
-GS1encoderScanDataException.prototype = Object.create(Error.prototype);
-GS1encoderScanDataException.prototype.name = 'GS1encoderScanDataException';
 
 export { GS1encoderGeneralException, GS1encoderParameterException, GS1encoderDigitalLinkException, GS1encoderScanDataException, symbology as Symbology, validation as Validation };

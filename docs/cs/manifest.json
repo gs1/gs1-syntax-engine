@@ -60,20 +60,6 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "build/GS1.Encoders.GS1EncoderEncodeException.yml",
-      "output": {
-        ".html": {
-          "relative_path": "GS1.Encoders.GS1EncoderEncodeException.html"
-        }
-      },
-      "version": "",
-      "Uid": null,
-      "IsMRef": true,
-      "Title": "GS1.Encoders.GS1EncoderEncodeException",
-      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1EncoderEncodeException.yml\" sourcestartlinenumber=\"1\">A custom exception class that is thrown to indicate a problem generating\na barcode symbol.</p>\n"
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "build/GS1.Encoders.GS1EncoderGeneralException.yml",
       "output": {
         ".html": {

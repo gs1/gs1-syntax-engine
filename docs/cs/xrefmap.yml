@@ -421,31 +421,6 @@ references:
   fullName.vb: GS1.Encoders.GS1EncoderDigitalLinkException.New
   nameWithType: GS1EncoderDigitalLinkException.GS1EncoderDigitalLinkException
   nameWithType.vb: GS1EncoderDigitalLinkException.New
-- uid: GS1.Encoders.GS1EncoderEncodeException
-  name: GS1EncoderEncodeException
-  href: GS1.Encoders.GS1EncoderEncodeException.html
-  commentId: T:GS1.Encoders.GS1EncoderEncodeException
-  fullName: GS1.Encoders.GS1EncoderEncodeException
-  nameWithType: GS1EncoderEncodeException
-- uid: GS1.Encoders.GS1EncoderEncodeException.#ctor(System.String)
-  name: GS1EncoderEncodeException(string)
-  href: GS1.Encoders.GS1EncoderEncodeException.html#GS1_Encoders_GS1EncoderEncodeException__ctor_System_String_
-  commentId: M:GS1.Encoders.GS1EncoderEncodeException.#ctor(System.String)
-  name.vb: New(String)
-  fullName: GS1.Encoders.GS1EncoderEncodeException.GS1EncoderEncodeException(string)
-  fullName.vb: GS1.Encoders.GS1EncoderEncodeException.New(String)
-  nameWithType: GS1EncoderEncodeException.GS1EncoderEncodeException(string)
-  nameWithType.vb: GS1EncoderEncodeException.New(String)
-- uid: GS1.Encoders.GS1EncoderEncodeException.#ctor*
-  name: GS1EncoderEncodeException
-  href: GS1.Encoders.GS1EncoderEncodeException.html#GS1_Encoders_GS1EncoderEncodeException__ctor_
-  commentId: Overload:GS1.Encoders.GS1EncoderEncodeException.#ctor
-  isSpec: "True"
-  name.vb: New
-  fullName: GS1.Encoders.GS1EncoderEncodeException.GS1EncoderEncodeException
-  fullName.vb: GS1.Encoders.GS1EncoderEncodeException.New
-  nameWithType: GS1EncoderEncodeException.GS1EncoderEncodeException
-  nameWithType.vb: GS1EncoderEncodeException.New
 - uid: GS1.Encoders.GS1EncoderGeneralException
   name: GS1EncoderGeneralException
   href: GS1.Encoders.GS1EncoderGeneralException.html
