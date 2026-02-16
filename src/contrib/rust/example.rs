@@ -78,8 +78,8 @@ fn main() {
 
     // DL URI
     match gs1encoder.get_dl_uri(Some("https://example.com")) {
-        Some(uri) => println!("\nDL URI: {}", uri),
-        Option::None => println!("\nDL URI: Failed: {}", gs1encoder.get_err_markup()),
+        Ok(uri) => println!("\nDL URI: {}", uri),
+        Err(e) => println!("\nDL URI: Failed: {}", e),
     }
 
     // Scan data round-trip

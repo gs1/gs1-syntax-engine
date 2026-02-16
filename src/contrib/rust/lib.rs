@@ -271,17 +271,17 @@ impl GS1Encoder {
         Ok(())
     }
 
-    pub fn get_dl_uri(&self, stem: Option<&str>) -> Option<String> {
+    pub fn get_dl_uri(&self, stem: Option<&str>) -> Result<String, GS1EncoderError> {
         let c_stem = stem.map(|s| CString::new(s).unwrap());
         let stem_ptr = c_stem
             .as_ref()
             .map_or(ptr::null(), |s| s.as_ptr() as *const c_char);
         let ptr = unsafe { gs1_encoder_getDLuri(self.ctx, stem_ptr) };
         if ptr.is_null() {
-            return None;
+            return Err(GS1EncoderError::GS1DigitalLinkError(self.get_err_msg()));
         }
         let c_str: &CStr = unsafe { CStr::from_ptr(ptr) };
-        Some(c_str.to_str().unwrap().to_owned())
+        Ok(c_str.to_str().unwrap().to_owned())
     }
 
     pub fn get_dl_ignored_query_params(&self) -> Vec<String> {
@@ -331,5 +331,118 @@ impl fmt::Display for GS1EncoderError {
             GS1EncoderError::GS1ScanDataError(msg) => write!(f, "{}", msg),
             GS1EncoderError::GS1DigitalLinkError(msg) => write!(f, "{}", msg),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_set_dl_uri() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder
+            .set_data_str("https://id.example.org/test/01/12312312312319?99=TESTING123")
+            .unwrap();
+
+        assert_eq!(
+            gs1encoder.get_data_str(),
+            "https://id.example.org/test/01/12312312312319?99=TESTING123"
+        );
+        assert_eq!(
+            gs1encoder.get_dl_uri(None).unwrap(),
+            "https://id.gs1.org/01/12312312312319?99=TESTING123"
+        );
+        assert_eq!(
+            gs1encoder.get_ai_data_str().unwrap(),
+            "(01)12312312312319(99)TESTING123"
+        );
+
+        gs1encoder.set_include_data_titles_in_hri(true).unwrap();
+        assert_eq!(
+            gs1encoder.get_hri(),
+            vec!["GTIN (01) 12312312312319", "INTERNAL (99) TESTING123"]
+        );
+
+        gs1encoder.set_sym(Symbology::Dm).unwrap();
+        assert_eq!(gs1encoder.get_sym(), Symbology::Dm);
+        assert_eq!(
+            gs1encoder.get_scan_data().unwrap(),
+            "]d1https://id.example.org/test/01/12312312312319?99=TESTING123"
+        );
+    }
+
+    #[test]
+    fn test_set_ai_data_str() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder
+            .set_ai_data_str("(01)12312312312319(99)TESTING123")
+            .unwrap();
+
+        assert_eq!(
+            gs1encoder.get_data_str(),
+            "^011231231231231999TESTING123"
+        );
+        assert_eq!(
+            gs1encoder.get_dl_uri(None).unwrap(),
+            "https://id.gs1.org/01/12312312312319?99=TESTING123"
+        );
+        assert_eq!(
+            gs1encoder.get_ai_data_str().unwrap(),
+            "(01)12312312312319(99)TESTING123"
+        );
+        assert_eq!(
+            gs1encoder.get_hri(),
+            vec!["(01) 12312312312319", "(99) TESTING123"]
+        );
+
+        gs1encoder.set_sym(Symbology::Qr).unwrap();
+        assert_eq!(gs1encoder.get_sym(), Symbology::Qr);
+        assert_eq!(
+            gs1encoder.get_scan_data().unwrap(),
+            "]Q3011231231231231999TESTING123"
+        );
+    }
+
+    #[test]
+    fn test_requisites() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        assert!(gs1encoder.get_validation_enabled(Validation::RequisiteAis));
+
+        let err = gs1encoder.set_data_str("^0212312312312319").unwrap_err();
+        assert!(matches!(err, GS1EncoderError::GS1ParameterError(_)));
+        assert!(
+            err.to_string().contains("not satisfied"),
+            "Expected 'not satisfied' in error: {err}"
+        );
+
+        gs1encoder
+            .set_validation_enabled(Validation::RequisiteAis, false)
+            .unwrap();
+        assert!(!gs1encoder.get_validation_enabled(Validation::RequisiteAis));
+        gs1encoder.set_data_str("^0212312312312319").unwrap();
+
+        assert_eq!(gs1encoder.get_data_str(), "^0212312312312319");
+        let err = gs1encoder.get_dl_uri(None).unwrap_err();
+        assert!(matches!(err, GS1EncoderError::GS1DigitalLinkError(_)));
+        assert!(
+            err.to_string().contains("without a primary key"),
+            "Expected 'without a primary key' in error: {err}"
+        );
+        assert_eq!(
+            gs1encoder.get_ai_data_str().unwrap(),
+            "(02)12312312312319"
+        );
+        assert_eq!(gs1encoder.get_hri(), vec!["(02) 12312312312319"]);
+
+        gs1encoder.set_sym(Symbology::DataBarExpanded).unwrap();
+        assert_eq!(gs1encoder.get_sym(), Symbology::DataBarExpanded);
+        assert_eq!(
+            gs1encoder.get_scan_data().unwrap(),
+            "]e00212312312312319"
+        );
     }
 }
