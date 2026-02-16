@@ -180,7 +180,7 @@ jobs:
         working-directory: src/swift
         run: |
           ln -s ../c-lib/gs1-syntax-dictionary.txt .
-          swift test
+          swift test -Xswiftc -warnings-as-errors
 
   ci-scan-build:
 

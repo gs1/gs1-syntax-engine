@@ -48,7 +48,7 @@ There is a large corpus of example code.
 
 **Swift:**
 
-- Console application ([source](src/swift/Example.swift))
+- Console application ([source](src/swift/Sources/Example/Example.swift))
 - iOS mobile app with ML Kit barcode scanning ([source](src/ios))
 
 **JavaScript/Wasm:**

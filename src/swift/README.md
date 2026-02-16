@@ -116,7 +116,7 @@ Build and run:
 swift run
 ```
 
-For a comprehensive example, see [Example.swift](https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Example.swift).
+For a comprehensive example, see [Example.swift](https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Sources/Example/Example.swift).
 
 ### iOS Mobile App Quick Start
 

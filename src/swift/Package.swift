@@ -55,9 +55,7 @@ let package = Package(
                 "c-lib/acutest.h",
                 "c-lib/syntax/acutest.h",
                 "c-lib/syntax/unittest.h",
-                // Exclude build artifacts directory
-                "c-lib/build-wasm",
-                // Exclude build scripts and non-C source files
+                // Exclude non-C source files
                 "c-lib/Makefile",
                 "c-lib/build-embedded-ai-table.pl",
                 "c-lib/gs1encoders.vcxproj",
@@ -65,7 +63,9 @@ let package = Package(
                 "c-lib/gs1encoders-app.vcxproj",
                 "c-lib/gs1encoders-app.vcxproj.filters",
                 "c-lib/gs1encoders-test.vcxproj",
-                "c-lib/gs1encoders-test.vcxproj.filters"
+                "c-lib/gs1encoders-test.vcxproj.filters",
+                "c-lib/aitable.inc",
+                "c-lib/README.md"
             ],
             resources: [
                 .copy("c-lib/gs1-syntax-dictionary.txt")
@@ -85,9 +85,7 @@ let package = Package(
         // Example executable
         .executableTarget(
             name: "Example",
-            dependencies: ["GS1Encoders"],
-            path: ".",
-            sources: ["Example.swift"]),
+            dependencies: ["GS1Encoders"]),
         .testTarget(
             name: "GS1EncodersTests",
             dependencies: ["GS1Encoders"]),
