@@ -23,7 +23,7 @@
 
 import { GS1encoder, GS1encoderParameterException, GS1encoderDigitalLinkException } from "./gs1encoder.mjs";
 
-var gs1encoder = new GS1encoder();
+const gs1encoder = new GS1encoder();
 
 test('setDLuri', async () => {
   await gs1encoder.init();
@@ -45,7 +45,7 @@ test('setDLuri', async () => {
 });
 
 test('setAIdataStr', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.aiDataStr = "(01)12312312312319(99)TESTING123" }).not.toThrow();
@@ -63,7 +63,7 @@ test('setAIdataStr', async () => {
 });
 
 test('requisites', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)).toBe(true);
@@ -88,7 +88,7 @@ test('requisites', async () => {
 });
 
 test('version', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(gs1encoder.version).toBeTruthy();
@@ -98,7 +98,7 @@ test('version', async () => {
 });
 
 test('defaults', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(gs1encoder.sym).toBe(GS1encoder.symbology.NONE);
@@ -117,7 +117,7 @@ test('defaults', async () => {
 });
 
 test('booleanSetters', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(gs1encoder.addCheckDigit).toBe(false);
@@ -148,7 +148,7 @@ test('booleanSetters', async () => {
 });
 
 test('validations', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(gs1encoder.getValidationEnabled(GS1encoder.validation.MutexAIs)).toBe(true);
@@ -169,7 +169,7 @@ test('validations', async () => {
 });
 
 test('setScanData', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.scanData = "]e0011231231231233310ABC123\x1D99XYZ" }).not.toThrow();
@@ -181,7 +181,7 @@ test('setScanData', async () => {
 });
 
 test('nonAIdata', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.dataStr = "TESTING" }).not.toThrow();
@@ -196,7 +196,7 @@ test('nonAIdata', async () => {
 });
 
 test('getDLuriWithStem', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.aiDataStr = "(01)12312312312319" }).not.toThrow();
@@ -207,7 +207,7 @@ test('getDLuriWithStem', async () => {
 });
 
 test('dlIgnoredQueryParams', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.dataStr = "https://a/01/12312312312333/22/TESTING?singleton&99=ABC&compound=XYZ" }).not.toThrow();
@@ -218,7 +218,7 @@ test('dlIgnoredQueryParams', async () => {
 });
 
 test('errMarkup', async () => {
-  var gs1encoder = new GS1encoder();
+  const gs1encoder = new GS1encoder();
   await gs1encoder.init();
 
   expect(() => { gs1encoder.dataStr = "^011234567890128399ABC" }).toThrow(GS1encoderParameterException);
