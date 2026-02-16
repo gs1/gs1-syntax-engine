@@ -182,6 +182,31 @@ jobs:
           ln -s ../c-lib/gs1-syntax-dictionary.txt .
           swift test -Xswiftc -warnings-as-errors
 
+  ci-contrib:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build C shared library
+        run: |
+          make -C src/c-lib -j "$(nproc)" libshared
+
+      - name: Rust tests
+        working-directory: src/contrib/rust
+        run: |
+          LD_LIBRARY_PATH=../../c-lib/build cargo test
+
+      - name: Python tests
+        working-directory: src/contrib/python3
+        run: |
+          LD_LIBRARY_PATH=../../c-lib/build \
+            python3 -m unittest test_gs1encoders -v
+
   ci-scan-build:
 
     runs-on: ubuntu-latest
