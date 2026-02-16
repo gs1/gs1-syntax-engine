@@ -88,5 +88,8 @@ let package = Package(
             dependencies: ["GS1Encoders"],
             path: ".",
             sources: ["Example.swift"]),
+        .testTarget(
+            name: "GS1EncodersTests",
+            dependencies: ["GS1Encoders"]),
     ]
 )

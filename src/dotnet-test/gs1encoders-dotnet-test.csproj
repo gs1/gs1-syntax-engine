@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NativePlatformDir Condition="'$(PlatformTarget)' == 'x86'">Win32</NativePlatformDir>
+    <NativePlatformDir Condition="'$(NativePlatformDir)' == ''">x64</NativePlatformDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.*" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dotnet-lib\gs1encoders-dotnet-lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\c-lib\build\library\$(NativePlatformDir)\$(Configuration)\gs1encoders.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="gs1encoders.dll" />
+    <Content Include="..\c-lib\gs1-syntax-dictionary.txt"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="gs1-syntax-dictionary.txt" />
+  </ItemGroup>
+
+</Project>

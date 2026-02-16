@@ -122,6 +122,9 @@ jobs:
           src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
             --version
 
+          dotnet test src\dotnet-test\gs1encoders-dotnet-test.csproj `
+            --no-build --configuration release
+
   ci-macos:
 
     runs-on: macos-latest
@@ -162,6 +165,22 @@ jobs:
             app-static SANITIZE=yes
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
+
+  ci-swift:
+
+    runs-on: macos-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Swift tests
+        working-directory: src/swift
+        run: |
+          ln -s ../c-lib/gs1-syntax-dictionary.txt .
+          swift test
 
   ci-scan-build:
 
@@ -741,6 +760,7 @@ jobs:
       - ci-clang
       - ci-msvc
       - ci-macos
+      - ci-swift
       - ci-scan-build
       - ci-java-linux
       - ci-java-macos

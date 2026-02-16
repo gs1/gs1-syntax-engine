@@ -84,6 +84,7 @@
   <property name="jar" location="libgs1encoders.jar"/>
   <property name="wrapfile" location="gs1encoders_wrap.c"/>
   <property name="clib" location="../c-lib"/>
+  <property name="junit-jar" location="${build}/junit-platform-console-standalone.jar"/>
 
 
   <!-- For Windows builds -->
@@ -162,6 +163,18 @@
 
   <target name="all" depends="jar,jni"/>
 
+  <target name="fetch-junit" depends="init">
+    <get src="https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar"
+         dest="${junit-jar}"
+         skipexisting="true"/>
+  </target>
+
+  <target name="compile-test" depends="all,fetch-junit">
+    <javac includes="GS1EncoderTest.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}:${junit-jar}">
+      <compilerarg value="-Werror"/>
+    </javac>
+  </target>
+
   <target name="example" depends="all">
     <javac includes="Example.java" srcdir="${src}" destdir="${src}" includeantruntime="false" classpath=".:${jar}">
       <compilerarg value="-Werror"/>
@@ -169,10 +182,21 @@
     <echo>To run: java -Djava.library.path=${src} -classpath ${src}:${jar} Example</echo>
   </target>
 
-  <target name="test" depends="example">
+  <target name="test" depends="example,compile-test">
+    <copy file="${clib}/gs1-syntax-dictionary.txt" todir="${src}" overwrite="true"/>
     <java classname="Example" failonerror="true" classpath="${src}:${jar}" fork="true">
       <sysproperty key="java.library.path" path="${src}"/>
       <arg value="--version"/>
+    </java>
+    <java classname="org.junit.platform.console.ConsoleLauncher" failonerror="true" fork="true">
+      <classpath>
+        <pathelement location="${junit-jar}"/>
+        <pathelement location="${src}"/>
+        <pathelement location="${jar}"/>
+      </classpath>
+      <sysproperty key="java.library.path" path="${src}"/>
+      <arg value="execute"/>
+      <arg value="--select-class=GS1EncoderTest"/>
     </java>
   </target>
 
@@ -186,6 +210,8 @@
     <delete file="${src}/gs1encodersjni.lib"/>
     <delete file="${src}/gs1encoders_wrap.obj"/>
     <delete file="${src}/Example.class"/>
+    <delete file="${src}/GS1EncoderTest.class"/>
+    <delete file="${src}/gs1-syntax-dictionary.txt"/>
   </target>
 
 </project>
