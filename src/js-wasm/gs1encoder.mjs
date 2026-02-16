@@ -544,6 +544,7 @@ export class GS1encoder {
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             hri[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
         }
+        this.module._free(ptr);
         return hri;
     }
 
@@ -571,6 +572,7 @@ export class GS1encoder {
              i++, p += Uint32Array.BYTES_PER_ELEMENT) {
             qp[i] = this.module.UTF8ToString(this.module.getValue(p, 'i32'));
         }
+        this.module._free(ptr);
         return qp;
     }
 
