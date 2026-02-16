@@ -404,6 +404,23 @@ jobs:
           npx tsc --noEmit \
             -p ../../maintenance/ci/js-wasm/tsconfig.json
 
+      - name: Check TypeScript declarations are up to date
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --allowJs \
+            --declaration \
+            --emitDeclarationOnly \
+            --skipLibCheck \
+            --moduleResolution node \
+            --module ES2020 \
+            --target ES2020 \
+            --lib ES2020 \
+            --outDir . \
+            gs1encoder.mjs
+          mv gs1encoder.d.mts gs1encoder.d.ts
+          rm -f gs1encoder-wasm.d.mts
+          git diff --exit-code gs1encoder.d.ts
+
       - name: Node.js run
         working-directory: src/js-wasm
         run: |
@@ -443,6 +460,23 @@ jobs:
         run: |
           npx tsc --noEmit \
             -p ../../maintenance/ci/js-wasm/tsconfig.json
+
+      - name: Check TypeScript declarations are up to date
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --allowJs \
+            --declaration \
+            --emitDeclarationOnly \
+            --skipLibCheck \
+            --moduleResolution node \
+            --module ES2020 \
+            --target ES2020 \
+            --lib ES2020 \
+            --outDir . \
+            gs1encoder.mjs
+          mv gs1encoder.d.mts gs1encoder.d.ts
+          rm -f gs1encoder-wasm.d.mts
+          git diff --exit-code gs1encoder.d.ts
 
       - name: Node.js run
         working-directory: src/js-wasm
