@@ -28,7 +28,7 @@
 import { GS1encoder } from './gs1encoder.mjs';
 
 
-var gs1encoder = {};
+let gs1encoder = {};
 
 
 async function init() {
@@ -42,7 +42,7 @@ async function init() {
 
 	document.title = "GS1 Barcode Syntax Engine HTML demo | Library release: " + gs1encoder.version;
 
-	var dataParam = new URL(document.location.toString()).searchParams.get('data');
+	const dataParam = new URL(document.location.toString()).searchParams.get('data');
 
 	document.getElementById("data").value = dataParam ??
 		"https://example.com/01/12312312312333/10/ABC123?99=TESTING";
@@ -85,7 +85,7 @@ function load_data_values() {
 		document.getElementById("dl").value = "⧚ " + err.message + " ⧛";
 	}
 
-	var hri = gs1encoder.hri;
+	const hri = gs1encoder.hri;
 	if (hri.length > 0) {
 		for (const ai of hri)
 			document.getElementById("hri").value += ai + "\n";
@@ -93,7 +93,7 @@ function load_data_values() {
 		document.getElementById("hri").value = "⧚ Not AI-based data ⧛";
 	}
 
-	var qps = gs1encoder.dlIgnoredQueryParams;
+	const qps = gs1encoder.dlIgnoredQueryParams;
 	if (qps.length > 0)
 		document.getElementById("info").value = "Warning: Non-numeric query parameters ignored: ⧚" +
 			qps.join('&') + "⧚";
@@ -107,7 +107,7 @@ function process_clicked() {
 
 	try {
 
-		var data = document.getElementById("data").value;
+		const data = document.getElementById("data").value;
 		if (data == "") return;
 
 		if (data.startsWith('(')) {
@@ -131,9 +131,9 @@ function process_clicked() {
 			}
 
 			// Perform a checksum validation here, since the Syntax Engine validates only AI-based data
-			var parity = 0;
-			var weight = data.length % 2 == 0 ? 3 : 1;
-			var i;
+			let parity = 0;
+			let weight = data.length % 2 == 0 ? 3 : 1;
+			let i;
 			for (i = 0; i < data.length - 1; i++) {
 				parity += weight * (data[i] - '0');
 				weight = 4 - weight;
@@ -157,7 +157,7 @@ function process_clicked() {
 	}
 	catch (err) {
 		document.getElementById("errmsg").value = "Error: " + err.message;
-		var markup = gs1encoder.errMarkup;
+		const markup = gs1encoder.errMarkup;
 		if (markup) {
 			document.getElementById("info").value = "AI content validation failed: " + markup.replace(/\|/g, "⧚");
 		}
