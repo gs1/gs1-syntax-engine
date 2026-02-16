@@ -43,8 +43,6 @@ public class GS1Encoder {
     private static native boolean gs1encoderSetPermitZeroSuppressedGTINinDLurisJNI(long ctx, boolean value);
     private static native boolean gs1encoderGetValidationEnabledJNI(long ctx, int validation);
     private static native boolean gs1encoderSetValidationEnabledJNI(long ctx, int validation, boolean value);
-    private static native boolean gs1encoderGetValidateAIassociationsJNI(long ctx);
-    private static native boolean gs1encoderSetValidateAIassociationsJNI(long ctx, boolean value);
     private static native String gs1encoderGetDataStrJNI(long ctx);
     private static native boolean gs1encoderSetDataStrJNI(long ctx, String value);
     private static native String gs1encoderGetAIdataStrJNI(long ctx);
@@ -482,7 +480,7 @@ public class GS1Encoder {
      * or {@link #setScanData(String)}. If the content must persist beyond such calls,
      * it should be copied to a separate variable.
      *
-     * @return the raw barcode data input buffer, or {@code null} if no data has been set
+     * @return the raw barcode data input buffer
      * @see #setDataStr(String)
      * @see #getAIdataStr()
      * @see #setAIdataStr(String)
@@ -593,7 +591,7 @@ public class GS1Encoder {
      * <p>
      * The output will be prefixed with the appropriate AIM symbology identifier.
      *
-     * @return the expected scan data string, or {@code null} if invalid
+     * @return the expected scan data string, or {@code null} if no symbology is set
      */
     public String getScanData() {
         return gs1encoderGetScanDataJNI(ctx);
