@@ -445,4 +445,176 @@ mod tests {
             "]e00212312312312319"
         );
     }
+
+    #[test]
+    fn test_version() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        let version = gs1encoder.get_version();
+        assert!(!version.is_empty());
+    }
+
+    #[test]
+    fn test_defaults() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        assert_eq!(gs1encoder.get_sym(), Symbology::None);
+        assert_eq!(gs1encoder.get_data_str(), "");
+        assert!(!gs1encoder.get_add_check_digit());
+        assert!(!gs1encoder.get_permit_unknown_ais());
+        assert!(!gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
+        assert!(!gs1encoder.get_include_data_titles_in_hri());
+        assert!(gs1encoder.get_ai_data_str().is_none());
+        assert!(gs1encoder.get_scan_data().is_none());
+        assert!(gs1encoder.get_hri().is_empty());
+        assert!(gs1encoder.get_dl_ignored_query_params().is_empty());
+        assert_eq!(gs1encoder.get_err_markup(), "");
+    }
+
+    #[test]
+    fn test_boolean_setters() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        assert!(!gs1encoder.get_add_check_digit());
+        gs1encoder.set_add_check_digit(true).unwrap();
+        assert!(gs1encoder.get_add_check_digit());
+        gs1encoder.set_add_check_digit(false).unwrap();
+        assert!(!gs1encoder.get_add_check_digit());
+
+        assert!(!gs1encoder.get_permit_unknown_ais());
+        gs1encoder.set_permit_unknown_ais(true).unwrap();
+        assert!(gs1encoder.get_permit_unknown_ais());
+        gs1encoder.set_permit_unknown_ais(false).unwrap();
+        assert!(!gs1encoder.get_permit_unknown_ais());
+
+        assert!(!gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
+        gs1encoder.set_permit_zero_suppressed_gtin_in_dl_uris(true).unwrap();
+        assert!(gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
+        gs1encoder.set_permit_zero_suppressed_gtin_in_dl_uris(false).unwrap();
+        assert!(!gs1encoder.get_permit_zero_suppressed_gtin_in_dl_uris());
+
+        assert!(!gs1encoder.get_include_data_titles_in_hri());
+        gs1encoder.set_include_data_titles_in_hri(true).unwrap();
+        assert!(gs1encoder.get_include_data_titles_in_hri());
+        gs1encoder.set_include_data_titles_in_hri(false).unwrap();
+        assert!(!gs1encoder.get_include_data_titles_in_hri());
+    }
+
+    #[test]
+    fn test_validations() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        assert!(gs1encoder.get_validation_enabled(Validation::MutexAis));
+        assert!(gs1encoder.get_validation_enabled(Validation::RequisiteAis));
+        assert!(gs1encoder.get_validation_enabled(Validation::RepeatedAis));
+        assert!(gs1encoder.get_validation_enabled(Validation::DigSigSerialKey));
+        assert!(gs1encoder.get_validation_enabled(Validation::UnknownAiNotDlAttr));
+
+        gs1encoder
+            .set_validation_enabled(Validation::RequisiteAis, false)
+            .unwrap();
+        assert!(!gs1encoder.get_validation_enabled(Validation::RequisiteAis));
+        gs1encoder
+            .set_validation_enabled(Validation::RequisiteAis, true)
+            .unwrap();
+        assert!(gs1encoder.get_validation_enabled(Validation::RequisiteAis));
+
+        let err = gs1encoder
+            .set_validation_enabled(Validation::RepeatedAis, false)
+            .unwrap_err();
+        assert!(matches!(err, GS1EncoderError::GS1ParameterError(_)));
+    }
+
+    #[test]
+    fn test_set_scan_data() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder
+            .set_scan_data("]e0011231231231233310ABC123\x1D99XYZ")
+            .unwrap();
+        assert_eq!(gs1encoder.get_sym(), Symbology::DataBarExpanded);
+        assert_eq!(
+            gs1encoder.get_data_str(),
+            "^011231231231233310ABC123^99XYZ"
+        );
+        assert_eq!(
+            gs1encoder.get_ai_data_str().unwrap(),
+            "(01)12312312312333(10)ABC123(99)XYZ"
+        );
+    }
+
+    #[test]
+    fn test_non_ai_data() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder.set_data_str("TESTING").unwrap();
+        assert!(gs1encoder.get_ai_data_str().is_none());
+        assert!(gs1encoder.get_scan_data().is_none());
+        assert!(gs1encoder.get_hri().is_empty());
+        assert!(gs1encoder.get_dl_ignored_query_params().is_empty());
+        let err = gs1encoder.get_dl_uri(None).unwrap_err();
+        assert!(matches!(err, GS1EncoderError::GS1DigitalLinkError(_)));
+        assert!(
+            err.to_string().contains("without a primary key"),
+            "Expected 'without a primary key' in error: {err}"
+        );
+    }
+
+    #[test]
+    fn test_get_dl_uri_with_stem() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder
+            .set_ai_data_str("(01)12312312312319")
+            .unwrap();
+        let custom_uri = gs1encoder
+            .get_dl_uri(Some("https://example.com"))
+            .unwrap();
+        assert!(
+            custom_uri.starts_with("https://example.com/"),
+            "Expected custom stem in URI: {custom_uri}"
+        );
+        let default_uri = gs1encoder.get_dl_uri(None).unwrap();
+        assert!(
+            default_uri.starts_with("https://id.gs1.org/"),
+            "Expected default stem in URI: {default_uri}"
+        );
+    }
+
+    #[test]
+    fn test_dl_ignored_query_params() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        gs1encoder
+            .set_data_str("https://a/01/12312312312333/22/TESTING?singleton&99=ABC&compound=XYZ")
+            .unwrap();
+        assert_eq!(
+            gs1encoder.get_dl_ignored_query_params(),
+            vec!["singleton", "compound=XYZ"]
+        );
+        assert_eq!(
+            gs1encoder.get_hri(),
+            vec!["(01) 12312312312333", "(22) TESTING", "(99) ABC"]
+        );
+    }
+
+    #[test]
+    fn test_err_markup() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+
+        let err = gs1encoder
+            .set_data_str("^011234567890128399ABC")
+            .unwrap_err();
+        assert!(matches!(err, GS1EncoderError::GS1ParameterError(_)));
+        assert!(
+            err.to_string().contains("check digit"),
+            "Expected 'check digit' in error: {err}"
+        );
+        assert!(!gs1encoder.get_err_markup().is_empty());
+        assert!(
+            gs1encoder.get_err_markup().contains('|'),
+            "Error markup should contain '|' delimiters: {}",
+            gs1encoder.get_err_markup()
+        );
+    }
 }

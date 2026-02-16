@@ -21,7 +21,7 @@
 
 "use strict";
 
-import { GS1encoder } from "./gs1encoder.mjs";
+import { GS1encoder, GS1encoderParameterException, GS1encoderDigitalLinkException } from "./gs1encoder.mjs";
 
 var gs1encoder = new GS1encoder();
 
@@ -67,6 +67,7 @@ test('requisites', async () => {
   await gs1encoder.init();
 
   expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)).toBe(true);
+  expect(() => { gs1encoder.dataStr = "^0212312312312319" }).toThrow(GS1encoderParameterException);
   expect(() => { gs1encoder.dataStr = "^0212312312312319" }).toThrow(/not satisfied/);
 
   expect(() => { gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, false) }).not.toThrow();
@@ -74,6 +75,7 @@ test('requisites', async () => {
   expect(() => { gs1encoder.dataStr = "^0212312312312319" }).not.toThrow();
 
   expect(gs1encoder.dataStr).toBe("^0212312312312319");
+  expect(() => { gs1encoder.getDLuri() }).toThrow(GS1encoderDigitalLinkException);
   expect(() => { gs1encoder.getDLuri() }).toThrow(/without a primary key/);
   expect(gs1encoder.aiDataStr).toBe("(02)12312312312319");
   expect(gs1encoder.hri).toStrictEqual(["(02) 12312312312319"]);
@@ -81,6 +83,148 @@ test('requisites', async () => {
   expect(() => { gs1encoder.sym = GS1encoder.symbology.DataBarExpanded }).not.toThrow();
   expect(gs1encoder.sym).toBe(GS1encoder.symbology.DataBarExpanded);
   expect(gs1encoder.scanData).toBe("]e00212312312312319");
+
+  gs1encoder.free();
+});
+
+test('version', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(gs1encoder.version).toBeTruthy();
+  expect(gs1encoder.version.length).toBeGreaterThan(0);
+
+  gs1encoder.free();
+});
+
+test('defaults', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(gs1encoder.sym).toBe(GS1encoder.symbology.NONE);
+  expect(gs1encoder.dataStr).toBe("");
+  expect(gs1encoder.addCheckDigit).toBe(false);
+  expect(gs1encoder.permitUnknownAIs).toBe(false);
+  expect(gs1encoder.permitZeroSuppressedGTINinDLuris).toBe(false);
+  expect(gs1encoder.includeDataTitlesInHRI).toBe(false);
+  expect(gs1encoder.aiDataStr).toBeNull();
+  expect(gs1encoder.scanData).toBeNull();
+  expect(gs1encoder.hri).toStrictEqual([]);
+  expect(gs1encoder.dlIgnoredQueryParams).toStrictEqual([]);
+  expect(gs1encoder.errMarkup).toBe("");
+
+  gs1encoder.free();
+});
+
+test('booleanSetters', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(gs1encoder.addCheckDigit).toBe(false);
+  gs1encoder.addCheckDigit = true;
+  expect(gs1encoder.addCheckDigit).toBe(true);
+  gs1encoder.addCheckDigit = false;
+  expect(gs1encoder.addCheckDigit).toBe(false);
+
+  expect(gs1encoder.permitUnknownAIs).toBe(false);
+  gs1encoder.permitUnknownAIs = true;
+  expect(gs1encoder.permitUnknownAIs).toBe(true);
+  gs1encoder.permitUnknownAIs = false;
+  expect(gs1encoder.permitUnknownAIs).toBe(false);
+
+  expect(gs1encoder.permitZeroSuppressedGTINinDLuris).toBe(false);
+  gs1encoder.permitZeroSuppressedGTINinDLuris = true;
+  expect(gs1encoder.permitZeroSuppressedGTINinDLuris).toBe(true);
+  gs1encoder.permitZeroSuppressedGTINinDLuris = false;
+  expect(gs1encoder.permitZeroSuppressedGTINinDLuris).toBe(false);
+
+  expect(gs1encoder.includeDataTitlesInHRI).toBe(false);
+  gs1encoder.includeDataTitlesInHRI = true;
+  expect(gs1encoder.includeDataTitlesInHRI).toBe(true);
+  gs1encoder.includeDataTitlesInHRI = false;
+  expect(gs1encoder.includeDataTitlesInHRI).toBe(false);
+
+  gs1encoder.free();
+});
+
+test('validations', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.MutexAIs)).toBe(true);
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)).toBe(true);
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RepeatedAIs)).toBe(true);
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.DigSigSerialKey)).toBe(true);
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.UnknownAInotDLattr)).toBe(true);
+
+  expect(() => { gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, false) }).not.toThrow();
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)).toBe(false);
+  expect(() => { gs1encoder.setValidationEnabled(GS1encoder.validation.RequisiteAIs, true) }).not.toThrow();
+  expect(gs1encoder.getValidationEnabled(GS1encoder.validation.RequisiteAIs)).toBe(true);
+
+  expect(() => { gs1encoder.setValidationEnabled(GS1encoder.validation.RepeatedAIs, false) }).toThrow(GS1encoderParameterException);
+  expect(() => { gs1encoder.setValidationEnabled(GS1encoder.validation.RepeatedAIs, false) }).toThrow(/cannot be amended/);
+
+  gs1encoder.free();
+});
+
+test('setScanData', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(() => { gs1encoder.scanData = "]e0011231231231233310ABC123\x1D99XYZ" }).not.toThrow();
+  expect(gs1encoder.sym).toBe(GS1encoder.symbology.DataBarExpanded);
+  expect(gs1encoder.dataStr).toBe("^011231231231233310ABC123^99XYZ");
+  expect(gs1encoder.aiDataStr).toBe("(01)12312312312333(10)ABC123(99)XYZ");
+
+  gs1encoder.free();
+});
+
+test('nonAIdata', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(() => { gs1encoder.dataStr = "TESTING" }).not.toThrow();
+  expect(gs1encoder.aiDataStr).toBeNull();
+  expect(gs1encoder.scanData).toBeNull();
+  expect(gs1encoder.hri).toStrictEqual([]);
+  expect(gs1encoder.dlIgnoredQueryParams).toStrictEqual([]);
+  expect(() => { gs1encoder.getDLuri(null) }).toThrow(GS1encoderDigitalLinkException);
+  expect(() => { gs1encoder.getDLuri(null) }).toThrow(/without a primary key/);
+
+  gs1encoder.free();
+});
+
+test('getDLuriWithStem', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(() => { gs1encoder.aiDataStr = "(01)12312312312319" }).not.toThrow();
+  expect(gs1encoder.getDLuri("https://example.com")).toMatch(/^https:\/\/example\.com\//);
+  expect(gs1encoder.getDLuri(null)).toMatch(/^https:\/\/id\.gs1\.org\//);
+
+  gs1encoder.free();
+});
+
+test('dlIgnoredQueryParams', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(() => { gs1encoder.dataStr = "https://a/01/12312312312333/22/TESTING?singleton&99=ABC&compound=XYZ" }).not.toThrow();
+  expect(gs1encoder.dlIgnoredQueryParams).toStrictEqual(["singleton", "compound=XYZ"]);
+  expect(gs1encoder.hri).toStrictEqual(["(01) 12312312312333", "(22) TESTING", "(99) ABC"]);
+
+  gs1encoder.free();
+});
+
+test('errMarkup', async () => {
+  var gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+
+  expect(() => { gs1encoder.dataStr = "^011234567890128399ABC" }).toThrow(GS1encoderParameterException);
+  expect(() => { gs1encoder.dataStr = "^011234567890128399ABC" }).toThrow(/check digit/);
+  expect(gs1encoder.errMarkup).not.toBe("");
+  expect(gs1encoder.errMarkup).toMatch(/\|/);
 
   gs1encoder.free();
 });
