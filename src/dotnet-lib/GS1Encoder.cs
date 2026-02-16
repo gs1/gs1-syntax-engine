@@ -171,7 +171,7 @@ namespace GS1.Encoders
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setIncludeDataTitlesInHRI", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setIncludeDataTitlesInHRI(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool addCheckDigit);
+        private static extern bool gs1_encoder_setIncludeDataTitlesInHRI(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool includeDataTitlesInHRI);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getPermitUnknownAIs", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -196,14 +196,6 @@ namespace GS1.Encoders
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setValidationEnabled", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool gs1_encoder_setValidationEnabled(IntPtr ctx, int validation, [MarshalAs(UnmanagedType.U1)] bool enabled);
-
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getValidateAIassociations", CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_getValidateAIassociations(IntPtr ctx);
-
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setValidateAIassociations", CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setValidateAIassociations(IntPtr ctx, [MarshalAs(UnmanagedType.U1)] bool validateAIasssociations);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataStr", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getDataStr(IntPtr ctx);
@@ -234,13 +226,6 @@ namespace GS1.Encoders
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDLignoredQueryParams", CallingConvention = CallingConvention.Cdecl)]
         private static extern int gs1_encoder_getDLignoredQueryParams(IntPtr ctx, ref IntPtr qp);
-
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getDataFile", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr gs1_encoder_getDataFile(IntPtr ctx);
-
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_setDataFile", CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool gs1_encoder_setDataFile(IntPtr ctx, string dataFile);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_free", CallingConvention = CallingConvention.Cdecl)]
         private static extern void gs1_encoder_free(IntPtr ctx);
@@ -644,7 +629,7 @@ namespace GS1.Encoders
         /// Process scan data received from a barcode reader or return the expected scan data string.
         /// </summary>
         /// <value>
-        /// The scan data string that a reader should return when scanning the current data, or <c>null</c> if invalid.
+        /// The scan data string that a reader should return when scanning the current data, or <c>null</c> if no symbology is set.
         /// </value>
         /// <remarks>
         /// <para>
@@ -725,7 +710,7 @@ namespace GS1.Encoders
         /// <summary>
         /// Get a GS1 Digital Link URI that represents the AI-based input data.
         /// </summary>
-        /// <param name="Stem">A URI "stem" used as a prefix for the URI. If <c>null</c>, the GS1 canonical stem (https://id.gs1.org/) will be used.</param>
+        /// <param name="stem">A URI "stem" used as a prefix for the URI. If <c>null</c>, the GS1 canonical stem (https://id.gs1.org/) will be used.</param>
         /// <returns>A string representing the GS1 Digital Link URI for the input data</returns>
         /// <exception cref="GS1EncoderDigitalLinkException">Thrown when invalid input was provided</exception>
         /// <remarks>
@@ -738,9 +723,9 @@ namespace GS1.Encoders
         /// <c>https://id.example.com/stem/01/12345678901231?10=ABC123&amp;11=210630</c>
         /// </para>
         /// </remarks>
-        public string GetDLuri(string Stem)
+        public string GetDLuri(string stem)
         {
-            string uri = Marshal.PtrToStringAnsi(gs1_encoder_getDLuri(ctx, Stem));
+            string uri = Marshal.PtrToStringAnsi(gs1_encoder_getDLuri(ctx, stem));
             if (uri == null)
                 throw new GS1EncoderDigitalLinkException(ErrMsg);
             return uri;
@@ -860,24 +845,6 @@ namespace GS1.Encoders
         /// Description of the error.
         /// </param>
         public GS1EncoderParameterException(string message)
-           : base(message)
-        {
-        }
-    }
-
-    /// <summary>
-    /// A custom exception class that is thrown to indicate a problem generating
-    /// a barcode symbol.
-    /// </summary>
-    public class GS1EncoderEncodeException : Exception
-    {
-        /// <summary>
-        /// Error constructor.
-        /// </summary>
-        /// <param name="message">
-        /// Description of the error.
-        /// </param>
-        public GS1EncoderEncodeException(string message)
            : base(message)
         {
         }
