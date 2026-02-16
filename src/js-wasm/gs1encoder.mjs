@@ -671,61 +671,49 @@ GS1encoder.validation = validation;
 
 /**
  * Exception thrown when a general library error occurs, such as initialisation failure.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderGeneralException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderGeneralException';
-    return error;
+class GS1encoderGeneralException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderGeneralException';
+    }
 }
-GS1encoderGeneralException.prototype = Object.create(Error.prototype);
-GS1encoderGeneralException.prototype.name = 'GS1encoderGeneralException';
 
 
 /**
  * Exception thrown when an invalid parameter is provided to a method or property setter.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderParameterException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderParameterException';
-    return error;
+class GS1encoderParameterException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderParameterException';
+    }
 }
-GS1encoderParameterException.prototype = Object.create(Error.prototype);
-GS1encoderParameterException.prototype.name = 'GS1encoderParameterException';
 
 
 /**
  * Exception thrown when an error occurs during GS1 Digital Link URI processing.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderDigitalLinkException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderDigitalLinkException';
-    return error;
+class GS1encoderDigitalLinkException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderDigitalLinkException';
+    }
 }
-GS1encoderDigitalLinkException.prototype = Object.create(Error.prototype);
-GS1encoderDigitalLinkException.prototype.name = 'GS1encoderDigitalLinkException';
 
 
 /**
  * Exception thrown when an error occurs during scan data processing.
- * @class
  * @extends Error
- * @param {string} message - The error message
  */
-function GS1encoderScanDataException(message) {
-    const error = new Error(message);
-    error.name = 'GS1encoderScanDataException';
-    return error;
+class GS1encoderScanDataException extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'GS1encoderScanDataException';
+    }
 }
-GS1encoderScanDataException.prototype = Object.create(Error.prototype);
-GS1encoderScanDataException.prototype.name = 'GS1encoderScanDataException';
 
 export { GS1encoderGeneralException, GS1encoderParameterException, GS1encoderDigitalLinkException, GS1encoderScanDataException, symbology as Symbology, validation as Validation };
