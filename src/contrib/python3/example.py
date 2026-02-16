@@ -21,7 +21,8 @@
 #  limitations under the License.
 #
 
-from gs1encoders import GS1Encoder, Symbology, Validation
+import gs1encoders
+from gs1encoders import *
 
 
 def main():
@@ -30,18 +31,18 @@ def main():
     print(f"\nVersion: {gs1encoder.version}\n")
 
     # Set symbology to DataMatrix
-    gs1encoder.sym = Symbology.DM
+    gs1encoder.sym = gs1encoders.Symbology.DM
     print(f"Symbology: {gs1encoder.sym.name}")
 
     # Demonstrate validation control
     print(
         "RequisiteAIs validation enabled: "
-        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
+        f"{gs1encoder.get_validation_enabled(gs1encoders.Validation.REQUISITE_AIS)}"
     )
-    gs1encoder.set_validation_enabled(Validation.REQUISITE_AIS, False)
+    gs1encoder.set_validation_enabled(gs1encoders.Validation.REQUISITE_AIS, False)
     print(
         "RequisiteAIs validation enabled (after disable): "
-        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
+        f"{gs1encoder.get_validation_enabled(gs1encoders.Validation.REQUISITE_AIS)}"
     )
 
     # Set AI data
@@ -59,11 +60,11 @@ def main():
         print(f"    {h}")
 
     # DL URI
-    dl_uri = gs1encoder.get_dl_uri("https://example.com")
-    if dl_uri:
+    try:
+        dl_uri = gs1encoder.get_dl_uri("https://example.com")
         print(f"\nDL URI: {dl_uri}")
-    else:
-        print(f"\nDL URI: Failed: {gs1encoder.err_markup}")
+    except GS1EncoderDigitalLinkException as e:
+        print(f"\nDL URI: Failed: {e}")
 
     # Scan data round-trip
     if gs1encoder.scan_data:
