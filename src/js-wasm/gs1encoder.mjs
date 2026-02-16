@@ -117,11 +117,11 @@ export class GS1encoder {
             gs1_encoder_getDataStr:
                 this.module.cwrap('gs1_encoder_getDataStr', 'string', ['number']),
             gs1_encoder_getDLuri:
-                this.module.cwrap('gs1_encoder_getDLuri', 'string', ['number', 'string']),
+                this.module.cwrap('gs1_encoder_getDLuri', 'number', ['number', 'string']),
             gs1_encoder_setScanData:
                 this.module.cwrap('gs1_encoder_setScanData', 'number', ['number', 'string']),
             gs1_encoder_getScanData:
-                this.module.cwrap('gs1_encoder_getScanData', 'string', ['number']),
+                this.module.cwrap('gs1_encoder_getScanData', 'number', ['number']),
             gs1_encoder_getHRI:
                 this.module.cwrap('gs1_encoder_getHRI', 'number', ['number', 'number']),
             gs1_encoder_getDLignoredQueryParams:
@@ -466,10 +466,10 @@ export class GS1encoder {
      * @throws {GS1encoderDigitalLinkException}
      */
     getDLuri(stem) {
-        var uri = this.api.gs1_encoder_getDLuri(this.ctx, stem);
-        if (!uri)
+        var c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
+        if (!c_str)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
-        return uri;
+        return this.module.UTF8ToString(c_str);
     }
 
 
@@ -507,11 +507,14 @@ export class GS1encoder {
      * @throws {@link GS1encoderParameterException}
      */
     get scanData() {
-        return this.api.gs1_encoder_getScanData(this.ctx);
+        var c_str = this.api.gs1_encoder_getScanData(this.ctx);
+        if (!c_str)
+            return null;
+        return this.module.UTF8ToString(c_str);
     }
     set scanData(value) {
         if (!this.api.gs1_encoder_setScanData(this.ctx, value))
-            throw new GS1encoderParameterException(this.api.gs1_encoder_getErrMsg(this.ctx));
+            throw new GS1encoderScanDataException(this.api.gs1_encoder_getErrMsg(this.ctx));
     }
 
 
