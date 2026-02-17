@@ -123,10 +123,6 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_getValidationEnabled', 'number', ['number', 'number']),
             gs1_encoder_setValidationEnabled:
                 this.module.cwrap('gs1_encoder_setValidationEnabled', 'number', ['number', 'number', 'number']),
-            gs1_encoder_getValidateAIassociations:
-                this.module.cwrap('gs1_encoder_getValidateAIassociations', 'number', ['number']),
-            gs1_encoder_setValidateAIassociations:
-                this.module.cwrap('gs1_encoder_setValidateAIassociations', 'number', ['number', 'number']),
             gs1_encoder_setAIdataStr:
                 this.module.cwrap('gs1_encoder_setAIdataStr', 'number', ['number', 'string']),
             gs1_encoder_getAIdataStr:
@@ -144,7 +140,7 @@ export class GS1encoder {
             gs1_encoder_getHRI:
                 this.module.cwrap('gs1_encoder_getHRI', 'number', ['number', 'number']),
             gs1_encoder_getDLignoredQueryParams:
-                this.module.cwrap('gs1_encoder_getDLignoredQueryParams', null, ['number', 'number']),
+                this.module.cwrap('gs1_encoder_getDLignoredQueryParams', 'number', ['number', 'number']),
         };
 
         this.ctx = this.api.gs1_encoder_init(null);
@@ -489,7 +485,7 @@ export class GS1encoder {
      * @returns {string} a string representing the GS1 Digital Link URI for the input data
      * @throws {GS1encoderDigitalLinkException}
      */
-    getDLuri(stem) {
+    getDLuri(stem = null) {
         const c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
         if (!c_str)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
@@ -655,7 +651,7 @@ const symbology = {
     NUMSYMS: 15,
 };
 
-GS1encoder.symbology = symbology;
+GS1encoder.symbology = Object.freeze(symbology);
 
 
 /**
@@ -690,7 +686,7 @@ const validation = {
     NUMVALIDATIONS: 5,
 };
 
-GS1encoder.validation = validation;
+GS1encoder.validation = Object.freeze(validation);
 
 
 /**

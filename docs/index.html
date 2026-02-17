@@ -106,12 +106,19 @@ Using in your own C/C++ project</h3>
 <div class="line">    gs1_encoder *gs = gs1_encoder_init(NULL);</div>
 <div class="line">    if (!gs) return 1;</div>
 <div class="line"> </div>
-<div class="line">    printf(&quot;GS1 Syntax Engine version: %s\n&quot;, gs1_encoder_getVersion());</div>
+<div class="line">    if (!gs1_encoder_setAIdataStr(gs, &quot;(01)09521234543213(99)TESTING123&quot;)) {</div>
+<div class="line">        printf(&quot;Error: %s\n&quot;, gs1_encoder_getErrMsg(gs));</div>
+<div class="line">        gs1_encoder_free(gs);</div>
+<div class="line">        return 1;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    printf(&quot;GS1 Digital Link URI: %s\n&quot;, gs1_encoder_getDLuri(gs, &quot;https://example.com&quot;));</div>
 <div class="line"> </div>
 <div class="line">    gs1_encoder_free(gs);</div>
 <div class="line">    return 0;</div>
 <div class="line">}</div>
-</div><!-- fragment --><p><b>On Unix/macOS:</b></p>
+</div><!-- fragment --><p><b>Note:</b> Each <code>gs1_encoder</code> instance allocates native resources. Always call <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a> when you are finished with an instance to release these resources.</p>
+<p><b>On Unix/macOS:</b></p>
 <p>Compile and link: </p><pre class="fragment">gcc myapp.c -I&lt;path-to-gs1-syntax-engine&gt;/src/c-lib -L&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build -lgs1encoders -o myapp
 </pre><p> Run: </p><pre class="fragment">LD_LIBRARY_PATH=&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build ./myapp
 </pre><p> <b>On Windows:</b></p>

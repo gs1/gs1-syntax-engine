@@ -153,12 +153,17 @@ swift build
 
 <span class="k">do</span> <span class="p">{</span>
     <span class="k">let</span> <span class="nv">gs</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">GS1Encoder</span><span class="p">()</span>
-    <span class="nf">print</span><span class="p">(</span><span class="s">"GS1 Syntax Engine version: </span><span class="se">\(</span><span class="n">gs</span><span class="o">.</span><span class="nf">getVersion</span><span class="p">()</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">gs</span><span class="o">.</span><span class="nf">free</span><span class="p">()</span>
+    <span class="k">try</span> <span class="n">gs</span><span class="o">.</span><span class="nf">setAIdataStr</span><span class="p">(</span><span class="s">"(01)09521234543213(99)TESTING123"</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">uri</span> <span class="o">=</span> <span class="k">try</span> <span class="n">gs</span><span class="o">.</span><span class="nf">getDLuri</span><span class="p">(</span><span class="s">"https://example.com"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"GS1 Digital Link URI: </span><span class="se">\(</span><span class="n">uri</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
 <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
     <span class="nf">print</span><span class="p">(</span><span class="s">"Error: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre>
+
+<p><strong>Note:</strong> Each <code><a href="Classes/GS1Encoder.html">GS1Encoder</a></code> instance allocates native resources that are automatically
+released when the instance is deallocated (<code>deinit</code>). You can also call <code>free()</code>
+explicitly if you need to release resources before the instance goes out of scope.</p>
 
 <p>Build and run:</p>
 <pre class="highlight shell"><code>swift run

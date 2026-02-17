@@ -116,9 +116,16 @@ library:</p>
 <pre><code class="lang-csharp">using System;
 using GS1.Encoders;
 
-GS1Encoder gs = new GS1Encoder();
-Console.WriteLine(&quot;GS1 Syntax Engine version: &quot; + gs.Version);
+using (GS1Encoder gs = new GS1Encoder())
+{
+    gs.AIdataStr = &quot;(01)09521234543213(99)TESTING123&quot;;
+    Console.WriteLine(&quot;GS1 Digital Link URI: &quot; + gs.GetDLuri(&quot;https://example.com&quot;));
+}
 </code></pre>
+<p><strong>Note:</strong> Each <code>GS1Encoder</code> instance allocates native resources. <code>GS1Encoder</code>
+implements <code>IDisposable</code>, so use a <code>using</code> block (as above) to ensure these
+resources are released promptly. Alternatively, call <code>Dispose()</code> or <code>Free()</code>
+explicitly when done.</p>
 <p>Run your application:</p>
 <pre><code>dotnet run
 </code></pre>
