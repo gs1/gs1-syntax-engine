@@ -227,6 +227,12 @@ final class GS1EncoderTests: XCTestCase {
         gs1encoder.free()
     }
 
+    func testDeinit() throws {
+        var gs1encoder: GS1Encoder? = try GS1Encoder()
+        XCTAssertNotNil(gs1encoder!.getVersion())
+        gs1encoder = nil  // Should trigger deinit and free native resources
+    }
+
     func testErrMarkup() throws {
         let gs1encoder = try GS1Encoder()
 

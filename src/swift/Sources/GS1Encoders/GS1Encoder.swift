@@ -146,6 +146,10 @@ public class GS1Encoder {
         }
     }
 
+    deinit {
+        free()
+    }
+
     /// Get the version string of the library.
     ///
     /// Returns a string containing the version of the library, typically the build date.
