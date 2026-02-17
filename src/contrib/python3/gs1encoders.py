@@ -223,6 +223,15 @@ class GS1Encoder:
         """Release the native library context on garbage collection."""
         self.free()
 
+    def __enter__(self) -> "GS1Encoder":
+        """Enter a context manager block."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+        """Exit a context manager block, freeing native resources."""
+        self.free()
+        return False
+
     def free(self) -> None:
         """Release the native library context."""
         if self.__ctx is not None:

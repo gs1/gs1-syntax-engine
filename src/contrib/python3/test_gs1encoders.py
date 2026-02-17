@@ -210,6 +210,10 @@ class GS1EncoderTest(unittest.TestCase):
         self.assertTrue(gs1encoder.version)
         del gs1encoder  # Should trigger __del__ and free native resources
 
+    def test_context_manager(self):
+        with GS1Encoder() as gs1encoder:
+            self.assertTrue(gs1encoder.version)
+
 
 if __name__ == "__main__":
     unittest.main()
