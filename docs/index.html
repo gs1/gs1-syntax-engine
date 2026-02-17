@@ -98,6 +98,7 @@ Using in your own C/C++ project</h3>
 <li>Include <code><a class="el" href="gs1encoders_8h.html">gs1encoders.h</a></code> in your source files</li>
 <li>Link against the library (<code>libgs1encoders.so</code>, <code>libgs1encoders.a</code>, <code>gs1encoders.dll</code>, or <code>gs1encoders.lib</code>)</li>
 </ol>
+<p><b>Note:</b> On Windows, <code>gs1encoders.dll</code> requires the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> to be installed on the target system. The architecture (x86 or x64) must match the platform used to build the library.</p>
 <p>For a minimal example, create a <code>myapp.c</code> file as follows:</p>
 <div class="fragment"><div class="line">#include &lt;stdio.h&gt;</div>
 <div class="line">#include &quot;gs1encoders.h&quot;</div>

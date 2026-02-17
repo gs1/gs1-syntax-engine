@@ -190,6 +190,7 @@ loadScripts(document, 'script');</script>
  <ol>
  <li>Add <code>libgs1encoders.jar</code> to your project's classpath at compile time and runtime
  <li>Ensure the directory containing the native library (<code>libgs1encodersjni.so</code>) and the symlink (<code>libgs1encoders.so</code>) are in <code>java.library.path</code> at runtime
+ <li>On Windows, ensure the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> is installed on the target system, with the architecture (x86 or x64) matching the native library build
  </ol>
 
  For a minimal example a <code>MyApp.java</code> file as follows:

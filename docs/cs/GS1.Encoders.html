@@ -89,6 +89,7 @@ and running:</p>
 <ol>
 <li>Include the wrapper source within your project</li>
 <li>Ensure <code>gs1encoders.dll</code> (the native library) is in the same directory as your executable or in a location on your system PATH</li>
+<li>Ensure the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> is installed on the target system, with the architecture (x86 or x64) matching the native library build</li>
 </ol>
 <p>For a minimal example, create a console application as follows:</p>
 <pre><code>dotnet new console -n MyApp -f net8.0
