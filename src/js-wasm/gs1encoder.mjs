@@ -140,7 +140,7 @@ export class GS1encoder {
             gs1_encoder_getHRI:
                 this.module.cwrap('gs1_encoder_getHRI', 'number', ['number', 'number']),
             gs1_encoder_getDLignoredQueryParams:
-                this.module.cwrap('gs1_encoder_getDLignoredQueryParams', null, ['number', 'number']),
+                this.module.cwrap('gs1_encoder_getDLignoredQueryParams', 'number', ['number', 'number']),
         };
 
         this.ctx = this.api.gs1_encoder_init(null);
