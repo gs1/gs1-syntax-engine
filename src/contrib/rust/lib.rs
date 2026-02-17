@@ -632,4 +632,11 @@ mod tests {
             gs1encoder.get_err_markup()
         );
     }
+
+    #[test]
+    fn test_drop() {
+        let gs1encoder = GS1Encoder::new().unwrap();
+        assert!(!gs1encoder.get_version().is_empty());
+        drop(gs1encoder); // Should trigger Drop and free native resources
+    }
 }
