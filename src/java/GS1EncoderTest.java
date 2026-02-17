@@ -232,7 +232,8 @@ public class GS1EncoderTest {
     @Test
     public void testAutoCloseable() throws Exception {
         try (GS1Encoder gs1encoder = new GS1Encoder()) {
-            assertNotNull(gs1encoder.getVersion());
+            gs1encoder.setAIdataStr("(01)12312312312319");
+            assertTrue(gs1encoder.getDLuri(null).startsWith("https://id.gs1.org/"));
         }
     }
 

@@ -228,7 +228,8 @@ namespace GS1EncodersTest
         {
             using (GS1Encoder gs1encoder = new GS1Encoder())
             {
-                Assert.IsNotNull(gs1encoder.Version);
+                gs1encoder.AIdataStr = "(01)12312312312319";
+                Assert.IsTrue(gs1encoder.GetDLuri(null).StartsWith("https://id.gs1.org/"));
             }
         }
 
