@@ -103,7 +103,11 @@ extern "C" {
     fn gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx: *mut gs1_encoder) -> bool;
     fn gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx: *mut gs1_encoder, value: bool) -> bool;
     fn gs1_encoder_getValidationEnabled(ctx: *mut gs1_encoder, validation: c_int) -> bool;
-    fn gs1_encoder_setValidationEnabled(ctx: *mut gs1_encoder, validation: c_int, enabled: bool) -> bool;
+    fn gs1_encoder_setValidationEnabled(
+        ctx: *mut gs1_encoder,
+        validation: c_int,
+        enabled: bool,
+    ) -> bool;
     fn gs1_encoder_getIncludeDataTitlesInHRI(ctx: *mut gs1_encoder) -> bool;
     fn gs1_encoder_setIncludeDataTitlesInHRI(ctx: *mut gs1_encoder, value: bool) -> bool;
     fn gs1_encoder_getDataStr(ctx: *mut gs1_encoder) -> *const c_char;
