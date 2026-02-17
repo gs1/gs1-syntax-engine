@@ -205,6 +205,11 @@ class GS1EncoderTest(unittest.TestCase):
         self.assertNotEqual(gs1encoder.err_markup, "")
         self.assertIn("|", gs1encoder.err_markup)
 
+    def test_del(self):
+        gs1encoder = GS1Encoder()
+        self.assertTrue(gs1encoder.version)
+        del gs1encoder  # Should trigger __del__ and free native resources
+
 
 if __name__ == "__main__":
     unittest.main()
