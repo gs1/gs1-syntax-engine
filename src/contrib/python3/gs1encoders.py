@@ -227,10 +227,9 @@ class GS1Encoder:
         """Enter a context manager block."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Exit a context manager block, freeing native resources."""
         self.free()
-        return False
 
     def free(self) -> None:
         """Release the native library context."""
