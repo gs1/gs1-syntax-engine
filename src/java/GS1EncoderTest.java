@@ -230,6 +230,13 @@ public class GS1EncoderTest {
     }
 
     @Test
+    public void testAutoCloseable() throws Exception {
+        try (GS1Encoder gs1encoder = new GS1Encoder()) {
+            assertNotNull(gs1encoder.getVersion());
+        }
+    }
+
+    @Test
     public void testErrMarkup() throws Exception {
         GS1Encoder gs1encoder = new GS1Encoder();
 

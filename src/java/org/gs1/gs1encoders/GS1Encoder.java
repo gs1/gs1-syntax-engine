@@ -21,7 +21,7 @@ package org.gs1.gs1encoders;
 /**
  * Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
  */
-public class GS1Encoder {
+public class GS1Encoder implements AutoCloseable {
 
     /*
      *  Functions imported from the JNI interface
@@ -235,6 +235,16 @@ public class GS1Encoder {
         if (ctx != 0)
             gs1encoderFreeJNI(ctx);
         ctx = 0;
+    }
+
+    /**
+     * Releases the resources associated with this encoder instance.
+     * <p>
+     * This method is called automatically when used with try-with-resources.
+     */
+    @Override
+    public void close() {
+        free();
     }
 
     /**
