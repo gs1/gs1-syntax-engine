@@ -92,6 +92,11 @@ To use the library in your C/C++ project you must:
   1. Include `gs1encoders.h` in your source files
   2. Link against the library (`libgs1encoders.so`, `libgs1encoders.a`, `gs1encoders.dll`, or `gs1encoders.lib`)
 
+**Note:** On Windows, `gs1encoders.dll` requires the
+[Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
+to be installed on the target system. The architecture (x86 or x64) must match
+the platform used to build the library.
+
 For a minimal example, create a `myapp.c` file as follows:
 
 \code

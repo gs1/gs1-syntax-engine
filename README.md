@@ -72,6 +72,10 @@ without needing to build from source. All demos can be
 | Node.js console | `gs1encoders-wasm-app.zip`            | Run `node example.node.mjs`                                                                                                 |
 | -               | `gs1encoders-jsonly-app.zip`          | Pure JavaScript (asm.js) alternative to Wasm build; No `.wasm` file                                                         |
 
+**Note:** The Windows pre-built applications require the [Microsoft Visual C++
+Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
+to be installed on the target system.
+
 ## Pre-built Library Assets
 
 The library is also provided in the form of a pre-built library for Windows

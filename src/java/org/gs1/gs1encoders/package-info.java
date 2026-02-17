@@ -120,6 +120,7 @@
  * <ol>
  * <li>Add {@code libgs1encoders.jar} to your project's classpath at compile time and runtime
  * <li>Ensure the directory containing the native library ({@code libgs1encodersjni.so}) and the symlink ({@code libgs1encoders.so}) are in {@code java.library.path} at runtime
+ * <li>On Windows, ensure the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> is installed on the target system, with the architecture (x86 or x64) matching the native library build
  * </ol>
  *
  * For a minimal example a {@code MyApp.java} file as follows:

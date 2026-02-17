@@ -67,6 +67,7 @@ To use the wrapper in your C# project you must:
 
 1. Include the wrapper source within your project
 2. Ensure `gs1encoders.dll` (the native library) is in the same directory as your executable or in a location on your system PATH
+3. Ensure the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) is installed on the target system, with the architecture (x86 or x64) matching the native library build
 
 For a minimal example, create a console application as follows:
 
