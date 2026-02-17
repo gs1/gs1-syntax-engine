@@ -84,6 +84,28 @@ references:
   isSpec: "True"
   fullName: GS1.Encoders.GS1Encoder.DataStr
   nameWithType: GS1Encoder.DataStr
+- uid: GS1.Encoders.GS1Encoder.Dispose
+  name: Dispose()
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_Dispose
+  commentId: M:GS1.Encoders.GS1Encoder.Dispose
+  fullName: GS1.Encoders.GS1Encoder.Dispose()
+  nameWithType: GS1Encoder.Dispose()
+- uid: GS1.Encoders.GS1Encoder.Dispose(System.Boolean)
+  name: Dispose(bool)
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_Dispose_System_Boolean_
+  commentId: M:GS1.Encoders.GS1Encoder.Dispose(System.Boolean)
+  name.vb: Dispose(Boolean)
+  fullName: GS1.Encoders.GS1Encoder.Dispose(bool)
+  fullName.vb: GS1.Encoders.GS1Encoder.Dispose(Boolean)
+  nameWithType: GS1Encoder.Dispose(bool)
+  nameWithType.vb: GS1Encoder.Dispose(Boolean)
+- uid: GS1.Encoders.GS1Encoder.Dispose*
+  name: Dispose
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_Dispose_
+  commentId: Overload:GS1.Encoders.GS1Encoder.Dispose
+  isSpec: "True"
+  fullName: GS1.Encoders.GS1Encoder.Dispose
+  nameWithType: GS1Encoder.Dispose
 - uid: GS1.Encoders.GS1Encoder.ErrMarkup
   name: ErrMarkup
   href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_ErrMarkup
