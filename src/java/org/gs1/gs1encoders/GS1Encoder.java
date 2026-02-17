@@ -69,87 +69,108 @@ public class GS1Encoder implements AutoCloseable {
             /**
              * None defined
              */
-            NONE,
+            NONE(-1),
 
             /**
              * GS1 DataBar Omnidirectional
              */
-            DataBarOmni,
+            DataBarOmni(0),
 
             /**
              * GS1 DataBar Truncated
              */
-            DataBarTruncated,
+            DataBarTruncated(1),
 
             /**
              * GS1 DataBar Stacked
              */
-            DataBarStacked,
+            DataBarStacked(2),
 
             /**
              * GS1 DataBar Stacked Omnidirectional
              */
-            DataBarStackedOmni,
+            DataBarStackedOmni(3),
 
             /**
              * GS1 DataBar Limited
              */
-            DataBarLimited,
+            DataBarLimited(4),
 
             /**
              * GS1 DataBar Expanded (Stacked)
              */
-            DataBarExpanded,
+            DataBarExpanded(5),
 
             /**
              * UPC-A
              */
-            UPCA,
+            UPCA(6),
 
             /**
              * UPC-E
              */
-            UPCE,
+            UPCE(7),
 
             /**
              * EAN-13
              */
-            EAN13,
+            EAN13(8),
 
             /**
              * EAN-8
              */
-            EAN8,
+            EAN8(9),
 
             /**
              * GS1-128 with CC-A or CC-B
              */
-            GS1_128_CCA,
+            GS1_128_CCA(10),
 
             /**
              * GS1-128 with CC
              */
-            GS1_128_CCC,
+            GS1_128_CCC(11),
 
             /**
              * (GS1) QR Code
              */
-            QR,
+            QR(12),
 
             /**
              * (GS1) Data Matrix
              */
-            DM,
+            DM(13),
 
             /**
              * (GS1) DotCode
              */
-            DotCode,
+            DotCode(14),
 
             /**
              * Value is the number of symbologies
              */
-            NUMSYMS
+            NUMSYMS(15);
+
+            private final int value;
+            Symbology(int value) { this.value = value; }
+
+            /**
+             * Returns the native library value for this symbology.
+             * @return the integer value corresponding to the native enum
+             */
+            public int getValue() { return value; }
+
+            private static final Symbology[] BY_VALUE;
+            static {
+                BY_VALUE = new Symbology[NUMSYMS.value + 1];
+                for (Symbology s : values()) {
+                    if (s.value >= 0) BY_VALUE[s.value] = s;
+                }
+            }
+            static Symbology fromValue(int value) {
+                if (value == -1) return NONE;
+                return BY_VALUE[value];
+            }
     }
 
 
@@ -166,32 +187,52 @@ public class GS1Encoder implements AutoCloseable {
             /**
              * Mutually exclusive AIs (locked: always enabled)
              */
-            MutexAIs,
+            MutexAIs(0),
 
             /**
              * Mandatory associations between AIs
              */
-            RequisiteAIs,
+            RequisiteAIs(1),
 
             /**
              * Repeated AIs having same value (locked: always enabled)
              */
-            RepeatedAIs,
+            RepeatedAIs(2),
 
             /**
              * Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)
              */
-            DigSigSerialKey,
+            DigSigSerialKey(3),
 
             /**
              * Unknown AIs not permitted as GS1 DL URI data attributes
              */
-            UnknownAInotDLattr,
+            UnknownAInotDLattr(4),
 
             /**
              * Value is the number of validations
              */
-            NUMVALIDATIONS
+            NUMVALIDATIONS(5);
+
+            private final int value;
+            Validation(int value) { this.value = value; }
+
+            /**
+             * Returns the native library value for this validation.
+             * @return the integer value corresponding to the native enum
+             */
+            public int getValue() { return value; }
+
+            private static final Validation[] BY_VALUE;
+            static {
+                BY_VALUE = new Validation[NUMVALIDATIONS.value + 1];
+                for (Validation v : values()) {
+                    BY_VALUE[v.value] = v;
+                }
+            }
+            static Validation fromValue(int value) {
+                return BY_VALUE[value];
+            }
     }
 
 
@@ -270,7 +311,7 @@ public class GS1Encoder implements AutoCloseable {
      * @see #setScanData(String)
      */
     public Symbology getSym() {
-        return Symbology.values()[gs1encoderGetSymJNI(ctx) + 1];
+        return Symbology.fromValue(gs1encoderGetSymJNI(ctx));
     }
 
     /**
@@ -284,7 +325,7 @@ public class GS1Encoder implements AutoCloseable {
      * @see Symbology
      */
     public void setSym(Symbology value) throws GS1EncoderParameterException {
-        if (!gs1encoderSetSymJNI(ctx, value.ordinal() - 1))
+        if (!gs1encoderSetSymJNI(ctx, value.getValue()))
             throw new GS1EncoderParameterException(this.getErrMsg());
     }
 
@@ -422,7 +463,7 @@ public class GS1Encoder implements AutoCloseable {
      * @return {@code true} if the AI validation procedure is currently enabled; {@code false} otherwise
      */
     public boolean getValidationEnabled(Validation validation) {
-        return gs1encoderGetValidationEnabledJNI(ctx, validation.ordinal());
+        return gs1encoderGetValidationEnabledJNI(ctx, validation.getValue());
     }
 
     /**
@@ -441,7 +482,7 @@ public class GS1Encoder implements AutoCloseable {
      * @throws GS1EncoderParameterException if an error occurs
      */
     public void setValidationEnabled(Validation validation, boolean value) throws GS1EncoderParameterException {
-        if (!gs1encoderSetValidationEnabledJNI(ctx, validation.ordinal(), value))
+        if (!gs1encoderSetValidationEnabledJNI(ctx, validation.getValue(), value))
             throw new GS1EncoderParameterException(this.getErrMsg());
     }
 
