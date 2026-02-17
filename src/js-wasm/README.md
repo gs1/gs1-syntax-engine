@@ -25,8 +25,7 @@ npm install gs1encoder
 ```javascript
 import { GS1encoder } from "gs1encoder";
 
-const gs = new GS1encoder();
-await gs.init();
+const gs = await GS1encoder.create();
 
 gs.aiDataStr = "(01)09521234543213(99)TESTING123";
 

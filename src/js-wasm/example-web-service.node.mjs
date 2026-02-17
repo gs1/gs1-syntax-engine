@@ -279,8 +279,7 @@ function sendSuccessResponse(res, response, requestStartTime) {
  */
 import { GS1encoder } from "./gs1encoder.mjs";
 
-const gs1encoder = new GS1encoder();
-await gs1encoder.init();
+const gs1encoder = await GS1encoder.create();
 
 import * as http from 'http';
 
