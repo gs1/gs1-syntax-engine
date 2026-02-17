@@ -115,8 +115,7 @@ file called <code>app.mjs</code> as follows:
 <pre>
 import { GS1encoder } from "gs1encoder";
 
-const gs = new GS1encoder();
-await gs.init();
+const gs = await GS1encoder.create();
 
 console.log("Version:", gs.version);
 
@@ -153,8 +152,7 @@ For browser usage in addition to initialising the library, create a
     &lt;script type="module"&gt;
         import { GS1encoder } from './node_modules/gs1encoder/gs1encoder.mjs';
 
-        const gs = new GS1encoder();
-        await gs.init();
+        const gs = await GS1encoder.create();
 
         document.getElementById('output').textContent = 'Version: ' + gs.version;
 
@@ -192,7 +190,7 @@ The following are examples of how to use the library.
 
 <p>
 Using the library always begins by creating a new GS1encoder instance
-and calling <a href="GS1encoder.html#init">GS1encoder#init</a>.
+using the <a href="GS1encoder.html#.create">GS1encoder.create</a> factory method.
 
 <p>
 Unless otherwise specified, the getter methods return library-managed
@@ -213,8 +211,7 @@ The following code processes AI data input, validates it (reporting any
 failures) and displays the extracted AIs if the validation succeeds.
 
 <pre>
-const gs = new GS1encoder();                             // Create a new instance of the library
-await gs.init();
+const gs = await GS1encoder.create();                     // Create a new instance of the library
 
 // gs.permitUnknownAIs = true;                           // Uncomment only if it is necessary to handle AIs
                                                          // that are not known to the library
@@ -252,8 +249,7 @@ In this example we process a bracketed AI element string to convert it into
 barcode message data, suitable for carrying in a GS1 barcode symbol.
 
 <pre>
-const gs = new GS1encoder();
-await gs.init();
+const gs = await GS1encoder.create();
 
 try {
     gs.aiDataStr = "(01)12312312312333(10)ABC123(99)TEST";    // Accept a bracketed AI element string
@@ -300,8 +296,7 @@ In this example we process scan data from a barcode reader to extract the AI
 data.
 
 <pre>
-const gs = new GS1encoder();
-await gs.init();
+const gs = await GS1encoder.create();
 
 // Disable validation of mandatory association between AIs if the symbol may
 // be one of multiple on a label
