@@ -651,7 +651,7 @@ const symbology = {
     NUMSYMS: 15,
 };
 
-GS1encoder.symbology = symbology;
+GS1encoder.symbology = Object.freeze(symbology);
 
 
 /**
@@ -686,7 +686,7 @@ const validation = {
     NUMVALIDATIONS: 5,
 };
 
-GS1encoder.validation = validation;
+GS1encoder.validation = Object.freeze(validation);
 
 
 /**
