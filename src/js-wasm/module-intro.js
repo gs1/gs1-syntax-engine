@@ -82,10 +82,15 @@
  *
  * const gs = await GS1encoder.create();
  *
- * console.log("Version:", gs.version);
+ * gs.aiDataStr = "(01)09521234543213(99)TESTING123";
+ * console.log("GS1 Digital Link URI: " + gs.getDLuri("https://example.com"));
  *
- * gs.free();
+ * gs.free();  // Release native resources when done
  * </pre>
+ *
+ * <strong>Note:</strong> Each GS1encoder instance allocates native resources. Call
+ * {@link GS1encoder#free free()} when you are finished with an instance to
+ * release these resources promptly.
  *
  * You can then run the example with:
  *

@@ -103,12 +103,17 @@ import GS1Encoders
 
 do {
     let gs = try GS1Encoder()
-    print("GS1 Syntax Engine version: \(gs.getVersion())")
-    gs.free()
+    try gs.setAIdataStr("(01)09521234543213(99)TESTING123")
+    let uri = try gs.getDLuri("https://example.com")
+    print("GS1 Digital Link URI: \(uri)")
 } catch {
     print("Error: \(error)")
 }
 ```
+
+**Note:** Each `GS1Encoder` instance allocates native resources that are automatically
+released when the instance is deallocated (`deinit`). You can also call `free()`
+explicitly if you need to release resources before the instance goes out of scope.
 
 Build and run:
 

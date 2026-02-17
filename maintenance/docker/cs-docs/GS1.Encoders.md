@@ -102,9 +102,17 @@ Edit `Program.cs` to contain:
 using System;
 using GS1.Encoders;
 
-GS1Encoder gs = new GS1Encoder();
-Console.WriteLine("GS1 Syntax Engine version: " + gs.Version);
+using (GS1Encoder gs = new GS1Encoder())
+{
+    gs.AIdataStr = "(01)09521234543213(99)TESTING123";
+    Console.WriteLine("GS1 Digital Link URI: " + gs.GetDLuri("https://example.com"));
+}
 ```
+
+**Note:** Each `GS1Encoder` instance allocates native resources. `GS1Encoder`
+implements `IDisposable`, so use a `using` block (as above) to ensure these
+resources are released promptly. Alternatively, call `Dispose()` or `Free()`
+explicitly when done.
 
 Run your application:
 

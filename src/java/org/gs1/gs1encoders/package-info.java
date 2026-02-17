@@ -134,16 +134,20 @@
  *     }
  *
  *     public static void main(String[] args) {
- *         try {
- *             GS1Encoder gs = new GS1Encoder();
- *             System.out.println("GS1 Syntax Engine version: " + gs.getVersion());
- *             gs.free();
+ *         try (GS1Encoder gs = new GS1Encoder()) {
+ *             gs.setAIdataStr("(01)09521234543213(99)TESTING123");
+ *             System.out.println("GS1 Digital Link URI: " + gs.getDLuri("https://example.com"));
  *         } catch (Exception e) {
  *             System.err.println("Error: " + e.getMessage());
  *         }
  *     }
  * }
  * </pre>
+ *
+ * <strong>Note:</strong> Each {@link GS1Encoder} instance allocates native resources.
+ * {@link GS1Encoder} implements {@link AutoCloseable}, so use try-with-resources
+ * (as above) to ensure these resources are released promptly. Alternatively, call
+ * {@link GS1Encoder#free() free()} explicitly when done.
  *
  * <strong>On Unix/macOS:</strong>
  *

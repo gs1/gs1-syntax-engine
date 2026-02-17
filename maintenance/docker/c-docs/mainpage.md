@@ -102,12 +102,22 @@ int main(void) {
     gs1_encoder *gs = gs1_encoder_init(NULL);
     if (!gs) return 1;
 
-    printf("GS1 Syntax Engine version: %s\n", gs1_encoder_getVersion());
+    if (!gs1_encoder_setAIdataStr(gs, "(01)09521234543213(99)TESTING123")) {
+        printf("Error: %s\n", gs1_encoder_getErrMsg(gs));
+        gs1_encoder_free(gs);
+        return 1;
+    }
+
+    printf("GS1 Digital Link URI: %s\n", gs1_encoder_getDLuri(gs, "https://example.com"));
 
     gs1_encoder_free(gs);
     return 0;
 }
 \endcode
+
+**Note:** Each `gs1_encoder` instance allocates native resources. Always call
+gs1_encoder_free() when you are finished with an instance to release these
+resources.
 
 **On Unix/macOS:**
 

@@ -28,13 +28,13 @@ import { GS1encoder } from "gs1encoder";
 const gs = await GS1encoder.create();
 
 gs.aiDataStr = "(01)09521234543213(99)TESTING123";
+console.log("GS1 Digital Link URI: " + gs.getDLuri("https://example.com"));
 
-console.log("AI element string:              ", gs.aiDataStr);
-console.log("Barcode message:                ", gs.dataStr);
-console.log("Canonical GS1 Digital Link URI: ", gs.getDLuri(null));
-
-gs.free();
+gs.free();  // Release native resources when done
 ```
+
+**Note:** Each `GS1encoder` instance allocates native resources. Call `free()` when you
+are finished with an instance to release these resources promptly.
 
 ## Examples
 
