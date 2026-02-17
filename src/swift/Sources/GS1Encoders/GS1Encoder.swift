@@ -35,52 +35,52 @@ public class GS1Encoder {
         case NONE = -1
 
         /// GS1 DataBar Omnidirectional
-        case DataBarOmni
+        case DataBarOmni = 0
 
         /// GS1 DataBar Truncated
-        case DataBarTruncated
+        case DataBarTruncated = 1
 
         /// GS1 DataBar Stacked
-        case DataBarStacked
+        case DataBarStacked = 2
 
         /// GS1 DataBar Stacked Omnidirectional
-        case DataBarStackedOmni
+        case DataBarStackedOmni = 3
 
         /// GS1 DataBar Limited
-        case DataBarLimited
+        case DataBarLimited = 4
 
         /// GS1 DataBar Expanded (Stacked)
-        case DataBarExpanded
+        case DataBarExpanded = 5
 
         /// UPC-A
-        case UPCA
+        case UPCA = 6
 
         /// UPC-E
-        case UPCE
+        case UPCE = 7
 
         /// EAN-13
-        case EAN13
+        case EAN13 = 8
 
         /// EAN-8
-        case EAN8
+        case EAN8 = 9
 
         /// GS1-128 with CC-A or CC-B
-        case GS1_128_CCA
+        case GS1_128_CCA = 10
 
         /// GS1-128 with CC-C
-        case GS1_128_CCC
+        case GS1_128_CCC = 11
 
         /// (GS1) QR Code
-        case QR
+        case QR = 12
 
         /// (GS1) Data Matrix
-        case DM
+        case DM = 13
 
         /// (GS1) DotCode
-        case DotCode
+        case DotCode = 14
 
         /// Value is the number of symbologies
-        case NUMSYMS
+        case NUMSYMS = 15
     }
 
 
@@ -97,19 +97,19 @@ public class GS1Encoder {
         case MutexAIs = 0
 
         /// Mandatory associations between AIs
-        case RequisiteAIs
+        case RequisiteAIs = 1
 
         /// Repeated AIs having same value (locked: always enabled)
-        case RepeatedAIs
+        case RepeatedAIs = 2
 
         /// Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)
-        case DigSigSerialKey
+        case DigSigSerialKey = 3
 
         /// Unknown AIs not permitted as GS1 DL URI data attributes
-        case UnknownAInotDLattr
+        case UnknownAInotDLattr = 4
 
         /// Value is the number of validations
-        case NUMVALIDATIONS
+        case NUMVALIDATIONS = 5
     }
 
     /// An opaque pointer used by the native code to represent an

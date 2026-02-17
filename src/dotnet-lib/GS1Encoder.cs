@@ -38,52 +38,52 @@ namespace GS1.Encoders
             NONE = -1,
 
             /// <summary>GS1 DataBar Omnidirectional</summary>
-            DataBarOmni,
+            DataBarOmni = 0,
 
             /// <summary>GS1 DataBar Truncated</summary>
-            DataBarTruncated,
+            DataBarTruncated = 1,
 
             /// <summary>GS1 DataBar Stacked</summary>
-            DataBarStacked,
+            DataBarStacked = 2,
 
             /// <summary>GS1 DataBar Stacked Omnidirectional</summary>
-            DataBarStackedOmni,
+            DataBarStackedOmni = 3,
 
             /// <summary>GS1 DataBar Limited</summary>
-            DataBarLimited,
+            DataBarLimited = 4,
 
             /// <summary>GS1 DataBar Expanded (Stacked)</summary>
-            DataBarExpanded,
+            DataBarExpanded = 5,
 
             /// <summary>UPC-A</summary>
-            UPCA,
+            UPCA = 6,
 
             /// <summary>UPC-E</summary>
-            UPCE,
+            UPCE = 7,
 
             /// <summary>EAN-13</summary>
-            EAN13,
+            EAN13 = 8,
 
             /// <summary>EAN-8</summary>
-            EAN8,
+            EAN8 = 9,
 
             /// <summary>GS1-128 with CC-A or CC-B</summary>
-            GS1_128_CCA,
+            GS1_128_CCA = 10,
 
             /// <summary>GS1-128 with CC</summary>
-            GS1_128_CCC,
+            GS1_128_CCC = 11,
 
             /// <summary>(GS1) QR Code</summary>
-            QR,
+            QR = 12,
 
             /// <summary>(GS1) Data Matrix</summary>
-            DM,
+            DM = 13,
 
             /// <summary>(GS1) DotCode</summary>
-            DotCode,
+            DotCode = 14,
 
             /// <summary>Value is the number of symbologies</summary>
-            NUMSYMS,
+            NUMSYMS = 15,
 
         };
 
@@ -106,19 +106,19 @@ namespace GS1.Encoders
             MutexAIs = 0,
 
             /// <summary>Mandatory associations between AIs</summary>
-            RequisiteAIs,
+            RequisiteAIs = 1,
 
             /// <summary>Repeated AIs having same value (locked: always enabled)</summary>
-            RepeatedAIs,
+            RepeatedAIs = 2,
 
             /// <summary>Serialisation qualifier AIs must be present with Digital Signature (locked: always enabled)</summary>
-            DigSigSerialKey,
+            DigSigSerialKey = 3,
 
             /// <summary>Unknown AIs not permitted as GS1 DL URI data attributes</summary>
-            UnknownAInotDLattr,
+            UnknownAInotDLattr = 4,
 
             /// <summary>Value is the number of validations</summary>
-            NUMVALIDATIONS,
+            NUMVALIDATIONS = 5,
 
         };
 
