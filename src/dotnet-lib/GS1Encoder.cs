@@ -132,7 +132,7 @@ namespace GS1.Encoders
         /// "instance" of the library. It is hidden behind the object
         /// interface that is provided to users of this wrapper.
         /// </summary>
-        private readonly IntPtr ctx;
+        private IntPtr ctx;
 
         /*
          *  Functions imported from the native GS1 Barcode Syntax Engine dynamic-link library
