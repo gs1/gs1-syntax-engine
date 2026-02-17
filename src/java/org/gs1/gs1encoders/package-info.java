@@ -81,7 +81,7 @@
  * <ol>
  * <li>First, build the C library using Visual Studio or from a Developer Command Prompt:
  * <pre>
- * msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Debug /p:Platform=x64
+ * msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Release /p:Platform=x64
  * </pre>
  * </li>
  * <li>Then build the Java wrapper:
