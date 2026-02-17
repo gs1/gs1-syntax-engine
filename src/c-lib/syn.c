@@ -151,6 +151,13 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 	char buf[MAX_AI_ATTR_LEN + 2] = { 0 };
 	char linebuf[MAX_SD_ENTRY_LEN + 1] = { 0 };
 
+	*(*entry)->ai = '\0';
+	(*entry)->ailen = 0;
+	(*entry)->attrs = NULL;
+	(*entry)->title = NULL;
+	(*entry)->fnc1 = DO_FNC1;
+	(*entry)->dlDataAttr = NO_DATA_ATTR;
+
 	len = strlen(line);
 	if (len > MAX_SD_ENTRY_LEN)
 		error(ENTRY_TOO_LONG);
@@ -163,13 +170,6 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 	if ((uint16_t)(*entry - sd) >= cap - 1)
 		error(SYNTAX_DICTIONARY_CAPACITY_TOO_SMALL);
-
-	*(*entry)->ai = '\0';
-	(*entry)->ailen = 0;
-	(*entry)->attrs = NULL;
-	(*entry)->title = NULL;
-	(*entry)->fnc1 = DO_FNC1;
-	(*entry)->dlDataAttr = NO_DATA_ATTR;
 
 	// Initial token should be an AI or an AI range
 	len = strlen(token);
