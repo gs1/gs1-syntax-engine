@@ -224,6 +224,15 @@ namespace GS1EncodersTest
         }
 
         [TestMethod]
+        public void TestDispose()
+        {
+            using (GS1Encoder gs1encoder = new GS1Encoder())
+            {
+                Assert.IsNotNull(gs1encoder.Version);
+            }
+        }
+
+        [TestMethod]
         public void TestErrMarkup()
         {
             GS1Encoder gs1encoder = new GS1Encoder();

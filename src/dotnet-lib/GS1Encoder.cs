@@ -25,7 +25,7 @@ namespace GS1.Encoders
     /// <summary>
     /// Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
     /// </summary>
-    public class GS1Encoder
+    public class GS1Encoder : IDisposable
     {
 
         /// <summary>
@@ -806,10 +806,32 @@ namespace GS1.Encoders
             }
         }
 
+        /// <summary>
+        /// Releases the resources used by this GS1Encoder instance.
+        /// </summary>
+        /// <param name="disposing">True if called from Dispose; false if called from the finalizer.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (ctx != IntPtr.Zero)
+            {
+                gs1_encoder_free(ctx);
+                ctx = IntPtr.Zero;
+            }
+        }
+
+        /// <summary>
+        /// Releases the resources used by this GS1Encoder instance.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         /// <exclude />
         ~GS1Encoder()
         {
-            gs1_encoder_free(ctx);
+            Dispose(false);
         }
 
     }
