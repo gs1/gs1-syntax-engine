@@ -121,6 +121,11 @@ SLOW_TESTS_CFLAGS=-DSLOW_TESTS
 endif
 
 
+ifeq ($(ANALYZER),yes)
+ANALYZER_CFLAGS = -fanalyzer
+endif
+
+
 ifeq ($(ARCH_OS), darwin)
 LIB_DYN_SUFFIX = dylib
 LIB_STATIC_SUFFIX = a
@@ -153,7 +158,7 @@ CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
 NPROC = nproc
 endif
 
-CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Werror -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
+CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Werror -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
 APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
 APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
