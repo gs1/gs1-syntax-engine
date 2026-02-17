@@ -83,40 +83,45 @@ pub enum Validation {
     UnknownAiNotDlAttr,
 }
 
+#[repr(C)]
+struct gs1_encoder {
+    _private: [u8; 0],
+}
+
 extern "C" {
     fn gs1_encoder_getVersion() -> *const c_char;
-    fn gs1_encoder_init(mem: *const u32) -> *const u32;
-    fn gs1_encoder_free(ctx: *const u32);
-    fn gs1_encoder_getErrMsg(ctx: *const u32) -> *const c_char;
-    fn gs1_encoder_getErrMarkup(ctx: *const u32) -> *const c_char;
-    fn gs1_encoder_getSym(ctx: *const u32) -> c_int;
-    fn gs1_encoder_setSym(ctx: *const u32, sym: c_int) -> bool;
-    fn gs1_encoder_getAddCheckDigit(ctx: *const u32) -> bool;
-    fn gs1_encoder_setAddCheckDigit(ctx: *const u32, value: bool) -> bool;
-    fn gs1_encoder_getPermitUnknownAIs(ctx: *const u32) -> bool;
-    fn gs1_encoder_setPermitUnknownAIs(ctx: *const u32, value: bool) -> bool;
-    fn gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx: *const u32) -> bool;
-    fn gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx: *const u32, value: bool) -> bool;
-    fn gs1_encoder_getValidationEnabled(ctx: *const u32, validation: c_int) -> bool;
-    fn gs1_encoder_setValidationEnabled(ctx: *const u32, validation: c_int, enabled: bool) -> bool;
-    fn gs1_encoder_getIncludeDataTitlesInHRI(ctx: *const u32) -> bool;
-    fn gs1_encoder_setIncludeDataTitlesInHRI(ctx: *const u32, value: bool) -> bool;
-    fn gs1_encoder_getDataStr(ctx: *const u32) -> *const c_char;
-    fn gs1_encoder_setDataStr(ctx: *const u32, value: *const c_char) -> bool;
-    fn gs1_encoder_getAIdataStr(ctx: *const u32) -> *const c_char;
-    fn gs1_encoder_setAIdataStr(ctx: *const u32, value: *const c_char) -> bool;
-    fn gs1_encoder_getScanData(ctx: *const u32) -> *const c_char;
-    fn gs1_encoder_setScanData(ctx: *const u32, value: *const c_char) -> bool;
-    fn gs1_encoder_getDLuri(ctx: *const u32, stem: *const c_char) -> *const c_char;
+    fn gs1_encoder_init(mem: *mut gs1_encoder) -> *mut gs1_encoder;
+    fn gs1_encoder_free(ctx: *mut gs1_encoder);
+    fn gs1_encoder_getErrMsg(ctx: *mut gs1_encoder) -> *const c_char;
+    fn gs1_encoder_getErrMarkup(ctx: *mut gs1_encoder) -> *const c_char;
+    fn gs1_encoder_getSym(ctx: *mut gs1_encoder) -> c_int;
+    fn gs1_encoder_setSym(ctx: *mut gs1_encoder, sym: c_int) -> bool;
+    fn gs1_encoder_getAddCheckDigit(ctx: *mut gs1_encoder) -> bool;
+    fn gs1_encoder_setAddCheckDigit(ctx: *mut gs1_encoder, value: bool) -> bool;
+    fn gs1_encoder_getPermitUnknownAIs(ctx: *mut gs1_encoder) -> bool;
+    fn gs1_encoder_setPermitUnknownAIs(ctx: *mut gs1_encoder, value: bool) -> bool;
+    fn gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx: *mut gs1_encoder) -> bool;
+    fn gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx: *mut gs1_encoder, value: bool) -> bool;
+    fn gs1_encoder_getValidationEnabled(ctx: *mut gs1_encoder, validation: c_int) -> bool;
+    fn gs1_encoder_setValidationEnabled(ctx: *mut gs1_encoder, validation: c_int, enabled: bool) -> bool;
+    fn gs1_encoder_getIncludeDataTitlesInHRI(ctx: *mut gs1_encoder) -> bool;
+    fn gs1_encoder_setIncludeDataTitlesInHRI(ctx: *mut gs1_encoder, value: bool) -> bool;
+    fn gs1_encoder_getDataStr(ctx: *mut gs1_encoder) -> *const c_char;
+    fn gs1_encoder_setDataStr(ctx: *mut gs1_encoder, value: *const c_char) -> bool;
+    fn gs1_encoder_getAIdataStr(ctx: *mut gs1_encoder) -> *const c_char;
+    fn gs1_encoder_setAIdataStr(ctx: *mut gs1_encoder, value: *const c_char) -> bool;
+    fn gs1_encoder_getScanData(ctx: *mut gs1_encoder) -> *const c_char;
+    fn gs1_encoder_setScanData(ctx: *mut gs1_encoder, value: *const c_char) -> bool;
+    fn gs1_encoder_getDLuri(ctx: *mut gs1_encoder, stem: *const c_char) -> *const c_char;
     fn gs1_encoder_getDLignoredQueryParams(
-        ctx: *const u32,
+        ctx: *mut gs1_encoder,
         qp: *const *const *const c_char,
     ) -> c_int;
-    fn gs1_encoder_getHRI(ctx: *const u32, hri: *const *const *const c_char) -> c_int;
+    fn gs1_encoder_getHRI(ctx: *mut gs1_encoder, hri: *const *const *const c_char) -> c_int;
 }
 
 pub struct GS1Encoder {
-    ctx: *mut u32,
+    ctx: *mut gs1_encoder,
 }
 
 impl GS1Encoder {
@@ -129,7 +134,7 @@ impl GS1Encoder {
         let mut gs1encoder = GS1Encoder {
             ctx: ptr::null_mut(),
         };
-        gs1encoder.ctx = unsafe { gs1_encoder_init(ptr::null()) as *mut u32 };
+        gs1encoder.ctx = unsafe { gs1_encoder_init(ptr::null_mut()) };
         if gs1encoder.ctx.is_null() {
             return Err(GS1EncoderError::GS1GeneralError(
                 "Failed to initialise the native library".to_string(),
