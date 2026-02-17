@@ -25,7 +25,7 @@
 use gs1encoders::{GS1Encoder, Symbology, Validation};
 
 fn main() {
-    let gs1encoder = GS1Encoder::new().unwrap_or_else(|error| panic!("{}", error));
+    let mut gs1encoder = GS1Encoder::new().unwrap_or_else(|error| panic!("{}", error));
 
     println!("\nVersion: {}\n", gs1encoder.get_version());
 

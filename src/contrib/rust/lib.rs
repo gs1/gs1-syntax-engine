@@ -135,7 +135,7 @@ impl GS1Encoder {
         unsafe { std::mem::transmute(raw) }
     }
 
-    pub fn set_sym(&self, sym: Symbology) -> Result<(), GS1EncoderError> {
+    pub fn set_sym(&mut self, sym: Symbology) -> Result<(), GS1EncoderError> {
         let ret = unsafe { gs1_encoder_setSym(self.ctx, sym as c_int) };
         if !ret {
             return Err(GS1EncoderError::GS1ParameterError(self.get_err_msg()));
@@ -147,7 +147,7 @@ impl GS1Encoder {
         unsafe { gs1_encoder_getAddCheckDigit(self.ctx) }
     }
 
-    pub fn set_add_check_digit(&self, value: bool) -> Result<(), GS1EncoderError> {
+    pub fn set_add_check_digit(&mut self, value: bool) -> Result<(), GS1EncoderError> {
         let ret = unsafe { gs1_encoder_setAddCheckDigit(self.ctx, value) };
         if !ret {
             return Err(GS1EncoderError::GS1ParameterError(self.get_err_msg()));
@@ -159,7 +159,7 @@ impl GS1Encoder {
         unsafe { gs1_encoder_getPermitUnknownAIs(self.ctx) }
     }
 
-    pub fn set_permit_unknown_ais(&self, value: bool) -> Result<(), GS1EncoderError> {
+    pub fn set_permit_unknown_ais(&mut self, value: bool) -> Result<(), GS1EncoderError> {
         let ret = unsafe { gs1_encoder_setPermitUnknownAIs(self.ctx, value) };
         if !ret {
             return Err(GS1EncoderError::GS1ParameterError(self.get_err_msg()));
@@ -172,7 +172,7 @@ impl GS1Encoder {
     }
 
     pub fn set_permit_zero_suppressed_gtin_in_dl_uris(
-        &self,
+        &mut self,
         value: bool,
     ) -> Result<(), GS1EncoderError> {
         let ret = unsafe { gs1_encoder_setPermitZeroSuppressedGTINinDLuris(self.ctx, value) };
@@ -187,7 +187,7 @@ impl GS1Encoder {
     }
 
     pub fn set_validation_enabled(
-        &self,
+        &mut self,
         validation: Validation,
         enabled: bool,
     ) -> Result<(), GS1EncoderError> {
@@ -205,11 +205,11 @@ impl GS1Encoder {
     }
 
     #[deprecated(note = "Use set_validation_enabled(Validation::RequisiteAis, value) instead")]
-    pub fn set_validate_ai_associations(&self, value: bool) -> Result<(), GS1EncoderError> {
+    pub fn set_validate_ai_associations(&mut self, value: bool) -> Result<(), GS1EncoderError> {
         self.set_validation_enabled(Validation::RequisiteAis, value)
     }
 
-    pub fn set_include_data_titles_in_hri(&self, value: bool) -> Result<(), GS1EncoderError> {
+    pub fn set_include_data_titles_in_hri(&mut self, value: bool) -> Result<(), GS1EncoderError> {
         let ret = unsafe { gs1_encoder_setIncludeDataTitlesInHRI(self.ctx, value) };
         if !ret {
             return Err(GS1EncoderError::GS1ParameterError(self.get_err_msg()));
@@ -226,7 +226,7 @@ impl GS1Encoder {
         c_str.to_str().unwrap().to_owned()
     }
 
-    pub fn set_data_str(&self, value: &str) -> Result<(), GS1EncoderError> {
+    pub fn set_data_str(&mut self, value: &str) -> Result<(), GS1EncoderError> {
         let c_str = CString::new(value).unwrap();
         let ret = unsafe { gs1_encoder_setDataStr(self.ctx, c_str.as_ptr() as *const c_char) };
         if !ret {
@@ -244,7 +244,7 @@ impl GS1Encoder {
         Some(c_str.to_str().unwrap().to_owned())
     }
 
-    pub fn set_ai_data_str(&self, value: &str) -> Result<(), GS1EncoderError> {
+    pub fn set_ai_data_str(&mut self, value: &str) -> Result<(), GS1EncoderError> {
         let c_str = CString::new(value).unwrap();
         let ret = unsafe { gs1_encoder_setAIdataStr(self.ctx, c_str.as_ptr() as *const c_char) };
         if !ret {
@@ -262,7 +262,7 @@ impl GS1Encoder {
         Some(c_str.to_str().unwrap().to_owned())
     }
 
-    pub fn set_scan_data(&self, value: &str) -> Result<(), GS1EncoderError> {
+    pub fn set_scan_data(&mut self, value: &str) -> Result<(), GS1EncoderError> {
         let c_str = CString::new(value).unwrap();
         let ret = unsafe { gs1_encoder_setScanData(self.ctx, c_str.as_ptr() as *const c_char) };
         if !ret {
@@ -334,13 +334,15 @@ impl fmt::Display for GS1EncoderError {
     }
 }
 
+impl std::error::Error for GS1EncoderError {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_set_dl_uri() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder
             .set_data_str("https://id.example.org/test/01/12312312312319?99=TESTING123")
@@ -375,7 +377,7 @@ mod tests {
 
     #[test]
     fn test_set_ai_data_str() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder
             .set_ai_data_str("(01)12312312312319(99)TESTING123")
@@ -405,7 +407,7 @@ mod tests {
 
     #[test]
     fn test_requisites() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         assert!(gs1encoder.get_validation_enabled(Validation::RequisiteAis));
 
@@ -464,7 +466,7 @@ mod tests {
 
     #[test]
     fn test_boolean_setters() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         assert!(!gs1encoder.get_add_check_digit());
         gs1encoder.set_add_check_digit(true).unwrap();
@@ -497,7 +499,7 @@ mod tests {
 
     #[test]
     fn test_validations() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         assert!(gs1encoder.get_validation_enabled(Validation::MutexAis));
         assert!(gs1encoder.get_validation_enabled(Validation::RequisiteAis));
@@ -522,7 +524,7 @@ mod tests {
 
     #[test]
     fn test_set_scan_data() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder
             .set_scan_data("]e0011231231231233310ABC123\x1D99XYZ")
@@ -537,7 +539,7 @@ mod tests {
 
     #[test]
     fn test_non_ai_data() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder.set_data_str("TESTING").unwrap();
         assert!(gs1encoder.get_ai_data_str().is_none());
@@ -554,7 +556,7 @@ mod tests {
 
     #[test]
     fn test_get_dl_uri_with_stem() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder.set_ai_data_str("(01)12312312312319").unwrap();
         let custom_uri = gs1encoder.get_dl_uri(Some("https://example.com")).unwrap();
@@ -571,7 +573,7 @@ mod tests {
 
     #[test]
     fn test_dl_ignored_query_params() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         gs1encoder
             .set_data_str("https://a/01/12312312312333/22/TESTING?singleton&99=ABC&compound=XYZ")
@@ -588,7 +590,7 @@ mod tests {
 
     #[test]
     fn test_err_markup() {
-        let gs1encoder = GS1Encoder::new().unwrap();
+        let mut gs1encoder = GS1Encoder::new().unwrap();
 
         let err = gs1encoder
             .set_data_str("^011234567890128399ABC")
