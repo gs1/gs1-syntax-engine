@@ -68,23 +68,23 @@ jobs:
         run: |
           # Load AI table from external Syntax Dictionary
           make -C src/c-lib -j "$(nproc)" test \
-            CC=gcc SLOW_TESTS=yes
+            CC=gcc ANALYZER=yes SLOW_TESTS=yes
 
           # Re-run using the embedded AI table
           rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib -j "$(nproc)" test \
-            CC=gcc SLOW_TESTS=yes
+            CC=gcc ANALYZER=yes SLOW_TESTS=yes
           git checkout src/c-lib/gs1-syntax-dictionary.txt
 
-          make -C src/c-lib -j "$(nproc)" lib CC=gcc
+          make -C src/c-lib -j "$(nproc)" lib CC=gcc ANALYZER=yes
 
-          make -C src/c-lib -j "$(nproc)" app CC=gcc
+          make -C src/c-lib -j "$(nproc)" app CC=gcc ANALYZER=yes
           ( cd src/c-lib && \
             LD_LIBRARY_PATH=build \
             build/gs1encoders.bin --version )
 
           make -C src/c-lib -j "$(nproc)" app-static \
-            CC=gcc
+            CC=gcc ANALYZER=yes
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
 
