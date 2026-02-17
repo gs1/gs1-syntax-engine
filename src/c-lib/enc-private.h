@@ -76,6 +76,7 @@
 #  define DIAG_PUSH __pragma(warning(push))
 #  define DIAG_POP __pragma(warning(pop))
 #  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
+#  define DIAG_DISABLE_ANALYZER
 #endif
 
 

@@ -364,21 +364,27 @@ static __ATTR_PURE int compareDLKeyQualifier(const void* const key, const void* 
 static int getDLpathAIseqEntry(const gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
 
 	const size_t bufsize = (size_t)len * (MAX_AI_LEN + 1);
-	// cppcheck-suppress allocaCalled
-	char* aiseq = alloca(bufsize);
-	char *p = aiseq;
+	char* aiseq;
+	char *p;
 	int i;
 	ssize_t index;
+
+	assert(len >= 1);
+
+	// cppcheck-suppress allocaCalled
+	aiseq = alloca(bufsize);
+	p = aiseq;
 
 	/*
 	 *  Build a space separated AI sequence string
 	 *
 	 */
-	for (i = 0; i < len; i++, *p++ = ' ') {
+	for (i = 0; i < len; i++) {
 		const char *q = ais[i];
+		if (i > 0) *p++ = ' ';
 		while (*q) *p++ = *q++;
 	}
-	*--p = '\0';		// Chop stray space
+	*p = '\0';
 
 	/*
 	 *  Search for it in the list of valid key-qualifier associations.
