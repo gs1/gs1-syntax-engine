@@ -123,10 +123,6 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_getValidationEnabled', 'number', ['number', 'number']),
             gs1_encoder_setValidationEnabled:
                 this.module.cwrap('gs1_encoder_setValidationEnabled', 'number', ['number', 'number', 'number']),
-            gs1_encoder_getValidateAIassociations:
-                this.module.cwrap('gs1_encoder_getValidateAIassociations', 'number', ['number']),
-            gs1_encoder_setValidateAIassociations:
-                this.module.cwrap('gs1_encoder_setValidateAIassociations', 'number', ['number', 'number']),
             gs1_encoder_setAIdataStr:
                 this.module.cwrap('gs1_encoder_setAIdataStr', 'number', ['number', 'string']),
             gs1_encoder_getAIdataStr:
