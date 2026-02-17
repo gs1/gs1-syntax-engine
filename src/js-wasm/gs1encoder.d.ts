@@ -282,7 +282,7 @@ export class GS1encoder {
      * @returns {string} a string representing the GS1 Digital Link URI for the input data
      * @throws {GS1encoderDigitalLinkException}
      */
-    getDLuri(stem: string | null): string;
+    getDLuri(stem?: string | null): string;
     set scanData(value: string);
     /**
      * Process scan data received from a barcode reader or return the expected scan data string.
@@ -353,8 +353,8 @@ export class GS1encoder {
     get dlIgnoredQueryParams(): string[];
 }
 export namespace GS1encoder {
-    export { symbology };
-    export { validation };
+    let symbology: Readonly<SymbologyEnum>;
+    let validation: Readonly<ValidationEnum>;
 }
 /**
  * - Numeric symbology identifier
@@ -461,6 +461,34 @@ export type ValidationEnum = {
     NUMVALIDATIONS: Validation;
 };
 /**
+ * Exception thrown when a general library error occurs, such as initialisation failure.
+ * @extends Error
+ */
+export class GS1encoderGeneralException extends Error {
+    constructor(message: any);
+}
+/**
+ * Exception thrown when an invalid parameter is provided to a method or property setter.
+ * @extends Error
+ */
+export class GS1encoderParameterException extends Error {
+    constructor(message: any);
+}
+/**
+ * Exception thrown when an error occurs during GS1 Digital Link URI processing.
+ * @extends Error
+ */
+export class GS1encoderDigitalLinkException extends Error {
+    constructor(message: any);
+}
+/**
+ * Exception thrown when an error occurs during scan data processing.
+ * @extends Error
+ */
+export class GS1encoderScanDataException extends Error {
+    constructor(message: any);
+}
+/**
  * Recognised GS1 barcode formats ("symbologies") for processing scan data.
  * <p>
  * This object defines all supported GS1 barcode symbology types that can be used
@@ -513,32 +541,4 @@ declare const symbology: SymbologyEnum;
  */
 /** @type {ValidationEnum} */
 declare const validation: ValidationEnum;
-/**
- * Exception thrown when a general library error occurs, such as initialisation failure.
- * @extends Error
- */
-export class GS1encoderGeneralException extends Error {
-    constructor(message: any);
-}
-/**
- * Exception thrown when an invalid parameter is provided to a method or property setter.
- * @extends Error
- */
-export class GS1encoderParameterException extends Error {
-    constructor(message: any);
-}
-/**
- * Exception thrown when an error occurs during GS1 Digital Link URI processing.
- * @extends Error
- */
-export class GS1encoderDigitalLinkException extends Error {
-    constructor(message: any);
-}
-/**
- * Exception thrown when an error occurs during scan data processing.
- * @extends Error
- */
-export class GS1encoderScanDataException extends Error {
-    constructor(message: any);
-}
 export { symbology as Symbology, validation as Validation };
