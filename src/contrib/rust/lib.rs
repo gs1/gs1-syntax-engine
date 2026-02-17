@@ -27,6 +27,31 @@ use std::fmt;
 use std::os::raw::{c_char, c_int};
 use std::ptr;
 
+impl TryFrom<c_int> for Symbology {
+    type Error = c_int;
+    fn try_from(value: c_int) -> Result<Self, Self::Error> {
+        match value {
+            -1 => Ok(Symbology::None),
+            0 => Ok(Symbology::DataBarOmni),
+            1 => Ok(Symbology::DataBarTruncated),
+            2 => Ok(Symbology::DataBarStacked),
+            3 => Ok(Symbology::DataBarStackedOmni),
+            4 => Ok(Symbology::DataBarLimited),
+            5 => Ok(Symbology::DataBarExpanded),
+            6 => Ok(Symbology::UpcA),
+            7 => Ok(Symbology::UpcE),
+            8 => Ok(Symbology::Ean13),
+            9 => Ok(Symbology::Ean8),
+            10 => Ok(Symbology::Gs1128Cca),
+            11 => Ok(Symbology::Gs1128Ccc),
+            12 => Ok(Symbology::Qr),
+            13 => Ok(Symbology::Dm),
+            14 => Ok(Symbology::DotCode),
+            _ => Err(value),
+        }
+    }
+}
+
 #[repr(i32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Symbology {
@@ -132,7 +157,7 @@ impl GS1Encoder {
 
     pub fn get_sym(&self) -> Symbology {
         let raw = unsafe { gs1_encoder_getSym(self.ctx) };
-        unsafe { std::mem::transmute(raw) }
+        Symbology::try_from(raw).expect("Unknown symbology value from native library")
     }
 
     pub fn set_sym(&mut self, sym: Symbology) -> Result<(), GS1EncoderError> {
