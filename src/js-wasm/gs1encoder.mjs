@@ -485,7 +485,7 @@ export class GS1encoder {
      * @returns {string} a string representing the GS1 Digital Link URI for the input data
      * @throws {GS1encoderDigitalLinkException}
      */
-    getDLuri(stem) {
+    getDLuri(stem = null) {
         const c_str = this.api.gs1_encoder_getDLuri(this.ctx, stem);
         if (!c_str)
             throw new GS1encoderDigitalLinkException(this.api.gs1_encoder_getErrMsg(this.ctx));
