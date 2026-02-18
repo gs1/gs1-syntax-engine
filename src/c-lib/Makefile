@@ -158,7 +158,7 @@ CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
 NPROC = nproc
 endif
 
-CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Werror -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
+CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Werror -fstack-protector-strong -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
 APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
 APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
