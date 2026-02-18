@@ -165,6 +165,9 @@ swift build
 released when the instance is deallocated (<code>deinit</code>). You can also call <code>free()</code>
 explicitly if you need to release resources before the instance goes out of scope.</p>
 
+<p><strong>Note:</strong> The library is thread-safe provided that each thread operates on its
+own <code><a href="Classes/GS1Encoder.html">GS1Encoder</a></code> instance. Do not share a single instance across threads.</p>
+
 <p>Build and run:</p>
 <pre class="highlight shell"><code>swift run
 </code></pre>

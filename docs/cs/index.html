@@ -127,6 +127,8 @@ using (GS1Encoder gs = new GS1Encoder())
 implements <code>IDisposable</code>, so use a <code>using</code> block (as above) to ensure these
 resources are released promptly. Alternatively, call <code>Dispose()</code> or <code>Free()</code>
 explicitly when done.</p>
+<p><strong>Note:</strong> The library is thread-safe provided that each thread operates on its
+own <code>GS1Encoder</code> instance. Do not share a single instance across threads.</p>
 <p>Run your application:</p>
 <pre><code>dotnet run
 </code></pre>

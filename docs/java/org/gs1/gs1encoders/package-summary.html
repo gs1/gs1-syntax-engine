@@ -220,6 +220,10 @@ loadScripts(document, 'script');</script>
  (as above) to ensure these resources are released promptly. Alternatively, call
  <code>free()</code> explicitly when done.
 
+ <strong>Note:</strong> The library is thread-safe provided that each thread
+ operates on its own <a href="GS1Encoder.html" title="class in org.gs1.gs1encoders"><code>GS1Encoder</code></a> instance. Do not share a single
+ instance across threads.
+
  <strong>On Unix/macOS:</strong>
 
  <p>
