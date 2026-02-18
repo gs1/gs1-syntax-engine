@@ -395,6 +395,8 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 	if (!sd)
 		error(FAILED_TO_ALLOCATE_AI_TABLE);
 	sd[0].ai[0] = '\0';
+	sd[0].attrs = NULL;
+	sd[0].title = NULL;
 
 	fp = fopen(fname, "r");
 	if (fp == NULL)
