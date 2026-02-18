@@ -31,8 +31,8 @@
 int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	static gs1_encoder *ctx = NULL;
-	char in[MAX_DATA+1];
-	char pristine[MAX_DATA+1];
+	char in[MAX_DATA+50];
+	char pristine[MAX_DATA+50];
 	const char *out;
 
 	if (!ctx) {
@@ -41,7 +41,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		gs1_encoder_setPermitUnknownAIs(ctx, true);
 	}
 
-	if (len > MAX_DATA)
+	if (len > MAX_DATA+49)
 		return 0;
 
 	memcpy(in, buf, len);

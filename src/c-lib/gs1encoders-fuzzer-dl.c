@@ -32,7 +32,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	static gs1_encoder *ctx = NULL;
 
-	char in[MAX_DATA+1];
+	char in[MAX_DATA+50];
 	char outDL1[MAX_DATA+1];
 	char outDL2[MAX_DATA+1];
 	const char *out;
@@ -45,7 +45,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
 	}
 
-	if (len > MAX_DATA)
+	if (len > MAX_DATA+49)
 		return 0;
 
 	memcpy(in, buf, len);
