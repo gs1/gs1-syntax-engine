@@ -113,6 +113,7 @@
       <PreprocessorDefinitions>GS1_LINTER_ERR_STR_EN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;UNIT_TESTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +144,7 @@
       <PreprocessorDefinitions>GS1_LINTER_ERR_STR_EN;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;UNIT_TESTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
