@@ -540,7 +540,8 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		q++;
 	if (*q == '^')
 		*p++ = '\\';
-	strcpy(p, scanData);
+	strncpy(p, scanData, (size_t)(ctx->dataStr + MAX_DATA - p));
+	ctx->dataStr[MAX_DATA] = '\0';
 
 	// If a GS1 Digital Link URI is given then process it immediately
 	if (strncmp(ctx->dataStr, "https://", 8) == 0 ||
