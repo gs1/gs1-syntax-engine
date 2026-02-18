@@ -60,6 +60,7 @@ static int processComponent(gs1_encoder* const ctx, char* const component, struc
 
 	// First component is the format specification
 	token = strtok_r(component, ",", &saveptr);
+	assert(token);	// Callers guarantee non-empty component
 	p = token;
 	len = strlen(p);
 	part->opt = (*p == '[') ? OPT : MAN;		// Component is optional
