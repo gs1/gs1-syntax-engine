@@ -110,6 +110,9 @@ static bool userInt(gs1_encoder* const ctx) {
 				printf("\nEnter data: ");
 				if (gets(inpStr) == NULL)
 					continue;
+#ifdef __COVERITY__
+				__coverity_tainted_data_sanitize__(inpStr);
+#endif
 				if (menuVal == 1)
 					ret = gs1_encoder_setDataStr(ctx, inpStr);
 				else if (menuVal == 2)
