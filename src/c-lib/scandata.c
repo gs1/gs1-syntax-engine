@@ -456,6 +456,12 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	}
 
 	scanData += 3;
+
+	if (strnlen(scanData, MAX_DATA) >= MAX_DATA) {
+		SET_ERR_V(DATA_TOO_LONG, MAX_DATA - 1);
+		goto fail;
+	}
+
 	ctx->sym = sym;
 	p = ctx->dataStr;
 

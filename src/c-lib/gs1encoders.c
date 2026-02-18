@@ -524,11 +524,6 @@ bool gs1_encoder_setScanData(gs1_encoder* const ctx, const char* const scanData)
 	assert(ctx);
 	assert(scanData);
 
-	if (strnlen(scanData, MAX_DATA + 1) > MAX_DATA) {
-		SET_ERR_V(DATA_TOO_LONG, MAX_DATA);
-		return false;
-	}
-
 	if (!gs1_processScanData(ctx, scanData))
 		goto fail;
 
