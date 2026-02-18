@@ -914,6 +914,9 @@ void test_api_init(void) {
 	TEST_ASSERT((ctx = gs1_encoder_init(&static_buf)) != NULL);
 	assert(ctx);
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
+#ifndef __clang_analyzer__
+	gs1_encoder_free(ctx);
+#endif
 
 }
 
