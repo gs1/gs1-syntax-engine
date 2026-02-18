@@ -347,6 +347,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 		(*entry)->dlDataAttr = lastEntry->dlDataAttr;
 		for (part = 0; part < MAX_PARTS; part++) {
 			(*entry)->parts[part].cset = lastEntry->parts[part].cset;
+			(*entry)->parts[part].opt  = lastEntry->parts[part].opt;
 			(*entry)->parts[part].min  = lastEntry->parts[part].min;
 			(*entry)->parts[part].max  = lastEntry->parts[part].max;
 			for (linter = 0; linter < MAX_LINTERS; linter++)
