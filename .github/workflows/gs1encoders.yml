@@ -88,6 +88,45 @@ jobs:
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
 
+  ci-valgrind:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Valgrind memcheck CI
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install valgrind
+
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc SLOW_TESTS=yes
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
+            --error-exitcode=1 \
+            --track-origins=yes \
+            -s src/c-lib/build-test/gs1encoders-test.bin
+
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc SLOW_TESTS=yes
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
+            --error-exitcode=1 \
+            --track-origins=yes \
+            -s src/c-lib/build-test/gs1encoders-test.bin
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
+
   ci-msvc:
 
     runs-on: windows-latest
@@ -817,6 +856,7 @@ jobs:
     needs:
       - ci-gcc
       - ci-clang
+      - ci-valgrind
       - ci-msvc
       - ci-macos
       - ci-swift
