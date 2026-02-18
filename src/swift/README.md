@@ -115,6 +115,9 @@ do {
 released when the instance is deallocated (`deinit`). You can also call `free()`
 explicitly if you need to release resources before the instance goes out of scope.
 
+**Note:** The library is thread-safe provided that each thread operates on its
+own `GS1Encoder` instance. Do not share a single instance across threads.
+
 Build and run:
 
 ```bash

@@ -150,6 +150,10 @@
  * (as above) to ensure these resources are released promptly. Alternatively, call
  * {@link GS1Encoder#free() free()} explicitly when done.
  *
+ * <strong>Note:</strong> The library is thread-safe provided that each thread
+ * operates on its own {@link GS1Encoder} instance. Do not share a single
+ * instance across threads.
+ *
  * <strong>On Unix/macOS:</strong>
  *
  * <p>

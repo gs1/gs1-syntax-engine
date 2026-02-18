@@ -115,6 +115,9 @@ implements `IDisposable`, so use a `using` block (as above) to ensure these
 resources are released promptly. Alternatively, call `Dispose()` or `Free()`
 explicitly when done.
 
+**Note:** The library is thread-safe provided that each thread operates on its
+own `GS1Encoder` instance. Do not share a single instance across threads.
+
 Run your application:
 
 ```
