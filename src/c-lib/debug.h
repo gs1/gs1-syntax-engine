@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 
-#if PRNT
+#ifdef PRNT
 
 #define DEBUG_PRINT(...) do {				\
 	printf(__VA_ARGS__);				\
