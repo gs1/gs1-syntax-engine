@@ -1,0 +1,59 @@
+---
+name: Coverity Scan
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  coverity:
+
+    if: github.repository == 'gs1/gs1-syntax-engine'
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download Coverity Build Tool
+        run: |
+          curl -fsS -o cov-analysis.tgz \
+            --form token="${COVERITY_SCAN_TOKEN}" \
+            --form project="${COVERITY_SCAN_PROJECT}" \
+            'https://scan.coverity.com/download/cxx/linux64'
+          mkdir cov-analysis
+          tar xzf cov-analysis.tgz --strip-components=1 \
+            -C cov-analysis
+        env:
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+          COVERITY_SCAN_PROJECT: ${{ vars.COVERITY_SCAN_PROJECT }}
+
+      - name: Build with Coverity
+        run: |
+          COV_BIN="$(pwd)/cov-analysis/bin"
+          export PATH="${COV_BIN}:${PATH}"
+          cov-build --dir cov-int \
+            make -C src/c-lib -j "$(nproc)" all CC=gcc
+
+      - name: Submit to Coverity Scan
+        run: |
+          tar czf cov-int.tgz cov-int
+          curl -fsS \
+            --form token="${COVERITY_SCAN_TOKEN}" \
+            --form email="${COVERITY_SCAN_EMAIL}" \
+            --form file=@cov-int.tgz \
+            --form version="$(git rev-parse --short HEAD)" \
+            --form description="Automated daily scan" \
+            "https://scan.coverity.com/builds?project=${COVERITY_SCAN_PROJECT}"
+        env:
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+          COVERITY_SCAN_EMAIL: ${{ secrets.COVERITY_SCAN_EMAIL }}
+          COVERITY_SCAN_PROJECT: ${{ vars.COVERITY_SCAN_PROJECT }}
