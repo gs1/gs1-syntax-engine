@@ -423,7 +423,7 @@ static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const c
 
 fail:
 	if (fp) fclose(fp);
-	gs1_freeSyntaxDictionaryEntries(ctx, sd);
+	if (sd) gs1_freeSyntaxDictionaryEntries(ctx, sd);
 	GS1_ENCODERS_FREE(sd);
 	return NULL;
 
