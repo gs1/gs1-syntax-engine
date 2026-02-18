@@ -29,7 +29,7 @@ jobs:
             --form token="${COVERITY_SCAN_TOKEN}" \
             --form project="${COVERITY_SCAN_PROJECT}" \
             --form md5=1 \
-            'https://scan.coverity.com/download/cxx/linux64'
+            'https://scan.coverity.com/download/linux64'
         env:
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
           COVERITY_SCAN_PROJECT: ${{ vars.COVERITY_SCAN_PROJECT }}
@@ -47,7 +47,7 @@ jobs:
           curl -fsS -o cov-analysis.tgz \
             --form token="${COVERITY_SCAN_TOKEN}" \
             --form project="${COVERITY_SCAN_PROJECT}" \
-            'https://scan.coverity.com/download/cxx/linux64'
+            'https://scan.coverity.com/download/linux64'
         env:
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
           COVERITY_SCAN_PROJECT: ${{ vars.COVERITY_SCAN_PROJECT }}
