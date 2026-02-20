@@ -1869,6 +1869,12 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(false, validateAImutex, "(3940)1234(3941)9999");	// Match by "394n", ignoring self
 	test_validateAIs(false, validateAImutex, "(3955)123456(3929)123");	// Match by "392n"
 
+	// Mutex between known and unknown AIs: (3333) ex=333n should conflict with unknown (3338)
+	test_validateAIs(false, validateAImutex, "(3333)333333(3338)030333");
+	test_validateAIs(false, validateAImutex, "(01)12345678901231(3333)333333(3338)030333");
+	test_validateAIs(false, validateAImutex, "(3338)030333(3333)333333");
+	test_validateAIs(false, validateAImutex, "(3300)000000(3333)333333(3338)030333");	// Extra 33xx AI shifts sort order
+
 
 	/*
 	 * "Req" attributes

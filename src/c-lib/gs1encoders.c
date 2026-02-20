@@ -850,9 +850,35 @@ __ATTR_PURE ssize_t gs1_binarySearch(const void* const needle, const void* const
 	while (s < e) {
 		const size_t m = s + (e - s) / 2;
 		const int cmp = compare(needle, haystack, m);
-		if (cmp == 0)
-			return (!validate || validate(needle, haystack, m)) ? (int)m : GS1_SEARCH_INVALID;
-		else if (cmp < 0)
+		if (cmp == 0) {
+
+			size_t i;
+
+			if (!validate || validate(needle, haystack, m))
+				return (ssize_t)m;
+
+			/*
+			 *  The comparison matched but validation failed.
+			 *  Scan adjacent entries that also match the
+			 *  comparison (e.g. same prefix) to find one
+			 *  that passes validation.
+			 *
+			 */
+			for (i = m; i > 0; i--)
+				if (compare(needle, haystack, i - 1) != 0)
+					break;
+				else if (validate(needle, haystack, i - 1))
+					return (ssize_t)(i - 1);
+
+			for (i = m + 1; i < haystack_size; i++)
+				if (compare(needle, haystack, i) != 0)
+					break;
+				else if (validate(needle, haystack, i))
+					return (ssize_t)i;
+
+			return GS1_SEARCH_INVALID;
+
+		} else if (cmp < 0)
 			s = m + 1;
 		else
 			e = m;
