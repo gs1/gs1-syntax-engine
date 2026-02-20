@@ -446,7 +446,8 @@ fuzzer: $(FUZZER_BINS) | $(FUZZER_CORPUSES) fuzzer-corpus-seeds
 
 .PHONY: clean
 clean:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) -r build build-test build-fuzzer build-msan build-coverage build-wasm
+	$(RM) $(WASM_DIST_FILES) *.gcov
 
 .PHONY: clean-test
 clean-test:
