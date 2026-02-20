@@ -549,14 +549,46 @@ struct test_parse_sd_entry_s {
 };
 
 struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
+
+	/*
+	 *  Empty lines and comments
+	 *
+	 */
 	{ true,  "",				{ AI_ENTRY_TERMINATOR } },
 	{ true,  "#",				{ AI_ENTRY_TERMINATOR } },
 	{ true,  "# ",				{ AI_ENTRY_TERMINATOR } },
 	{ true,  "# COMMENT",			{ AI_ENTRY_TERMINATOR } },
+
+	/*
+	 *  AI: single AI, various widths
+	 *
+	 */
 	{ true, "90  ?  X..30  # INTERNAL", {						/* Single AI */
 		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY_TERMINATOR
 	} },
+	{ true, "253  ?  N13,csum,gcppos1 [X..17]  dlpkey  # GDTI", {			/* 3-digit AI, optional component */
+		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,gcppos1,_, X,1,17,OPT,_,_,_, __, __, __, "dlpkey", "GDTI"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "8200  X..70  req=01  # PRODUCT URL", {				/* 4-digit AI, not GS1 DL URI data attr */
+		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "9  X1", {								/* AI too short */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "12345  X1", {								/* AI too long */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "9a  X1", {								/* AI not numeric */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  AI: range of AIs
+	 *
+	 */
 	{ true, "91-99  ?  X..90  # INTERNAL", {					/* Range of AIs */
 		AI_ENTRY("91", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY("92", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
@@ -569,18 +601,26 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY("99", DO_FNC1, DL_DATA_ATTR, X,1,90,MAN,_,_,_, __, __, __, __, "", "INTERNAL"),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "8010  ?  Y..30,gcppos1  dlpkey=8011  # CPID", {			/* CSET 32 */
-		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,gcppos1,_,_, __, __, __, __, "dlpkey=8011", "CPID"),
+	{ false, "9-99  X1", {								/* Range: wrong width */
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "253  ?  N13,csum,gcppos1 [X..17]  dlpkey  # GDTI", {			/* Optional component */
-		AI_ENTRY("253", DO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,gcppos1,_, X,1,17,OPT,_,_,_, __, __, __, "dlpkey", "GDTI"),
+	{ false, "9-099  X1", {								/* Range: unequal width */
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "7007  ?  N6,yymmdd [N..6],yymmdd  req=01,02  # HARVEST DATE", {	/* Requisites */
-		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_,_, N,1,6,MAN,yymmdd,_,_, __, __, __, "req=01,02", "HARVEST DATE"),
+	{ false, "9a-99  X1", {								/* Range: non-numeric */
 		AI_ENTRY_TERMINATOR
 	} },
+	{ false, "10-29  X1", {								/* Range: differ in more than last digit */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "95-91  X1", {								/* Range: end does not exceed start */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Flags: *, !, ?
+	 *
+	 */
 	{ true, "01  * ?  N14,csum,gcppos1  ex=02,255,37  dlpkey=22,10,21|235  # GTIN", {	/* FNC1 not required, gappy flags */
 		AI_ENTRY("01", NO_FNC1, DL_DATA_ATTR, N,14,14,MAN,csum,gcppos1,_, __, __, __, __, "ex=02,255,37 dlpkey=22,10,21|235", "GTIN"),
 		AI_ENTRY_TERMINATOR
@@ -588,30 +628,194 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	{ true, "414  *!?  N13,csum,gcppos1  dlpkey=254|7040  # LOC No.", {		/* Christmas tree case for flags */
 		AI_ENTRY("414", NO_FNC1, DL_DATA_ATTR, N,13,13,MAN,csum,gcppos1,_, __, __, __, __, "dlpkey=254|7040", "LOC No."),
 	} },
-	{ true, "8200  X..70  req=01  # PRODUCT URL", {					/* Not GS1 DL URI data attr */
-		AI_ENTRY("8200", DO_FNC1, NO_DATA_ATTR, X,1,70,MAN,_,_,_, __, __, __, __, "req=01", "PRODUCT URL"),
+	{ false, "90", {								/* Truncated after AI */
 		AI_ENTRY_TERMINATOR
 	} },
+	{ false, "90  ?", {								/* Truncated after flags */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: character sets (X, N, Y, Z)
+	 *
+	 */
+	{ true, "8010  ?  Y..30,gcppos1  dlpkey=8011  # CPID", {			/* CSET 32 */
+		AI_ENTRY("8010", DO_FNC1, DL_DATA_ATTR, Y,1,30,MAN,gcppos1,_,_, __, __, __, __, "dlpkey=8011", "CPID"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4307  ?  Z2,iso3166alpha2  # COUNTRY - INITIAL PROCESS.", {		/* CSET Z */
+		AI_ENTRY("4307", DO_FNC1, DL_DATA_ATTR, Z,2,2,MAN,iso3166alpha2,_,_, __, __, __, __, "", "COUNTRY - INITIAL PROCESS."),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  Q5", {								/* Unknown character set */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: fixed-length format spec
+	 *
+	 */
+	{ false, "90  X", {								/* Format spec too short */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X0", {								/* Unrecognised format spec */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X123", {								/* Fixed-length: too many digits */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X1a", {								/* Fixed-length: non-digit in length */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: variable-length format spec
+	 *
+	 */
+	{ false, "90  X..123", {							/* Variable-length: too many digits */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X..1a", {								/* Variable-length: non-digit in max */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: optional components
+	 *
+	 */
+	{ true, "7007  ?  N6,yymmdd [N..6],yymmdd  req=01,02  # HARVEST DATE", {	/* Requisites */
+		AI_ENTRY("7007", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmdd,_,_, N,1,6,MAN,yymmdd,_,_, __, __, __, "req=01,02", "HARVEST DATE"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  [N5", {								/* Optional missing closing bracket */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  ?  [N5] X5", {							/* Mandatory component follows optional */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: count and ordering
+	 *
+	 */
 	{ true, "8001  ?  N4,nonzero N5,nonzero N3,nonzero N1,winding N1  req=01  # DIMENSIONS", {	/* Max components */
 		AI_ENTRY("8001", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,nonzero,_,_, N,5,5,MAN,nonzero,_,_, N,3,3,MAN,nonzero,_,_, N,1,1,MAN,winding,_,_, N,1,1,MAN,_,_,_, "req=01", "DIMENSIONS"),
 		AI_ENTRY_TERMINATOR
 	} },
+	{ false, "90  #", {								/* No components */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  ?  N1 N1 N1 N1 N1 N1", {						/* Too many components (6 > max 5) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  ?  N..5 X..30", {							/* Non-final, variable-length component */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Components: linters
+	 *
+	 */
 	{ true, "8014  X..25,csumalpha,gcppos1,hasnondigit  req=01  # MUDI", {		/* Max linters */
 		AI_ENTRY("8014", DO_FNC1, NO_DATA_ATTR, X,1,25,MAN,csumalpha,gcppos1,hasnondigit, __, __, __, __, "req=01", "MUDI"),
 		AI_ENTRY_TERMINATOR
 	} },
+	{ true, "4308  ?  N3,iso3166 N3,iso4217 N1,iso5218  # COUNTRY/CURRENCY", {
+		AI_ENTRY("4308", DO_FNC1, DL_DATA_ATTR, N,3,3,MAN,iso3166,_,_, N,3,3,MAN,iso4217,_,_, N,1,1,MAN,iso5218,_,_, __, __, "", "COUNTRY/CURRENCY"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4309  ?  N3,iso3166999 X..34,iban  # EXTENDED COUNTRY", {
+		AI_ENTRY("4309", DO_FNC1, DL_DATA_ATTR, N,3,3,MAN,iso3166999,_,_, X,1,34,MAN,iban,_,_, __, __, __, "", "EXTENDED COUNTRY"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "7003  ?  N8,yyyymmdd N2,hh N2,mi [N2],ss  # EXPIRATION DATE/TIME", {
+		AI_ENTRY("7003", DO_FNC1, DL_DATA_ATTR, N,8,8,MAN,yyyymmdd,_,_, N,2,2,MAN,hh,_,_, N,2,2,MAN,mi,_,_, N,2,2,OPT,ss,_,_, __, "", "EXPIRATION DATE/TIME"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "7006  ?  N6,yymmd0 [N8],yyyymmd0  # FIRST FREEZE DATE", {
+		AI_ENTRY("7006", DO_FNC1, DL_DATA_ATTR, N,6,6,MAN,yymmd0,_,_, N,8,8,OPT,yyyymmd0,_,_, __, __, __, "", "FIRST FREEZE DATE"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4310  ?  N4,hhmi N10,latitude N11,longitude  # GEO/TIME", {
+		AI_ENTRY("4310", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,hhmi,_,_, N,10,10,MAN,latitude,_,_, N,11,11,MAN,longitude,_,_, __, __, "", "GEO/TIME"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4320  ?  X20,cset82,cset39,cset64  # CSET TEST", {
+		AI_ENTRY("4320", DO_FNC1, DL_DATA_ATTR, X,20,20,MAN,cset82,cset39,cset64, __, __, __, __, "", "CSET TEST"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4321  ?  N10,csetnumeric X..10,hyphen  # CSET TEST 2", {
+		AI_ENTRY("4321", DO_FNC1, DL_DATA_ATTR, N,10,10,MAN,csetnumeric,_,_, X,1,10,MAN,hyphen,_,_, __, __, __, "", "CSET TEST 2"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4322  ?  N1,yesno N1,zero [N..5],nozeroprefix  # FLAGS", {
+		AI_ENTRY("4322", DO_FNC1, DL_DATA_ATTR, N,1,1,MAN,yesno,_,_, N,1,1,MAN,zero,_,_, N,1,5,OPT,nozeroprefix,_,_, __, __, "", "FLAGS"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "8112  ?  X..70,couponposoffer  # PAPERLESS COUPON", {
+		AI_ENTRY("8112", DO_FNC1, DL_DATA_ATTR, X,1,70,MAN,couponposoffer,_,_, __, __, __, __, "", "PAPERLESS COUPON"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4323  ?  X4,pieceoftotal [X..10],posinseqslash  # PIECE", {
+		AI_ENTRY("4323", DO_FNC1, DL_DATA_ATTR, X,4,4,MAN,pieceoftotal,_,_, X,1,10,OPT,posinseqslash,_,_, __, __, __, "", "PIECE"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4324  ?  X..70,pcenc  # ENCODED DATA", {
+		AI_ENTRY("4324", DO_FNC1, DL_DATA_ATTR, X,1,70,MAN,pcenc,_,_, __, __, __, __, "", "ENCODED DATA"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4325  ?  X..3,packagetype  # PACKAGE TYPE", {
+		AI_ENTRY("4325", DO_FNC1, DL_DATA_ATTR, X,1,3,MAN,packagetype,_,_, __, __, __, __, "", "PACKAGE TYPE"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4326  ?  X3,importeridx [X..70],mediatype  # IMPORT MEDIA", {
+		AI_ENTRY("4326", DO_FNC1, DL_DATA_ATTR, X,3,3,MAN,importeridx,_,_, X,1,70,OPT,mediatype,_,_, __, __, __, "", "IMPORT MEDIA"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true, "4329  ?  X20,gcppos2 [N..2],ss  # CODE", {
+		AI_ENTRY("4329", DO_FNC1, DL_DATA_ATTR, X,20,20,MAN,gcppos2,_,_, N,1,2,OPT,ss,_,_, __, __, __, "", "CODE"),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5,csum,csum,csum,csum", {					/* Too many linters (4 > max 3) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5,badlinter", {							/* Unknown linter */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Attributes
+	 *
+	 */
+	{ true, "90  ?  X..30  req=999", {						/* Attrs and no title */
+		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_,_, __, __, __, __, "req=999", ""),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  =value", {							/* Missing attribute name (LHS) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  Req=01", {							/* Attribute name: illegal chars */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  req=!!", {							/* Attribute value: illegal chars */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  req=", {							/* Missing attribute value (RHS) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  Req", {							/* Singleton name: illegal chars */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Title
+	 *
+	 */
 	{ true, "8110  ?  X..70,couponcode", {						/* No attrs and no title */
 		AI_ENTRY("8110", DO_FNC1, DL_DATA_ATTR, X,1,70,MAN,couponcode,_,_, __, __, __, __, "", ""),
 		AI_ENTRY_TERMINATOR
 	} },
-	{ true, "90  ?  X..30  req=999", {						/* Bespoke test for attrs and no title */
-		AI_ENTRY("90", DO_FNC1, DL_DATA_ATTR, X,1,30,MAN,_,_,_, __, __, __, __, "req=999", ""),
-		AI_ENTRY_TERMINATOR
-	} },
-	{ false, "90  ?  N..5 X..30", {							/* Bespoke test for non-final, variable-length component */
-		AI_ENTRY_TERMINATOR
-	} },
-	{ false, "90  ?  [N5] X5", {							/* Bespoke test mandatory component follows optional component */
+	{ false, "90  X5  # @title", {							/* Title: illegal characters */
 		AI_ENTRY_TERMINATOR
 	} },
 };
