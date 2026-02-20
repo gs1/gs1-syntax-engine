@@ -35,6 +35,8 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	char pristine[MAX_DATA+50];
 	char out1[MAX_DATA+50];
 	const char *out;
+	char **hri;
+	int numHRI;
 	unsigned int cfg = 0;
 	size_t i;
 
@@ -88,6 +90,13 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		}
 	} else if (strcmp(in, out) != 0) {
 		printf("\nIN:  %s\nOUT: %s\n", in, out);
+		abort();
+	}
+
+	// HRI must contain at least one entry
+	numHRI = gs1_encoder_getHRI(ctx, &hri);
+	if (numHRI < 1) {
+		printf("\nHRI count %d after successful setAIdataStr: %s\n", numHRI, in);
 		abort();
 	}
 

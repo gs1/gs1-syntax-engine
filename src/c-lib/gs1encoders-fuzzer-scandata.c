@@ -93,6 +93,12 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		abort();
 	}
 
+	// If AIs were extracted, AI data string must be non-NULL
+	if (ctx->numAIs > 0 && gs1_encoder_getAIdataStr(ctx) == NULL) {
+		printf("\ngetAIdataStr NULL with numAIs=%d after: %s\n", ctx->numAIs, in);
+		abort();
+	}
+
 	return 0;
 
 }

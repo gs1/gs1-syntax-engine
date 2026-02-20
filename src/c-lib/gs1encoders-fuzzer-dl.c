@@ -92,6 +92,13 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	 *  The input was accepted, so exercise the output paths.
 	 *
 	 */
+
+	// AI data must be extractable when AIs were parsed
+	if (ctx->numAIs > 0 && gs1_encoder_getAIdataStr(ctx) == NULL) {
+		printf("\ngetAIdataStr NULL with numAIs=%d after: %s\n", ctx->numAIs, in);
+		abort();
+	}
+
 	gs1_encoder_getHRI(ctx, &hri);
 	gs1_encoder_getDLignoredQueryParams(ctx, &qp);
 #pragma GCC diagnostic push
