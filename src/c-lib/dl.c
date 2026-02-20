@@ -262,7 +262,7 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	int i = 0;
 	size_t pos = 0, cap = DL_KEY_QUALIFIER_INITIAL_CAPACITY;
 
-	char **dlKeyQualifiers = malloc(cap * sizeof(char *));
+	char **dlKeyQualifiers = GS1_ENCODERS_MALLOC(cap * sizeof(char *));
 	if (!dlKeyQualifiers) {
 		SET_ERR(FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS);
 		return false;
