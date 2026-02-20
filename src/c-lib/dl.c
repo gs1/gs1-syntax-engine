@@ -402,7 +402,7 @@ static inline bool isValidDLpathAIseq(const gs1_encoder* const ctx, const char (
 }
 
 static inline bool isDLpkey(const gs1_encoder* const ctx, const struct aiEntry* const entry) {
-	char seq[1][MAX_AI_LEN+1];
+	char seq[1][MAX_AI_LEN+1] = {{0}};
 	memcpy(seq[0], entry->ai, entry->ailen);
 	seq[0][entry->ailen] = '\0';
 	return getDLpathAIseqEntry(ctx, (const char (*)[MAX_AI_LEN+1])seq, 1) != -1;
@@ -1032,7 +1032,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 */
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char seq[1][MAX_AI_LEN+1];
+		char seq[1][MAX_AI_LEN+1] = {{0}};
 		int ke;
 		const struct aiValue* const ai = &ctx->aiData[i];
 
@@ -1225,7 +1225,7 @@ again:
 
 static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, const int line, bool should_succeed, const char* const dlData, const char* const expect) {
 
-	char in[256];
+	char in[256] = {0};
 	char out[256];
 	char casename[256];
 

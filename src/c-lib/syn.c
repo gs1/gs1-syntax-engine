@@ -484,7 +484,7 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 	const uint16_t cap = 600;
 	int16_t numOut, expectOut = 0;
 	size_t i, j, k;
-	char buf[256];
+	char buf[256] = {0};
 	struct aiEntry *out, *tmp;
 
 	TEST_CASE(sdEntry);
