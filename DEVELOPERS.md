@@ -100,10 +100,22 @@ allocating new memory.
 **Heap allocation**:
 
 - Don't heap allocate after init is complete.
-- Always use the `GS1_ENCODERS_*` macros, never direct `malloc`/`free`, to
-  enable users to use their preferred heap management framework. See the
-  [C API documentation](https://gs1.github.io/gs1-syntax-engine/) for a
-  custom heap management example.
+- Always use the allocation macros, never direct `malloc`/`calloc`/`realloc`/`free`:
+
+| Macro                  | Wraps     |
+|------------------------|-----------|
+| `GS1_ENCODERS_MALLOC`  | `malloc`  |
+| `GS1_ENCODERS_CALLOC`  | `calloc`  |
+| `GS1_ENCODERS_REALLOC` | `realloc` |
+| `GS1_ENCODERS_FREE`    | `free`    |
+
+These macros are defined in `enc-private.h`. By default they call the
+standard library functions. Users can override them at compile time by
+defining `GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H` to a header file that
+provides `GS1_ENCODERS_CUSTOM_MALLOC`, `GS1_ENCODERS_CUSTOM_CALLOC`,
+`GS1_ENCODERS_CUSTOM_REALLOC`, and `GS1_ENCODERS_CUSTOM_FREE` macros. See
+the [C API documentation](https://gs1.github.io/gs1-syntax-engine/) for a
+custom heap management example.
 
 **Stack allocation** (`alloca`):
 
@@ -327,6 +339,17 @@ Techniques used:
 
 This provides a human-readable format that is type-checked by the compiler and has no runtime overhead.
 
+### Unknown AI Vivification
+
+When `permitUnknownAIs` is enabled, `gs1_lookupAIentry` returns pseudo
+`aiEntry` structs for AIs not present in the AI table rather than returning
+`NULL`. The pseudo-entries are selected based on the AI length and value
+length implied by the AI's prefix (e.g. `unknownAI4fixed6` for a 4-digit AI
+whose prefix implies a 6-digit fixed-length value). These static entries
+have empty attribute strings, so they pass through processing without
+triggering linting or DL attribute checks, but they still participate in
+mutual exclusivity validation via the `ex=` mechanism.
+
 ### Error Message Translations
 
 Translations use conditional include files selected at compile time:
@@ -358,7 +381,10 @@ Returns:
 
 This pattern enables prefix-based lookups with additional constraints. For
 example, AI lookups find a prefix match, then validate that the AI length is
-correct and doesn't conflict with known AIs.
+correct and doesn't conflict with known AIs. Multiple entries may compare
+equal (e.g. AIs sharing a prefix like `333n`), so when validation fails on
+the initial match the function scans adjacent entries with the same
+comparison key before returning `GS1_SEARCH_INVALID`.
 
 The distinct return values allow callers to differentiate "unknown AI" from
 "invalid AI".
@@ -496,7 +522,23 @@ make test TEST="test_ai_"
 rm gs1-syntax-dictionary.txt
 make test
 git checkout gs1-syntax-dictionary.txt  # Restore it
+
+# MemorySanitizer (detects reads of uninitialised memory; requires clang)
+make -j $(nproc) test MSAN=yes
+
+# GCC static analyser
+make -j $(nproc) test ANALYZER=yes
+
+# Code coverage report (generates build-coverage/coverage-report/)
+make coverage
 ```
+
+**Malloc fault injection**: Unit tests exercise every allocation failure path
+using a countdown-based injection framework (`test-heap.h`). The test build
+uses `-DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h` to redirect the
+`GS1_ENCODERS_*` allocation macros through a wrapper that returns `NULL`
+when a shared counter (`test_alloc_fail_at`) reaches zero. Tests iterate
+over all allocation sites to verify graceful failure handling.
 
 ### Fuzzing
 
@@ -520,10 +562,26 @@ mode. This provides meaningful starting inputs derived from unit tests.
 Run a fuzzer (command printed after build):
 
 ```bash
+# Multi-process mode (recommended for long runs)
+ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais -fork=3 corpus-ais
+
+# Job mode
 ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais -jobs=$(nproc) -workers=$(nproc) corpus-ais
 ```
 
 To regenerate seeds for an existing corpus, delete the corpus directory first.
+
+**Fuzzer configuration**: Each fuzzer derives a configuration bitmask from the
+input content (polynomial hash) to toggle options such as `permitUnknownAIs`,
+`permitZeroSuppressedGTINinDLuris`, `includeDataTitlesInHRI`, validation
+flags, and `addCheckDigit`. This explores the space of configuration
+combinations without consuming input bytes.
+
+**Round-trip invariant assertions**: The fuzzers verify invariants beyond
+crash-freedom. For example, the DL fuzzer generates a GS1 Digital Link URI
+from parsed data, feeds it back via `setDataStr`, and asserts that the
+result is stable. This catches semantic bugs that don't manifest as memory
+errors.
 
 ### JavaScript Tests
 
