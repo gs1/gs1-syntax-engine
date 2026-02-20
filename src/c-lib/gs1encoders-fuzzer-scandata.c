@@ -32,12 +32,29 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	static gs1_encoder *ctx = NULL;
 	char in[MAX_DATA+50];
 	char pristine[MAX_DATA+50];
+	char out1[MAX_DATA+50];
 	const char *out;
+	unsigned int cfg = 0;
+	size_t i;
 
 	if (!ctx) {
 		ctx = gs1_encoder_init(NULL);
 		assert(ctx);
 	}
+
+	/*
+	 *  Derive configuration from input content so that the fuzzer
+	 *  explores the space of configuration flags without consuming
+	 *  any input bytes (which would break auto-extracted seeds).
+	 *
+	 */
+	for (i = 0; i < len; i++)
+		cfg = cfg * 31 + buf[i];
+	gs1_encoder_setPermitUnknownAIs(ctx, cfg & 1);
+	gs1_encoder_setIncludeDataTitlesInHRI(ctx, (cfg >> 2) & 1);
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, (cfg >> 3) & 1);
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, (cfg >> 4) & 1);
+	gs1_encoder_setAddCheckDigit(ctx, (cfg >> 7) & 1);
 
 	if (len > MAX_DATA+49)
 		return 0;
@@ -57,7 +74,21 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	};
 
 	out = gs1_encoder_getScanData(ctx);
-	if (strcmp(in, out) != 0) {
+	if (out == NULL)
+		return 0;
+	if ((cfg >> 7) & 1) {
+		// addCheckDigit may modify data; verify output is stable
+		memcpy(out1, out, strlen(out) + 1);
+		if (!gs1_encoder_setScanData(ctx, out1))
+			abort();
+		out = gs1_encoder_getScanData(ctx);
+		if (out == NULL)
+			abort();
+		if (strcmp(out1, out) != 0) {
+			printf("\nOUT1: %s\nOUT2: %s\n", out1, out);
+			abort();
+		}
+	} else if (strcmp(in, out) != 0) {
 		printf("\nIN:   %s\nOUT:  %s\nSYM:  %d\nDATA: %s\n", in, out, gs1_encoder_getSym(ctx), gs1_encoder_getDataStr(ctx));
 		abort();
 	}
