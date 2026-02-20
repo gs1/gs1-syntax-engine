@@ -768,7 +768,7 @@ void test_scandata_generateScanData(void) {
 	 *
 	 */
 	{
-		char *out;
+		const char *out;
 
 		/* DataBar Omni composite with plain CC */
 		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));

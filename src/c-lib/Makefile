@@ -48,7 +48,7 @@ endif
 
 ifeq ($(MAKECMDGOALS),test)
 BUILD_DIR = build-test
-UNIT_TEST_CFLAGS = -DUNIT_TESTS
+UNIT_TEST_CFLAGS = -DUNIT_TESTS -DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h
 endif
 
 WASM_DIR = ../js-wasm

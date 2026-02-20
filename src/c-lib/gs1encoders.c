@@ -1115,7 +1115,7 @@ void test_api_validations(void) {
 void test_api_getters(void) {
 
 	gs1_encoder* ctx;
-	char *out;
+	const char *out;
 	char buf[256];
 
 	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
@@ -1807,6 +1807,72 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	gs1_encoder_free(ctx);
 
 DIAG_POP
+
+}
+
+
+void test_api_allocFailures(void) {
+
+	const gs1_encoder* ctx;
+
+	/*
+	 *  test_alloc_fail_at is a shared global counter across all TUs.
+	 *  Each alloc (malloc/calloc/realloc) decrements it; when it
+	 *  reaches 0 the allocation returns NULL.
+	 *
+	 *  Default gs1_encoder_init(NULL) allocation sequence:
+	 *    1: ctx malloc in gs1_encoder_init_ex
+	 *    2: sd malloc in parseSyntaxDictionaryFile
+	 *    3: first gs1_strdup_alloc — attrs
+	 *    4: first gs1_strdup_alloc — title
+	 *    5..N: further attrs/title strdups for each AI entry
+	 *    N+1: dlKeyQualifiers initial malloc
+	 *    N+2..: addDLkeyQualifiers allocs
+	 *
+	 */
+
+	/* Alloc 1: ctx malloc failure in gs1_encoder_init_ex */
+	test_alloc_fail_at = 1;
+	ctx = gs1_encoder_init(NULL);
+	TEST_CHECK(ctx == NULL);
+	test_alloc_fail_at = 0;
+
+	/* Alloc 2: sd malloc failure in parseSyntaxDictionaryFile */
+	test_alloc_fail_at = 2;
+	ctx = gs1_encoder_init(NULL);
+	TEST_CHECK(ctx == NULL);
+	test_alloc_fail_at = 0;
+
+	/* Alloc 3: attrs strdup failure in parseSyntaxDictionaryEntry */
+	test_alloc_fail_at = 3;
+	ctx = gs1_encoder_init(NULL);
+	TEST_CHECK(ctx == NULL);
+	test_alloc_fail_at = 0;
+
+	/* Alloc 4: title strdup failure in parseSyntaxDictionaryEntry */
+	test_alloc_fail_at = 4;
+	ctx = gs1_encoder_init(NULL);
+	TEST_CHECK(ctx == NULL);
+	test_alloc_fail_at = 0;
+
+	/*
+	 *  gs1_setAItable failure path: skip syndict so we go straight
+	 *  to the embedded table. Alloc 2 is the dlKeyQualifiers
+	 *  initial malloc in gs1_populateDLkeyQualifiers, whose failure
+	 *  sets FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS and exercises the
+	 *  error-classification switch in gs1_encoder_init_ex.
+	 *
+	 */
+	{
+		gs1_encoder_init_opts_t opts = {
+			.struct_size = sizeof(gs1_encoder_init_opts_t),
+			.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET,
+		};
+		test_alloc_fail_at = 2;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
+	}
 
 }
 

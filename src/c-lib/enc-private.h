@@ -319,6 +319,7 @@ void test_api_getHRI(void);
 void test_api_copyHRI(void);
 void test_api_getDLignoredQueryParams(void);
 void test_api_copyDLignoredQueryParams(void);
+void test_api_allocFailures(void);
 
 #endif
 

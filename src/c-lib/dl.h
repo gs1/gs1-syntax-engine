@@ -43,6 +43,7 @@ void test_dl_parseDLuri(void);
 void test_dl_URIunescape(void);
 void test_dl_URIescape(void);
 void test_dl_generateDLuri(void);
+void test_dl_allocFailures(void);
 
 #endif
 

@@ -49,6 +49,8 @@
 #include "scandata.h"
 #include "syn.h"
 
+int test_alloc_fail_at = 0;
+
 
 TEST_LIST = {
 
@@ -75,6 +77,7 @@ TEST_LIST = {
     { "api_copyHRI", test_api_copyHRI },
     { "api_getDLignoredQueryParams", test_api_getDLignoredQueryParams },
     { "api_copyDLignoredQueryParams", test_api_copyDLignoredQueryParams },
+    { "api_allocFailures", test_api_allocFailures },
 
 
     /*
@@ -83,6 +86,7 @@ TEST_LIST = {
      */
 #ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
     { "syn_parseSyntaxDictionaryEntry", test_syn_parseSyntaxDictionaryEntry },
+    { "syn_allocFailures", test_syn_allocFailures },
 #endif
 
 
@@ -110,6 +114,7 @@ TEST_LIST = {
     { "dl_URIunescape", test_dl_URIunescape },
     { "dl_URIescape", test_dl_URIescape },
     { "dl_generateDLuri", test_dl_generateDLuri },
+    { "dl_allocFailures", test_dl_allocFailures },
 
 
     /*

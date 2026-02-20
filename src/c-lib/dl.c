@@ -38,7 +38,9 @@
 
 
 #define CANONICAL_DL_STEM "https://id.gs1.org"
+#ifndef DL_KEY_QUALIFIER_INITIAL_CAPACITY
 #define DL_KEY_QUALIFIER_INITIAL_CAPACITY 50
+#endif
 
 
 /*
@@ -323,8 +325,8 @@ fail:
 	 * Release what we have allocated so far
 	 *
 	 */
-	for (i--; i >= 0; i--)
-		GS1_ENCODERS_FREE(dlKeyQualifiers[i]);
+	while (pos > 0)
+		GS1_ENCODERS_FREE(dlKeyQualifiers[--pos]);
 	GS1_ENCODERS_FREE(dlKeyQualifiers);
 
 	return false;
@@ -2138,6 +2140,54 @@ void test_dl_generateDLuri(void) {
 	}
 
 #undef test_testGenerateDLuri
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_dl_allocFailures(void) {
+
+	gs1_encoder* ctx;
+	int i;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	/*
+	 *  Allocation sequence for gs1_populateDLkeyQualifiers:
+	 *    1: dlKeyQualifiers initial malloc
+	 *    2: first gs1_strdup_alloc for key
+	 *    3: first q_new malloc for qualifier combo
+	 *    ...
+	 *
+	 */
+
+	/*
+	 *  Alloc 1: dlKeyQualifiers initial malloc failure
+	 *
+	 */
+	gs1_freeDLkeyQualifiers(ctx);
+	test_alloc_fail_at = 1;
+	TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == false);
+	test_alloc_fail_at = 0;
+
+	/*
+	 *  Allocs 2..5: exercise progressively later allocation failures
+	 *  in addDLkeyQualifiers (realloc, gs1_strdup_alloc, qualifier
+	 *  combo malloc)
+	 *
+	 */
+	for (i = 2; i <= 5; i++) {
+		gs1_freeDLkeyQualifiers(ctx);
+		test_alloc_fail_at = i;
+		TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == false);
+		test_alloc_fail_at = 0;
+	}
+
+	// Restore valid state for cleanup
+	gs1_freeDLkeyQualifiers(ctx);
+	TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == true);
 
 	gs1_encoder_free(ctx);
 

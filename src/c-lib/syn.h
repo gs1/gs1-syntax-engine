@@ -43,6 +43,7 @@ int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct 
 #ifdef UNIT_TESTS
 
 void test_syn_parseSyntaxDictionaryEntry(void);
+void test_syn_allocFailures(void);
 
 #endif  /* UNIT_TESTS */
 

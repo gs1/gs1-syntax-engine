@@ -489,8 +489,11 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 
 	TEST_CASE(sdEntry);
 
-	TEST_ASSERT((out = GS1_ENCODERS_CALLOC(cap, sizeof(struct aiEntry))) != NULL);
-	assert(out);
+	out = GS1_ENCODERS_CALLOC(cap, sizeof(struct aiEntry));
+	if (!out) {
+		TEST_ASSERT(out != NULL);
+		goto out;
+	}
 
 	*out->ai = '\0';
 	tmp = out;
@@ -852,6 +855,26 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 
 	for (i = 0; i < SIZEOF_ARRAY(tests_parse_sd_entry); i++)
 		test_parseSyntaxDictionaryEntry(ctx, tests_parse_sd_entry[i].sdEntry, tests_parse_sd_entry[i].aiEntries, tests_parse_sd_entry[i].expectSuccess);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_syn_allocFailures(void) {
+
+	gs1_encoder* ctx;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	/*
+	 *  parseSyntaxDictionaryFile: malloc failure for AI table
+	 *
+	 */
+	test_alloc_fail_at = 1;
+	TEST_CHECK(gs1_loadSyntaxDictionary(ctx, NULL, true) == NULL);
+	test_alloc_fail_at = 0;
 
 	gs1_encoder_free(ctx);
 
