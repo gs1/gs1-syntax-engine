@@ -1675,6 +1675,38 @@ void test_dl_parseDLuri(void) {
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
+
+	/*
+	 *  MAX_AI_VALUE_LEN boundary: AI (99) accepts X..90 in query
+	 *
+	 */
+	{
+		char dlbuf[512] = {0};
+		char outbuf[512];
+		char *p;
+		int j;
+
+		// Build DL URI with AI (01) in path and AI (99) with 90-char value in query
+		p = dlbuf;
+		strcpy(p, "https://a/01/12312312312333?99=");
+		p += strlen(p);
+		for (j = 0; j < 90; j++)
+			*p++ = 'A';
+		*p = '\0';
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(gs1_parseDLuri(ctx, dlbuf, outbuf));		// Exactly 90 chars
+
+		// 91-char value should fail
+		*p++ = 'A';
+		*p = '\0';
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(!gs1_parseDLuri(ctx, dlbuf, outbuf));	// 91 chars, too long
+	}
+
+
 #undef test_parseDLuri
 
 	gs1_encoder_free(ctx);

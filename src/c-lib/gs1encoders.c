@@ -872,7 +872,7 @@ __ATTR_PURE ssize_t gs1_binarySearch(const void* const needle, const void* const
 static uint8_t static_buf[sizeof(gs1_encoder)];
 
 // Sizable buffer on the heap so that we don't exhaust the stack
-char bigbuffer[MAX_DATA+2];
+char bigbuffer[MAX_DATA+5];
 
 
 void test_api_getVersion(void) {
@@ -1136,6 +1136,101 @@ void test_api_dataStr(void) {
 	bigbuffer[MAX_DATA]='\0';
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));   // Maximum length
 
+
+	/*
+	 *  MAX_AIS boundary via raw AI data (linear-only path)
+	 *
+	 *  Use identical values so validateAIrepeats passes.
+	 *
+	 */
+	{
+		char *p;
+		int j;
+
+		// Build raw AI string with exactly MAX_AIS (64) AIs: ^99XY^99XY...
+		p = bigbuffer;
+		*p++ = '^';
+		for (j = 0; j < MAX_AIS; j++) {
+			if (j > 0)
+				*p++ = '^';
+			*p++ = '9'; *p++ = '9';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p = '\0';
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));	// Exactly 64 AIs
+
+		// One more AI pushes over the limit
+		*p++ = '^';
+		*p++ = '9'; *p++ = '9'; *p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));	// 65 AIs, too many
+	}
+
+
+	/*
+	 *  MAX_AIS boundary via composite: linear fills MAX_AIS, separator
+	 *  itself triggers the overflow check
+	 *
+	 */
+	{
+		char *p;
+		int j;
+
+		// Build composite where linear uses exactly MAX_AIS AIs
+		p = bigbuffer;
+		*p++ = '^';
+		for (j = 0; j < MAX_AIS; j++) {
+			if (j > 0)
+				*p++ = '^';
+			*p++ = '9'; *p++ = '9';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p++ = '|';
+		*p++ = '^'; *p++ = '9'; *p++ = '9'; *p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));	// Linear fills MAX_AIS, composite overflows
+	}
+
+
+	/*
+	 *  MAX_AIS boundary via composite: linear + separator fit,
+	 *  composite component triggers the overflow
+	 *
+	 */
+	{
+		char *p;
+		int j;
+
+		// Linear: MAX_AIS - 2 AIs, separator: 1 slot, composite: 1 AI = MAX_AIS total
+		p = bigbuffer;
+		*p++ = '^';
+		for (j = 0; j < MAX_AIS - 2; j++) {
+			if (j > 0)
+				*p++ = '^';
+			*p++ = '9'; *p++ = '9';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p++ = '|';
+		*p++ = '^'; *p++ = '9'; *p++ = '9'; *p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, bigbuffer));	// 62 + 1 sep + 1 = 64, at limit
+
+		// Linear: MAX_AIS - 1 AIs, separator: 1 slot, composite: 1 AI = MAX_AIS + 1
+		p = bigbuffer;
+		*p++ = '^';
+		for (j = 0; j < MAX_AIS - 1; j++) {
+			if (j > 0)
+				*p++ = '^';
+			*p++ = '9'; *p++ = '9';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p++ = '|';
+		*p++ = '^'; *p++ = '9'; *p++ = '9'; *p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		TEST_CHECK(!gs1_encoder_setDataStr(ctx, bigbuffer));	// 63 + 1 sep + 1 = 65, overflows in composite
+	}
+
+
 	gs1_encoder_free(ctx);
 
 }
@@ -1220,6 +1315,34 @@ void test_api_setScanData(void) {
 	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sDataBarExpanded);
 	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "^011231231231233310ABC123^99XYZ") == 0);
+
+
+	/*
+	 *  MAX_DATA boundary via scan data path
+	 *
+	 *  Use "]Q1" (QR plain data) to avoid GS1 AI processing.
+	 *  The 3-byte prefix is consumed, so the payload after it
+	 *  must have strlen < MAX_DATA.
+	 *
+	 */
+	{
+		int j;
+
+		// Fill with 'a': "]Q1" + payload + '\0'
+		memcpy(bigbuffer, "]Q1", 3);
+		for (j = 3; j < MAX_DATA + 4; j++)
+			bigbuffer[j] = 'a';
+
+		// Payload = MAX_DATA - 1 chars: passes length check
+		bigbuffer[3 + MAX_DATA - 1] = '\0';
+		TEST_CHECK(gs1_encoder_setScanData(ctx, bigbuffer));
+
+		// Payload = MAX_DATA chars: triggers DATA_TOO_LONG
+		bigbuffer[3 + MAX_DATA - 1] = 'a';
+		bigbuffer[3 + MAX_DATA] = '\0';
+		TEST_CHECK(!gs1_encoder_setScanData(ctx, bigbuffer));
+	}
+
 
 	gs1_encoder_free(ctx);
 

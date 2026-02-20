@@ -860,6 +860,32 @@ void test_scandata_processScanData(void) {
 	test_testProcessScanData(true, "]E402345673|]e099COMPOSITE" "\x1D" "98XYZ",
 		EAN8, "02345673|^99COMPOSITE^98XYZ");
 
+	/*
+	 *  MAX_DATA boundary
+	 *
+	 *  Use "]Q1" (QR plain data) to avoid GS1 AI processing.
+	 *  The 3-byte prefix is consumed, so the payload after it
+	 *  must have strlen < MAX_DATA.
+	 *
+	 */
+	{
+		static char scanbuf[MAX_DATA+5];
+		int j;
+
+		memcpy(scanbuf, "]Q1", 3);
+		for (j = 3; j < MAX_DATA + 4; j++)
+			scanbuf[j] = 'a';
+
+		// Payload = MAX_DATA - 1 chars: passes length check
+		scanbuf[3 + MAX_DATA - 1] = '\0';
+		TEST_CHECK(gs1_encoder_setScanData(ctx, scanbuf));
+
+		// Payload = MAX_DATA chars: triggers DATA_TOO_LONG
+		scanbuf[3 + MAX_DATA - 1] = 'a';
+		scanbuf[3 + MAX_DATA] = '\0';
+		TEST_CHECK(!gs1_encoder_setScanData(ctx, scanbuf));
+	}
+
 #undef test_testProcessScanData
 
 	gs1_encoder_free(ctx);
