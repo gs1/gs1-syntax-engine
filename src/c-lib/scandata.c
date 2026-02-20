@@ -723,6 +723,86 @@ void test_scandata_generateScanData(void) {
 	test_testGenerateScanData(EAN8, "02345673|^99COMPOSITE^98XYZ",
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
 
+
+	/*
+	 *  checkAndNormalisePrimaryData error paths
+	 *
+	 */
+
+	/* Wrong-length primary data */
+	test_testGenerateScanData(EAN13, "2112345678", NULL);		// Too short for 13-digit EAN-13
+
+	/* Non-digit primary data */
+	test_testGenerateScanData(EAN13, "ABCDEFGHIJKLM", NULL);
+
+	/* Bad check digit */
+	test_testGenerateScanData(EAN13, "2112345678901", NULL);	// Wrong check digit (correct: 2112345678900)
+
+	/* addCheckDigit: wrong-length data */
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	test_testGenerateScanData(EAN13, "2112345678", NULL);		// Too short for addCheckDigit (needs 12)
+	test_testGenerateScanData(EAN13, "2112345678901", NULL);	// Too long for addCheckDigit (needs 12)
+	gs1_encoder_setAddCheckDigit(ctx, false);
+
+
+	/*
+	 *  generateScanData failure paths
+	 *
+	 */
+
+	/* QR plain data with CC delimiter: pipe is restored (lines 252-256) */
+	test_testGenerateScanData(QR, "TESTING|^99XYZ", "]Q1TESTING|^99XYZ");
+
+	/* GS1-128 linear-only with plain data (no ^ prefix) fails (lines 270-271) */
+	test_testGenerateScanData(GS1_128_CCA, "PLAINDATA", NULL);
+
+	/* DataBar Expanded with plain data (no ^ prefix) fails (lines 285-286) */
+	test_testGenerateScanData(DataBarExpanded, "PLAINDATA", NULL);
+
+	/* DataBar Limited primary data too large (first digit >= '2') */
+	test_testGenerateScanData(DataBarLimited, "20000000000004", NULL);
+
+	/*
+	 *  Composite with plain CC (no ^ prefix): bypasses setDataStr
+	 *  because setDataStr rejects the CC part, so we set data directly
+	 *
+	 */
+	{
+		char *out;
+
+		/* DataBar Omni composite with plain CC */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
+		strcpy(ctx->dataStr, "24012345678905|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* EAN-13 composite with plain CC */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+		strcpy(ctx->dataStr, "2112345678900|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* GS1-128 composite with plain CC (line 298) */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
+		strcpy(ctx->dataStr, "^0112312312312333|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* DataBar Omni with bad primary data (line 336) */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
+		strcpy(ctx->dataStr, "SHORT");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+	}
+
+	/*
+	 *  addCheckDigit: successful path appends '-' placeholder (line 210)
+	 *
+	 */
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	test_testGenerateScanData(EAN13, "211234567890", "]E02112345678900");	// Check digit computed from '-' placeholder
+	gs1_encoder_setAddCheckDigit(ctx, false);
+
 #undef test_testGenerateScanData
 
 	gs1_encoder_free(ctx);
@@ -885,6 +965,12 @@ void test_scandata_processScanData(void) {
 		scanbuf[3 + MAX_DATA] = '\0';
 		TEST_CHECK(!gs1_encoder_setScanData(ctx, scanbuf));
 	}
+
+	/* Scan data with illegal carat in GS1-128 AI data */
+	test_testProcessScanData(false, "]C101123123123133^10ABC", NONE, "");
+
+	/* Plain scan data with invalid DL URI (no primary AI) */
+	test_testProcessScanData(false, "]Q1https://a/NOPRIMARYAI", NONE, "");
 
 #undef test_testProcessScanData
 

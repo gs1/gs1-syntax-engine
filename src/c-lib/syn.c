@@ -794,7 +794,10 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	{ false, "90  X5  =value", {							/* Missing attribute name (LHS) */
 		AI_ENTRY_TERMINATOR
 	} },
-	{ false, "90  X5  Req=01", {							/* Attribute name: illegal chars */
+	{ false, "90  X5  Req=01", {							/* Attribute name: illegal chars (caught as bad component) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  req1=01", {							/* Attribute name: illegal chars (digit in name) */
 		AI_ENTRY_TERMINATOR
 	} },
 	{ false, "90  X5  req=!!", {							/* Attribute value: illegal chars */
@@ -803,7 +806,10 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	{ false, "90  X5  req=", {							/* Missing attribute value (RHS) */
 		AI_ENTRY_TERMINATOR
 	} },
-	{ false, "90  X5  Req", {							/* Singleton name: illegal chars */
+	{ false, "90  X5  Req", {							/* Singleton name: illegal chars (caught as bad component) */
+		AI_ENTRY_TERMINATOR
+	} },
+	{ false, "90  X5  req1", {							/* Singleton name: illegal chars (digit in name) */
 		AI_ENTRY_TERMINATOR
 	} },
 
@@ -816,6 +822,22 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 		AI_ENTRY_TERMINATOR
 	} },
 	{ false, "90  X5  # @title", {							/* Title: illegal characters */
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Attributes too long: cumulative attributes exceed MAX_AI_ATTR_LEN + 2 buffer
+	 *
+	 */
+	{ false, "90  X5  req=aaaaaaaaaa req=bbbbbbbbbb req=cccccccccc req=dddddddddd req=eeeeeeeeee", {
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Entry too long: exceeds MAX_SD_ENTRY_LEN (150)
+	 *
+	 */
+	{ false, "90  X5  # title_padding_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {
 		AI_ENTRY_TERMINATOR
 	} },
 };

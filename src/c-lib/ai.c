@@ -1123,6 +1123,9 @@ void test_ai_lookupAIentry(void) {
 	TEST_CHECK(gs1_lookupAIentry(ctx, "4199", 4) == NULL);				// Don't vivify (4199) since AI prefix "41" is defined as having length 3
 	TEST_CHECK(gs1_lookupAIentry(ctx, "419", 3) == &unknownAI3fixed13);		// So (419) is okay, not requiring FNC1
 
+	TEST_CHECK(gs1_lookupAIentry(ctx, "23XABC", 0) == NULL);			// Don't vivify when non-digit in AI position (prefix "23" = len 3, "23X" has non-digit)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "3199", 4) == &unknownAI4fixed6);		// Vivify (3199) as fixed-6 since prefix "31" has value length 6
+
 	gs1_encoder_free(ctx);
 
 }

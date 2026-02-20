@@ -310,6 +310,7 @@ void test_api_permitUnknownAIs(void);
 void test_api_permitZeroSuppressedGTINinDLuris(void);
 void test_api_validateAIassociations(void);
 void test_api_validations(void);
+void test_api_getters(void);
 void test_api_dataStr(void);
 void test_api_getAIdataStr(void);
 void test_api_getScanData(void);

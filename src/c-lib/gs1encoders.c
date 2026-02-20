@@ -1112,6 +1112,131 @@ void test_api_validations(void) {
 }
 
 
+void test_api_getters(void) {
+
+	gs1_encoder* ctx;
+	char *out;
+	char buf[256];
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	/*
+	 *  gs1_encoder_getIncludeDataTitlesInHRI
+	 *
+	 */
+	TEST_CHECK(!gs1_encoder_getIncludeDataTitlesInHRI(ctx));		// Default
+	gs1_encoder_setIncludeDataTitlesInHRI(ctx, true);
+	TEST_CHECK(gs1_encoder_getIncludeDataTitlesInHRI(ctx));
+	gs1_encoder_setIncludeDataTitlesInHRI(ctx, false);
+
+	/*
+	 *  gs1_encoder_getErrMsg
+	 *
+	 */
+	TEST_CHECK(strcmp(gs1_encoder_getErrMsg(ctx), "") == 0);	// No error yet
+	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNUMSYMS));	// Trigger error
+	TEST_CHECK(strlen(gs1_encoder_getErrMsg(ctx)) > 0);		// Non-empty
+
+	/*
+	 *  gs1_encoder_getErrMarkup
+	 *
+	 */
+	TEST_CHECK(gs1_encoder_getErrMarkup(ctx) != NULL);		// Always allocated
+
+	// Trigger a linter error: bad check digit in AI (01)
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "^0112312312312334"));	// Wrong check digit
+	TEST_CHECK(strlen(gs1_encoder_getErrMarkup(ctx)) > 0);
+
+	/*
+	 *  gs1_encoder_getDLuri: with primary key
+	 *
+	 */
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^0112312312312333"));
+	out = gs1_encoder_getDLuri(ctx, "https://example.com");
+	TEST_CHECK(out != NULL);
+
+	/*
+	 *  gs1_encoder_getDLuri: no primary key
+	 *
+	 */
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^99XYZ"));
+	out = gs1_encoder_getDLuri(ctx, "https://example.com");
+	TEST_CHECK(out == NULL);
+
+	/*
+	 *  gs1_encoder_setAIdataStr: composite path
+	 *
+	 */
+	strcpy(buf, "(01)12312312312333|(10)ABC123");
+	TEST_CHECK(gs1_encoder_setAIdataStr(ctx, buf));
+
+	/*
+	 *  gs1_encoder_getMaxDataStrLength
+	 *
+	 */
+	TEST_CHECK(gs1_encoder_getMaxDataStrLength() == MAX_DATA);
+
+	/*
+	 *  gs1_encoder_init_ex with opts
+	 *
+	 */
+	{
+		gs1_encoder *ctx2;
+		gs1_encoder_init_status_t status;
+		char msgBuf[256];
+		gs1_encoder_init_opts_t opts = {
+			.struct_size = sizeof(gs1_encoder_init_opts_t),
+			.flags = gs1_encoder_iDEFAULT,
+			.status = &status,
+			.msgBuf = msgBuf,
+			.msgBufSize = sizeof(msgBuf),
+		};
+
+		msgBuf[0] = 'X';	// Pre-fill to verify it gets cleared
+		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		assert(ctx2);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+		TEST_CHECK(msgBuf[0] == '\0');		// Cleared on success
+		gs1_encoder_free(ctx2);
+
+		/* NO_SYNDICT: skip syndict, fallback to embedded table */
+		opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET;
+		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		assert(ctx2);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE);
+		gs1_encoder_free(ctx2);
+
+		/* NO_SYNDICT + NO_EMBEDDED: both disabled, must fail */
+		opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iNO_EMBEDDED | gs1_encoder_iQUIET;
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx2 == NULL);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE);
+		TEST_CHECK(msgBuf[0] != '\0');		// Error message populated
+	}
+
+	/*
+	 *  gs1_encoder_setValidationEnabled: invalid enum
+	 *
+	 */
+	TEST_CHECK(!gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vNUMVALIDATIONS, false));
+
+	/*
+	 *  gs1_encoder_copyDLignoredQueryParams: buffer overflow
+	 *
+	 */
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "https://a/01/12312312312333?singleton&99=ABC"));
+	gs1_encoder_copyDLignoredQueryParams(ctx, (void*)buf, 1);	// Buffer too small
+	TEST_CHECK(buf[0] == '\0');
+DIAG_POP
+
+	gs1_encoder_free(ctx);
+
+}
+
+
 void test_api_dataStr(void) {
 
 	gs1_encoder* ctx;
@@ -1231,6 +1356,79 @@ void test_api_dataStr(void) {
 	}
 
 
+	/*
+	 *  gs1_encoder_setAIdataStr error paths
+	 *
+	 */
+	{
+		char buf[256];
+
+		// Invalid AI in linear part of composite
+		strcpy(buf, "(BADAI)DATA|(99)XYZ");
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, buf));
+
+		// Invalid AI in linear-only path
+		strcpy(buf, "(BADAI)DATA");
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, buf));
+
+		// Invalid AI in CC part of composite
+		strcpy(buf, "(01)12312312312333|(BADAI)XYZ");
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, buf));
+
+		// Validation failure: bad GTIN check digit
+		strcpy(buf, "(01)12312312312334");
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, buf));
+
+		// Validation failure: repeated AI with different values
+		strcpy(buf, "(99)ABC(99)XYZ");
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, buf));
+	}
+
+
+	/*
+	 *  gs1_encoder_setAIdataStr: MAX_AIS boundary via composite
+	 *
+	 *  Linear fills MAX_AIS AIs, separator itself triggers overflow
+	 *
+	 */
+	{
+		char *p;
+		int j;
+
+		p = bigbuffer;
+		for (j = 0; j < MAX_AIS; j++) {
+			*p++ = '('; *p++ = '9'; *p++ = '9'; *p++ = ')';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p++ = '|';
+		*p++ = '('; *p++ = '9'; *p++ = '9'; *p++ = ')';
+		*p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, bigbuffer));
+	}
+
+
+	/*
+	 *  gs1_encoder_setDataStr error paths
+	 *
+	 */
+
+	// DL URI parse failure: no valid AI in URI
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "https://a/NOPRIMARYAI"));
+
+	// Linear AI parse failure: too short for AI 00 (needs 18 digits)
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "^00SHORT"));
+
+	// Validation failure: bad GTIN check digit
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "^0112312312312334"));
+
+	// Composite: linear component AI parse failure
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "^00SHORT|^99XYZ"));
+
+	// Validation failure: repeated AI with different values
+	TEST_CHECK(!gs1_encoder_setDataStr(ctx, "^99ABC^99XYZ"));
+
+
 	gs1_encoder_free(ctx);
 
 }
@@ -1342,6 +1540,14 @@ void test_api_setScanData(void) {
 		bigbuffer[3 + MAX_DATA] = '\0';
 		TEST_CHECK(!gs1_encoder_setScanData(ctx, bigbuffer));
 	}
+
+
+	/*
+	 *  Validation failure path: scan data parses OK but
+	 *  gs1_validateAIs fails (repeated AI with different values)
+	 *
+	 */
+	TEST_CHECK(!gs1_encoder_setScanData(ctx, "]C199ABC" "\x1D" "99XYZ"));
 
 
 	gs1_encoder_free(ctx);

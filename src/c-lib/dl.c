@@ -1347,6 +1347,15 @@ void test_dl_parseDLuri(void) {
 		"https://a$/006141411234567890",
 		"");
 
+	/* Illegal URI characters outside uriCharacters set */
+	test_parseDLuri(false, "https://a/01/12312312312333<bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333>bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333{bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333}bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333\\bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333^bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333`bad", "");
+
 	/*
 	 * Custom stem
 	 *
@@ -1676,6 +1685,16 @@ void test_dl_parseDLuri(void) {
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
 
+	/* Empty AI value in DL path element */
+	test_parseDLuri(false, "https://a/01//12312312312333", "");
+
+	/* Percent-encoded null in DL path value */
+	test_parseDLuri(false, "https://a/01/1231231231233%003", "");
+
+	/* Percent-encoded null in DL query value */
+	test_parseDLuri(false, "https://a/01/12312312312333?99=ABC%00DEF", "");
+
+
 	/*
 	 *  MAX_AI_VALUE_LEN boundary: AI (99) accepts X..90 in query
 	 *
@@ -1705,6 +1724,19 @@ void test_dl_parseDLuri(void) {
 		ctx->numSortedAIs = 0;
 		TEST_CHECK(!gs1_parseDLuri(ctx, dlbuf, outbuf));	// 91 chars, too long
 	}
+
+
+	/*
+	 *  Empty AI value in DL path element during forward processing
+	 *
+	 */
+	test_parseDLuri(false, "https://a/01/12312312312333/10/", "");
+
+	/*
+	 *  Invalid key-qualifier sequence in DL path
+	 *
+	 */
+	test_parseDLuri(false, "https://a/01/12312312312333/99/ABC", "");
 
 
 #undef test_parseDLuri
@@ -2005,6 +2037,9 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI?95=INT");
 	test_testGenerateDLuri(true, "https://example.com", "(21)XYZ(01)12312312312333(10)ABC123(99)XYZ", "https://example.com/01/12312312312333/10/ABC123/21/XYZ?99=XYZ");
 
+	/* No primary key AI: cannot generate DL URI */
+	test_testGenerateDLuri(false, "https://example.com", "(99)XYZ789", "");
+
 	/*
 	 * "+" represents space in query info but not path components
 	 *
@@ -2076,6 +2111,29 @@ void test_dl_generateDLuri(void) {
 			TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
 			TEST_CHECK(strcmp(uri, expect) == 0);
 			TEST_MSG("Expected: '%s'. Got: '%s'", expect, uri);
+		}
+	}
+
+	/*
+	 *  Stem with trailing slash: should be trimmed
+	 *
+	 */
+	test_testGenerateDLuri(true, "https://example.com/", "(01)12312312312326", "https://example.com/01/12312312312326");
+
+	/*
+	 *  Composite data (ccsep before primary key AI): line 1040
+	 *
+	 */
+	{
+		const char *uri;
+
+		TEST_CASE("Composite with ccsep before pkey in AI list");
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, "^99ABC|^0112312312312333^10DEF") == true);
+		TEST_MSG("Parse failed. Err: %s", ctx->errMsg);
+		TEST_CHECK((uri = gs1_generateDLuri(ctx, "https://example.com")) != NULL);
+		if (uri) {
+			TEST_CHECK(strcmp(uri, "https://example.com/01/12312312312333/10/DEF?99=ABC") == 0);
+			TEST_MSG("Got: '%s'", uri);
 		}
 	}
 

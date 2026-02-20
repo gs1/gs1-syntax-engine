@@ -66,6 +66,7 @@ TEST_LIST = {
     { "api_permitZeroSuppressedGTINinDLuris", test_api_permitZeroSuppressedGTINinDLuris },
     { "api_validateAIassociations", test_api_validateAIassociations },
     { "api_validations", test_api_validations },
+    { "api_getters", test_api_getters },
     { "api_dataStr", test_api_dataStr },
     { "api_getAIdataStr", test_api_getAIdataStr },
     { "api_getScanData", test_api_getScanData },
