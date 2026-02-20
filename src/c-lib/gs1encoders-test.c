@@ -26,7 +26,9 @@
  */
 #if defined(__clang__)
 #elif defined(__GNUC__)
+#  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
 #elif defined(_MSC_VER)
 #  include <CodeAnalysis/warnings.h>
 #  pragma warning(push)

@@ -91,6 +91,10 @@ ifeq ($(MAKECMDGOALS),clean-msan)
 BUILD_DIR = build-msan
 endif
 
+ifeq ($(MAKECMDGOALS),clean-coverage)
+BUILD_DIR = build-coverage
+endif
+
 ifeq ($(MAKECMDGOALS),clean-wasm)
 BUILD_DIR = build-wasm
 endif
@@ -131,6 +135,18 @@ BUILD_DIR = build-msan
 SAN_LDFLAGS = -fuse-ld=lld
 SAN_CFLAGS = -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_ENV = MSAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
+endif
+
+
+# Code coverage: builds with gcov instrumentation, runs tests and
+# generates an HTML report via lcov/genhtml.
+#
+#   make coverage
+#
+ifeq ($(COVERAGE),yes)
+BUILD_DIR = build-coverage
+CFLAGS_O = -O0
+COV_CFLAGS = --coverage
 endif
 
 
@@ -176,7 +192,7 @@ CFLAGS_FORTIFY = -D_FORTIFY_SOURCE=2
 NPROC = nproc
 endif
 
-CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Wundef -Wnull-dereference -Wstrict-prototypes -Werror -fstack-protector-strong -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
+CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Wundef -Wnull-dereference -Wstrict-prototypes -Werror -fstack-protector-strong -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(COV_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
 APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
 APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
@@ -361,6 +377,19 @@ wasm: $(WASM_JS)
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
+.PHONY: coverage
+coverage:
+	$(MAKE) COVERAGE=yes SLOW_TESTS=yes test
+	lcov --capture --directory build-coverage \
+		--output-file build-coverage/coverage.info
+	lcov --remove build-coverage/coverage.info \
+		'*/syntax/*' '*/gs1encoders-test.c' '*/gs1encoders-app.c' \
+		--output-file build-coverage/coverage.info
+	genhtml build-coverage/coverage.info \
+		--output-directory build-coverage/coverage-report
+	@echo
+	@echo "Coverage report: build-coverage/coverage-report/index.html"
+
 # Generate seeds for a specific fuzzer (internal target)
 .PHONY: fuzzer-corpus-seeds-%
 fuzzer-corpus-seeds-%: $(BUILD_DIR)/$(FUZZER_PREFIX)% | $(FUZZER_CORPUS_PREFIX)%/
@@ -430,6 +459,10 @@ clean-fuzzer:
 .PHONY: clean-msan
 clean-msan:
 	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+
+.PHONY: clean-coverage
+clean-coverage:
+	$(RM) -r build-coverage
 
 .PHONY: clean-fuzzer-corpus
 clean-fuzzer-corpus:
