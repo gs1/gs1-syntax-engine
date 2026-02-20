@@ -12,7 +12,10 @@ lib*.so.*
 src/c-lib/build/
 src/c-lib/build-test/
 src/c-lib/build-fuzzer/
+src/c-lib/build-msan/
+src/c-lib/build-coverage/
 src/c-lib/build-wasm/
+src/c-lib/*.gcov
 src/c-lib/docstmp/
 src/c-lib/corpus-*/
 src/c-lib/crash-*
