@@ -116,6 +116,7 @@ ifeq ($(ARCH_OS), darwin)
 # Leak detection is not supported on MacOS builds of LLVM
 SAN_CFLAGS = -fsanitize=address,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_ENV = ASAN_OPTIONS="symbolize=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" MallocNanoZone=0 ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
+FUZZER_LDLIBS = -L$(shell $(CC) --print-resource-dir)/../../c++ -lc++
 else
 SAN_CFLAGS = -fsanitize=address,leak,undefined$(FUZZER_SAN_OPT) -fno-omit-frame-pointer -fno-optimize-sibling-calls -O1
 SAN_ENV = ASAN_OPTIONS="symbolize=1 detect_leaks=1" LSAN_OPTIONS="fast_unwind_on_malloc=0:malloc_context_size=50" ASAN_SYMBOLIZER_PATH="$(shell which llvm-symbolizer)"
@@ -316,33 +317,33 @@ $(FUZZER_CORPUS_PREFIX)ais/:
 	mkdir -p $@
 
 $(BUILD_DIR)/$(FUZZER_PREFIX)ais: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o
-	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)ais
+	$(CC) $(CFLAGS) $(FUZZER_LDLIBS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)ais.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)ais
 
 $(FUZZER_CORPUS_PREFIX)data/:
 	mkdir -p $@
 
 $(BUILD_DIR)/$(FUZZER_PREFIX)data: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)data.o
-	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)data.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)data
+	$(CC) $(CFLAGS) $(FUZZER_LDLIBS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)data.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)data
 
 $(FUZZER_CORPUS_PREFIX)dl/:
 	mkdir -p $@
 
 $(BUILD_DIR)/$(FUZZER_PREFIX)dl: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)dl.o
-	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)dl.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)dl
+	$(CC) $(CFLAGS) $(FUZZER_LDLIBS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)dl.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)dl
 
 
 $(FUZZER_CORPUS_PREFIX)scandata/:
 	mkdir -p $@
 
 $(BUILD_DIR)/$(FUZZER_PREFIX)scandata: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)scandata.o
-	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)scandata.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)scandata
+	$(CC) $(CFLAGS) $(FUZZER_LDLIBS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)scandata.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)scandata
 
 
 $(FUZZER_CORPUS_PREFIX)syn/:
 	mkdir -p $@
 
 $(BUILD_DIR)/$(FUZZER_PREFIX)syn: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o
-	$(CC) $(CFLAGS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)syn
+	$(CC) $(CFLAGS) $(FUZZER_LDLIBS) $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o -o $(BUILD_DIR)/$(FUZZER_PREFIX)syn
 
 
 #
