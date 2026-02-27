@@ -1,4 +1,4 @@
-# GS1 Barcode Syntax Engine
+# GS1 Barcode Syntax Engine (Contributing)
 
 This document is for developers contributing to the library, not users of the
 library. It is authoritative for both human contributors and automated tools.
