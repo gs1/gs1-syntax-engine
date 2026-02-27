@@ -487,7 +487,8 @@ The iOS demo is a SwiftUI application that uses the Swift package from `src/swif
 ```bash
 cd src/ios
 pod install
-xcodebuild -workspace "GS1 Encoders App.xcworkspace" -scheme "GS1 Encoders App" build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+xcodebuild -workspace "GS1 Encoders App.xcworkspace" -scheme "GS1 Encoders App" build \
+    CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 ```
 
 ### Android App
@@ -566,7 +567,8 @@ Run a fuzzer (command printed after build):
 ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais -fork=3 corpus-ais
 
 # Job mode
-ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais -jobs=$(nproc) -workers=$(nproc) corpus-ais
+ASAN_OPTIONS="symbolize=1 detect_leaks=1" ./build-fuzzer/gs1encoders-fuzzer-ais \
+    -jobs=$(nproc) -workers=$(nproc) corpus-ais
 ```
 
 To regenerate seeds for an existing corpus, delete the corpus directory first.
