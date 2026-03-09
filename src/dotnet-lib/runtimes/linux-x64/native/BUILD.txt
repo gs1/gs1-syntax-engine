@@ -1,0 +1,7 @@
+Build `libgs1encoders.so` on a Linux host and place it in this directory.
+
+Expected file name:
+- `libgs1encoders.so`
+
+Upstream build command:
+- `make -C src/c-lib libshared`

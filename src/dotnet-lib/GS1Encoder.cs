@@ -109,9 +109,12 @@ namespace GS1.Encoders
         };
 
         /// <summary>
-        /// The expected name of the GS1 Syntax Engine dynamic-link library
+        /// The base name of the GS1 Syntax Engine native library.
+        /// .NET resolves this to the platform-specific file name, e.g.
+        /// gs1encoders.dll on Windows, libgs1encoders.so on Linux, and
+        /// libgs1encoders.dylib on macOS.
         /// </summary>
-        private const String gs1_dll = "gs1encoders.dll";
+        private const String gs1_dll = "gs1encoders";
 
         /// <summary>
         /// An opaque pointer used by the native code to represent an
