@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2000-2024 GS1 AISBL.
+ * @author Copyright (c) 2000-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@
 static char *inpStr;
 
 // Replacement for the deprecated gets(3) function
+#ifdef gets
+#undef gets
+#endif
 #define gets(i) _gets(i)
 
 static char* _gets(char* const in) {
@@ -107,6 +110,9 @@ static bool userInt(gs1_encoder* const ctx) {
 				printf("\nEnter data: ");
 				if (gets(inpStr) == NULL)
 					continue;
+#ifdef __COVERITY__
+				__coverity_tainted_string_sanitize_content__(inpStr);
+#endif
 				if (menuVal == 1)
 					ret = gs1_encoder_setDataStr(ctx, inpStr);
 				else if (menuVal == 2)
@@ -157,6 +163,38 @@ static bool userInt(gs1_encoder* const ctx) {
 int main(int argc, const char* const argv[]) {
 
 	gs1_encoder* ctx;
+	gs1_encoder_init_status_t status;
+	char msg[256] = { 0 };
+
+
+	/*
+	 *  Initialise the library using the extended interface.
+	 *
+	 *  If detailed control is not required then this will suffice:
+	 *
+	 *      ctx = gs1_encoder_init(NULL);
+	 *
+	 */
+	gs1_encoder_init_opts_t opts = {
+		.struct_size	= sizeof(gs1_encoder_init_opts_t),
+		.flags		= gs1_encoder_iQUIET|gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+		.status		= &status,
+		.msgBuf		= msg,
+		.msgBufSize	= sizeof(msg)
+	};
+
+	ctx = gs1_encoder_init_ex(NULL, &opts);
+
+	if (ctx == NULL) {
+		printf("Failed to initialise GS1 Encoders library!\n");
+		if (*msg)
+			printf("\n!!! Error: %s\n", msg);
+		return 1;
+	}
+
+	if (status != GS1_ENCODERS_INIT_SUCCESS && *msg)
+		printf("\n!!! Warning: %s\n", msg);
+
 
 	inpStr = malloc((size_t)gs1_encoder_getMaxDataStrLength()+1);
 	if (inpStr == NULL) {
@@ -164,11 +202,6 @@ int main(int argc, const char* const argv[]) {
 		return 1;
 	}
 
-	ctx = gs1_encoder_init(NULL);
-	if (ctx == NULL) {
-		printf("Failed to initialise GS1 Encoders library!\n");
-		return 1;
-	}
 
 	if (argc == 2 && strcmp(argv[1],"--version") == 0) {
 		printf("Application version: " RELEASE "\n");
@@ -176,8 +209,8 @@ int main(int argc, const char* const argv[]) {
 		goto out;
 	}
 
-	printf("\nGS1 Syntax Engine Console Demo (Built " RELEASE "):");
-	printf("\n\nCopyright (c) 2020-2024 GS1 AISBL. License: Apache-2.0");
+	printf("\nGS1 Barcode Syntax Engine Console Demo (Built " RELEASE "):");
+	printf("\n\nCopyright (c) 2020-2026 GS1 AISBL. License: Apache-2.0");
 
 	while (userInt(ctx));
 

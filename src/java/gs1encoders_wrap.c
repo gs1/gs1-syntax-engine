@@ -1,8 +1,8 @@
 /*
- * JNI interface for accessing the GS1 Syntax Engine native library from Java
- * using the org.gs1.gs1encoders.GS1Encoder wrapper class.
+ * JNI interface for accessing the GS1 Barcode Syntax Engine native library
+ * from Java using the org.gs1.gs1encoders.GS1Encoder wrapper class.
  *
- * Copyright (c) 2022-2024 GS1 AISBL.
+ * Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,6 @@
 #include <jni.h>
 #include <stdio.h>
 #include "gs1encoders.h"
-
-
-#if defined(__clang__)
-#  define DIAG_PUSH _Pragma("clang diagnostic push")
-#  define DIAG_POP _Pragma("clang diagnostic pop")
-#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
-#elif defined(__GNUC__)
-#  define DIAG_PUSH _Pragma("GCC diagnostic push")
-#  define DIAG_POP _Pragma("GCC diagnostic pop")
-#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#elif defined(_MSC_VER)
-#  define DIAG_PUSH __pragma(warning(push))
-#  define DIAG_POP __pragma(warning(pop))
-#  define DIAG_DISABLE_DEPRECATED_DECLARATIONS __pragma(warning(disable: 4996))
-#endif
 
 
 JNIEXPORT jstring JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetErrMsgJNI(
@@ -127,6 +112,21 @@ JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetPerm
     return gs1_encoder_setPermitUnknownAIs((gs1_encoder*)ctx, value);
 }
 
+JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetPermitZeroSuppressedGTINinDLurisJNI(
+        JNIEnv *env,
+        jobject obj,
+        jlong ctx) {
+    return gs1_encoder_getPermitZeroSuppressedGTINinDLuris((gs1_encoder *) ctx);
+}
+
+JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetPermitZeroSuppressedGTINinDLurisJNI(
+        JNIEnv *env,
+        jobject obj,
+        jlong ctx,
+        jboolean value) {
+    return gs1_encoder_setPermitZeroSuppressedGTINinDLuris((gs1_encoder *) ctx, value);
+}
+
 JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetValidationEnabledJNI(
         JNIEnv* env,
         jobject obj,
@@ -142,27 +142,6 @@ JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetVali
         jint validation,
         jboolean value) {
     return gs1_encoder_setValidationEnabled((gs1_encoder*)ctx, (enum gs1_encoder_validations)validation, value);
-}
-
-JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetValidateAIassociationsJNI(
-        JNIEnv* env,
-        jobject obj,
-        jlong ctx) {
-DIAG_PUSH
-DIAG_DISABLE_DEPRECATED_DECLARATIONS
-    return gs1_encoder_getValidateAIassociations((gs1_encoder*)ctx);
-DIAG_POP
-}
-
-JNIEXPORT jboolean JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderSetValidateAIassociationsJNI(
-        JNIEnv* env,
-        jobject obj,
-        jlong ctx,
-        jboolean value) {
-DIAG_PUSH
-DIAG_DISABLE_DEPRECATED_DECLARATIONS
-    return gs1_encoder_setValidateAIassociations((gs1_encoder*)ctx, value);
-DIAG_POP
 }
 
 JNIEXPORT jstring JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetDataStrJNI(

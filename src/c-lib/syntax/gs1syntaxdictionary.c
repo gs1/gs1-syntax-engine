@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 struct name_function_s {
@@ -26,49 +27,77 @@ struct name_function_s {
 	gs1_linter_t fn;
 };
 
+
+#define ENT(x) { .name = #x, .fn = gs1_lint_##x }
+#define DEP(x)					\
+DIAG_PUSH					\
+DIAG_DISABLE_DEPRECATED_DECLARATIONS		\
+ENT(x)						\
+DIAG_POP
+
+/* GCC has flaky support for pragmas within expressions */
+#if defined(__GNUC__) && !defined(__clang__)
+  #undef DEP
+  #define DEP(x) ENT(x)
+  DIAG_PUSH
+  DIAG_DISABLE_DEPRECATED_DECLARATIONS
+#endif
+
 const struct name_function_s name_function_map[] = {
-	{ .name = "couponcode",		.fn = gs1_lint_couponcode },
-	{ .name = "couponposoffer",	.fn = gs1_lint_couponposoffer },
-	{ .name = "cset39",		.fn = gs1_lint_cset39 },
-	{ .name = "cset64",		.fn = gs1_lint_cset64 },
-	{ .name = "cset82",		.fn = gs1_lint_cset82 },
-	{ .name = "csetnumeric",	.fn = gs1_lint_csetnumeric },
-	{ .name = "csum",		.fn = gs1_lint_csum },
-	{ .name = "csumalpha",		.fn = gs1_lint_csumalpha },
-	{ .name = "hasnondigit",	.fn = gs1_lint_hasnondigit },
-	{ .name = "hh",			.fn = gs1_lint_hh },
-	{ .name = "hhmm",		.fn = gs1_lint_hhmm },
-	{ .name = "hyphen",		.fn = gs1_lint_hyphen },
-	{ .name = "iban",		.fn = gs1_lint_iban },
-	{ .name = "importeridx",	.fn = gs1_lint_importeridx },
-	{ .name = "iso3166",		.fn = gs1_lint_iso3166 },
-	{ .name = "iso3166999",		.fn = gs1_lint_iso3166999 },
-	{ .name = "iso3166alpha2",	.fn = gs1_lint_iso3166alpha2 },
-	{ .name = "iso3166list",	.fn = gs1_lint_iso3166list },
-	{ .name = "iso4217",		.fn = gs1_lint_iso4217 },
-	{ .name = "iso5218",		.fn = gs1_lint_iso5218 },
-	{ .name = "key",		.fn = gs1_lint_key },
-	{ .name = "latitude",		.fn = gs1_lint_latitude },
-	{ .name = "longitude",		.fn = gs1_lint_longitude },
-	{ .name = "mediatype",		.fn = gs1_lint_mediatype },
-	{ .name = "mm",			.fn = gs1_lint_mm },
-	{ .name = "mmoptss",		.fn = gs1_lint_mmoptss },
-	{ .name = "nonzero",		.fn = gs1_lint_nonzero },
-	{ .name = "nozeroprefix",	.fn = gs1_lint_nozeroprefix },
-	{ .name = "pcenc",		.fn = gs1_lint_pcenc },
-	{ .name = "pieceoftotal",	.fn = gs1_lint_pieceoftotal },
-	{ .name = "posinseqslash",	.fn = gs1_lint_posinseqslash },
-	{ .name = "ss",			.fn = gs1_lint_ss },
-	{ .name = "winding",		.fn = gs1_lint_winding },
-	{ .name = "yesno",		.fn = gs1_lint_yesno },
-	{ .name = "yymmd0",		.fn = gs1_lint_yymmd0 },
-	{ .name = "yymmdd",		.fn = gs1_lint_yymmdd },
-	{ .name = "yymmddhh",		.fn = gs1_lint_yymmddhh },
-	{ .name = "yyyymmd0",		.fn = gs1_lint_yyyymmd0 },
-	{ .name = "yyyymmdd",		.fn = gs1_lint_yyyymmdd },
-	{ .name = "zero",		.fn = gs1_lint_zero },
+	ENT(couponcode),
+	ENT(couponposoffer),
+	ENT(cset39),
+	ENT(cset64),
+	ENT(cset82),
+	ENT(csetnumeric),
+	ENT(csum),
+	ENT(csumalpha),
+	ENT(gcppos1),
+	ENT(gcppos2),
+	ENT(hasnondigit),
+	ENT(hh),
+	ENT(hhmi),
+	DEP(hhmm),
+	ENT(hyphen),
+	ENT(iban),
+	ENT(importeridx),
+	ENT(iso3166),
+	ENT(iso3166999),
+	ENT(iso3166alpha2),
+	DEP(iso3166list),
+	ENT(iso4217),
+	ENT(iso5218),
+	DEP(key),
+	DEP(keyoff1),
+	ENT(latitude),
+	ENT(longitude),
+	ENT(mediatype),
+	ENT(mi),
+	DEP(mmoptss),
+	ENT(nonzero),
+	ENT(nozeroprefix),
+	ENT(packagetype),
+	ENT(pcenc),
+	ENT(pieceoftotal),
+	ENT(posinseqslash),
+	ENT(ss),
+	ENT(winding),
+	ENT(yesno),
+	ENT(yymmd0),
+	ENT(yymmdd),
+	DEP(yymmddhh),
+	ENT(yyyymmd0),
+	ENT(yyyymmdd),
+	ENT(zero),
 };
 
+/* Flaky GCC */
+#if defined(__GNUC__) && !defined(__clang__)
+  DIAG_POP
+#endif
+
+#undef ENT
+#undef DEP
 
 
 /*
@@ -107,7 +136,7 @@ gs1_linter_t gs1_linter_from_name(const char* const name) {
  */
 #ifdef GS1_LINTER_ERR_STR_EN
 
-GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = {
+GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[] = {
 	"No issues were detected by the linter.",
 	"A non-digit character was found where a digit is expected.",
 	"A non-CSET 82 character was found where a CSET 82 character is expected.",
@@ -119,7 +148,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The component is too short to perform an alphanumeric check character pair calculation.",
 	"The component is too long to perform an alphanumeric check character pair calculation.",
 	"The data source for GCP lookups is offline.",
-	"The component is shorter than the minimum length GS1 Company Prefix.",
+	"",	// Unused
 	"The GS1 Company Prefix is invalid.",
 	"The Importer Index must be a single character.",
 	"The Importer Index is an invalid character.",
@@ -140,8 +169,9 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The date is too long.",
 	"",	// Unused
 	"",	// Unused
-	"The hour with minute is too short for HHMM format.",
-	"The hour with minute is too long for HHMM format.",
+	"",	// Unused
+	"The hour with minute is too short for HHMI format.",
+	"The hour with minute is too long for HHMI format.",
 	"",	// Unused
 	"The date contains an illegal month of the year.",
 	"The date contains an illegal day of the month.",
@@ -197,7 +227,7 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"The coupon's expiration date is invalid.",
 	"The coupon's start date is too short to YYMMDD format.",
 	"The coupon's start date is invalid.",
-	"The coupon's expiration date preceed the start date.",
+	"The coupon's expiration date precede the start date.",
 	"The coupon's Retailer GCP/GLN VLI is missing.",
 	"The coupon's Retailer GCP/GLN VLI must be \"1\" to \"7\".",
 	"The coupon's Retailer GCP/GLN is shorter than what is indicated by its VLI.",
@@ -224,10 +254,13 @@ GS1_SYNTAX_DICTIONARY_API const char *gs1_lint_err_str[__GS1_LINTER_NUM_ERRS] = 
 	"A non-digit character is required.",
 	"The hour is too short for HH format.",
 	"The hour is too long for HH format.",
-	"The minute is too short for MM format.",
-	"The minute is too long for MM format.",
+	"The minute is too short for MI format.",
+	"The minute is too long for MI format.",
 	"The second is too short for SS format.",
 	"The second is too long for SS format.",
+	"A valid PackageTypeCode is required.",
+	"The component is shorter than the minimum length GS1 Company Prefix.",
+	"The IBAN is too long.",
 };
 
 #endif  /* GS1_LINTER_ERR_STR_EN */
@@ -252,8 +285,22 @@ void test_name_function_map_is_sorted(void)
 
 void test_gs1_linter_from_name(void)
 {
-	TEST_CHECK(gs1_linter_from_name("key") == gs1_lint_key);
+	TEST_CHECK(gs1_linter_from_name("gcppos1") == gs1_lint_gcppos1);
 	TEST_CHECK(gs1_linter_from_name("dummy") == NULL);
+
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+	TEST_CHECK(gs1_linter_from_name("key") == gs1_lint_key);
+DIAG_POP
+
 }
+
+
+#ifdef GS1_LINTER_ERR_STR_EN
+void test_gs1_linter_err_str_en_size(void)
+{
+	TEST_CHECK(sizeof(gs1_lint_err_str)/sizeof(gs1_lint_err_str[0]) == __GS1_LINTER_NUM_ERRS);
+}
+#endif
 
 #endif  /* UNIT_TESTS */

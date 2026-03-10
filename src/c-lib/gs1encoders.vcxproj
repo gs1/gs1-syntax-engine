@@ -105,6 +105,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -130,6 +131,7 @@
     <ClCompile>
       <PreprocessorDefinitions>GS1_LINTER_ERR_STR_EN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <PostBuildEvent>
       <Command>xcopy /y gs1encoders.h "$(OutDir)"</Command>
@@ -150,26 +152,26 @@
     <ClCompile Include="syntax\lint_csetnumeric.c" />
     <ClCompile Include="syntax\lint_csum.c" />
     <ClCompile Include="syntax\lint_csumalpha.c" />
+    <ClCompile Include="syntax\lint_gcppos1.c" />
+    <ClCompile Include="syntax\lint_gcppos2.c" />
     <ClCompile Include="syntax\lint_hasnondigit.c" />
     <ClCompile Include="syntax\lint_hh.c" />
-    <ClCompile Include="syntax\lint_hhmm.c" />
+    <ClCompile Include="syntax\lint_hhmi.c" />
     <ClCompile Include="syntax\lint_hyphen.c" />
     <ClCompile Include="syntax\lint_iban.c" />
     <ClCompile Include="syntax\lint_importeridx.c" />
     <ClCompile Include="syntax\lint_iso3166.c" />
     <ClCompile Include="syntax\lint_iso3166999.c" />
     <ClCompile Include="syntax\lint_iso3166alpha2.c" />
-    <ClCompile Include="syntax\lint_iso3166list.c" />
     <ClCompile Include="syntax\lint_iso4217.c" />
     <ClCompile Include="syntax\lint_iso5218.c" />
-    <ClCompile Include="syntax\lint_key.c" />
     <ClCompile Include="syntax\lint_latitude.c" />
     <ClCompile Include="syntax\lint_longitude.c" />
     <ClCompile Include="syntax\lint_mediatype.c" />
-    <ClCompile Include="syntax\lint_mm.c" />
-    <ClCompile Include="syntax\lint_mmoptss.c" />
+    <ClCompile Include="syntax\lint_mi.c" />
     <ClCompile Include="syntax\lint_nonzero.c" />
     <ClCompile Include="syntax\lint_nozeroprefix.c" />
+    <ClCompile Include="syntax\lint_packagetype.c" />
     <ClCompile Include="syntax\lint_pcenc.c" />
     <ClCompile Include="syntax\lint_pieceoftotal.c" />
     <ClCompile Include="syntax\lint_posinseqslash.c" />
@@ -178,10 +180,10 @@
     <ClCompile Include="syntax\lint_yesno.c" />
     <ClCompile Include="syntax\lint_yymmd0.c" />
     <ClCompile Include="syntax\lint_yymmdd.c" />
-    <ClCompile Include="syntax\lint_yymmddhh.c" />
     <ClCompile Include="syntax\lint_yyyymmd0.c" />
     <ClCompile Include="syntax\lint_yyyymmdd.c" />
     <ClCompile Include="syntax\lint_zero.c" />
+    <ClCompile Include="syntax\lint__stubs.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ai.h" />
@@ -191,7 +193,10 @@
     <ClInclude Include="gs1encoders.h" />
     <ClInclude Include="scandata.h" />
     <ClInclude Include="syn.h" />
+    <ClInclude Include="tr.h" />
+    <ClInclude Include="tr_EN.h" />
     <ClInclude Include="syntax\gs1syntaxdictionary.h" />
+    <ClInclude Include="syntax\gs1syntaxdictionary-utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

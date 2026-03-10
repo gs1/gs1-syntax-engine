@@ -1,58 +1,47 @@
-gs1encoder
-==========
+# gs1encoder
 
-JavaScript wrapper library for the GS1 Syntax Engine compiled as a WASM by
+JavaScript wrapper library for the GS1 Barcode Syntax Engine compiled as a Wasm by
 Emscripten.
 
-This JS library is provided as an ESM and therefore requires a modern Node.js engine.
+The GS1 Barcode Syntax Engine provides routines that support the processing of
+GS1 syntax data, including Application Identifier element strings and GS1
+Digital Link URIs, whether these are provided in raw or human-friendly format
+or as normalised scan data received from barcode readers.
 
+## Documentation
 
-Documentation
--------------
+Full API documentation with usage examples is available at:
+<https://gs1.github.io/gs1-syntax-engine/js-wasm/>
 
-The library is a lightweight wrapper around the Syntax Engine native C library described here:
-<https://gs1.github.io/gs1-syntax-engine/>
-
-
-Example
--------
-
-A minimal example is as follows:
+## Installation
 
 ```shell
 npm init es6
-...
-npm install --save gs1encoder
+npm install gs1encoder
 ```
 
-`example.js`:
+## Quick Start
 
 ```javascript
 import { GS1encoder } from "gs1encoder";
 
-var gs1encoder = new GS1encoder();
-await gs1encoder.init();
+const gs = await GS1encoder.create();
 
-console.log("\nSyntax Engine version: %s\n", gs1encoder.version);
+gs.aiDataStr = "(01)09521234543213(99)TESTING123";
+console.log("GS1 Digital Link URI: " + gs.getDLuri("https://example.com"));
 
-gs1encoder.aiDataStr = "(01)09521234543213(99)TESTING123";
-
-console.log("AI element string:              %s", gs1encoder.aiDataStr);
-console.log("Barcode message:                %s", gs1encoder.dataStr);
-console.log("Canonical GS1 Digital Link URI: %s", gs1encoder.getDLuri(null));
-
-gs1encoder.free();
+gs.free();  // Release native resources when done
 ```
 
-```shell
-$ node example.js
+**Note:** Each `GS1encoder` instance allocates native resources. Call `free()` when you
+are finished with an instance to release these resources promptly.
 
-Syntax Engine version: Apr  6 2024
+## Examples
 
-AI element string:              (01)09521234543213(99)TESTING123
-Barcode message:                ^010952123454321399TESTING123
-Canonical GS1 Digital Link URI: https://id.gs1.org/01/09521234543213?99=TESTING123
-```
+- Node.js: [example.node.mjs](https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.node.mjs)
+- Browser: [example.html](https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.html) with [example.mjs](https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.mjs)
 
-An comprehensive, interactive example is provided here:
-<https://github.com/gs1/gs1-syntax-engine/blob/main/src/js-wasm/example.node.mjs>
+## TypeScript Support
+
+This library includes type definitions (`.d.ts` file) that provide compile-time
+type checking in TypeScript projects and autocompletion in many IDEs.

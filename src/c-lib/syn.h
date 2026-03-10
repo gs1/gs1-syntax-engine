@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,19 @@
 #ifndef SYN_H
 #define SYN_H
 
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "gs1encoders.h"
 
 
+
 struct aiEntry;
 
 
-bool gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname);
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname, bool quiet);
 void gs1_freeSyntaxDictionaryEntries(const gs1_encoder *ctx, struct aiEntry *sd);
 
 // Exposed for fuzzing
@@ -40,8 +43,11 @@ int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct 
 #ifdef UNIT_TESTS
 
 void test_syn_parseSyntaxDictionaryEntry(void);
+void test_syn_allocFailures(void);
 
-#endif
+#endif  /* UNIT_TESTS */
 
+
+#endif  /* EXCLUDE_SYNTAX_DICTIONARY_LOADER */
 
 #endif  /* SYN_H */

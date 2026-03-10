@@ -1,0 +1,8 @@
+---
+quiet: true
+compact: true
+skip-check:
+  # Doc-build containers are ephemeral and run locally, not deployed
+  - CKV_DOCKER_2   # HEALTHCHECK not needed for doc generation
+  - CKV_DOCKER_3   # USER not needed for local doc generation
+  - CKV_DOCKER_5   # apt-get update alone is fine for doc containers

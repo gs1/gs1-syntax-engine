@@ -1,8 +1,12 @@
+---
 name: GS1 Encoders CI
 
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
 
@@ -16,29 +20,39 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: clang CI (with sanitizers)
-      run: |
+      - name: clang CI (with sanitizers)
+        run: |
 
-        # For llvm-symbolizer
-        sudo apt-get -y --no-install-recommends install llvm
+          # For llvm-symbolizer
+          sudo apt-get -y --no-install-recommends install llvm
 
-        # Load AI table from external Syntax Dictionary
-        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=clang SANITIZE=yes SLOW_TESTS=yes
 
-        # Re-run using the embedded AI table
-        rm src/c-lib/gs1-syntax-dictionary.txt
-        make -C src/c-lib -j `nproc` test CC=clang SANITIZE=yes SLOW_TESTS=yes
-        git checkout src/c-lib/gs1-syntax-dictionary.txt
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=clang SANITIZE=yes SLOW_TESTS=yes
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
-        make -C src/c-lib -j `nproc` lib CC=clang SANITIZE=yes
+          make -C src/c-lib -j "$(nproc)" lib \
+            CC=clang SANITIZE=yes
 
-        make -C src/c-lib -j `nproc` app CC=clang SANITIZE=yes
-        ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
+          make -C src/c-lib -j "$(nproc)" app \
+            CC=clang SANITIZE=yes
+          ( cd src/c-lib && \
+            LD_LIBRARY_PATH=build \
+            build/gs1encoders.bin --version )
 
-        make -C src/c-lib -j `nproc` app-static CC=clang SANITIZE=yes
-        ( cd src/c-lib && build/gs1encoders-static.bin --version )
+          make -C src/c-lib -j "$(nproc)" app-static \
+            CC=clang SANITIZE=yes
+          ( cd src/c-lib && \
+            build/gs1encoders-static.bin --version )
 
   ci-gcc:
 
@@ -46,78 +60,217 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: gcc CI
-      run: |
-        # Load AI table from external Syntax Dictionary
-        make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
+      - name: gcc CI
+        run: |
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc ANALYZER=yes SLOW_TESTS=yes
 
-        # Re-run using the embedded AI table
-        rm src/c-lib/gs1-syntax-dictionary.txt
-        make -C src/c-lib -j `nproc` test CC=gcc SLOW_TESTS=yes
-        git checkout src/c-lib/gs1-syntax-dictionary.txt
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc ANALYZER=yes SLOW_TESTS=yes
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
-        make -C src/c-lib -j `nproc` lib CC=gcc
+          make -C src/c-lib -j "$(nproc)" lib CC=gcc ANALYZER=yes
 
-        make -C src/c-lib -j `nproc` app CC=gcc
-        ( cd src/c-lib && LD_LIBRARY_PATH=build build/gs1encoders.bin --version )
+          make -C src/c-lib -j "$(nproc)" app CC=gcc ANALYZER=yes
+          ( cd src/c-lib && \
+            LD_LIBRARY_PATH=build \
+            build/gs1encoders.bin --version )
 
-        make -C src/c-lib -j `nproc` app-static CC=gcc
-        ( cd src/c-lib && build/gs1encoders-static.bin --version )
+          make -C src/c-lib -j "$(nproc)" app-static \
+            CC=gcc ANALYZER=yes
+          ( cd src/c-lib && \
+            build/gs1encoders-static.bin --version )
+
+  ci-valgrind:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Valgrind memcheck CI
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install valgrind
+
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc SLOW_TESTS=yes
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
+            --error-exitcode=1 \
+            --track-origins=yes \
+            -s src/c-lib/build-test/gs1encoders-test.bin
+
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib -j "$(nproc)" test \
+            CC=gcc SLOW_TESTS=yes
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
+            --error-exitcode=1 \
+            --track-origins=yes \
+            -s src/c-lib/build-test/gs1encoders-test.bin
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
+
+  ci-msan:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: MemorySanitizer CI
+        run: |
+
+          # For llvm-symbolizer and lld
+          sudo apt-get -y --no-install-recommends install llvm lld
+
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib -j "$(nproc)" MSAN=yes \
+            SLOW_TESTS=yes test
+
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib -j "$(nproc)" MSAN=yes \
+            SLOW_TESTS=yes test
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
   ci-msvc:
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: MSVC CI
-      run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /warnaserror src\gs1encoders.sln
+      - name: MSVC CI
+        run: |
+          msbuild /t:Restore,Build `
+            /p:Configuration=release `
+            /p:Platform="x64" `
+            /warnaserror src\gs1encoders.sln
 
-        # Load AI table from external Syntax Dictionary
-        copy src\c-lib\gs1-syntax-dictionary.txt .
-        src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
+          # Load AI table from external Syntax Dictionary
+          copy src\c-lib\gs1-syntax-dictionary.txt .
+          src\c-lib\build\test\x64\Release\gs1encoders-test.exe
 
-        # Re-run using the embedded AI table
-        del gs1-syntax-dictionary.txt
-        src\c-lib\build\test\Win32\Release\gs1encoders-test.exe
-        copy src\c-lib\gs1-syntax-dictionary.txt .
+          # Re-run using the embedded AI table
+          del gs1-syntax-dictionary.txt
+          src\c-lib\build\test\x64\Release\gs1encoders-test.exe
+          copy src\c-lib\gs1-syntax-dictionary.txt .
 
-        src\c-lib\build\console-app\Win32\Release\gs1encoders-app.exe --version
-        src\dotnet-app\bin\Release\netcoreapp3.1\gs1encoders-dotnet-app.exe --version
+          src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
+            --version
+          src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
+            --version
+
+          dotnet test src\dotnet-test\gs1encoders-dotnet-test.csproj `
+            --no-build --configuration release
 
   ci-macos:
 
-    runs-on: macos-12
+    runs-on: macos-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: clang CI
-      run: |
-        # Load AI table from external Syntax Dictionary
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=yes SLOW_TESTS=yes
+      - name: clang CI
+        run: |
+          # Load AI table from external Syntax Dictionary
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            test SANITIZE=yes SLOW_TESTS=yes
 
-        # Re-run using the embedded AI table
-        rm src/c-lib/gs1-syntax-dictionary.txt
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` test SANITIZE=yes SLOW_TESTS=yes
-        git checkout src/c-lib/gs1-syntax-dictionary.txt
+          # Re-run using the embedded AI table
+          rm src/c-lib/gs1-syntax-dictionary.txt
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            test SANITIZE=yes SLOW_TESTS=yes
+          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` lib SANITIZE=yes
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            lib SANITIZE=yes
 
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app SANITIZE=yes
-        ( cd src/c-lib && DYLD_LIBRARY_PATH=build build/gs1encoders.bin --version )
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            app SANITIZE=yes
+          ( cd src/c-lib && \
+            DYLD_LIBRARY_PATH=build \
+            build/gs1encoders.bin --version )
 
-        make -C src/c-lib -j `sysctl -n hw.logicalcpu` app-static SANITIZE=yes
-        ( cd src/c-lib && build/gs1encoders-static.bin --version )
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            app-static SANITIZE=yes
+          ( cd src/c-lib && \
+            build/gs1encoders-static.bin --version )
+
+  ci-swift:
+
+    runs-on: macos-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Swift tests
+        working-directory: src/swift
+        run: |
+          ln -s ../c-lib/gs1-syntax-dictionary.txt .
+          swift test -Xswiftc -warnings-as-errors
+
+  ci-contrib:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build C shared library
+        run: |
+          make -C src/c-lib -j "$(nproc)" libshared
+
+      - name: Rust tests
+        working-directory: src/contrib/rust
+        run: |
+          LD_LIBRARY_PATH=../../c-lib/build cargo test
+
+      - name: Python tests
+        working-directory: src/contrib/python3
+        run: |
+          LD_LIBRARY_PATH=../../c-lib/build \
+            python3 -m unittest test_gs1encoders -v
 
   ci-scan-build:
 
@@ -125,35 +278,55 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: clang static analyser CI
-      run: |
-        sudo apt-get update
-        sudo apt-get -y --no-install-recommends install clang-tools
-        scan-build -o plist make -C src/c-lib -j `nproc` all CC=clang
-        scan-build -o plist make -C src/c-lib -j `nproc` test CC=clang SLOW_TESTS=yes
-        [ "$(find plist/ -name *.html)" = '' ];
+      - name: clang static analyser CI
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends \
+            install clang-tools
+          scan-build -o plist \
+            make -C src/c-lib -j "$(nproc)" \
+            all CC=clang
+          scan-build -o plist \
+            make -C src/c-lib -j "$(nproc)" \
+            test CC=clang SLOW_TESTS=yes
+          [ "$(find plist/ -name '*.html')" = '' ];
 
-    - name: "clang static analyzer: Store assets on failure"
-      uses: actions/upload-artifact@v4
-      with:
-        name: clang-scan.tgz
-        path: plist/**/*.html
-        retention-days: 30
-      if: ${{ failure() }}
+      - name: "clang static analyzer: Store assets on failure"
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-scan.tgz
+          path: plist/**/*.html
+          retention-days: 30
+        if: ${{ failure() }}
 
-    - name: check includes with IWYU
-      working-directory: src/c-lib
-      run: |
-        sudo apt-get -y --no-install-recommends install iwyu
-        find -name '*.c' -print0 | xargs -0 -n1 -i bash -c 'iwyu -DPRNT -DSYMBOLOGY=gs1_encoder_sNONE -DUNIT_TESTS -DGS1_LINTER_ERR_STR_EN {}; [[ $? = 2 ]] || false'
+      - name: check includes with IWYU
+        working-directory: src/c-lib
+        run: |
+          sudo apt-get -y --no-install-recommends \
+            install iwyu
+          find . -name '*.c' -not -path './syntax/*' \
+            -exec bash -c \
+            'iwyu -Xiwyu --error \
+              -DPRNT \
+              -DSYMBOLOGY=gs1_encoder_sNONE \
+              -DUNIT_TESTS \
+              -DGS1_LINTER_ERR_STR_EN "$1"; \
+              [[ $? = 0 ]] || false' _ {} \;
 
-    - name: cppcheck
-      working-directory: src/c-lib
-      run: |
-        sudo apt-get -y --no-install-recommends install cppcheck
-        cppcheck --enable=all --force \
+      - name: cppcheck
+        working-directory: src/c-lib
+        run: |
+          sudo apt-get -y --no-install-recommends \
+            install cppcheck
+          cppcheck --enable=all --force \
+            --error-exitcode=1 \
+            --check-level=exhaustive \
+            --inline-suppr \
+            --suppress='*:acutest.h' \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP \
             -U GS1_LINTER_CUSTOM_GCP_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_ISO4217_LOOKUP \
@@ -164,31 +337,103 @@ jobs:
             -U GS1_LINTER_CUSTOM_ISO3166_LOOKUP_H \
             -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP \
             -U GS1_LINTER_CUSTOM_MEDIA_TYPE_LOOKUP_H \
-            -U CLOCK_MONOTONIC -U RUNNING_ON_VALGRIND -U TEST_FINI -U TEST_INIT \
+            -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP \
+            -U GS1_LINTER_CUSTOM_PACKAGE_TYPE_LOOKUP_H \
+            -U GS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H \
+            -D EXCLUDE_EMBEDDED_AI_TABLE \
+            -U CLOCK_MONOTONIC \
+            -U RUNNING_ON_VALGRIND \
+            -U TEST_FINI \
+            -U TEST_INIT \
+            -D'DIAG_PUSH=' \
+            -D'DIAG_POP=' \
+            -D'DIAG_DISABLE_DEPRECATED_DECLARATIONS=' \
+            -i syntax \
             -i gs1encoders-fuzzer-ais.c \
+            -i gs1encoders-fuzzer-data.c \
             -i gs1encoders-fuzzer-dl.c \
             -i gs1encoders-fuzzer-scandata.c \
             -i gs1encoders-fuzzer-syn.c \
             -i gs1syntaxdictionary-fuzzer-linters.c \
-            --suppress=missingIncludeSystem .
+            --suppress=missingIncludeSystem \
+            --suppress=preprocessorErrorDirective:ai.h .
 
-  ci-java:
+  ci-java-linux:
 
     runs-on: ubuntu-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Java CI
-      run: |
-        make -C src/c-lib -j `nproc` libstatic
-        ant -f src/java/build.xml test
+      - name: Java CI
+        run: |
+          make -C src/c-lib -j "$(nproc)" libstatic
+          ant -f src/java/build.xml test
+
+  ci-java-macos:
+
+    runs-on: macos-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Java CI
+        run: |
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" libstatic
+          ant -f src/java/build.xml test
+
+  ci-java-windows:
+
+    runs-on: windows-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Add JDK to PATH
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Java CI build C lib
+        run: |
+          msbuild `
+            /p:Configuration=debug `
+            /p:Platform="x64" `
+            /warnaserror src\gs1encoders.sln `
+            /target:gs1encoders
+
+      - name: Set up MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Java CI build JNI lib and test
+        run: |
+          ant -f src/java/build.xml test
 
   ci-wasm:
 
@@ -196,29 +441,55 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: WASM build
-      run: |
-        make -C src/c-lib -j `nproc` wasm
-        ls -l src/c-lib/build-wasm
+      - name: WASM build
+        run: |
+          make -C src/c-lib -j "$(nproc)" wasm
+          ls -l src/c-lib/build-wasm
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-    - name: Node.js tests
-      working-directory: src/js-wasm
-      run: |
-        npm install
-        node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
+      - name: Node.js tests
+        working-directory: src/js-wasm
+        run: |
+          npm install
+          node --experimental-vm-modules \
+            node_modules/jest-cli/bin/jest.js
 
-    - name: Node.js run
-      working-directory: src/js-wasm
-      run: |
-        node example.node.mjs --version
+      - name: TypeScript type checking
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --noEmit \
+            -p ../../maintenance/ci/js-wasm/tsconfig.json
+
+      - name: Check TypeScript declarations are up to date
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --allowJs \
+            --declaration \
+            --emitDeclarationOnly \
+            --skipLibCheck \
+            --moduleResolution node \
+            --module ES2020 \
+            --target ES2020 \
+            --lib ES2020 \
+            --outDir . \
+            gs1encoder.mjs
+          mv gs1encoder.d.mts gs1encoder.d.ts
+          rm -f gs1encoder-wasm.d.mts
+          git diff --exit-code gs1encoder.d.ts
+
+      - name: Node.js run
+        working-directory: src/js-wasm
+        run: |
+          node example.node.mjs --version
 
   ci-jsonly:
 
@@ -226,50 +497,83 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: WASM build
-      run: |
-        make -C src/c-lib -j `nproc` wasm JSONLY=yes
-        ls -l src/c-lib/build-wasm
+      - name: WASM build
+        run: |
+          make -C src/c-lib -j "$(nproc)" wasm \
+            JSONLY=yes
+          ls -l src/c-lib/build-wasm
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-    - name: Node.js test
-      working-directory: src/js-wasm
-      run: |
-        npm install
-        node --experimental-vm-modules node_modules/jest-cli/bin/jest.js
+      - name: Node.js test
+        working-directory: src/js-wasm
+        run: |
+          npm install
+          node --experimental-vm-modules \
+            node_modules/jest-cli/bin/jest.js
 
-    - name: Node.js run
-      working-directory: src/js-wasm
-      run: |
-        node example.node.mjs --version
+      - name: TypeScript type checking
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --noEmit \
+            -p ../../maintenance/ci/js-wasm/tsconfig.json
+
+      - name: Check TypeScript declarations are up to date
+        working-directory: src/js-wasm
+        run: |
+          npx tsc --allowJs \
+            --declaration \
+            --emitDeclarationOnly \
+            --skipLibCheck \
+            --moduleResolution node \
+            --module ES2020 \
+            --target ES2020 \
+            --lib ES2020 \
+            --outDir . \
+            gs1encoder.mjs
+          mv gs1encoder.d.mts gs1encoder.d.ts
+          rm -f gs1encoder-wasm.d.mts
+          git diff --exit-code gs1encoder.d.ts
+
+      - name: Node.js run
+        working-directory: src/js-wasm
+        run: |
+          node example.node.mjs --version
 
   ci-ios-app:
 
-    runs-on: macos-12
+    runs-on: macos-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - uses: actions/cache@v4
-      with:
-        path: src/ios/Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
+      - uses: actions/cache@v4
+        with:
+          path: src/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
-    - name: iOS app CI
-      working-directory: src/ios
-      run: |
-        pod install
-        xcodebuild -workspace GS1\ Encoders\ App.xcworkspace -scheme 'GS1 Encoders App' build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+      - name: iOS app CI
+        working-directory: src/ios
+        run: |
+          pod install
+          xcodebuild \
+            -workspace "GS1 Encoders App.xcworkspace" \
+            -scheme 'GS1 Encoders App' build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
 
   ci-android-app:
 
@@ -277,18 +581,20 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'gradle'
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-    - name: Android app CI
-      working-directory: src/android
-      run: |
-        ./gradlew build --no-daemon
+      - name: Android app CI
+        working-directory: src/android
+        run: |
+          ./gradlew build --no-daemon
 
   #
   #  Production builds
@@ -299,56 +605,161 @@ jobs:
     needs:
       - ci-msvc
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Windows release build
-      run: |
-        msbuild /t:Restore,Build /p:Configuration=release /p:Platform="x86" /p:RuntimeIdentifier=win-x86 /warnaserror src\gs1encoders.sln
-        msbuild /p:Configuration=release /p:Platform="x86" /p:PublishSingleFile=True /p:SelfContained=True /p:RuntimeIdentifier=win-x86 /p:PublishDir=bin\Release\netcoreapp3.1\win-x86\publish\ /warnaserror src\gs1encoders.sln -target:gs1encoders-dotnet-app:Publish
+      - name: Windows release build
+        run: |
+          msbuild /t:Restore,Build `
+            /p:Configuration=release `
+            /p:Platform="x64" `
+            /p:RuntimeIdentifier=win-x64 `
+            /warnaserror src\gs1encoders.sln
+          msbuild /t:Build `
+            /p:Configuration=release `
+            /p:Platform="x86" `
+            /warnaserror `
+            src\c-lib\gs1encoders.vcxproj
+          msbuild `
+            /p:Configuration=release `
+            /p:Platform="x64" `
+            /p:PublishSingleFile=True `
+            /p:SelfContained=True `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ `
+            /warnaserror src\gs1encoders.sln `
+            -target:gs1encoders-dotnet-app:Publish
+          msbuild /t:Publish `
+            /p:Configuration=release `
+            /p:Platform="x64" `
+            /p:PlatformTarget="x64" `
+            /p:PublishSingleFile=True `
+            /p:SelfContained=True `
+            /p:IncludeNativeLibrariesForSelfExtract=True `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:PublishDir=bin\Release\net8.0-windows\win-x64\publish\ `
+            /restore /warnaserror `
+            src\js-wasm\example-web-service-user-dotnet-app\gs1encoders-example-web-service-user-dotnet-app.csproj
 
-    - name: ZIP development libs
-      working-directory: src/c-lib/build/library/Win32/Release
-      run: |
-        7z a gs1encoders-windows-libs.zip gs1encoders.h gs1encoders.lib gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
+      - name: ZIP development libs (x64)
+        working-directory: >-
+          src/c-lib/build/library/x64/Release
+        run: |
+          7z a gs1encoders-windows-libs-x64.zip `
+            gs1encoders.h gs1encoders.lib `
+            gs1encoders.dll `
+            ../../../../gs1-syntax-dictionary.txt
 
-    - name: Store Windows development libs
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-libs
-        path: src/c-lib/build/library/Win32/Release/gs1encoders-windows-libs.zip
+      - name: ZIP development libs (x86)
+        working-directory: >-
+          src/c-lib/build/library/Win32/Release
+        run: |
+          7z a gs1encoders-windows-libs-x86.zip `
+            gs1encoders.h gs1encoders.lib `
+            gs1encoders.dll `
+            ../../../../gs1-syntax-dictionary.txt
 
-    - name: ZIP console application
-      working-directory: src/c-lib/build/console-app/Win32/Release
-      run: |
-        7z a gs1encoders-windows-console-app.zip gs1encoders-app.exe gs1encoders.dll ../../../../gs1-syntax-dictionary.txt
+      - name: Stage Windows development libs
+        run: |
+          mkdir windows-libs
+          copy src\c-lib\build\library\x64\Release\gs1encoders-windows-libs-x64.zip `
+            windows-libs\
+          copy src\c-lib\build\library\Win32\Release\gs1encoders-windows-libs-x86.zip `
+            windows-libs\
 
-    - name: Store Windows console app
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-console-app
-        path: src/c-lib/build/console-app/Win32/Release/gs1encoders-windows-console-app.zip
+      - name: Store Windows development libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-libs
+          path: windows-libs/
+          retention-days: 1
 
-    - name: ZIP GUI application
-      working-directory: src/dotnet-app/bin/Release\netcoreapp3.1\win-x86\publish
-      run: |
-        7z a gs1encoders-windows-gui-app.zip gs1encoders-dotnet-app.exe ../../gs1encoders.dll ../../../../../../c-lib/gs1-syntax-dictionary.txt
+      - name: ZIP console application
+        working-directory: >-
+          src/c-lib/build/console-app/x64/Release
+        run: |
+          7z a gs1encoders-windows-console-app.zip `
+            gs1encoders-app.exe gs1encoders.dll `
+            ../../../../gs1-syntax-dictionary.txt
 
-    - name: Store Windows GUI app
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-gui-app
-        path: src/dotnet-app/bin/Release/netcoreapp3.1/win-x86/publish/gs1encoders-windows-gui-app.zip
+      - name: Store Windows console app
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-console-app
+          path: "\
+            src/c-lib/build/console-app/\
+            x64/Release/\
+            gs1encoders-windows-console-app.zip"
+          retention-days: 1
 
+      - name: ZIP GUI application
+        working-directory: >-
+          src/dotnet-app/bin/Release/net8.0-windows/win-x64/publish
+        run: |
+          7z a gs1encoders-windows-gui-app.zip `
+            gs1encoders-dotnet-app.exe `
+            ../../../../../../c-lib/gs1-syntax-dictionary.txt
+
+      - name: Store Windows GUI app
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-gui-app
+          path: "\
+            src/dotnet-app/bin/Release/\
+            net8.0-windows/win-x64/publish/\
+            gs1encoders-windows-gui-app.zip"
+          retention-days: 1
+
+      - name: ZIP Windows Web service user app
+        working-directory: >-
+          src/js-wasm/example-web-service-user-dotnet-app/bin/Release/net8.0-windows/win-x64/publish
+        run: |
+          7z a example-web-service-user-app.zip `
+            gs1encoders-example-web-service-user-dotnet-app.exe
+
+      - name: Store Windows Web service user app
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-web-service-user-app
+          path: "\
+            src/js-wasm/\
+            example-web-service-user-dotnet-app/\
+            bin/Release/net8.0-windows/\
+            win-x64/publish/\
+            example-web-service-user-app.zip"
+          retention-days: 1
+
+      - name: ZIP .NET wrapper library
+        run: |
+          mkdir dotnet-lib-release
+          mkdir dotnet-lib-release\runtimes\win-x64\native
+          mkdir dotnet-lib-release\runtimes\win-x86\native
+          copy src\dotnet-lib\bin\Release\net8.0\gs1encoders-dotnet.dll `
+            dotnet-lib-release\
+          copy src\c-lib\build\library\x64\Release\gs1encoders.dll `
+            dotnet-lib-release\runtimes\win-x64\native\
+          copy src\c-lib\build\library\Win32\Release\gs1encoders.dll `
+            dotnet-lib-release\runtimes\win-x86\native\
+          copy src\c-lib\gs1-syntax-dictionary.txt `
+            dotnet-lib-release\
+          cd dotnet-lib-release
+          7z a ..\gs1encoders-windows-dotnet-lib.zip *
+
+      - name: Store .NET wrapper library
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dotnet-lib
+          path: gs1encoders-windows-dotnet-lib.zip
+          retention-days: 1
 
   build-release-linux:
 
@@ -360,22 +771,28 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: Linux release build
-      run: |
-        make -C src/c-lib -j `nproc` CC=clang
-        src/c-lib/build/gs1encoders-static.bin --version
-        cp src/c-lib/gs1-syntax-dictionary.txt src/c-lib/build/
-        cd src/c-lib/build
-        tar cvzf gs1encoders-linux-app.tgz gs1encoders-static.bin gs1-syntax-dictionary.txt
+      - name: Linux release build
+        run: |
+          make -C src/c-lib -j "$(nproc)" CC=clang
+          src/c-lib/build/gs1encoders-static.bin \
+            --version
+          cp src/c-lib/gs1-syntax-dictionary.txt \
+            src/c-lib/build/
+          cd src/c-lib/build
+          tar cvzf gs1encoders-linux-app.tgz \
+            gs1encoders-static.bin \
+            gs1-syntax-dictionary.txt
 
-    - name: Store Linux build
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-app
-        path: src/c-lib/build/gs1encoders-linux-app.tgz
+      - name: Store Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-app
+          path: src/c-lib/build/gs1encoders-linux-app.tgz
+          retention-days: 1
 
   build-release-wasm:
 
@@ -386,22 +803,31 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: WASM release build
-      run: |
-        make -C src/c-lib -j `nproc` wasm
-        cd src/js-wasm
-        tar cvzf gs1encoders-wasm-app.tgz gs1encoder-wasm.wasm gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
+      - name: WASM release build
+        run: |
+          make -C src/c-lib -j "$(nproc)" wasm
+          cd src/js-wasm
+          zip gs1encoders-wasm-app.zip \
+            gs1encoder-wasm.wasm \
+            gs1encoder-wasm.mjs \
+            gs1encoder.mjs \
+            example.html \
+            example.mjs \
+            example.node.mjs \
+            example-web-service.node.mjs
 
-    - name: Store WASM build
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: wasm-app
-        path: src/js-wasm/gs1encoders-wasm-app.tgz
+      - name: Store WASM build
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-app
+          path: src/js-wasm/gs1encoders-wasm-app.zip
+          retention-days: 1
 
 
   build-release-jsonly:
@@ -413,22 +839,31 @@ jobs:
 
     steps:
 
-    - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v14
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-    - name: JSONLY release build
-      run: |
-        make -C src/c-lib -j `nproc` wasm JSONLY=yes
-        cd src/js-wasm
-        tar cvzf gs1encoders-jsonly-app.tgz gs1encoder-wasm.mjs gs1encoder.mjs example.html example.mjs example.node.mjs
+      - name: JSONLY release build
+        run: |
+          make -C src/c-lib -j "$(nproc)" wasm \
+            JSONLY=yes
+          cd src/js-wasm
+          zip gs1encoders-jsonly-app.zip \
+            gs1encoder-wasm.mjs \
+            gs1encoder.mjs \
+            example.html \
+            example.mjs \
+            example.node.mjs \
+            example-web-service.node.mjs
 
-    - name: Store JSONLY build
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: jsonly-app
-        path: src/js-wasm/gs1encoders-jsonly-app.tgz
+      - name: Store JSONLY build
+        uses: actions/upload-artifact@v4
+        with:
+          name: jsonly-app
+          path: src/js-wasm/gs1encoders-jsonly-app.zip
+          retention-days: 1
 
 
   #
@@ -441,13 +876,21 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     needs:
       - ci-gcc
       - ci-clang
+      - ci-valgrind
+      - ci-msan
       - ci-msvc
       - ci-macos
+      - ci-swift
       - ci-scan-build
-      - ci-java
+      - ci-java-linux
+      - ci-java-macos
+      - ci-java-windows
       - ci-wasm
       - ci-jsonly
       - ci-ios-app
@@ -459,109 +902,62 @@ jobs:
 
     steps:
 
-    - name: Load Windows libs
-      uses: actions/download-artifact@v4
-      with:
-        name: windows-libs
+      - name: Load Windows libs
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-libs
 
-    - name: Load Windows console app
-      uses: actions/download-artifact@v4
-      with:
-        name: windows-console-app
+      - name: Load Windows .NET wrapper library
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-dotnet-lib
 
-    - name: Load Windows GUI app
-      uses: actions/download-artifact@v4
-      with:
-        name: windows-gui-app
+      - name: Load Windows console app
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-console-app
 
-    - name: Load Linux app
-      uses: actions/download-artifact@v4
-      with:
-        name: linux-app
+      - name: Load Windows GUI app
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-gui-app
 
-    - name: Load WASM app
-      uses: actions/download-artifact@v4
-      with:
-        name: wasm-app
+      - name: Load Windows Web Service User app
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-web-service-user-app
 
-    - name: Load JSONLY app
-      uses: actions/download-artifact@v4
-      with:
-        name: jsonly-app
+      - name: Load Linux app
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-app
 
-    - name: Get version
-      id: get_version
-      run: |
-        VERSION=${GITHUB_REF/refs\/tags\//}
-        echo ::set-output name=VERSION::$VERSION
+      - name: Load WASM app
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-app
 
-    - name: Create GitHub release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.get_version.outputs.VERSION }}
-        release_name: ${{ steps.get_version.outputs.VERSION }}
-        draft: false
-        prerelease: false
+      - name: Load JSONLY app
+        uses: actions/download-artifact@v4
+        with:
+          name: jsonly-app
 
-    - name: "Upload asset: Windows development libs"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-libs.zip
-        asset_name: gs1encoders-windows-libs.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Windows console application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-console-app.zip
-        asset_name: gs1encoders-windows-console-app.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Windows GUI application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-windows-gui-app.zip
-        asset_name: gs1encoders-windows-gui-app.zip
-        asset_content_type: application/zip
-
-    - name: "Upload asset: Linux application"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-linux-app.tgz
-        asset_name: gs1encoders-linux-app.tgz
-        asset_content_type: application/octet-stream
-
-    - name: "Upload asset: WASM applications (browser and Node.js)"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-wasm-app.tgz
-        asset_name: gs1encoders-wasm-app.tgz
-        asset_content_type: application/octet-stream
-
-    - name: "Upload asset: JSONLY applications (browser and Node.js)"
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: gs1encoders-jsonly-app.tgz
-        asset_name: gs1encoders-jsonly-app.tgz
-        asset_content_type: application/octet-stream
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            gs1encoders-windows-libs-x64.zip
+            gs1encoders-windows-libs-x86.zip
+            gs1encoders-windows-dotnet-lib.zip
+            gs1encoders-windows-console-app.zip
+            gs1encoders-windows-gui-app.zip
+            gs1encoders-linux-app.tgz
+            gs1encoders-wasm-app.zip
+            gs1encoders-jsonly-app.zip
+            example-web-service-user-app.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

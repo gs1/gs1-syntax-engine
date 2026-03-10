@@ -1,10 +1,10 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
  * @file gs1encoders.h
  * @author GS1 AISBL
  *
- * \copyright Copyright (c) 2000-2024 GS1 AISBL.
+ * \copyright Copyright (c) 2000-2026 GS1 AISBL.
  *
  * @licenseblock{License}
  *
@@ -23,199 +23,8 @@
  *
  * @endlicenseblock
  *
- *
- * Overview
- * --------
- *
- * The GS1 Syntax Engine provides routines that support the processing of GS1
- * syntax data, including Application Identifier element strings and GS1
- * Digital Link URIs, whether these are provided in raw or human-friendly
- * format or as normalised scan data received from barcode readers.
- *
- * The implementations are intended for use with GS1 standards and applications
- * and do not contain additional features that might be required for more
- * general use.
- *
- * Within the GS1 Application Identifier system, structured data is represented
- * in different formats depending upon the context.
- *
- * The data formats supported by this library are:
- *
- *   * **Bracketed AI element strings**: Human-friendly rendition of AI data as a single string using numerical AIs.
- *   * **Unbracketed AI element strings**: Rendition of AI data that corresponds most directly to encoded barcode data.
- *   * **GS1 Digital Link URIs**
- *   * **Scan data**: The expected result of scanning a symbol with a barcode reader that has AIM symbologies identifiers enabled.
- *   * **Human Readable Interpretation (HRI)**: Human-friendly redition of the AI data contained within a symbol. This may also include Data Titles to present the AI data in the form of "mixed HRI/non-HRI text". (Output only.)
- *
- * This following diagram shows how the library can be used for processing and
- * transformation of GS1 data, indicating which formats are accepted as input,
- * how barcode message data is generated and AI data extracted from the
- * provided input data, and how the given data can be output in various
- * formats.
- *
- * | Data transformation: Inputs, outputs and buffers |
- * | :----------------------------------------------- |
- * | \image html input_output_buffers.svg             |
- *
- * The above diagram highlights that conceptually the library contains two
- * internal "data buffers":
- *
- *   * **Barcode message buffer:** This is populated with the raw message
- *     that would be borne by a GS1 barcode symbol that represents the input
- *     data, e.g. unbracketed AI syntax with FNC1 in first for regular AI
- *     element strings; plain string for a plain data or a GS1 Digital Link
- *     URI.
- *
- *   * **Extracted AI buffer:** This contains the in-order AI data that was
- *     extracted from the input data.
- *
- * The main operations of the library involve reading and updating the state of
- * these buffers.
- *
- * Example Uses
- * ------------
- *
- * The following are examples of how to use the library.
- *
- * \note
- * Using the library always begins by initialising the library with
- * gs1_encoder_init() and finishes by releasing the library with
- * gs1_encoder_free().
- *
- * \note
- * Unless otherwise specified, the getter functions return pointers to
- * per-instance storage managed by this library and therefore must not be freed
- * by the user. If their content must persist following a subsequent call to
- * the same instance of the library then they must be copied to a user-managed
- * buffer.
- *
- * \note
- * Most of the setter and action functions of this library return a boolean
- * indicating whether the function was successful and write an error message
- * that can be accessed with gs1_encoder_getErrMsg() in the event of failure.
- * Production code should check the output of the functions and where relevant
- * do something appropriate with the error message such as render it to the
- * user.
- *
- * Refer to the example console application (`gs1encoders-app.c`) for a
- * comprehensive example of how to use this library.
- *
- *
- * ### GS1 AI data validation and extraction (including GS1 Digital Link)
- *
- * The following code processes AI data input, validates it (reporting any
- * failures) and displays the extracted AIs if the validation succeeds.
- *
- * \code
- * gs1_encoder *ctx = gs1_encoder_init(NULL);              // Create a new instance of the library
- *
- * // gs1_encoder_permitUnknownAIs(ctx, true);             // Uncomment only if it is necessary to handle AIs
- *                                                         // that are not known to the library
- *
- * // Input provided as a bracketed AI element string
- * //
- * bool ret = gs1_encoder_setAIdataStr(ctx, "(01)12312312312333(10)ABC123(99)TEST");
- *
- * // Alternatively, the input may be given in the following formats:
- * //
- * // bool ret = gs1_encoder_setDataStr(ctx,               // Unbracketed element string, "^" = FNC1
- * //                "^011231231231233310ABC123^99TEST");
- * //
- * // bool ret = gs1_encoder_setDataStr(ctx,               // GS1 Digital Link URI
- * //                "https://example.com/01/12312312312333/10/ABC123/99/TEST");
- * //
- * // bool ret = gs1_encoder_setScanData(ctx,              // Barcode scan data, containing a "GS" (ASCII 0x1D) separator
- * //                "]Q1011231231231233310ABC123" "\x1D" "99TEST");
- *
- * if (!ret) {
- *     printf("ERROR: %s\n", gs1_encoder_getErrMsg(ctx));  // Display a descriptive error message
- *     char *errMarkup = gs1_encoder_getErrMarkup(ctx);
- *     if (*errMarkup != '\0')                             // Display the invalid AI in the case of a Linting failure
- *         printf("Bad AI data: %s\n", errMarkup);
- *     abort();                                            // Finally, handle the error in an application-specific way
- * }
- *
- * char **hri;
- * int numHRI = gs1_encoder_getHRI(ctx, &hri);             // Display the extracted AI data as HRI text
- * for (int i = 0; i < numHRI; i++) {
- *     printf("%s\n", hri[i]);
- * }
- *
- * gs1_encoder_free(ctx);                                  // Release the instance of the library
- * \endcode
- *
- *
- * ### Converting an AI element string to barcode message data
- *
- * In this example we process a bracketed AI element string to convert it into
- * barcode message data, suitable for carrying in a GS1 barcode symbol.
- *
- * \code
- * gs1_encoder *ctx = gs1_encoder_init(NULL);
- *
- * bool ret = gs1_encoder_setAIdataStr(ctx,        // Accept a bracketed AI element string
- *     "(01)12312312312333(10)ABC123(99)TEST");
- *
- * if (!ret) {
- *     // Handle error and return
- * }
- *
- * printf("%s\n", gs1_encoder_getDataStr(ctx));    // Render the barcode message buffer
- *
- * gs1_encoder_free(ctx);
- * \endcode
- *
- * \note
- * In the barcode message data `^` represents the FNC1 character. Barcode image
- * encoder libraries will have differing conventions for how to input FNC1
- * characters, including whether it is necessary to be explicit about the FNC1
- * character in the first position. The message data output by this library may
- * need to be post-processed to align to the requirements of whatever symbol
- * generation library is in use.
- *
- *
- * ### Barcode scan data processing
- *
- * In this example we process scan data from a barcode reader to extract the AI
- * data.
- *
- * \code
- * gs1_encoder *ctx = gs1_encoder_init(NULL);
- *
- * // Disable validation of mandatory association between AIs if the symbol may
- * // be one of multiple on a label
- * setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);
- *
- * bool ret = gs1_encoder_setScanData(ctx,
- *                "]Q1011231231231233310ABC123" "\x1D" "99TEST");
- *
- * if (!ret) {
- *     // Handle error and return
- * }
- *
- * char **hri;
- * int numHRI = gs1_encoder_getHRI(ctx, &hri);
- * for (int i = 0; i < numHRI; i++) {
- *     printf("%s\n", hri[i]);
- * }
- *
- * // If it is necessary to know the "symbology" that was scanned then this can
- * // be read using gs1_encoder_getSym(), however note the caveats given in the
- * // description of gs1_encoder_setScanData()
- *
- * gs1_encoder_free(ctx);
- * \endcode
- *
- * \note
- * It is required that AIM Symbology Identifiers are enabled on the barcode
- * reader.
- *
- * \note
- * It is assumed the scanned barcode message "survives the channel" intact,
- * i.e. that no character substitutions have been made by the reader, in
- * particular that any embedded FNC1 separator characters are correctly
- * represented by GS characters (ASCII 29). If this is not the case then the
- * scanned data should be pre-processed to meet this requirement.
+ * API reference for the GS1 Barcode Syntax Engine. For an overview, examples and usage
+ * instructions, see the main documentation page.
  *
  */
 
@@ -236,9 +45,9 @@
 // Decorator for public API functions that we export
 #ifdef __EMSCRIPTEN__
 #  define GS1_ENCODERS_API EMSCRIPTEN_KEEPALIVE
-#elif _WIN32
+#elif defined(_WIN32)
 #  define GS1_ENCODERS_API __declspec(dllexport)
-#elif __GNUC__ >= 4
+#elif defined(__GNUC__) && __GNUC__ >= 4
 #  define GS1_ENCODERS_API __attribute__((visibility ("default")))
 #else
 #  define GS1_ENCODERS_API
@@ -246,11 +55,11 @@
 
 
 #if defined(__GNUC__) || defined(__clang__)
-#  define DEPRECATED __attribute__((deprecated))
+#  define GS1_ENCODERS_DEPRECATED __attribute__((__deprecated__))
 #elif defined(_MSC_VER)
-#  define DEPRECATED __declspec(deprecated)
+#  define GS1_ENCODERS_DEPRECATED __declspec(deprecated)
 #else
-#  define DEPRECATED
+#  define GS1_ENCODERS_DEPRECATED
 #endif
 
 
@@ -276,6 +85,7 @@ enum gs1_encoder_symbologies {
 	gs1_encoder_sGS1_128_CCC,		///< GS1-128 with CC-C
 	gs1_encoder_sQR,			///< (GS1) QR Code
 	gs1_encoder_sDM,			///< (GS1) Data Matrix
+	gs1_encoder_sDotCode,			///< (GS1) DotCode
 	gs1_encoder_sNUMSYMS,
 };
 
@@ -306,13 +116,69 @@ enum gs1_encoder_validations {
 typedef enum gs1_encoder_validations gs1_encoder_validations_t;
 
 
+/// Initialisation flags for gs1_encoder_init_ex().
+enum gs1_encoder_init_flags {
+	gs1_encoder_iDEFAULT                   = 0,		///< Default: Use Syntax Dictionary if the file exists, otherwise fallback to the embedded AI table (if compiled in).
+	gs1_encoder_iNO_SYNDICT                = 1 << 0,	///< Disable use of the Syntax Dictionary, even if the file exists.
+	gs1_encoder_iNO_EMBEDDED               = 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
+	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR = 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing error with the Syntax Dictionary.
+	gs1_encoder_iQUIET                     = 1 << 3,	///< Suppress initialisation error output to stdout.
+};
+
+
+/**
+ * @brief Equivalent to the `enum gs1_encoder_init_flags` type.
+ *
+ */
+typedef enum gs1_encoder_init_flags gs1_encoder_init_flags_t;
+
+
+/// Initialisation status codes returned by gs1_encoder_init_ex().
+enum gs1_encoder_init_status {
+	GS1_ENCODERS_INIT_SUCCESS                    =  0,	///< Initialised successfully
+	GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
+	GS1_ENCODERS_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialisation.
+	GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
+	GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
+	GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
+};
+
+
+/**
+ * @brief Equivalent to the `enum gs1_encoder_init_status` type.
+ *
+ */
+typedef enum gs1_encoder_init_status gs1_encoder_init_status_t;
+
+
+/**
+ * @brief Initialisation options structure for gs1_encoder_init_ex().
+ *
+ * @note Legacy code will continue to work if new fields are added at the end.
+ */
+struct gs1_encoder_init_opts {
+	size_t struct_size;				///< Must be initialised to sizeof(gs1_encoder_init_opts_t)
+	gs1_encoder_init_flags_t flags;			///< Initialization flags (bitwise OR of gs1_encoder_init_flags values)
+	gs1_encoder_init_status_t *status;		///< Optional pointer to receive initialisation status code (may be NULL)
+	char *msgBuf;					///< Optional buffer to receive error message (may be NULL)
+	size_t msgBufSize;				///< Size of msgBuf in bytes (0 if no buffer)
+};
+
+
+/**
+ * @brief Equivalent to the `struct gs1_encoder_init_opts` type.
+ *
+ */
+typedef struct gs1_encoder_init_opts gs1_encoder_init_opts_t;
+
+
 /**
  * @brief A gs1_encoder context.
  *
  * This is an opaque struct that represents an instance of the library.
  *
  * This context maintains all state required for an instance. Any number of
- * instances of the library can be created, each operating seperately and
+ * instances of the library can be created, each operating separately and
  * equivalently to the others.
  *
  * This library does not introduce any global variables. All runtime state
@@ -320,9 +186,9 @@ typedef enum gs1_encoder_validations gs1_encoder_validations_t;
  * only be modified using the public API functions provided by this library,
  * decorated with GS1_ENCODERS_API.
  *
- * A context is created by calling gs1_encoder_init() and destroyed by calling
- * gs1_encoder_free(), releasing all of the storage allocated by the library
- * for that instance.
+ * A context is created by calling gs1_encoder_init() or gs1_encoder_init_ex()
+ * and destroyed by calling gs1_encoder_free(), releasing all of the storage
+ * allocated by the library for that instance.
  *
  * \note
  * This struct is deliberately opaque and it's layout should be assumed to vary
@@ -430,6 +296,65 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
 
 
 /**
+ * @brief Initialise a new ::gs1_encoder context with the extended interface.
+ *
+ * This is an extended version of gs1_encoder_init() that provides control over
+ * Syntax Dictionary and embedded AI table loading behavior and reports
+ * detailed initialisation status.
+ *
+ * Example of an extended initialisation:
+ *
+ * \code{.c}
+ *
+ * gs1_encoder *ctx;
+ * gs1_encoder_init_status_t status;
+ * char msg[256]		// Sufficient, otherwise would truncate
+ *
+ * gs1_encoder_init_opts_t opts = {
+ * 	.struct_size = sizeof(gs1_encoder_init_opts_t),
+ *
+ *	// Silent fallback to the embedded AI table on Syntax Dictionary parse errors
+ * 	.flags       = gs1_encoder_iQUIET|gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+ *
+ * 	.status      = &status,		// What happened?
+ * 	.msgBuf      = msg,		// Description of error or warning
+ * 	.msgBufSize  = sizeof(msg)
+ * };
+ *
+ * ctx = gs1_encoder_init_ex(NULL, &opts);
+ *
+ * // Initialisation failed, so do something with status or simply report the error
+ * if (ctx == NULL) {
+ * 	printf("Failed to initialise GS1 Encoders library!\n");
+ * 	if (*msg)
+ * 		printf("\n!!! Error: %s\n", msg);
+ * 	abort();
+ * }
+ *
+ * // Initialisation worked, but check for warnings
+ * if (status != GS1_ENCODERS_INIT_SUCCESS && *msg)
+ * 	printf("\n!!! Warning: %s\n", msg);
+ *
+ * ...
+ * \endcode
+ *
+ * @param [in,out] mem buffer to use for storage, or NULL for automatic allocation
+ * @param [in,out] opts Optional pointer to initialisation options structure (may be NULL for defaults)
+ * @return ::gs1_encoder context on success, else NULL.
+ *
+ * @note If opts is provided, `opts->struct_size` must be initialised to
+ * `sizeof(gs1_encoder_init_opts_t)`
+ *
+ * @see gs1_encoder_init()
+ * @see gs1_encoder_instanceSize()
+ * @see gs1_encoder_init_opts
+ * @see gs1_encoder_init_flags
+ * @see gs1_encoder_init_status
+ */
+GS1_ENCODERS_API gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts);
+
+
+/**
  * @brief Read an error message generated by the library.
  *
  * When any of the setter functions of this library return false (indicating an
@@ -475,10 +400,10 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  *     * Ensure that the AIs extracted from the query parameters are valid GS1 DL URI data attributes.
  *     * Ensure that there are no duplicate AIs within any part of the URI structure.
  *   * Then, for all AI-based data (bracketed, unbracketed and GS1 Digital Link URIs):
- *     * For each component of each AI, as defined by the Syntax Dictionary:
- *       * Validate that its length is within limits.
+ *     * For each component of each AI, as defined by the GS1 Barcode Syntax Dictionary:
+ *       * Validate that its length is within the specified limits.
  *       * Validate that it conforms to the specified character set.
- *       * Apply each of the Linters in turn.
+ *       * Apply each of the specified GS1 Barcode Syntax Tests ("linters") in turn.
  *     * Validate the overall AI data and associations for each validation process, except where they are disabled (either by default or manually via gs1_encoder_setValidationEnabled()), for example:
  *       * Ensure that repeated AIs have the same value.
  *       * Ensure that mutually-exclusive AIs are not present.
@@ -500,7 +425,7 @@ GS1_ENCODERS_API char* gs1_encoder_getErrMsg(gs1_encoder *ctx);
  * marked up instance of the AI that failed will be generated which can be read
  * using this function.
  *
- * Where it is meaningful to identify offending charaters in the input data,
+ * Where it is meaningful to identify offending characters in the input data,
  * these characters will be surrounded by `|` characters. Otherwise the
  * entire AI value will be surrounded by `|` characters.
  *
@@ -699,7 +624,7 @@ GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, gs1_enc
 /**
  * @brief Enable or disable the given AI validation procedure of type
  * ::gs1_encoder_validations, that determines whether certain checks are
- * enfored when data is provided using gs1_encoder_setAIdataStr(),
+ * enforced when data is provided using gs1_encoder_setAIdataStr(),
  * gs1_encoder_setDataStr() or gs1_encoder_setScanData().
  *
  *   * If enabled is true (default), then the corresponding validation will be enforced.
@@ -713,8 +638,8 @@ GS1_ENCODERS_API bool gs1_encoder_getValidationEnabled(gs1_encoder *ctx, gs1_enc
  * satisfy checks when the provided AI data represents only part if the overall
  * AI data on a label.
  *
- * Nevertheless, the full AI data should be validated by concatinating it and
- * verifying it with this library with all relivant AI validation procedures
+ * Nevertheless, the full AI data should be validated by concatenating it and
+ * verifying it with this library with all relevant AI validation procedures
  * enabled.
  *
  * @see gs1_encoder_getValidationEnabled()
@@ -742,13 +667,13 @@ GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, gs1_enc
  * @param [in,out] ctx ::gs1_encoder context
  * @return current status of the ::gs1_encoder_vREQUISITE_AIS validation procedure
  */
-GS1_ENCODERS_API DEPRECATED bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED bool gs1_encoder_getValidateAIassociations(gs1_encoder *ctx);
 
 
 /**
  * @brief Provided for backwards compatibility to enable or disable the
  * ::gs1_encoder_vREQUISITE_AIS validation procedure, that determines whether
- * mandatory AI pairings are enfored when data is provided using
+ * mandatory AI pairings are enforced when data is provided using
  * gs1_encoder_setAIdataStr(), gs1_encoder_setDataStr() or
  * gs1_encoder_setScanData().
  *
@@ -761,7 +686,7 @@ GS1_ENCODERS_API DEPRECATED bool gs1_encoder_getValidateAIassociations(gs1_encod
  * @param [in] validateAIassociations enable the ::gs1_encoder_vREQUISITE_AIS validation procedure if true; otherwise disable
  * @return true on success, otherwise false and an error message is set that can be read using gs1_encoder_getErrMsg()
  */
-GS1_ENCODERS_API DEPRECATED bool gs1_encoder_setValidateAIassociations(gs1_encoder *ctx, bool validateAIassociations);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED bool gs1_encoder_setValidateAIassociations(gs1_encoder *ctx, bool validateAIassociations);
 
 
 /**
@@ -869,8 +794,9 @@ GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char *dataS
  * conflating them with the start of the next AI.
  *
  * For symbologies that support a composite component (all except
- * ::gs1_encoder_sDM and ::gs1_encoder_sQR), the data for the linear and 2D
- * components can be separated by a "|" character, for example:
+ * ::gs1_encoder_sDM, ::gs1_encoder_sQR and ::gs1_encoder_sDotCode), the data
+ * for the linear and 2D components can be separated by a "|" character, for
+ * example:
  *
  * \code
  * (01)12345678901231|(10)ABC123(11)210630
@@ -1036,6 +962,8 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * ::gs1_encoder_sQR          | ^01123123123123338200http://example.com        | ]Q301123123123123338200http://example.com
  * ::gs1_encoder_sDM          | https://example.com/gtin/09506000134352/lot/A1 | ]d1https://example.com/gtin/09506000134352/lot/A1
  * ::gs1_encoder_sDM          | ^011231231231233310ABC123^99TESTING            | ]d2011231231231233310ABC123{GS}99TESTING
+ * ::gs1_encoder_sDotCode     | https://example.com/gtin/09506000134352/lot/A1 | ]J0https://example.com/gtin/09506000134352/lot/A1
+ * ::gs1_encoder_sDotCode     | ^011231231231233310ABC123^99TESTING            | ]J1011231231231233310ABC123{GS}99TESTING
  *
  * The output will be prefixed with the appropriate AIM symbology identifier.
  *
@@ -1074,7 +1002,7 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * @see gs1_encoder_setAIdataStr()
  *
  * @param [in,out] ctx ::gs1_encoder context
- * @return a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology
+ * @return a pointer to a string representing the scan data for the input data contained within symbols of the selected symbology, or NULL if no symbology is selected
  */
 GS1_ENCODERS_API char* gs1_encoder_getScanData(gs1_encoder* ctx);
 
@@ -1124,7 +1052,7 @@ GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder* ctx, char ***hri);
  * @param [in,out] ctx ::gs1_encoder context
  * @return required length of the buffer
  */
-GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
 
 
 /**
@@ -1145,7 +1073,7 @@ GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getHRIsize(gs1_encoder *ctx);
  * @param [out] buf a pointer to a buffer into which the formatted HRI text is copied
  * @param [in] max the maximum number of bytes that may be copied into the provided buffer
  */
-GS1_ENCODERS_API DEPRECATED void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED void gs1_encoder_copyHRI(gs1_encoder *ctx, void *buf, size_t max);
 
 
 /**
@@ -1200,7 +1128,7 @@ GS1_ENCODERS_API int gs1_encoder_getDLignoredQueryParams(gs1_encoder* ctx, char 
  * @param [in,out] ctx ::gs1_encoder context
  * @return required length of the buffer
  */
-GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_encoder *ctx);
 
 
 /**
@@ -1222,7 +1150,7 @@ GS1_ENCODERS_API DEPRECATED size_t gs1_encoder_getDLignoredQueryParamsSize(gs1_e
  * @param [out] buf a pointer to a buffer into which the formatted non-numeric (ignored) query parameters are copied
  * @param [in] max the maximum number of bytes that may be copied into the provided buffer
  */
-GS1_ENCODERS_API DEPRECATED void gs1_encoder_copyDLignoredQueryParams(gs1_encoder *ctx, void *buf, size_t max);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED void gs1_encoder_copyDLignoredQueryParams(gs1_encoder *ctx, void *buf, size_t max);
 
 
 /**
@@ -1241,7 +1169,7 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 
 
 #undef GS1_ENCODERS_API
-#undef DEPRECATED
+#undef GS1_ENCODERS_DEPRECATED
 
 
 #endif /* GS1_ENCODERS_H */

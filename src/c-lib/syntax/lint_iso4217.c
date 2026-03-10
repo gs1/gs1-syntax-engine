@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <ctype.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /*
@@ -57,12 +58,12 @@
  *       `GS1_LINTER_CUSTOM_ISO4217_LOOKUP` macro.
  * @note If provided, the GS1_LINTER_CUSTOM_ISO4217_LOOKUP macro shall invoke
  *       whatever functionality is available in the user-provided lookup
- *       function, then using the result must assign to a locally-scoped
- *       variable as follows:
+ *       function using the first argument (data) and second argument (data length),
+ *       then using the result must assign to third (output) argument as follows:
  *         - `valid`: Set to 1 if the lookup was successful. Otherwise 0.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -73,7 +74,7 @@
  *         currency code.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -81,7 +82,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 	 *
 	 */
 #ifdef GS1_LINTER_CUSTOM_ISO4217_LOOKUP
-#define GS1_LINTER_ISO4217_LOOKUP(cc) GS1_LINTER_CUSTOM_ISO4217_LOOKUP(cc)
+#define GS1_LINTER_ISO4217_LOOKUP(cc, cc_len, valid) GS1_LINTER_CUSTOM_ISO4217_LOOKUP(cc, cc_len, valid)
 #else
 
 	/*
@@ -99,19 +100,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 #if __STDC_VERSION__ >= 202311L
 		0b0000000010001000000000000000000010001000000010001011100000001000,  // 000-063: 008 012 032 036 044 048 050-052 060
 		0b1000100010000000000010000010000010000000100010000000100000001000,  // 064-127: 064 068 072 084 090 096 104 108 116 124
-		0b0000100010000000100000001000100000000000001000100000000000001001,  // 128-191: 132 136 144 152 156 170 174 188 191-192
+		0b0000100010000000100000001000100000000000001000100000000000001000,  // 128-191: 132 136 144 152 156 170 174 188
 		0b1000000000010000100000100000001000000010100000100010000000000000,  // 192-255: 192 203 208 214 222 230 232 238 242
 		0b0000001000000010000000000000000000001000000000000000000000000000,  // 256-319: 262 270 292
 		0b1000100010001000000010001000100010001000100010001000000010000000,  // 320-383: 320 324 328 332 340 344 348 352 356 360 364 368 376
-		0b0000100010000010100010001010001001100010001000100010000000000010,  // 384-447: 388 392 398 400 404 408 410 414 417-418 422 426 430 434 446
+		0b0000100010001010100010001010001001100010001000100010000000000010,  // 384-447: 388 392 396 398 400 404 408 410 414 417-418 422 426 430 434 446
 		0b0000001000100010000000000000000010001000000000001010000010000000,  // 448-511: 454 458 462 480 484 496 498 504
 		0b1000100000001000000011000000000000001000001000100000001000000000,  // 512-575: 512 516 524 532-533 548 554 558 566
 		0b0010000000100010000000101000100010000000000000000000000000100000,  // 576-639: 578 586 590 598 600 604 608 634
-		0b0001001000000010000000000000000000000000001000000010001000000010,  // 640-703: 643 646 654 682 690 694 702
+		0b0001001000000010000000000000000000000000001000000010000000000010,  // 640-703: 643 646 654 682 690 702
 		0b1010001000000000000000001000000000000000000010001000100010001000,  // 704-767: 704 706 710 728 748 752 756 760 764
 		0b0000000010001000100010000000000010000001000000000010000000100000,  // 768-831: 776 780 784 788 800 807 818 826
 		0b0010000010000000000000000010100000000000000000000010001000000000,  // 832-895: 834 840 858 860 882 886
-		0b0000010000000000000000000000110111111110101011011011111111011111,  // 896-959: 901 924-925 927-934 936 938 940-941 943-944 946-953 955-959
+		0b0000010000000000000000000000111111100110101011011011111111011111,  // 896-959: 901 924-930 933-934 936 938 940-941 943-944 946-953 955-959
 		0b1111110111111101111111001110001000100101000000000000000000000000,  // 960-999: 960-965 967-973 975-981 984-986 990 994 997 999
 #else
 		/*
@@ -119,30 +120,29 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 		 *
 		 *  Generated from the above data with:
 		 *
-		 *     for (size_t i = 0; i < sizeof(iso4217) / sizeof(iso4217[0]); i++) { printf("%lx ", iso4217[i]); };
+		 *     for (size_t i = 0; i < sizeof(iso4217) / sizeof(iso4217[0]); i++) { printf("0x%016lx, ", iso4217[i]); };
 		 *
 		 */
-		0x008800008808b808, 0x8880082080880808, 0x0880808800220009, 0x8010820202822000,
-		0x0202000008000000, 0x8888088888888080, 0x088288a262222002, 0x022200008800a080,
-		0x88080c0008220200, 0x2022028880000020, 0x1202000000202202, 0xa200008000088888,
-		0x0088880081002020, 0x2080002800002200, 0x0400000dfeadbfdf, 0xfdfdfce225000000,
+		0x008800008808b808, 0x8880082080880808, 0x0880808800220008, 0x8010820202822000,
+		0x0202000008000000, 0x8888088888888080, 0x088a88a262222002, 0x022200008800a080,
+		0x88080c0008220200, 0x2022028880000020, 0x1202000000202002, 0xa200008000088888,
+		0x0088880081002020, 0x2080002800002200, 0x0400000fe6adbfdf, 0xfdfdfce225000000,
 #endif
 	};
 
 /// \cond
-#define GS1_LINTER_ISO4217_LOOKUP(cc) do {						\
-	if (strlen(cc) == 3 && isdigit(cc[0]) && isdigit(cc[1]) && isdigit(cc[2])) {	\
-		int v = (cc[0] - '0') * 100 + (cc[1] - '0') * 10 + cc[2] - '0';		\
-		assert(v <= 999);	/* Satisfy analyzer */				\
-		if (iso4217[v/64] & (0x8000000000000000 >> (v%64)))			\
-			valid = 1;							\
-	}										\
+#define GS1_LINTER_ISO4217_LOOKUP(cc, cc_len, valid) do {					\
+	valid = 0;										\
+	if (cc_len == 3 && isdigit((int)cc[0]) && isdigit((int)cc[1]) && isdigit((int)cc[2])) {	\
+		int v = (cc[0] - '0') * 100 + (cc[1] - '0') * 10 + cc[2] - '0';			\
+		GS1_LINTER_BITFIELD_LOOKUP(v, iso4217, valid);					\
+	}											\
 } while (0)
 /// \endcond
 
 #endif
 
-	int valid = 0;
+	int valid;
 
 	assert(data);
 
@@ -150,17 +150,19 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iso4217(const char* const data
 	 * Ensure that the data is in the list.
 	 *
 	 */
-	GS1_LINTER_ISO4217_LOOKUP(data);
-	if (valid)
-		return GS1_LINTER_OK;
+	GS1_LINTER_ISO4217_LOOKUP(data, data_len, valid);
+	if (GS1_LINTER_LIKELY(valid))
+		GS1_LINTER_RETURN_OK;
 
 	/*
 	 * If not valid then indicate an error.
 	 *
 	 */
-	if (err_pos) *err_pos = 0;
-	if (err_len) *err_len = strlen(data);
-	return GS1_LINTER_NOT_ISO4217;
+	GS1_LINTER_RETURN_ERROR(
+		GS1_LINTER_NOT_ISO4217,
+		0,
+		data_len
+	);
 
 }
 
@@ -372,7 +374,7 @@ void test_lint_iso4217(void)
 	UNIT_TEST_PASS(gs1_lint_iso4217, "188");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "189", GS1_LINTER_NOT_ISO4217, "*189*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "190", GS1_LINTER_NOT_ISO4217, "*190*");
-	UNIT_TEST_PASS(gs1_lint_iso4217, "191");
+	UNIT_TEST_FAIL(gs1_lint_iso4217, "191", GS1_LINTER_NOT_ISO4217, "*191*");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "192");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "193", GS1_LINTER_NOT_ISO4217, "*193*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "194", GS1_LINTER_NOT_ISO4217, "*194*");
@@ -577,7 +579,7 @@ void test_lint_iso4217(void)
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "393", GS1_LINTER_NOT_ISO4217, "*393*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "394", GS1_LINTER_NOT_ISO4217, "*394*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "395", GS1_LINTER_NOT_ISO4217, "*395*");
-	UNIT_TEST_FAIL(gs1_lint_iso4217, "396", GS1_LINTER_NOT_ISO4217, "*396*");
+	UNIT_TEST_PASS(gs1_lint_iso4217, "396");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "397", GS1_LINTER_NOT_ISO4217, "*397*");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "398");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "399", GS1_LINTER_NOT_ISO4217, "*399*");
@@ -875,7 +877,7 @@ void test_lint_iso4217(void)
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "691", GS1_LINTER_NOT_ISO4217, "*691*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "692", GS1_LINTER_NOT_ISO4217, "*692*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "693", GS1_LINTER_NOT_ISO4217, "*693*");
-	UNIT_TEST_PASS(gs1_lint_iso4217, "694");
+	UNIT_TEST_FAIL(gs1_lint_iso4217, "694", GS1_LINTER_NOT_ISO4217, "*694*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "695", GS1_LINTER_NOT_ISO4217, "*695*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "696", GS1_LINTER_NOT_ISO4217, "*696*");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "697", GS1_LINTER_NOT_ISO4217, "*697*");
@@ -1107,13 +1109,13 @@ void test_lint_iso4217(void)
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "923", GS1_LINTER_NOT_ISO4217, "*923*");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "924");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "925");
-	UNIT_TEST_FAIL(gs1_lint_iso4217, "926", GS1_LINTER_NOT_ISO4217, "*926*");
+	UNIT_TEST_PASS(gs1_lint_iso4217, "926");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "927");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "928");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "929");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "930");
-	UNIT_TEST_PASS(gs1_lint_iso4217, "931");
-	UNIT_TEST_PASS(gs1_lint_iso4217, "932");
+	UNIT_TEST_FAIL(gs1_lint_iso4217, "931", GS1_LINTER_NOT_ISO4217, "*931*");
+	UNIT_TEST_FAIL(gs1_lint_iso4217, "932", GS1_LINTER_NOT_ISO4217, "*932*");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "933");
 	UNIT_TEST_PASS(gs1_lint_iso4217, "934");
 	UNIT_TEST_FAIL(gs1_lint_iso4217, "935", GS1_LINTER_NOT_ISO4217, "*935*");

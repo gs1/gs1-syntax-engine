@@ -1,10 +1,10 @@
 package org.gs1.gs1encoders;
 
 /**
- * Custom error class for the wrapper for accessing the GS1 Syntax Engine
+ * Custom error class for the wrapper for accessing the GS1 Barcode Syntax Engine
  * native library from Java.
  *
- * @author Copyright (c) 2022-2024 GS1 AISBL.
+ * @author Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@ package org.gs1.gs1encoders;
  */
 
 public class GS1EncoderGeneralException extends Exception {
+    /**
+     * Constructs a new GS1EncoderGeneralException with the specified error message.
+     *
+     * @param msg the error message
+     */
     public GS1EncoderGeneralException(String msg) {
         super(msg);
     }

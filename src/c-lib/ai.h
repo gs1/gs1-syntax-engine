@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@
  *
  */
 #define MAX_PARTS (5 + 1)		/* Currently AI (8001) = N4 N5 N3 N1 N1            */
-#define MAX_LINTERS (3 + 1)		/* Currently AI (8014) = csumalpha,key,hasnondigit */
+#define MAX_LINTERS (3 + 1)		/* Currently AI (8014) = csumalpha,gcppos1,hasnondigit */
 
 
 typedef enum {
@@ -66,6 +66,7 @@ struct aiComponent {
 
 struct aiEntry {
 	char ai[MAX_AI_LEN+1];			// AI itself
+	uint8_t ailen;				// Defined to avoid repeated strlen(ai) at runtime
 	bool fnc1;				// FNC1 required as a separator
 	uint8_t dlDataAttr;			// Permitted as a GS1 DL URI data attribute
 	struct aiComponent parts[MAX_PARTS];	// Format specification components
@@ -77,7 +78,7 @@ struct aiEntry {
 typedef enum {
 	aiValue_undef = 0,
 	aiValue_aival,				// Extracted AI value pair
-	aiValue_ccsep,				// Separater between linear and composite component AIs
+	aiValue_ccsep,				// Separator between linear and composite component AIs
 	alValue_dlign,				// An ignored (non-numeric) query parameter of a DL URI (stored undecoded in aiValue.value)
 } aiValueKind_t;
 
@@ -119,6 +120,7 @@ struct validationEntry {
 
 #define AI_VA(a, f, d, c1,mn1,mx1,o1,l00,l01,l02, c2,mn2,mx2,o2,l10,l11,l12, c3,mn3,mx3,o3,l20,l21,l22, c4,mn4,mx4,o4,l30,l31,l32, c5,mn5,mx5,o5,l40,l41,l42, k, t) {	\
 		.ai = a,																		\
+		.ailen = (uint8_t)(sizeof(a) - 1),															\
 		.fnc1 = f,																		\
 		.dlDataAttr = d,																	\
 		.parts = {																		\
@@ -136,28 +138,26 @@ struct validationEntry {
 #define AI_ENTRY(...) PASS_ON(AI_VA(__VA_ARGS__))
 #define cset_0 0
 #define gs1_lint__ NULL
-#define __ 0,0,0,0,_,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,key */
+#define __ 0,0,0,0,_,_,_		/* NULL placeholder instead of e.g. X,1,30,MAN,csum,gcppos1 */
 #define AI_ENTRY_TERMINATOR AI_ENTRY( "", 0, 0, __, __, __, __, __, "", "" )
 
 
 // Write to unbracketed AI dataStr checking for overflow
-#define writeDataStr(v) do {						\
-	if (strlen(dataStr) + strlen(v) > MAX_DATA)			\
+#define writeDataStr(v, v_len, offset) do {				\
+	if (*(offset) + v_len > MAX_DATA)				\
 		goto fail;						\
-	strcat(dataStr, v);						\
-} while (0)
-
-#define nwriteDataStr(v,l) do {						\
-	if (strlen(dataStr) + l > MAX_DATA)				\
-		goto fail;						\
-	strncat(dataStr, v, l);						\
+	memcpy(dataStr + *(offset), v, v_len);				\
+	*(offset) += v_len;						\
+	dataStr[*(offset)] = '\0';					\
 } while (0)
 
 
 #include "gs1encoders.h"
 
-void gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table);
+bool gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table, bool quiet);
+void gs1_sortAIs(gs1_encoder* ctx);
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder *ctx, const char *ai, size_t ailen);
+bool existsInAIdata(const gs1_encoder *ctx, const char *ai, size_t ailen, const char *ignoreAI, const struct aiValue **matchedAI);
 bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct aiEntry *entry, const char *aiVal, size_t vallen);
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);
 bool gs1_processAIdata(gs1_encoder *ctx, const char *dataStr, bool extractAIs);
@@ -168,6 +168,7 @@ void gs1_loadValidationTable(gs1_encoder* ctx);
 #ifdef UNIT_TESTS
 
 void test_ai_lookupAIentry(void);
+void test_ai_existsInAIdata(void);
 void test_ai_checkAIlengthByPrefix(void);
 void test_ai_AItableVsPrefixLength(void);
 void test_ai_AItableVsIsFNC1required(void);

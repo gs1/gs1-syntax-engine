@@ -23,7 +23,7 @@ namespace GS1.EncodersApp
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool FreeConsole();
 
-        const uint ATTACH_PARENT_PROCESS = 0x0ffffffff;  // default value if not specifing a process ID
+        const uint ATTACH_PARENT_PROCESS = 0x0ffffffff;  // default value if not specifying a process ID
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
@@ -40,7 +40,7 @@ namespace GS1.EncodersApp
 
             MainWindow mw = new MainWindow
             {
-                Title = "GS1 Syntax Engine GUI demo | Library release: " + gs1Encoder.Version
+                Title = "GS1 Barcode Syntax Engine GUI demo | Library release: " + gs1Encoder.Version
             };
             mw.Show();
 

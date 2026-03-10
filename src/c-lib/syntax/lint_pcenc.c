@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,19 @@
 
 
 #include <assert.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Used to ensure that an AI component conforms with correct percent encoding.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -49,16 +51,12 @@
  *         invalid percent sequence.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	const char *p, *q;
-	char pct[3] = {0};
+	size_t pos;
 
 	assert(data);
-
-	p = data;
-	q = data + strlen(data);
 
 	/*
 	 * Find each instance of "%" in the data and ensure that there are at
@@ -66,26 +64,28 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pcenc(const char* const data, 
 	 * represent a hex value.
 	 *
 	 */
-	while (p != q && (p = strchr(p, '%')) != NULL) {
+	for (pos = 0; pos < data_len; pos++) {
+		if (data[pos] == '%') {
+			if (GS1_LINTER_UNLIKELY(pos + 2 >= data_len)) {
+				GS1_LINTER_RETURN_ERROR(
+					GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+					pos,
+					data_len - pos
+				);
+			}
 
-		if (q - p < 3) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = (size_t)(q - p);
-			return GS1_LINTER_INVALID_PERCENT_SEQUENCE;
+			if (GS1_LINTER_UNLIKELY(!isxdigit((int)data[pos + 1]) || !isxdigit((int)data[pos + 2])))
+				GS1_LINTER_RETURN_ERROR(
+					GS1_LINTER_INVALID_PERCENT_SEQUENCE,
+					pos,
+					3
+				);
+
+			pos += 2;  /* Skip the two hex digits, loop will increment past '%' */
 		}
-
-		memcpy(pct, p + 1, 2);
-		if (strspn(pct, "0123456789ABCDEFabcdef") != 2) {
-			if (err_pos) *err_pos = (size_t)(p - data);
-			if (err_len) *err_len = 3;
-			return GS1_LINTER_INVALID_PERCENT_SEQUENCE;
-		}
-
-		p += 3;
-
 	}
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 
@@ -101,14 +101,17 @@ void test_lint_pcenc(void)
 	UNIT_TEST_PASS(gs1_lint_pcenc, "A");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHI");
 
-	UNIT_TEST_PASS(gs1_lint_pcenc, "%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%00");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%FF");
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%Ff");
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%fF");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "%ff");
+
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%fg", GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%fg*");
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%gf", GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%gf*");
 	UNIT_TEST_FAIL(gs1_lint_pcenc, "%g",  GS1_LINTER_INVALID_PERCENT_SEQUENCE, "*%g*");
 
+	UNIT_TEST_PASS(gs1_lint_pcenc, "%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%20");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%00");
 	UNIT_TEST_PASS(gs1_lint_pcenc, "ABC%FF");

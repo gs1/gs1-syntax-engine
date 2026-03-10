@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,14 @@
 #include <string.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Use to ensure that the AI component has a valid numeric check digit.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -52,37 +53,25 @@
  *         character.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	int weight;
+	size_t pos;
 	int parity = 0;
-	const char *p;
-	size_t len, pos;
 
 	assert(data);
-
-	len = strlen(data);
 
 	/*
 	 * Data must include at least the check digit.
 	 *
 	 */
-	if (*data == '\0') {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 0;
-		return GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT;
-	}
-
-	/*
-	 * Data must consist of all digits.
-	 *
-	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	if (GS1_LINTER_UNLIKELY(data_len == 0))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_CHECK_DIGIT,
+			0,
+			0
+		);
 
 	/*
 	 * Calculate the sum of the numeric values of the data, excluding the
@@ -93,21 +82,45 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csum(const char* const data, s
 	 * checksum, makes the overall sum a multiple of 10.
 	 *
 	 */
-	weight = len % 2 == 0 ? 3 : 1;
-	p = data;
-	while (*(p+1)) {
-		parity += weight * (*p++ - '0');
+	weight = data_len % 2 == 0 ? 3 : 1;
+	
+	for (pos = 0; pos < data_len - 1; pos++) {
+
+		/*
+		 * Data must consist of all digits.
+		 *
+		 */
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+
+		parity += weight * (data[pos] - '0');
 		weight = 4 - weight;
 	}
+
+	/*
+	 * Check character must also be a digit.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(data[data_len - 1] < '0' || data[data_len - 1] > '9'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_NON_DIGIT_CHARACTER,
+			data_len - 1,
+			1
+		);
 	parity = (10 - parity % 10) % 10;
 
-	if (parity + '0' != *p) {
-		if (err_pos) *err_pos = len - 1;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INCORRECT_CHECK_DIGIT;
-	}
+	if (GS1_LINTER_UNLIKELY(parity + '0' != data[data_len - 1]))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INCORRECT_CHECK_DIGIT,
+			data_len - 1,
+			1
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

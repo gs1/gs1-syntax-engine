@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,15 @@
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Used to ensure that an AI component conforms to HH format for hours within
  * a day.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -50,46 +51,46 @@
  * @return #GS1_LINTER_ILLEGAL_HOUR if the data contains an invalid hour.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_hh(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
-	size_t len, pos;
+	int pos;
 
 	assert(data);
 
-	len = strlen(data);
-
 	/*
-	 * Data must be two characters.
+	 * Data must be exactly two characters.
 	 *
 	 */
-	if (len != 2) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return len < 2 ? GS1_LINTER_HOUR_TOO_SHORT : GS1_LINTER_HOUR_TOO_LONG;
-	}
+	if (GS1_LINTER_UNLIKELY(data_len != 2))
+		GS1_LINTER_RETURN_ERROR(
+			data_len < 2 ? GS1_LINTER_HOUR_TOO_SHORT : GS1_LINTER_HOUR_TOO_LONG,
+			0,
+			data_len
+		);
 
 	/*
 	 * Data must consist of all digits.
-	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	for (pos = 0; pos < 2; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				(size_t)pos,
+				1
+			);
 
 	/*
-	 * Validate the minute.
-	 *
+	 * Validate the hour (00-23).
 	 */
-	if ((data[0] - '0') * 10 + (data[1] - '0') > 23) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_ILLEGAL_HOUR;
-	}
+	if (GS1_LINTER_UNLIKELY((data[0] - '0') * 10 + (data[1] - '0') > 23))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_HOUR,
+			0,
+			2
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 
@@ -102,6 +103,28 @@ void test_lint_hh(void)
 {
 
 	UNIT_TEST_PASS(gs1_lint_hh, "00");
+	UNIT_TEST_PASS(gs1_lint_hh, "01");
+	UNIT_TEST_PASS(gs1_lint_hh, "02");
+	UNIT_TEST_PASS(gs1_lint_hh, "03");
+	UNIT_TEST_PASS(gs1_lint_hh, "04");
+	UNIT_TEST_PASS(gs1_lint_hh, "05");
+	UNIT_TEST_PASS(gs1_lint_hh, "06");
+	UNIT_TEST_PASS(gs1_lint_hh, "07");
+	UNIT_TEST_PASS(gs1_lint_hh, "08");
+	UNIT_TEST_PASS(gs1_lint_hh, "09");
+	UNIT_TEST_PASS(gs1_lint_hh, "10");
+	UNIT_TEST_PASS(gs1_lint_hh, "11");
+	UNIT_TEST_PASS(gs1_lint_hh, "12");
+	UNIT_TEST_PASS(gs1_lint_hh, "13");
+	UNIT_TEST_PASS(gs1_lint_hh, "14");
+	UNIT_TEST_PASS(gs1_lint_hh, "15");
+	UNIT_TEST_PASS(gs1_lint_hh, "16");
+	UNIT_TEST_PASS(gs1_lint_hh, "17");
+	UNIT_TEST_PASS(gs1_lint_hh, "18");
+	UNIT_TEST_PASS(gs1_lint_hh, "19");
+	UNIT_TEST_PASS(gs1_lint_hh, "20");
+	UNIT_TEST_PASS(gs1_lint_hh, "21");
+	UNIT_TEST_PASS(gs1_lint_hh, "22");
 	UNIT_TEST_PASS(gs1_lint_hh, "23");
 	UNIT_TEST_FAIL(gs1_lint_hh, "24",  GS1_LINTER_ILLEGAL_HOUR, "*24*");
 
@@ -111,6 +134,7 @@ void test_lint_hh(void)
 	UNIT_TEST_FAIL(gs1_lint_hh, "",    GS1_LINTER_HOUR_TOO_SHORT, "**");
 	UNIT_TEST_FAIL(gs1_lint_hh, "1",   GS1_LINTER_HOUR_TOO_SHORT, "*1*");
 	UNIT_TEST_FAIL(gs1_lint_hh, "111", GS1_LINTER_HOUR_TOO_LONG,  "*111*");
+	UNIT_TEST_FAIL(gs1_lint_hh, "1111", GS1_LINTER_HOUR_TOO_LONG,  "*1111*");
 
 }
 

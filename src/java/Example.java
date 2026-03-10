@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine example user of the Java binding
+ * GS1 Barcode Syntax Engine example user of the Java binding
  *
- * @author Copyright (c) 2022-2024 GS1 AISBL.
+ * @author Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.Scanner;
 public class Example {
 
     static {
-        System.loadLibrary("gs1encoders");
+        System.loadLibrary("gs1encodersjni");
     }
 
     public static void main(final String args[]) {

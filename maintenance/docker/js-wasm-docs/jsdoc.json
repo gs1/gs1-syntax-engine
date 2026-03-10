@@ -1,0 +1,19 @@
+{
+  "source": {
+    "include": ["../../../src/js-wasm/module-intro.js", "../../../src/js-wasm/gs1encoder.mjs"],
+    "includePattern": ".+\\.(mjs|js)$"
+  },
+  "opts": {
+    "destination": "../../../docs/js-wasm",
+    "template": "templates/default"
+  },
+  "templates": {
+    "default": {
+      "includeDate": false,
+      "outputSourceFiles": false,
+      "staticFiles": {
+        "include": ["input_output_buffers.svg"]
+      }
+    }
+  }
+}

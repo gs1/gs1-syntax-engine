@@ -1,18 +1,20 @@
 /*
- *  Basic node.js example for using the JavaScript wrapper around the WASM
- *  build of the GS1 Syntax Engine.
+ *  Basic node.js example for using the JavaScript wrapper around the WASM or
+ *  JS-only build of the GS1 Barcode Syntax Engine.
  *
  *  Requirements:
  *
- *    - Compile with emsdk >= 3.1.28 for correct ES6 module support
- *    - Run with Node.js >= v17.0.0 for stable ES6 module support and readline/promises
+ *    - WASM or JS-only build of the Syntax Engine in the current directory or
+ *      the gs1encoder package installed via npm
+ *
+ *    - Any maintained version of Node.js
  *
  *  The API reference for the native C library is available here:
  *
  *      https://gs1.github.io/gs1-syntax-engine/
  *
  *
- *  Copyright (c) 2022-2024 GS1 AISBL.
+ *  Copyright (c) 2022-2026 GS1 AISBL.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -40,19 +42,25 @@ import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 const rl = readline.createInterface({ input, output });
 
+/*
+ *  To run this example with an instance of gs1encoder that you have installed
+ *  from npm change the following import to:
+ *
+ *    import { GS1encoder } from "gs1encoder";
+ *
+ */
 import { GS1encoder } from "./gs1encoder.mjs";
 
-var gs1encoder = new GS1encoder();
-await gs1encoder.init();
+const gs1encoder = await GS1encoder.create();
 
-var exit = 0;
+let exit = 0;
 
 
 /*
  *  If --version is provided, then just report the library version
  *
  */
-var argv = process.argv.slice(2);
+const argv = process.argv.slice(2);
 if (argv.length == 1 && argv == "--version") {
     console.log("Library version: %s", gs1encoder.version);
     exit = 1;
@@ -65,10 +73,10 @@ if (argv.length == 1 && argv == "--version") {
  */
 while (!exit) {
 
-    var dataStr = gs1encoder.dataStr;
-    var aiDataStr = "";
-    var dlURI = "";
-    var hri = [];
+    let dataStr = gs1encoder.dataStr;
+    let aiDataStr = "";
+    let dlURI = "";
+    let hri = [];
     if (dataStr !== "") {
         aiDataStr = gs1encoder.aiDataStr ?? "⧚ Not AI-based data ⧚";
         try { dlURI = gs1encoder.getDLuri(null); } catch (err) { dlURI = "⧚ " + err.message + " ⧚"; }
@@ -102,13 +110,13 @@ while (!exit) {
 
     console.log("\n 0) Exit program");
 
-    var menuVal = await rl.question("\nMenu selection: ");
+    const menuVal = await rl.question("\nMenu selection: ");
 
     switch (menuVal) {
         case "1":
         case "2":
-        case "3":
-            var inpStr = await rl.question("\nEnter data: ");
+        case "3": {
+            const inpStr = await rl.question("\nEnter data: ");
             if (!inpStr)
                 continue;
             try {
@@ -120,17 +128,18 @@ while (!exit) {
                     gs1encoder.scanData = inpStr;
             } catch (err) {
                 console.log("\n\nERROR message: %s", err.message);
-                var markup = gs1encoder.errMarkup;
+                const markup = gs1encoder.errMarkup;
                 if (markup)
                     console.log("ERROR markup:  %s", markup.replace(/\|/g, "⧚"));
                 continue;
             }
             break;
+        }
         case "4":
         case "5":
         case "6":
-        case "7":
-            var inpStr = await rl.question("\nEnter 0 for OFF or 1 for ON: ");
+        case "7": {
+            const inpStr = await rl.question("\nEnter 0 for OFF or 1 for ON: ");
             if (!inpStr)
                 continue;
             if (inpStr !== "0" && inpStr !== "1") {
@@ -151,6 +160,7 @@ while (!exit) {
                 continue;
             }
             break;
+        }
         case "0":
             exit = 1;
             break;

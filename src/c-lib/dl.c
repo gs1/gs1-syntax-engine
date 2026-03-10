@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
  *
  */
 
+// IWYU pragma: no_include <alloca.h>
+
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -31,10 +34,13 @@
 #include "enc-private.h"
 #include "debug.h"
 #include "dl.h"
+#include "tr.h"
 
 
 #define CANONICAL_DL_STEM "https://id.gs1.org"
+#ifndef DL_KEY_QUALIFIER_INITIAL_CAPACITY
 #define DL_KEY_QUALIFIER_INITIAL_CAPACITY 50
+#endif
 
 
 /*
@@ -46,10 +52,113 @@ static const char *uriCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
 
 /*
  *  Set of unreserved characters that do not require escaping when used in URI
- *  components (path elements and query parameter values)
+ *  components (path elements and query parameter values):
+ *
+ *      ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~
  *
  */
-static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+static inline __ATTR_CONST bool isURIunreservedCharacters(unsigned char c) {
+	return ( (c>='A' && c<='Z') || (c>='a' && c<='z') ||
+		 (c>='0' && c<='9') ||
+		 c=='-' || c=='.' || c=='_' || c=='~' );
+}
+
+
+/*
+ *  Set of characters in urlCharacters that are illegal in a domain
+ *
+ *     _~?#@!$&'()*+,;=%
+ *
+ */
+static inline __ATTR_CONST bool isBadDomainChar(char c) {
+	return c == '_' || c == '~' || c == '?' || c == '#'  || c == '@' ||
+	       c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' ||
+	       c == ')' || c == '*' || c == '+' || c == ','  || c == ';' ||
+	       c == '=' || c == '%';
+}
+
+
+/*
+ *  Convenience alphas (deprecated)
+ *
+ */
+struct alpha_ai_s {
+	char alpha[6];
+	char ai[5];
+};
+
+static const struct alpha_ai_s alpha_ai_map[] = {
+	{ "cpid",  "8010" },
+	{ "cpsn",  "8011" },
+	{ "cpv",   "22"   },
+	{ "gcn",   "255"  },
+	{ "gdti",  "253"  },
+	{ "giai",  "8004" },
+	{ "ginc",  "401"  },
+	{ "gln",   "414"  },
+	{ "glnx",  "254"  },
+	{ "gmn",   "8013" },
+	{ "grai",  "8003" },
+	{ "gsin",  "402"  },
+	{ "gsrn",  "8018" },
+	{ "gsrnp", "8017" },
+	{ "gtin",  "01"   },
+	{ "itip",  "8006" },
+	{ "lot",   "10"   },
+	{ "party", "417"  },
+	{ "refno", "8020" },
+	{ "ser",   "21"   },
+	{ "srin",  "8019" },
+	{ "sscc",  "00"   },
+};
+
+
+/*
+ *  Return the AI entry corresponding to a convenience alpha
+ *
+ */
+struct alpha_len_s {
+	const char* alpha;
+	size_t len;
+};
+
+static __ATTR_PURE int compareAlphaAI(const void* const needle, const void* const haystack, const size_t index) {
+
+	const struct alpha_len_s* const alpha_len = (const struct alpha_len_s*)needle;
+	const struct alpha_ai_s* map = (const struct alpha_ai_s*)haystack;
+	const size_t map_len = strlen(map[index].alpha);
+	const size_t min_len = (alpha_len->len < map_len) ? alpha_len->len : map_len;
+	int cmp;
+
+	cmp = memcmp(map[index].alpha, alpha_len->alpha, min_len);
+	if (cmp != 0)
+		return cmp;
+
+	if (map_len != alpha_len->len)
+		return (map_len > alpha_len->len) ? 1 : -1;
+
+	return 0;
+
+}
+
+static const struct aiEntry* aiEntryFromAlpha(const gs1_encoder* const ctx, const char* const alpha, const size_t len) {
+
+	const char* ai;
+	const struct aiEntry *entry;
+	struct alpha_len_s alpha_len = { .alpha = alpha, .len = len };
+	const ssize_t index = gs1_binarySearch(&alpha_len, alpha_ai_map, SIZEOF_ARRAY(alpha_ai_map), compareAlphaAI, NULL);
+
+	if (index < 0)
+		return NULL;
+
+	ai = alpha_ai_map[index].ai;
+	entry = gs1_lookupAIentry(ctx, ai, strlen(ai));
+
+	assert(entry);
+
+	return entry;
+
+}
 
 
 /*
@@ -60,24 +169,21 @@ static const char *uriUnreservedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
  *  array of space-separated AI sequences which we can efficiently search.
  *
  */
-static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers) {
+static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualifiers, size_t* const pos, size_t* const cap, const char* const key, const char* const qualifiers, size_t qualifiers_len) {
 
 	int i, j, num;
 	size_t req;
-	char buf[MAX_AI_ATTR_LEN + 1] = { 0 };
-	char qualifiersbuf[MAX_AI_ATTR_LEN + 1] = { 0 };
-	char *saveptr = NULL;
-	const char *token;
+	gs1_tok_t tok;
 	char **addedQualifiers;
 
 	/*
 	 *  Count number of qualifiers passed in
 	 *
 	 */
-	for (i = 0, num = 0; qualifiers[i]; i++)
+	for (i = 0, num = 0; i < (int)qualifiers_len; i++)
 		if (qualifiers[i] == ',')
 			num++;
-	if (*qualifiers != '\0')
+	if (qualifiers_len > 0)
 		num++;
 
 	/*
@@ -86,9 +192,11 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 */
 	for (i = 0, req = 1; i < num; i++, req *= 2);
 	if (*pos + req >= *cap) {
-		char **reallocDLkeyQualifiers = realloc(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
+
+		char **reallocDLkeyQualifiers = GS1_ENCODERS_REALLOC(*dlKeyQualifiers, (*pos + req) * sizeof(char *));
+
 		if (!reallocDLkeyQualifiers) {
-			strcpy(ctx->errMsg, "Failed to reallocate memory for key-qualifiers");
+			SET_ERR(FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS);
 			return false;
 		}
 		*dlKeyQualifiers = reallocDLkeyQualifiers;
@@ -107,25 +215,38 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 	 *  key-qualifier sequence
 	 *
 	 */
-	strncat(buf, key, MAX_AI_ATTR_LEN);
-	*addedQualifiers = strdup(buf);
+	*addedQualifiers = gs1_strdup_alloc(key);
 	if (!*addedQualifiers)
 		return false;
 	(*pos)++;
 
-	strcpy(qualifiersbuf, qualifiers);
-	for (i = 0, j = 1, token = strtok_r(qualifiersbuf, ",", &saveptr);
+	tok = (gs1_tok_t) { .len = qualifiers_len };
+	for (i = 0, j = 1, gs1_tokenise(qualifiers, ',', &tok);
 	     i < num;
-	     i++, j *= 2, token = strtok_r(NULL, ",", &saveptr)) {
+	     i++, j *= 2, gs1_tokenise(NULL, ',', &tok)) {
 
 		int k;
 
 		for (k = 0; k < j; k++) {
-			snprintf(buf, sizeof(buf), "%s %s", addedQualifiers[k], token);
-			addedQualifiers[k + j] = strdup(buf);
-			if (!addedQualifiers[k + j])
+
+			size_t q_len = strlen(addedQualifiers[k]);
+			size_t total_len = q_len + 1 + tok.len + 1;	// "<Q> <token>\0"
+			char *q_new;
+
+			assert(total_len <= MAX_AI_ATTR_LEN + 1);		// Must fit in original buf size
+
+			q_new = GS1_ENCODERS_MALLOC(total_len);
+			if (!q_new)
 				return false;
+
+			memcpy(q_new, addedQualifiers[k], q_len);
+			q_new[q_len] = ' ';
+			memcpy(q_new + q_len + 1, tok.ptr, tok.len);
+			q_new[q_len + 1 + tok.len] = '\0';
+
+			addedQualifiers[k + j] = q_new;
 			(*pos)++;
+
 		}
 
 	}
@@ -134,7 +255,7 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 
 }
 
-static int q_cmp(const void* const a, const void* const b) {
+static __ATTR_PURE int q_cmp(const void* const a, const void* const b) {
 	return strcmp(*(const char**)a, *(const char**)b);
 }
 
@@ -143,9 +264,9 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	int i = 0;
 	size_t pos = 0, cap = DL_KEY_QUALIFIER_INITIAL_CAPACITY;
 
-	char **dlKeyQualifiers = malloc(cap * sizeof(char *));
+	char **dlKeyQualifiers = GS1_ENCODERS_MALLOC(cap * sizeof(char *));
 	if (!dlKeyQualifiers) {
-		strcpy(ctx->errMsg, "Failed to allocate memory for key-qualifiers");
+		SET_ERR(FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS);
 		return false;
 	}
 
@@ -155,30 +276,34 @@ bool gs1_populateDLkeyQualifiers(gs1_encoder* const ctx) {
 	 */
 	for (i = 0; i < (int)ctx->aiTableEntries; i++) {
 
-		const char *token;
-		char *saveptr = NULL;
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
+		gs1_tok_t tok;
+		bool more;
 
-		strncat(attrs, ctx->aiTable[i].attrs, MAX_AI_ATTR_LEN);
-		for (token = strtok_r(attrs, " ", &saveptr);
-		     token;
-		     token = strtok_r(NULL, " ", &saveptr)) {
-			if (strcmp(token, "dlpkey") == 0) {
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ctx->aiTable[i].attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
+
+			if (tok.len == 6 && strncmp(tok.ptr, "dlpkey", 6) == 0) {
+
 				if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
-							&pos, &cap, ctx->aiTable[i].ai, ""))
+							&pos, &cap, ctx->aiTable[i].ai, "", 0))
 					goto fail;
-			} else if (strncmp(token, "dlpkey=", 7) == 0) {
 
-				char *saveptr2 = NULL;
+			} else if (tok.len > 7 && strncmp(tok.ptr, "dlpkey=", 7) == 0) {
 
-				for (token = strtok_r((char*)(token+7), "|", &saveptr2);
-				     token;
-				     token = strtok_r(NULL, " ", &saveptr2))
+				gs1_tok_t tok2;
+				bool more2;
+
+				tok2 = (gs1_tok_t) { .len = tok.len - 7 };
+				for (more2 = gs1_tokenise(tok.ptr + 7, '|', &tok2); more2; more2 = gs1_tokenise(NULL, '|', &tok2)) {
+
 					if (!addDLkeyQualifiers(ctx, &dlKeyQualifiers,
-							&pos, &cap, ctx->aiTable[i].ai, token))
+							&pos, &cap, ctx->aiTable[i].ai, tok2.ptr, tok2.len))
 						goto fail;
 
+				}
+
 			}
+
 		}
 
 	}
@@ -200,9 +325,9 @@ fail:
 	 * Release what we have allocated so far
 	 *
 	 */
-	for (i--; i >= 0; i--)
-		free(dlKeyQualifiers[i]);
-	free(dlKeyQualifiers);
+	while (pos > 0)
+		GS1_ENCODERS_FREE(dlKeyQualifiers[--pos]);
+	GS1_ENCODERS_FREE(dlKeyQualifiers);
 
 	return false;
 
@@ -219,9 +344,9 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
 		return;
 
 	for (i = 0; i < ctx->numDLkeyQualifiers; i++)
-		free(ctx->dlKeyQualifiers[i]);
+		GS1_ENCODERS_FREE(ctx->dlKeyQualifiers[i]);
 
-	free(ctx->dlKeyQualifiers);
+	GS1_ENCODERS_FREE(ctx->dlKeyQualifiers);
 	ctx->dlKeyQualifiers = NULL;
 
 }
@@ -232,57 +357,68 @@ void gs1_freeDLkeyQualifiers(gs1_encoder* const ctx) {
  *  the position in the list or -1 if missing
  *
  */
-static int getDLpathAIseqEntry(gs1_encoder* const ctx, const char seq[MAX_AIS][MAX_AI_LEN+1], const int len) {
+static __ATTR_PURE int compareDLKeyQualifier(const void* const key, const void* const array, const size_t index) {
+	const char* const aiseq = (const char*)key;
+	const char* const * const qualifiers = (const char* const *)array;
+	return strcmp(qualifiers[index], aiseq);
+}
 
-	char aiseq[(MAX_AI_LEN+1) * MAX_AIS] = { 0 };
-	char *p = aiseq;
+static int getDLpathAIseqEntry(const gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
+
+	const size_t bufsize = (size_t)len * (MAX_AI_LEN + 1);
+	char* aiseq;
+	char *p;
 	int i;
-	size_t s = 0;
-	size_t e = (size_t)ctx->numDLkeyQualifiers;
+	ssize_t index;
+
+	assert(len >= 1);
+
+	// cppcheck-suppress allocaCalled
+	aiseq = alloca(bufsize);
+	p = aiseq;
 
 	/*
 	 *  Build a space separated AI sequence string
 	 *
 	 */
-	for (i = 0 ; i < len; i++) {
-		const int n = snprintf(p, sizeof(aiseq) - (size_t)(p - aiseq), "%s ", seq[i]);
-		assert(n >= 1 && n < (int)(sizeof(aiseq) - (size_t)(p - aiseq)));
-		p += n;
+	for (i = 0; i < len; i++) {
+		const char *q = ais[i];
+		if (i > 0) *p++ = ' ';
+		while (*q) *p++ = *q++;
 	}
-	*--p = '\0';		// Chop stray space
+	*p = '\0';
 
 	/*
-	 *  Binary search for string in the list of valid key-qualifier
-	 *  associations.
+	 *  Search for it in the list of valid key-qualifier associations.
 	 *
 	 */
-	while (s < e) {
-		const size_t m = s + (e - s) / 2;
-		const int cmp = strcmp(ctx->dlKeyQualifiers[m], aiseq);
-		if (cmp == 0)
-			return (int)m;
-		if (cmp < 0)
-			s = m + 1;
-		else
-			e = m;
-	}
+	index = gs1_binarySearch(aiseq, ctx->dlKeyQualifiers, (size_t)ctx->numDLkeyQualifiers,
+				 compareDLKeyQualifier, NULL);
 
-	return -1;
+	return (index >= 0) ? (int)index : -1;
 
 }
 
-static inline bool isValidDLpathAIseq(gs1_encoder* const ctx, const char seq[MAX_AIS][MAX_AI_LEN+1], const int len) {
-	return getDLpathAIseqEntry(ctx, seq, len) != -1;
+static inline bool isValidDLpathAIseq(const gs1_encoder* const ctx, const char (*ais)[MAX_AI_LEN+1], const int len) {
+	return getDLpathAIseqEntry(ctx, ais, len) != -1;
 }
 
-static inline bool isDLpkey(gs1_encoder* const ctx, const char* const p) {
-	char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
-	strcpy(seq[0], p);
-	return getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1) != -1;
+static inline bool isDLpkey(const gs1_encoder* const ctx, const struct aiEntry* const entry) {
+	char seq[1][MAX_AI_LEN+1] = {{0}};
+	memcpy(seq[0], entry->ai, entry->ailen);
+	seq[0][entry->ailen] = '\0';
+	return getDLpathAIseqEntry(ctx, (const char (*)[MAX_AI_LEN+1])seq, 1) != -1;
 }
 
 
-static size_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
+static inline __ATTR_CONST uint8_t hex_nibble(char c) {
+	if (c >= '0' && c <= '9') return (uint8_t)(c - '0');
+	if (c >= 'A' && c <= 'F') return (uint8_t)(c - 'A' + 10);
+	if (c >= 'a' && c <= 'f') return (uint8_t)(c - 'a' + 10);
+	return UINT8_MAX;
+}
+
+static ssize_t URIunescape(char* const out, size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
 	size_t i, j;
 
@@ -290,10 +426,15 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 	assert(out);
 
 	for (i = 0, j = 0; i < inlen && j < maxlen; i++, j++) {
-		if (i < inlen - 2 && in[i] == '%' && isxdigit(in[i+1]) && isxdigit(in[i+2])) {
-			const char hex[] = { in[i+1], in[i+2], '\0' };
-			out[j] = (char)strtoul(hex, NULL, 16);
-			if (out[j] == 0)	// Illegal null
+		if (i < inlen - 2 && in[i] == '%') {
+			uint8_t hi = hex_nibble(in[i+1]);
+			uint8_t lo = hex_nibble(in[i+2]);
+			if (hi == UINT8_MAX || lo == UINT8_MAX) {	// Invalid hex character
+				out[j] = '%';
+				continue;
+			}
+			out[j] = (char)((hi << 4) | lo);
+			if (out[j] == 0)				// Illegal null
 				return 0;
 			i += 2;
 		} else if (is_query_component && in[i] == '+')
@@ -303,33 +444,38 @@ static size_t URIunescape(char* const out, size_t maxlen, const char* const in, 
 	}
 	out[j] = '\0';
 
-	return j;
+	return (i == inlen) ? (ssize_t)j : -1;
 
 }
 
 
-static size_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
+static ssize_t URIescape(char* const out, const size_t maxlen, const char* const in, const size_t inlen, const bool is_query_component) {
 
+	static const char HEX[] = "0123456789ABCDEF";
 	size_t i, j;
 
 	assert(in);
 	assert(out);
 
 	for (i = 0, j = 0; i < inlen && j < maxlen; i++) {
-		if (strchr(uriUnreservedCharacters, in[i]))
-			out[j++] = in[i];
-		else if (in[i] == ' ' && is_query_component)
+		const unsigned char c = (unsigned char)in[i];
+
+		if (isURIunreservedCharacters(c))
+			out[j++] = (char)c;
+		else if (c == ' ' && is_query_component)
 			out[j++] = '+';
-//		else if (in[i] == '+' && !is_query_component)		// Encoding '+' as '%2d' in path info is preferred
+//		else if (c == '+' && !is_query_component)		// Encoding '+' as '%2d' in path info is preferred
 //			out[j++] = '+';
-		else if (j+2 < maxlen)
-			j += (size_t)snprintf(&out[j], 4, "%%%02X", in[i]);
-		else
+		else if (j+2 < maxlen) {
+			out[j++] = '%';
+			out[j++] = HEX[c >> 4];
+			out[j++] = HEX[c & 0x0F];
+		} else
 			break;		/* Out of space */
 	}
 	out[j] = '\0';
 
-	return j;
+	return (i == inlen) ? (ssize_t)j : -1;
 
 }
 
@@ -338,9 +484,6 @@ static size_t URIescape(char* const out, const size_t maxlen, const char* const 
  * Parse a GS1 DL URI, validating the key to key-qualifier associations in the
  * path information, and convert it to a regular AI data string with ^ = FNC1,
  * extracting AI data for HRI purposes.
- *
- * Note: "Convenience alphas" (e.g. "/gtin/0123...", which have been
- * deprecated) are not supported.
  *
  */
 bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const dataStr) {
@@ -352,13 +495,16 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	const char* dp = NULL;	// DL path info
 	bool ret;
 	bool fnc1req = true;
-	char pathAIseq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };	// Sequence of AIs extracted from the path info
+	char (*pathAIseq)[MAX_AI_LEN+1];
 	int numPathAIs;
+	int i;
+	size_t dataStr_len = 0;
 
 	assert(ctx);
 	assert(dlData);
 
 	*dataStr = '\0';
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -367,28 +513,33 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	p = dlData;
 
-	if (strspn(p, uriCharacters) != strlen(p)) {
-		strcpy(ctx->errMsg, "URI contains illegal characters");
+	if (p[strspn(p, uriCharacters)] != '\0') {
+		SET_ERR(URI_CONTAINS_ILLEGAL_CHARACTERS);
 		goto fail;
 	}
 
-	if (strlen(p) >= 8 && strncmp(p, "https://", 8) == 0)
+	if (strncmp(p, "https://", 8) == 0 || strncmp(p, "HTTPS://", 8) == 0)
 		p += 8;
-	else if (strlen(p) >= 8 && strncmp(p, "HTTPS://", 8) == 0)
-		p += 8;
-	else if (strlen(p) >= 7 && strncmp(p, "http://", 7) == 0)
-		p += 7;
-	else if (strlen(p) >= 7 && strncmp(p, "HTTP://", 7) == 0)
+	else if (strncmp(p, "http://", 7) == 0 || strncmp(p, "HTTP://", 7) == 0)
 		p += 7;
 	else {
-		strcpy(ctx->errMsg, "Scheme must be http:// or HTTP:// or https:// or HTTPS://");
+		SET_ERR(URI_CONTAINS_ILLEGAL_SCHEME);
 		goto fail;
 	}
 
 	DEBUG_PRINT("  Scheme %.*s\n", (int)(p-dlData-3), dlData);
 
-	if (((r = strchr(p, '/')) == NULL) || r-p < 1) {
-		strcpy(ctx->errMsg, "URI must contain a domain and path info");
+	// Scan domain for '/' delimiter while validating characters
+	r = p;
+	while (*r && *r != '/') {
+		if (isBadDomainChar(*r)) {
+			SET_ERR(DOMAIN_CONTAINS_ILLEGAL_CHARACTERS);
+			goto fail;
+		}
+		r++;
+	}
+	if (*r != '/' || r-p < 1) {
+		SET_ERR(URI_MISSING_DOMAIN_AND_PATH_INFO);
 		goto fail;
 	}
 
@@ -408,38 +559,53 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	// Search backwards from the end of the path info looking for an
 	// "/AI/value" pair where AI is a DL primary key
-	while ((r = strrchr(pi, '/')) != NULL) {
+	r = (char *)pi + strlen(pi);			// Start from end
+	while (r > pi) {
+		const struct aiEntry* entry = NULL;
+		size_t ailen;
 
-		const struct aiEntry* entry;
+		// Find previous slash by scanning backwards
+		while (r > pi && *--r != '/') ;
+		if (r == pi) break;			// No more slashes
 
 		*p = '/';				// Restore original pair separator
 							// Clobbers first character of path
 							// info on first iteration
 
 		// Find start of AI
-		*r = '\0';				// Chop off value
-		p = strrchr(pi, '/'); 			// Beginning of AI
-		*r = '/';				// Restore original AI/value separator
-		if (!p)					// At beginning of path
+		p = r - 1;
+		while (p >= pi && *p != '/') p--;
+		if (p < pi)				// At beginning of path
 			break;
 
 		DEBUG_PRINT("      %s\n", p);
 
-		entry = gs1_lookupAIentry(ctx, p+1, (size_t)(r-p-1));
+		ailen = (size_t)(r-p-1);
+
+		if (ctx->permitConvenienceAlphas &&
+		    ailen >= 3 && ailen <= 5 &&
+		    !isdigit((int)*(p+1))) {		// Possible convenience alpha
+			entry = aiEntryFromAlpha(ctx, p+1, ailen);
+		}
+
+		if (!entry)
+			entry = gs1_lookupAIentry(ctx, p+1, ailen);
+
 		if (!entry)
 			break;
 
-		if (isDLpkey(ctx, entry->ai)) {		// Found root of DL path info
+		if (isDLpkey(ctx, entry)) {		// Found root of DL path info
 			dp = p;
 			break;
 		}
 
-		*p = '\0';
+		// Continue backwards from current position (p points to start of AI)
+		r = p;
 
 	}
 
 	if (!dp) {
-		strcpy(ctx->errMsg, "No GS1 DL keys found in path info");
+		SET_ERR(NO_GS1_DL_KEYS_FOUND_IN_PATH_INFO);
 		goto fail;
 	}
 
@@ -452,65 +618,89 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	numPathAIs = 0;
 	while (*p) {
 
-		const struct aiEntry* entry;
-		size_t ailen, vallen;
-		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
+		const struct aiEntry* entry = NULL;
+		size_t ailen;
+		ssize_t vallen;
 		const char *outai, *outval;
 		const char *ai;
+		bool fromAlpha = false;
 
 		assert(*p == '/');
 		r = strchr(++p, '/');
 		assert(r);
 
-		// AI is known to be valid since we previously walked over it
+		// Process the AI which is known to be valid since we previously walked over it
 		ai = p;
 		ailen = (size_t)(r-p);
-		entry = gs1_lookupAIentry(ctx, ai, ailen);
+		if (ctx->permitConvenienceAlphas &&
+		    ailen >= 3 && ailen <= 5 &&
+		    !isdigit((int)*p)) {
+			entry = aiEntryFromAlpha(ctx, ai, ailen);
+		}
+		if (entry)
+			fromAlpha = true;
+		else
+			entry = gs1_lookupAIentry(ctx, ai, ailen);
 		assert(entry);
 
-		if ((p = strchr(++r, '/')) == NULL)
-			p = r + strlen(r);
+		DEBUG_PRINT("    Extracted AI: (%.*s)\n", (int)ailen, ai);
+
+		// Write out the AI
+		if (fnc1req)
+			writeDataStr("^", 1, &dataStr_len);			// Write FNC1, if required
+		outai = dataStr + dataStr_len;					// Save start of AI for AI data
+		if (fromAlpha)
+			writeDataStr(entry->ai, entry->ailen, &dataStr_len);	// Resolved from convenience alpha
+		else
+			writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;						// Record if required before next AI
+
+		// Now process the AI value
+		++r;
+		p = r;
+		while (*p && *p != '/') p++;	// Find next '/' or end of string
 
 		if (p == r) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value path element is empty", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_PATH_ELEMENT_IS_EMPTY, (int)entry->ailen, ai);
 			goto fail;
 		}
 
+		// Save start of value for AI value
+		outval = dataStr + dataStr_len;
+
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, r, (size_t)(p-r), false)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) from DL path info contains illegal null character", (int)ailen, ai);
+		vallen = URIunescape(dataStr + dataStr_len, MAX_DATA - dataStr_len, r, (size_t)(p-r), false);
+		assert(vallen >= 0);	// URI decoding should not overflow
+		if (vallen == 0) {
+			SET_ERR_V(DECODED_AI_FROM_DL_PATH_INFO_CONTAINS_ILLEGAL_NULL, (int)ailen, ai);
 			goto fail;
 		}
 
 		// Legacy handling of AI (01) to pad up to a GTIN-14, when feature enabled
 		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
-			size_t i;
-			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
-			aival[14] = '\0';
+			size_t j;
+			char *v = dataStr + dataStr_len;
+			for (j = 0; j <= 13; j++)
+				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
+			v[14] = '\0';
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		// Update dataStr length and NULL terminate
+		dataStr_len += (size_t)vallen;
+		dataStr[dataStr_len] = '\0';
 
-		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		nwriteDataStr(ai, ailen);			// Write AI
-		fnc1req = entry->fnc1;				// Record if required before next AI
-
-		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
-		nwriteDataStr(aival, vallen);			// Write value
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, outval);
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, (size_t)vallen))
 			goto fail;
 
 		// Update the AI data
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
@@ -524,7 +714,6 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			.dlPathOrder = (uint8_t)numPathAIs
 		};
 
-		strcpy(pathAIseq[numPathAIs], entry->ai);
 		numPathAIs++;
 
 	}
@@ -538,16 +727,17 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	while (p && *p) {
 
 		const struct aiEntry* entry = NULL;
-		size_t ailen = 0, vallen;
-		char aival[MAX_AI_VALUE_LEN + 1];		// Unescaped AI value
+		size_t ailen = 0;
+		ssize_t vallen;
 		const char *outai = NULL, *outval, *ai, *e;
 
 		aiValueKind_t kind = alValue_dlign;
 
+		// Process the AI
 		while (*p == '&')				// Jump any & separators
 			p++;
-		if ((r = strchr(p, '&')) == NULL)
-			r = p + strlen(p);			// Value-pair finishes at end of data
+		r = p;
+		while (*r && *r != '&') r++;			// Find next '&' or end of string
 
 		// Discard parameters with no value
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
@@ -561,7 +751,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		ai = p;
 		ailen = (size_t)(e-p);
 		if (gs1_allDigits((uint8_t*)p, ailen) && (entry = gs1_lookupAIentry(ctx, p, ailen)) == NULL) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Unknown AI (%.*s) in query parameters", (int)ailen, p);
+			SET_ERR_V(UNKNOWN_AI_IN_QUERY_PARAMS, (int)ailen, p);
 			goto fail;
 		}
 
@@ -573,41 +763,52 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
+		DEBUG_PRINT("    Extracted AI: (%.*s)\n", (int)ailen, ai);
+
+		// Write out the AI
+		if (fnc1req)
+			writeDataStr("^", 1, &dataStr_len);		// Write FNC1, if required
+		outai = dataStr + dataStr_len;				// Save start of AI for AI data
+		writeDataStr(ai, ailen, &dataStr_len);			// Might be an "unknown AI"
+		fnc1req = entry->fnc1;					// Record if required before next AI
+
+		// Process the AI value
 		if (r == ++e) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value query element is empty", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_VALUE_QUERY_ELEMENT_IN_EMPTY, (int)entry->ailen, ai);
 			goto fail;
 		}
 
+		// Save start of value for AI data
+		outval = dataStr + dataStr_len;
+
 		// Reverse percent encoding
-		if ((vallen = URIunescape(aival, MAX_AI_VALUE_LEN, e, (size_t)(r-e), true)) == 0) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Decoded AI (%.*s) value from DL query params contains illegal null character", (int)strlen(entry->ai), ai);
+		vallen = URIunescape(dataStr + dataStr_len, MAX_DATA - dataStr_len, e, (size_t)(r-e), true);
+		assert(vallen >= 0);	// URI decoding should not overflow
+		if (vallen == 0) {
+			SET_ERR_V(DECODED_AI_VALUE_FROM_QUERY_PARAMS_CONTAINS_ILLEGAL_NULL, (int)entry->ailen, ai);
 			goto fail;
 		}
 
 		// Special handling of AI (01) to pad up to a GTIN-14
 		if (strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
-			size_t i;
-			for (i = 0; i <= 13; i++)
-				aival[13-i] = vallen >= i+1 ? aival[vallen-i-1] : '0';
-			aival[14] = '\0';
+			size_t j;
+			char *v = dataStr + dataStr_len;
+			for (j = 0; j <= 13; j++)
+				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
+			v[14] = '\0';
 			vallen = 14;
 		}
 
-		DEBUG_PRINT("    Extracted: (%.*s) %.*s\n", (int)ailen, ai, (int)vallen, aival);
+		// Update dataStr length and NULL terminate
+		dataStr_len += (size_t)vallen;
+		dataStr[dataStr_len] = '\0';
 
-		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Save start of AI for AI data
-		nwriteDataStr(ai, ailen);			// Write AI
-		fnc1req = entry->fnc1;				// Record if required before next AI
-
-		outval = dataStr + strlen(dataStr);		// Save start of value for AI data
-		nwriteDataStr(aival, vallen);			// Write value
+		DEBUG_PRINT("    Extracted value: %.*s\n", (int)vallen, outval);
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, aival, vallen))
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, (size_t)vallen))
 			goto fail;
 
 		kind = aiValue_aival;
@@ -615,7 +816,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 add_query_param_to_ai_data:
 
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
@@ -640,10 +841,24 @@ add_query_param_to_ai_data:
 
 	ret = true;
 
-	// Validate that the AI sequence in the path info is a valid
-	// key-qualifier association
-	if (!isValidDLpathAIseq(ctx, (const char(*)[MAX_AI_LEN+1])pathAIseq, numPathAIs)) {
-		strcpy(ctx->errMsg, "The AIs in the path are not a valid key-qualifier sequence for the key");
+	/*
+	 *  Validate that the AI sequence in the path info is a valid
+	 *  key-qualifier association
+	 *
+	 */
+	// cppcheck-suppress allocaCalled
+	pathAIseq = alloca((size_t)numPathAIs * sizeof(*pathAIseq));
+	for (i = 0; i < numPathAIs; i++) {
+
+		const struct aiValue* ai = &ctx->aiData[i];
+
+		assert(ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE && ai->dlPathOrder < numPathAIs);
+
+		memcpy(pathAIseq[ai->dlPathOrder], ai->aiEntry->ai, ai->aiEntry->ailen + 1);
+
+	}
+	if (!isValidDLpathAIseq(ctx, (const char (*)[MAX_AI_LEN+1])pathAIseq, numPathAIs)) {
+		SET_ERR(INVALID_KEY_QUALIFIER_SEQUENCE);
 		ret = false;
 		goto out;
 	}
@@ -651,34 +866,42 @@ add_query_param_to_ai_data:
 	// Validate that attributes in the query params are valid and do not
 	// instead belong within path info
 	if (numPathAIs < MAX_AIS) {
-		int i;
-		for (i = 0; i < ctx->numAIs; i++) {
+		int k;
+		// cppcheck-suppress allocaCalled
+		char (*seq)[MAX_AI_LEN+1] = alloca((size_t)(numPathAIs + 1) * sizeof(*seq));
 
-			char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
-			const struct aiValue* const ai = &ctx->aiData[i];
+		// Sort AIs to enable O(n) duplicate check
+		gs1_sortAIs(ctx);
+
+		// First, check for duplicate AIs in attributes using sorted array - O(n) instead of O(n²)
+		// Forbid duplicate AIs
+		for (k = 0; k < ctx->numSortedAIs - 1; k++) {
+			const struct aiValue* const ai = ctx->sortedAIs[k];
+			const struct aiValue* const ai2 = ctx->sortedAIs[k+1];
+
+			if (ai->ailen == ai2->ailen &&
+			    memcmp(ai->ai, ai2->ai, ai->ailen) == 0) {
+				SET_ERR_V(DUPLICATE_AI, ai->ailen, ai->ai);
+				ret = false;
+				goto out;
+			}
+		}
+
+		// Now validate each attribute AI
+		for (k = 0; k < ctx->numSortedAIs; k++) {
+
+			const struct aiValue* const ai = ctx->sortedAIs[k];
 			int j;
 
-			if (ai->kind != aiValue_aival || ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
+			if (ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE)
 				continue;
 
 			assert(ai->aiEntry);
 
-			// Forbid duplicate AIs
-			for (j = 0; j < i; j++) {
-				const struct aiValue* ai2 = &ctx->aiData[j];
-				if (ai2->kind == aiValue_aival &&
-				    ai2->ailen == ai->ailen &&
-				    memcmp(ai2->ai, ai->ai, ai2->ailen) == 0) {
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is duplicated", ai->ailen, ai->ai);
-					ret = false;
-					goto out;
-				}
-			}
-
 			// Check that the AI is a permitted DL URI data attribute
 			if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 			    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+				SET_ERR_V(AI_IS_NOT_VALID_DATA_ATTRIBUTE, ai->ailen, ai->ai);
 				ret = false;
 				goto out;
 			}
@@ -689,11 +912,11 @@ add_query_param_to_ai_data:
 			for (j = 1; j <= numPathAIs; j++) {
 
 				memcpy(&seq[0], &pathAIseq[0], (size_t)j * sizeof(seq[0]));
-				strcpy(seq[j], ai->aiEntry->ai);
+				memcpy(seq[j], ai->aiEntry->ai, ai->aiEntry->ailen + 1);	// Includes NULL
 				memcpy(&seq[j+1], &pathAIseq[j], (size_t)(numPathAIs-j) * sizeof(seq[0]));
 
-				if (getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
-					snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%s) from query params should be in the path info", seq[j]);
+				if (getDLpathAIseqEntry(ctx, (const char (*)[MAX_AI_LEN+1])seq, numPathAIs + 1) != -1) {
+					SET_ERR_V(AI_SHOULD_BE_IN_PATH_INFO, seq[j]);
 					ret = false;
 					goto out;
 				}
@@ -709,12 +932,12 @@ add_query_param_to_ai_data:
 
 out:
 
-	if (qp) {			// Restore original query parameter delimiter
+	if (qp) {					// Restore original query parameter delimiter
 //		*(qp-1) = '?';
-		dlData[qp - dlData - 1] = '?';  // Ugly hack generates same code as above to satiate GCC 11
+		dlData[qp - dlData - 1] = '?';		// Ugly hack generates same code as above to satiate GCC 11
 	}
 
-	if (fr) {			// Restore original fragment delimiter
+	if (fr) {					// Restore original fragment delimiter
 //		*(fr-1) = '#';
 		dlData[fr - dlData - 1] = '#';  // Ditto
 	}
@@ -724,7 +947,7 @@ out:
 fail:
 
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to parse DL data");
+		SET_ERR(DL_URI_PARSE_FAILED);
 
 	DEBUG_PRINT("Parsing DL data failed: %s\n", ctx->errMsg);
 
@@ -741,24 +964,77 @@ fail:
  */
 char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
-	int i, maxQualifiers, numQualifiers;
+	int i, maxQualifiers, numQualifiers = -1;
 	const char *key = NULL;
+	size_t key_len = 0;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
-	char *saveptr = NULL;
-	const char *token;
-	char tmp[256];
 	bool emitFixed;
+	ssize_t len;
+	const char *stem_to_use;
+	const struct aiValue* pathAIs[MAX_AIS] = { NULL };
+	uint64_t outputAIbitfield[157] = { 0 };		// Track when an AI is emitted
+	gs1_tok_t tok;
+	bool more;
+
+#define GS1_AI_OUTPUT_VAL(ai, val) do {								\
+	uint8_t k;										\
+	for (k = 0, val = 0; k < (ai)->ailen; k++)						\
+		val = (uint16_t)(val * 10 + ((ai)->ai[k] - '0'));				\
+} while (0)
+
+#define GS1_SET_AI_OUTPUT(ai) do {								\
+	uint16_t val;										\
+	int w = CHAR_BIT * sizeof(outputAIbitfield[0]);						\
+	GS1_AI_OUTPUT_VAL(ai, val);								\
+	assert((size_t)(val/w) < sizeof(outputAIbitfield) / sizeof(outputAIbitfield[0]));	\
+	outputAIbitfield[val/w] |= (UINT64_C(1) << (w-1) >> (val%w));				\
+} while (0)
+
+#define GS1_GET_AI_OUTPUT(ai, exists) do {							\
+	uint16_t val;										\
+	int w = CHAR_BIT * sizeof(outputAIbitfield[0]);						\
+	GS1_AI_OUTPUT_VAL(ai, val);								\
+	assert((size_t)(val/w) < sizeof(outputAIbitfield) / sizeof(outputAIbitfield[0]));	\
+	exists = (outputAIbitfield[val/w] & (UINT64_C(1) << (w-1) >> (val%w))) != 0;		\
+} while (0)
 
 	assert(ctx);
 
 	/*
+	 *  Check whether we already have path orders for the elements, i.e.
+	 *  the data originated from a GS1 DL URI, in which case we can just
+	 *  output what we already have
+	 *
+	 */
+	for (i = 0; i < ctx->numAIs; i++) {
+
+		const struct aiValue* const ai = &ctx->aiData[i];
+
+		if (ai->kind == aiValue_aival && ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE) {
+			assert(ai->dlPathOrder < MAX_AIS);
+			pathAIs[ai->dlPathOrder] = ai;
+			if (ai->dlPathOrder + 1 > numQualifiers)
+				numQualifiers = ai->dlPathOrder + 1;
+		}
+
+	}
+
+	if (numQualifiers != -1) {
+		DEBUG_PRINT("  Skipping assignment of path order as already set");
+		goto output;
+	}
+
+	/*
+	 *  No path orders exists to be must assign them by hoisting as many
+	 *  AIs as we can into the path
+	 *
 	 *  Select the first AI that is a valid primary key for a DL
 	 *
 	 */
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char seq[MAX_AIS][MAX_AI_LEN+1] = { { 0 } };
+		char seq[1][MAX_AI_LEN+1] = {{0}};
 		int ke;
 		const struct aiValue* const ai = &ctx->aiData[i];
 
@@ -767,23 +1043,25 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 
 		assert(ai->aiEntry);
 
-		strcpy(seq[0], ai->aiEntry->ai);
-		if ((ke = getDLpathAIseqEntry(ctx, (const char(*)[MAX_AI_LEN+1])seq, 1)) != -1) {
+		memcpy(seq[0], ai->aiEntry->ai, ai->aiEntry->ailen + 1);	// Includes NULL
+		if ((ke = getDLpathAIseqEntry(ctx, (const char (*)[MAX_AI_LEN+1])seq, 1)) != -1) {
 			keyEntry = ke;
 			key = ctx->dlKeyQualifiers[keyEntry];
+			key_len = strlen(key);
 			break;
 		}
 
 	}
 
 	if (keyEntry == -1) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Cannot create a DL URI without a primary key AI");
+		SET_ERR(CANNOT_CREATE_DL_URI_WITHOUT_PRIMARY_KEY_AI);
 		return NULL;
 	}
 
+	gs1_sortAIs(ctx);
+
 	/*
-	 *  Pick a qualifier-key sequence starting with the chosen primary key
-	 *  and having a maximum number of matching qualifier AIs
+	 *  Pick a maximum length key-qualifier sequence satisfied by the data
 	 *
 	 */
 	DEBUG_PRINT("Considering DL key-qualifier sequences\n");
@@ -791,24 +1069,28 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	maxQualifiers = 0;
 	while (++keyEntry < ctx->numDLkeyQualifiers) {
 
-		strcpy(tmp, ctx->dlKeyQualifiers[keyEntry]);
-		token = strtok_r(tmp, " ", &saveptr);
-		if (strcmp(token, key) != 0)
+		bool satisfied = true;
+		gs1_tok_t tok2;
+		bool more2;
+
+		tok2 = (gs1_tok_t) { .len = 0 };
+		more2 = gs1_tokenise(ctx->dlKeyQualifiers[keyEntry], ' ', &tok2);
+		assert(more2);
+		if (tok2.len != key_len || strncmp(tok2.ptr, key, key_len) != 0)
 			break;
 
 		numQualifiers = 0;
-		while ((token = strtok_r(NULL, " ", &saveptr)) != NULL)
-			for (i = 0; i < ctx->numAIs; i++) {
+		while (gs1_tokenise(NULL, ' ', &tok2)) {
 
-				if (ctx->aiData[i].kind != aiValue_aival)
-					continue;
-
-				assert(ctx->aiData[i].aiEntry);
-				if (strcmp(ctx->aiData[i].aiEntry->ai, token) == 0)
-					numQualifiers++;
-
+			assert(tok2.len <= MAX_AI_LEN);
+			if (!existsInAIdata(ctx, tok2.ptr, tok2.len, NULL, NULL)) {
+				satisfied = false;
+				break;
 			}
-		if (numQualifiers > maxQualifiers) {
+			numQualifiers++;
+		}
+
+		if (satisfied && numQualifiers > maxQualifiers) {
 			maxQualifiers = numQualifiers;
 			bestKeyEntry = keyEntry;
 		}
@@ -821,28 +1103,31 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *  Apply the path order from the sequence to the AI elements
 	 *
 	 */
-	strcpy(tmp, ctx->dlKeyQualifiers[bestKeyEntry]);
-	for (i = 0, token = strtok_r(tmp, " ", &saveptr); token; i++, token = strtok_r(NULL, " ", &saveptr)) {
-		int j;
-		for (j = 0; j < ctx->numAIs; j++) {
+	tok = (gs1_tok_t) { .len = 0 };
+	for (more = gs1_tokenise(ctx->dlKeyQualifiers[bestKeyEntry], ' ', &tok), i = 0; more; more = gs1_tokenise(NULL, ' ', &tok), i++) {
+		const struct aiValue *match = NULL;
 
-			if (ctx->aiData[j].kind != aiValue_aival)
-				continue;
+		assert(tok.len <= MAX_AI_LEN);		/* Should be validated already */
 
-			assert(ctx->aiData[j].aiEntry);
-			if (strcmp(ctx->aiData[j].aiEntry->ai, token) == 0)
-				ctx->aiData[j].dlPathOrder = (uint8_t)i;
+		existsInAIdata(ctx, tok.ptr, tok.len, NULL, &match);
+		assert(match);		// Should never fail since key-qualifier selection ensures all present
 
-		}
+		pathAIs[i] = match;
 	}
 	numQualifiers = i;
+
+output:
 
 	/*
 	 *  Now build the output
 	 *
 	 */
 	p = ctx->outStr;
-	p += snprintf(p, sizeof(ctx->outStr), "%s", stem ? stem : CANONICAL_DL_STEM);
+	stem_to_use = stem ? stem : CANONICAL_DL_STEM;
+	len = (ssize_t)strlen(stem_to_use);
+	assert((size_t)len < sizeof(ctx->outStr));
+	memcpy(p, stem_to_use, (size_t)len);
+	p += len;
 
 	// Trim trailing slash
 	if (*(p-1) == '/')
@@ -854,25 +1139,23 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	 *
 	 */
 	for (i = 0; i < numQualifiers; i++) {
-		int j;
-		for (j = 0; j < ctx->numAIs; j++) {
+		const struct aiValue* const ai = pathAIs[i];
 
-			char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-			int n;
-			const struct aiValue* const ai = &ctx->aiData[j];
+		assert(ai);				// Should not have gaps in the path order
 
-			if (ai->kind != aiValue_aival || ai->dlPathOrder != i)
-				continue;
+		len = URIescape(p + 1 + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - 1 - ai->ailen - 1, ai->value, ai->vallen, false);
+		assert(len >= 0);
+		assert(1 + (size_t)ai->ailen + 1 + (size_t)len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
 
-			URIescape(encval, sizeof(encval), ai->value, ai->vallen, false);
-			n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "/%.*s/%s", ai->ailen, ai->ai, encval);
-			assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-			p += n;
-			break;
+		*p++ = '/';
+		memcpy(p, ai->ai, ai->ailen);
+		p += ai->ailen;
+		*p++ = '/';
+		p += len;
 
-		}
+		GS1_SET_AI_OUTPUT(ai);			// Mark as processed
 	}
-	p += snprintf(p, 2, "?");
+	*p++ = '?';
 
 	/*
 	 *  Output the query parameter components (i.e. attribute AIs) in received order (i.e. attribute AIs), fixed-length first
@@ -882,35 +1165,18 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 again:
 	for (i = 0; i < ctx->numAIs; i++) {
 
-		char encval[MAX_AI_VALUE_LEN*3+1];	// Assuming that we %-escape everything
-		int j, n;
-		bool skip = false;
 		const struct aiValue* ai = &ctx->aiData[i];
+		bool emitted;
 
 		if (ai->kind != aiValue_aival ||
 		    ai->dlPathOrder != DL_PATH_ORDER_ATTRIBUTE ||
 		    ai->aiEntry->fnc1 == emitFixed)
 			continue;
 
-		/*
-		 *  Skip duplicate AIs that we have already processed
-		 *
-		 */
-		for (j = 0; j < i; j++) {
-
-			const struct aiValue* ai2 = &ctx->aiData[j];
-
-			if (ai2->kind != aiValue_aival ||
-			    ai2->aiEntry->fnc1 == emitFixed ||
-			    ai2->ailen != ai->ailen ||
-			    memcmp(ai2->ai, ai->ai, ai2->ailen) != 0)
-				continue;
-
-			skip = true;
-			break;
-
-		}
-		if (skip) continue;
+		// Check if we've already processed this AI
+		GS1_GET_AI_OUTPUT(ai, emitted);
+		if (emitted)
+			continue;
 
 		/*
 		 *  Check that the AI is permitted as a data attribute
@@ -918,15 +1184,22 @@ again:
 		 */
 		if (ai->aiEntry->dlDataAttr == NO_DATA_ATTR ||
 		    (ai->aiEntry->dlDataAttr == XX_DATA_ATTR && ctx->validationTable[gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR].enabled)) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) is not a valid DL URI data attribute", ai->ailen, ai->ai);
+			SET_ERR_V(AI_IS_NOT_VALID_DATA_ATTRIBUTE, ai->ailen, ai->ai);
 			*ctx->outStr = '\0';
 			return NULL;
 		}
 
-		URIescape(encval, sizeof(encval), ai->value, ai->vallen, true);
-		n = snprintf(p, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr), "%.*s=%s&", ai->ailen, ai->ai, encval);
-		assert(n >= 0 && n < (int)(sizeof(ctx->outStr) - (size_t)(p - ctx->outStr)));  // Satisfy analyser
-		p += n;
+		len = URIescape(p + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - ai->ailen - 1, ai->value, ai->vallen, true);
+		assert(len >= 0);	// URI encoding should not overflow
+		assert((size_t)ai->ailen + 1 + (size_t)len + 1 < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
+
+		memcpy(p, ai->ai, ai->ailen);
+		p += ai->ailen;
+		*p++ = '=';
+		p += len;
+		*p++ = '&';
+
+		GS1_SET_AI_OUTPUT(ai);		// Mark as processed
 
 	}
 	if (emitFixed) {
@@ -939,6 +1212,10 @@ again:
 
 	return ctx->outStr;
 
+#undef GS1_AI_OUTPUT_VAL
+#undef GS1_SET_AI_OUTPUT
+#undef GS1_GET_AI_OUTPUT
+
 }
 
 
@@ -950,7 +1227,7 @@ again:
 
 static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, const int line, bool should_succeed, const char* const dlData, const char* const expect) {
 
-	char in[256];
+	char in[256] = {0};
 	char out[256];
 	char casename[256];
 
@@ -958,12 +1235,15 @@ static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, c
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	strcpy(in, dlData);
 	TEST_CHECK(gs1_parseDLuri(ctx, in, out) ^ (!should_succeed));
 	TEST_MSG("Err: %s", ctx->errMsg);
-	if (should_succeed)
+	if (should_succeed) {
+		gs1_sortAIs(ctx);
 		TEST_CHECK(strcmp(out, expect) == 0);
-	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+		TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", dlData, out, expect, ctx->errMsg);
+	}
 
 	TEST_CHECK(strcmp(dlData, in) == 0);
 	TEST_MSG("Input data was erroneously clobbered: %s", in);
@@ -987,11 +1267,11 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(false, "", "");
 	test_parseDLuri(false, "ftp://", "");
 	test_parseDLuri(false, "http://", "");
-	test_parseDLuri(false, "http:///", "");				// No domain
-	test_parseDLuri(false, "http://a", "");				// No path info
-	test_parseDLuri(false, "http://a/", "");				// Pathelogical minimal domain but no AI info
-	test_parseDLuri(false, "http://a/b", "");				// No path info
-	test_parseDLuri(false, "http://a/b/", "");				// Pathelogical minimal domain but no AI info
+	test_parseDLuri(false, "http:///", "");			// No domain
+	test_parseDLuri(false, "http://a", "");			// No path info
+	test_parseDLuri(false, "http://a/", "");		// Pathological minimal domain but no AI info
+	test_parseDLuri(false, "http://a/b", "");		// No path info
+	test_parseDLuri(false, "http://a/b/", "");		// Pathological minimal domain but no AI info
 
 	test_parseDLuri(true,					// http
 		"http://a/00/006141411234567890",
@@ -1016,6 +1296,74 @@ void test_dl_parseDLuri(void) {
 		"");
 
 	test_parseDLuri(true,
+		"https://a/01/12312312312333",
+		"^0112312312312333");
+
+	/*
+	 *  To prevent ossification, we don't strictly validate the form of the
+	 *  domain (IPv4/6, ports, etc.), only the characterset
+	 *
+	 */
+
+	test_parseDLuri(true,					// Puny code
+		"https://xn--fsq.xn--0zwm56d/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Explicit FQDN
+		"https://a./01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Port specified
+		"https://a:65535/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// IPv4
+		"https://192.0.2.1/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in decimal form!
+		"https://3232235777/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in octal form!
+		"https://0300.0250.01.01/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,					// Valid IPv4 in octal form!
+		"https://0xC0.0xA8.0x01.0x01/01/12312312312333",
+		"^0112312312312333");
+
+	test_parseDLuri(true,
+		"https://[2001:db8::1]/01/12312312312333",	// IPv6
+		"^0112312312312333");
+
+	test_parseDLuri(false,
+		"https://[fe80::1%25lo]/01/12312312312333",	// IPv6 zone identifiers not useful
+		"");
+
+	test_parseDLuri(false,					// Bad character in domain
+		"https://$a/006141411234567890",
+		"");
+
+	test_parseDLuri(false,					// Bad character in domain
+		"https://a$/006141411234567890",
+		"");
+
+	/* Illegal URI characters outside uriCharacters set */
+	test_parseDLuri(false, "https://a/01/12312312312333<bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333>bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333{bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333}bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333\\bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333^bad", "");
+	test_parseDLuri(false, "https://a/01/12312312312333`bad", "");
+
+	/*
+	 * Custom stem
+	 *
+	 */
+
+	test_parseDLuri(true,
 		"https://a/stem/00/006141411234567890",
 		"^00006141411234567890");
 
@@ -1027,10 +1375,17 @@ void test_dl_parseDLuri(void) {
 		"https://a/00/faux/00/006141411234567890",
 		"^00006141411234567890");
 
-	test_parseDLuri(true,
-		"https://a/01/12312312312333",
-		"^0112312312312333");
 
+	/*
+	 * Test parsing of convenience alphas. Disabled by default.
+	 *
+	 */
+	test_parseDLuri(false, "https://a/gtin/12312312312333", "");
+	ctx->permitConvenienceAlphas = true;			// No API so we hack this
+	test_parseDLuri(true, "https://a/gtin/12312312312333", "^0112312312312333");
+	test_parseDLuri(true, "https://a/gtin/12312312312333/ser/ABC123", "^011231231231233321ABC123");
+	test_parseDLuri(true, "https://a/sscc/006141411234567890", "^00006141411234567890");
+	ctx->permitConvenienceAlphas = false;			// No API so we hack this
 
 	/*
 	 * Test legacy expansion of GTIN-{8,12,13} in AI (01) path component
@@ -1167,19 +1522,19 @@ void test_dl_parseDLuri(void) {
 		"https://a/01/12312312312333/22/ABC%2d123?99=ABC&98=XYZ+987",	// "+" means " " in path info
 		"");
 
-	test_parseDLuri(true,					// Empty fragment after path info
+	test_parseDLuri(true,							// Empty fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(true,					// Ignore fragment after path info
+	test_parseDLuri(true,							// Ignore fragment after path info
 		"https://a/01/12312312312333/22/test/10/abc/21/xyz#fragment",
 		"^011231231231233322test^10abc^21xyz");
 
-	test_parseDLuri(true,					// Empty fragment after query info
+	test_parseDLuri(true,							// Empty fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#",
 		"^0000614141123456789099ABC");
 
-	test_parseDLuri(true,					// Ignore fragment after query info
+	test_parseDLuri(true,							// Ignore fragment after query info
 		"https://a/stem/00/006141411234567890?99=ABC#fragment",
 		"^0000614141123456789099ABC");
 
@@ -1321,7 +1676,7 @@ void test_dl_parseDLuri(void) {
 
 	// Examples with unknown AIs
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_parseDLuri(false,								// Unknown AIs are not permitted data attributes
+	test_parseDLuri(false,									// Unknown AIs are not permitted data attributes
 		"https://example.com/01/09520123456788?99=XYZ&89=ABC123",
 		"");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);	// ... unless when explicitly permitted
@@ -1330,6 +1685,61 @@ void test_dl_parseDLuri(void) {
 		"^010952012345678899XYZ^89ABC123");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
+
+
+	/* Empty AI value in DL path element */
+	test_parseDLuri(false, "https://a/01//12312312312333", "");
+
+	/* Percent-encoded null in DL path value */
+	test_parseDLuri(false, "https://a/01/1231231231233%003", "");
+
+	/* Percent-encoded null in DL query value */
+	test_parseDLuri(false, "https://a/01/12312312312333?99=ABC%00DEF", "");
+
+
+	/*
+	 *  MAX_AI_VALUE_LEN boundary: AI (99) accepts X..90 in query
+	 *
+	 */
+	{
+		char dlbuf[512] = {0};
+		char outbuf[512];
+		char *p;
+		int j;
+
+		// Build DL URI with AI (01) in path and AI (99) with 90-char value in query
+		p = dlbuf;
+		strcpy(p, "https://a/01/12312312312333?99=");
+		p += strlen(p);
+		for (j = 0; j < 90; j++)
+			*p++ = 'A';
+		*p = '\0';
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(gs1_parseDLuri(ctx, dlbuf, outbuf));		// Exactly 90 chars
+
+		// 91-char value should fail
+		*p++ = 'A';
+		*p = '\0';
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(!gs1_parseDLuri(ctx, dlbuf, outbuf));	// 91 chars, too long
+	}
+
+
+	/*
+	 *  Empty AI value in DL path element during forward processing
+	 *
+	 */
+	test_parseDLuri(false, "https://a/01/12312312312333/10/", "");
+
+	/*
+	 *  Invalid key-qualifier sequence in DL path
+	 *
+	 */
+	test_parseDLuri(false, "https://a/01/12312312312333/99/ABC", "");
+
 
 #undef test_parseDLuri
 
@@ -1346,11 +1756,11 @@ static void do_test_URIunescape(const char* const file, const int line, const ch
 	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
 	TEST_CASE(casename);
 
-	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
+	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), false) == (ssize_t)strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected query component: %s", in, out, expect_path);
 
-	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), true) == strlen(expect_query));
+	TEST_CHECK(URIunescape(out, sizeof(out)-1, in, strlen(in), true) == (ssize_t)strlen(expect_query));
 	TEST_CHECK(strcmp(out, expect_query) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected path component: %s", in, out, expect_query);
 
@@ -1395,13 +1805,11 @@ void test_dl_URIunescape(void) {
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);				// Includes \0
 
 	// Truncated output
-	TEST_CHECK(URIunescape(out, 2, "ABCD", 4, false) == 2);
-	TEST_CHECK(memcmp(out, "AB", 3) == 0);				// Includes \0
+	TEST_CHECK(URIunescape(out, 2, "ABCD", 4, false) == -1);
 
-	TEST_CHECK(URIunescape(out, 1, "ABCD", 4, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);				// Includes \0
+	TEST_CHECK(URIunescape(out, 1, "ABCD", 4, false) == -1);
 
-	TEST_CHECK(URIunescape(out, 0, "ABCD", 4, false) == 0);
+	TEST_CHECK(URIunescape(out, 0, "ABCD", 4, false) == -1);
 	TEST_CHECK(memcmp(out, "", 1) == 0);				// Includes \0
 
 #undef test_URIunescape
@@ -1417,11 +1825,11 @@ static void do_test_URIescape(const char* const file, const int line, const char
 	snprintf(casename, sizeof(casename), "%s:%d: %s => %s | %s", file, line, in, expect_path, expect_query);
 	TEST_CASE(casename);
 
-	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == strlen(expect_path));
+	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), false) == (ssize_t)strlen(expect_path));
 	TEST_CHECK(strcmp(out, expect_path) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected path component: %s", in, out, expect_path);
 
-	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), true) == strlen(expect_query));
+	TEST_CHECK(URIescape(out, sizeof(out)-1, in, strlen(in), true) == (ssize_t)strlen(expect_query));
 	TEST_CHECK(strcmp(out, expect_query) == 0);
 	TEST_MSG("Given: %s; Got: %s; Expected query component: %s", in, out, expect_query);
 
@@ -1455,25 +1863,20 @@ void test_dl_URIescape(void) {
 	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
 
 	// Truncated output
-	TEST_CHECK(URIescape(out, 2, "ABCD", 4, false) == 2);
-	TEST_CHECK(memcmp(out, "AB", 3) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 2, "ABCD", 4, false) == -1);
 
 	TEST_CHECK(URIescape(out, 5, "A!B", 3, false) == 5);
 	TEST_CHECK(memcmp(out, "A%21B", 6) == 0);		// Includes \0
 
-	TEST_CHECK(URIescape(out, 4, "A!B", 3, false) == 4);
-	TEST_CHECK(memcmp(out, "A%21", 5) == 0);		// Includes \0
+	TEST_CHECK(URIescape(out, 4, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 3, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 3, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 2, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 2, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 1, "A!B", 3, false) == 1);
-	TEST_CHECK(memcmp(out, "A", 2) == 0);			// Includes \0
+	TEST_CHECK(URIescape(out, 1, "A!B", 3, false) == -1);
 
-	TEST_CHECK(URIescape(out, 0, "A!B", 3, false) == 0);
+	TEST_CHECK(URIescape(out, 0, "A!B", 3, false) == -1);
 	TEST_CHECK(memcmp(out, "", 1) == 0);			// Includes \0
 
 #undef test_URIescape
@@ -1567,13 +1970,17 @@ void test_dl_testValidateDLpathAIseq(void) {
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(seq); i++) {
-		int num;
+		int num, n;
 		char casename[256] = { 0 };
-		for (num = 0; *seq[i][num]; num++) {
-			strcat(casename, seq[i][num]);
-			strcat(casename, " ");
+		char *p;
+
+		for (num = 0, p = casename; *seq[i][num]; num++, p += n) {
+			n = snprintf(p, sizeof(casename) - (size_t)(p - casename), "%s ", seq[i][num]);
+			assert(n >= 0 || n < (int)(sizeof(casename) - (size_t)(p - casename)));
 		}
+		*(p-1) = '\0';
 		TEST_CASE(casename);
+
 		TEST_CHECK(isValidDLpathAIseq(ctx, seq[i], num));
 	}
 
@@ -1594,6 +2001,7 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK((ret = gs1_parseAIdata(ctx, aiData, out)) == true);
 	TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
 	if (!ret)
@@ -1630,6 +2038,9 @@ void test_dl_generateDLuri(void) {
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI");
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(22)ABC(10)DEF(21)GHI(95)INT", "https://example.com/01/12312312312326/22/ABC/10/DEF/21/GHI?95=INT");
 	test_testGenerateDLuri(true, "https://example.com", "(21)XYZ(01)12312312312333(10)ABC123(99)XYZ", "https://example.com/01/12312312312333/10/ABC123/21/XYZ?99=XYZ");
+
+	/* No primary key AI: cannot generate DL URI */
+	test_testGenerateDLuri(false, "https://example.com", "(99)XYZ789", "");
 
 	/*
 	 * "+" represents space in query info but not path components
@@ -1670,13 +2081,113 @@ void test_dl_generateDLuri(void) {
 	 *
 	 */
 	gs1_encoder_setPermitUnknownAIs(ctx, true);
-	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");	// Unknown AIs not permitted as DL URI data attributes...
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","");		// Unknown AIs not permitted as DL URI data attributes...
+
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, false);				// ... unless when explicitly permitted
 	test_testGenerateDLuri(true, "https://example.com", "(01)12312312312326(99)000001(89)XXX(95)INT","https://example.com/01/12312312312326?99=000001&89=XXX&95=INT");
 	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vUNKNOWN_AI_NOT_DL_ATTR, true);
 	gs1_encoder_setPermitUnknownAIs(ctx, false);
 
+	/*
+	 *  The following will not render from regular AI data due to
+	 *  /01/../10/.. path chosen, but (235) is not a valid attribute...
+	 *
+	 */
+	test_testGenerateDLuri(false, "https://example.com", "(01)12312312312326(235)ABC(10)DEF","");
+
+	/*
+	 *  ... but it will render from a given DL URI which provides path info
+	 *  order causing /01/../235/..?10=... to be the chosen form
+	 *
+	 */
+	{
+		const char *uri;
+
+		TEST_CASE("DL URI, having path order: https://example.com/01/12312312312326/235/ABC?10=DEF");
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, "https://example.com/01/12312312312326/235/ABC?10=DEF") == true);
+		TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
+		TEST_CHECK((uri = gs1_generateDLuri(ctx, "https://example.com")) != NULL);
+		if (uri) {
+			const char *expect = "https://example.com/01/12312312312326/235/ABC?10=DEF";
+
+			TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
+			TEST_CHECK(strcmp(uri, expect) == 0);
+			TEST_MSG("Expected: '%s'. Got: '%s'", expect, uri);
+		}
+	}
+
+	/*
+	 *  Stem with trailing slash: should be trimmed
+	 *
+	 */
+	test_testGenerateDLuri(true, "https://example.com/", "(01)12312312312326", "https://example.com/01/12312312312326");
+
+	/*
+	 *  Composite data (ccsep before primary key AI): line 1040
+	 *
+	 */
+	{
+		const char *uri;
+
+		TEST_CASE("Composite with ccsep before pkey in AI list");
+		TEST_CHECK(gs1_encoder_setDataStr(ctx, "^99ABC|^0112312312312333^10DEF") == true);
+		TEST_MSG("Parse failed. Err: %s", ctx->errMsg);
+		TEST_CHECK((uri = gs1_generateDLuri(ctx, "https://example.com")) != NULL);
+		if (uri) {
+			TEST_CHECK(strcmp(uri, "https://example.com/01/12312312312333/10/DEF?99=ABC") == 0);
+			TEST_MSG("Got: '%s'", uri);
+		}
+	}
+
 #undef test_testGenerateDLuri
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_dl_allocFailures(void) {
+
+	gs1_encoder* ctx;
+	int i;
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+	/*
+	 *  Allocation sequence for gs1_populateDLkeyQualifiers:
+	 *    1: dlKeyQualifiers initial malloc
+	 *    2: first gs1_strdup_alloc for key
+	 *    3: first q_new malloc for qualifier combo
+	 *    ...
+	 *
+	 */
+
+	/*
+	 *  Alloc 1: dlKeyQualifiers initial malloc failure
+	 *
+	 */
+	gs1_freeDLkeyQualifiers(ctx);
+	test_alloc_fail_at = 1;
+	TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == false);
+	test_alloc_fail_at = 0;
+
+	/*
+	 *  Allocs 2..5: exercise progressively later allocation failures
+	 *  in addDLkeyQualifiers (realloc, gs1_strdup_alloc, qualifier
+	 *  combo malloc)
+	 *
+	 */
+	for (i = 2; i <= 5; i++) {
+		gs1_freeDLkeyQualifiers(ctx);
+		test_alloc_fail_at = i;
+		TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == false);
+		test_alloc_fail_at = 0;
+	}
+
+	// Restore valid state for cleanup
+	gs1_freeDLkeyQualifiers(ctx);
+	TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == true);
 
 	gs1_encoder_free(ctx);
 

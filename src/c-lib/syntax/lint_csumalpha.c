@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,19 @@
 
 
 #include <assert.h>
-#include <string.h>
-#include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Used to ensure that the AI component has a valid alphanumeric check
  * character pair.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -57,15 +58,13 @@
  *         algorithm.
  *         `GS1_LINTER_INVALID_CSET82_CHARACTER` if any of the data characters
  *         are not in CSET 82.
- *         `GS1_LINTER_INVALID_CSET32_CHARACTER` if any of the data characters
- *         are not in CSET 32.
  *
  * @note The return value `GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION`
- * represents exceeding an implementation-specific limit. Some implmenetations
+ * represents exceeding an implementation-specific limit. Some implementations
  * may choose to support longer data inputs.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 	/*
@@ -89,66 +88,70 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	};
 
 	/*
-	 * Sequence of all characters in CSET 82, ordered by weight.
-	 *
-	 */
-	static const char* const cset82 =
-		"!\"%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-		"abcdefghijklmnopqrstuvwxyz";
-
-	/*
 	 * Sequence of all characters in CSET 32, ordered by weight.
-	 *
 	 */
 	static const char* const cset32 = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-	size_t i, pos, len;
-	unsigned int sum = 0;
-	const unsigned int *p;
+	/*
+	 * CSET82 character weights lookup table (0 = invalid; weight off by 1)
+	 */
+	static const unsigned char cset82_weights[256] = {
+		['!'] = 1, ['"'] = 2, ['%'] = 3, ['&'] = 4, ['\''] = 5, ['('] = 6,
+		[')'] = 7, ['*'] = 8, ['+'] = 9, [','] = 10, ['-'] = 11, ['.'] = 12,
+		['/'] = 13, ['0'] = 14, ['1'] = 15, ['2'] = 16, ['3'] = 17, ['4'] = 18,
+		['5'] = 19, ['6'] = 20, ['7'] = 21, ['8'] = 22, ['9'] = 23, [':'] = 24,
+		[';'] = 25, ['<'] = 26, ['='] = 27, ['>'] = 28, ['?'] = 29, ['A'] = 30,
+		['B'] = 31, ['C'] = 32, ['D'] = 33, ['E'] = 34, ['F'] = 35, ['G'] = 36,
+		['H'] = 37, ['I'] = 38, ['J'] = 39, ['K'] = 40, ['L'] = 41, ['M'] = 42,
+		['N'] = 43, ['O'] = 44, ['P'] = 45, ['Q'] = 46, ['R'] = 47, ['S'] = 48,
+		['T'] = 49, ['U'] = 50, ['V'] = 51, ['W'] = 52, ['X'] = 53, ['Y'] = 54,
+		['Z'] = 55, ['_'] = 56, ['a'] = 57, ['b'] = 58, ['c'] = 59, ['d'] = 60,
+		['e'] = 61, ['f'] = 62, ['g'] = 63, ['h'] = 64, ['i'] = 65, ['j'] = 66,
+		['k'] = 67, ['l'] = 68, ['m'] = 69, ['n'] = 70, ['o'] = 71, ['p'] = 72,
+		['q'] = 73, ['r'] = 74, ['s'] = 75, ['t'] = 76, ['u'] = 77, ['v'] = 78,
+		['w'] = 79, ['x'] = 80, ['y'] = 81, ['z'] = 82
+	};
+
+	size_t pos;
+	uint32_t sum = 0;	/* Sufficient for 97-prime implementation */
 
 	assert(data);
 
-	len = strlen(data);
+
+	/*
+	 * Constrain data to the number of primes that we have.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(data_len > sizeof(primes) / sizeof(primes[0]) + 2))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
+			0,
+			data_len
+		);
 
 	/*
 	 * Data must include at least the check character pair.
 	 *
 	 */
-	if (len < 2) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR;
-	}
+	if (GS1_LINTER_UNLIKELY(data_len < 2))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR,
+			0,
+			data_len
+		);
 
 	/*
-	 * Constrain the length of the data to the number of primes that we
-	 * have.
+	 * Handling the two-character case now avoids conditionals later.
 	 *
 	 */
-	if (len > sizeof(primes) / sizeof(primes[0])) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION;
-	}
-
-	/*
-	 * Ensure that the data characters are in CSET 82
-	 *
-	 */
-	if ((pos = strspn(data, cset82)) < len - 2) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_CSET82_CHARACTER;
-	}
-
-	/*
-	 * Ensure that the check characters are in CSET 32
-	 *
-	 */
-	if ((pos = strspn(&data[len - 2], cset32)) != 2) {
-		if (err_pos) *err_pos = len - 2 + pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_INVALID_CSET32_CHARACTER;
+	if (data_len == 2) {
+		if (GS1_LINTER_UNLIKELY(data[0] != '2' || data[1] != '2'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INCORRECT_CHECK_PAIR,
+				data_len - 2,
+				2
+			);
+		GS1_LINTER_RETURN_OK;
 	}
 
 	/*
@@ -166,18 +169,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_csumalpha(const char* const da
 	 * positions in CSET 32.
 	 *
 	 */
-	p = primes + len - 3;
-	for (i = 0; i < len - 2; i++)
-		sum += (unsigned int)(strchr(cset82, data[i]) - cset82) * *p--;
-	sum %= 1021;
-
-	if (data[i] != cset32[sum >> 5] || data[i+1] != cset32[sum & 31]) {
-		if (err_pos) *err_pos = len - 2;
-		if (err_len) *err_len = 2;
-		return GS1_LINTER_INCORRECT_CHECK_PAIR;
+	for (pos = 0; pos < data_len - 2; pos++) {
+		if (GS1_LINTER_UNLIKELY(cset82_weights[(unsigned char)data[pos]] == 0))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_INVALID_CSET82_CHARACTER,
+				pos,
+				1
+			);
+		sum += (unsigned int)(cset82_weights[(unsigned char)data[pos]] - 1) * primes[data_len - 3 - pos];
 	}
+	sum %= 1021;	/* Overflow not possible with uint32_t */
 
-	return GS1_LINTER_OK;
+	if (GS1_LINTER_UNLIKELY(data[data_len-2] != cset32[sum >> 5] || data[data_len-1] != cset32[sum & 31]))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INCORRECT_CHECK_PAIR,
+			data_len - 2,
+			2
+		);
+
+	GS1_LINTER_RETURN_OK;
 
 }
 
@@ -190,7 +200,11 @@ void test_lint_csumalpha(void)
 {
 
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, "", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "**");
-	UNIT_TEST_FAIL(gs1_lint_csumalpha, "0", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "*0*");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "2", GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR, "*2*");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "22");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "33", GS1_LINTER_INCORRECT_CHECK_PAIR, "*33*");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "!22");
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "!!22");
 
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "1987654Ad4X4bL5ttr2310c2K");
 
@@ -225,11 +239,23 @@ void test_lint_csumalpha(void)
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "99999zzzzzzzzzzzzzzzzzzT2");
 	UNIT_TEST_PASS(gs1_lint_csumalpha, "99999zzzzzzzzzzzzzzzzzzT2");
 
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "12345678901234567890123456789012345678901234567890"
+					   "12345678901234567890123456789012345678901234567HA");  // len = 99
+
+	UNIT_TEST_PASS(gs1_lint_csumalpha, "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+					   "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzUA");  // Maximum implementation sum
+
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123456789012345678901234567890"
+					   "123456789012345678901234567890123456789012345678ZZ",
+					   GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION,
+					   "*12345678901234567890123456789012345678901234567890"
+					   "123456789012345678901234567890123456789012345678ZZ*");  // len = 100, exceeds implementation
+
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, " 2345678901234567890123NT", GS1_LINTER_INVALID_CSET82_CHARACTER, "* *2345678901234567890123NT");
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, "123456789 1234567890123NT", GS1_LINTER_INVALID_CSET82_CHARACTER, "123456789* *1234567890123NT");
 	UNIT_TEST_FAIL(gs1_lint_csumalpha, "1234567890123456789012 NT", GS1_LINTER_INVALID_CSET82_CHARACTER, "1234567890123456789012* *NT");
-	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123 T", GS1_LINTER_INVALID_CSET32_CHARACTER, "12345678901234567890123* *T");
-	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123N ", GS1_LINTER_INVALID_CSET32_CHARACTER, "12345678901234567890123N* *");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123 T", GS1_LINTER_INCORRECT_CHECK_PAIR, "12345678901234567890123* T*");
+	UNIT_TEST_FAIL(gs1_lint_csumalpha, "12345678901234567890123N ", GS1_LINTER_INCORRECT_CHECK_PAIR, "12345678901234567890123*N *");
 
 }
 

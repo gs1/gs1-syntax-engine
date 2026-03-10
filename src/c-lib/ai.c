@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "ai.h"
 #include "dl.h"
+#include "tr.h"
 
 
 /*
@@ -90,9 +91,9 @@ static bool populateAIlengthByPrefix(gs1_encoder* const ctx) {
 
 	for (e = ctx->aiTable; *e->ai; e++) {
 		uint8_t prefix = (uint8_t)((e->ai[0] - '0') * 10 + (e->ai[1] - '0'));
-		uint8_t length = (uint8_t)strlen(e->ai);
+		uint8_t length = e->ailen;
 		if (ctx->aiLengthByPrefix[prefix] != 0 && ctx->aiLengthByPrefix[prefix] != length) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI table is broken: AIs beginning '%c%c' have different lengths", e->ai[0], e->ai[1]);
+			SET_ERR_V(AI_TABLE_BROKEN_PREFIXES_DIFFER_IN_LENGTH, e->ai[0], e->ai[1]);
 			return false;
 		}
 		ctx->aiLengthByPrefix[prefix] = length;
@@ -107,7 +108,7 @@ static inline __ATTR_PURE uint8_t aiLengthByPrefix(const gs1_encoder* const ctx,
 }
 
 
-void gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable) {
+bool gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable, bool quiet) {
 
 	struct aiEntry *e;
 
@@ -120,7 +121,7 @@ redo:
 	 *
 	 */
 	if (ctx->aiTable && ctx->aiTableIsDynamic)
-		free(ctx->aiTable);
+		GS1_ENCODERS_FREE(ctx->aiTable);
 
 	/*
 	 *  Set the given AI table and populate the various additional
@@ -133,9 +134,12 @@ redo:
 		aiTable = embedded_ai_table;
 		ctx->aiTableIsDynamic = false;
 #else
-		printf("*** Embedded AI table is not available.\n");
-		printf("***  Unable to continue. STOPPING.\n");
-		abort();
+		if (!quiet) {
+			printf("*** Embedded AI table is not available.\n");
+			printf("***  Unable to continue. STOPPING.\n");
+		}
+		strcpy(ctx->errMsg, "Embedded AI table is not available");
+		return false;
 #endif
 	}
 
@@ -151,23 +155,28 @@ redo:
 	if (!gs1_populateDLkeyQualifiers(ctx))
 		goto fail;
 
-	return;
+	return true;
 
 fail:
 
-	printf("*** Failed to process the AI table.\n");
-	printf("*** %s\n", ctx->errMsg);
+	if (!quiet) {
+		printf("*** Failed to process the AI table.\n");
+		printf("*** %s\n", ctx->errMsg);
+	}
 
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 	if (aiTable != embedded_ai_table) {
-		printf("*** Loading embedded AI table as a fallback!\n");
+		if (!quiet)
+			printf("*** Loading embedded AI table as a fallback!\n");
 		aiTable = embedded_ai_table;
 		goto redo;
 	}
 #endif
 
-	printf("*** Unable to continue. STOPPING.\n");
-	abort();
+	// cppcheck-suppress duplicateCondition
+	if (!quiet)
+		printf("*** Unable to continue. STOPPING.\n");
+	return false;
 
 }
 
@@ -233,59 +242,89 @@ static const struct aiEntry unknownAI4fixed6 =
 
 
 /*
- * Lookup an AI table entry matching a given AI or matching prefix of given
- * data
+ *  Lookup an AI table entry matching a given AI or matching prefix of given
+ *  data.
  *
- * For an exact AI lookup its length is given. Otherwise 0 length will look for
- * an AI in the table that matches a prefix of the given data.
+ *  Providing a length will result in an exact AI lookup. Otherwise 0 length
+ *  will look for an AI in the table that matches a prefix of the given data.
  *
  */
-const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
+struct aiTableLookupKey {
+	const char* const ai;
+	size_t ailen;
+};
+
+static inline __ATTR_PURE int compareAItableAIEntryPrefix(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiTableLookupKey* lookupKey = (const struct aiTableLookupKey*)needle;
+	const struct aiEntry* entries = (const struct aiEntry*)haystack;
+	const struct aiEntry* entry = &entries[index];
+
+	return strncmp(entry->ai, lookupKey->ai, entry->ailen);	// Look for matches against the prefix of needle
+}
+
+static inline __ATTR_PURE bool validateAItableAIEntryMatch(const void* const needle, const void* const haystack, const size_t index) {
+	const struct aiTableLookupKey *lookupKey = (const struct aiTableLookupKey *)needle;
+	const struct aiEntry *entries = (const struct aiEntry*)haystack;
+	const char *ai = entries[index].ai;
+	const size_t ailen = entries[index].ailen;
+
+	return lookupKey->ailen == 0 ||			// Prefix of variable-length needle matched an entry
+	       lookupKey->ailen == ailen ||		// Fixed-length needle exactly matched an entry
+	       strncmp(lookupKey->ai, ai, ailen) != 0;	// Fixed-length needle is not a prefix of some longer AI
+}
+
+__ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char *ai, size_t ailen) {
 
 	size_t aiLenByPrefix;
-	size_t s = 0, e = ctx->aiTableEntries;
+	struct aiTableLookupKey lookupKey = { ai, ailen };
+	ssize_t index;
 
 	assert(ailen == 0 || ailen <= strlen(ai));
 
 	if (ailen != 0 && (ailen < MIN_AI_LEN || ailen > MAX_AI_LEN))	// Even for unknown AIs
 		return NULL;
 
-	// Don't attempt to find a non-digit AI
+	/*
+	 *  Don't attempt to find a non-digit AI
+	 *
+	 */
 	if (!gs1_allDigits((uint8_t *)ai, ailen != 0 ? ailen : MIN_AI_LEN))
 		return NULL;
 
 	/*
-	 * Binary search through the AI table to find an entry that matches a
-	 * prefix, optionally ensuring that the AI also has a specified length
+	 *  With a variable-length AI lookup we might actually know the AI
+	 *  length from the length by prefix table
 	 *
 	 */
-	while (s < e) {
-		const size_t m = s + (e - s) / 2;
-		const struct aiEntry* const entry = &ctx->aiTable[m];
-		const size_t entrylen = strlen(entry->ai);
-		const int cmp = strncmp(entry->ai, ai, entrylen);
-		if (cmp == 0) {
-			if (ailen != 0 && entrylen != ailen)
-				return NULL;	// Prefix match, but incorrect length
-			return entry;		// Found
-		}
-		if (ailen != 0 && strncmp(ai, entry->ai, ailen) == 0)
-			return NULL;	// Don't vivify an AI that is a prefix of a known AI
-		if (cmp < 0)
-			s = m + 1;
-		else
-			e = m;
-	}
+	if (ailen == 0 && (aiLenByPrefix = aiLengthByPrefix(ctx, ai)) > 0)
+		lookupKey.ailen = aiLenByPrefix;
+
+	/*
+	 *  Search AI table to find an entry that matches a prefix, with
+	 *  validation for length and prefix constraints
+	 *
+	 */
+	index = gs1_binarySearch(&lookupKey, ctx->aiTable, ctx->aiTableEntries,
+				 compareAItableAIEntryPrefix, validateAItableAIEntryMatch);
+
+	if (index >= 0)
+		return &ctx->aiTable[index];	// Found and validated
+
+	if (index == GS1_SEARCH_INVALID)
+		return NULL;			// Either length mismatch or prefix conflict
+
+	// Not found, but not conflicting with some known AI either
+	assert(index == GS1_SEARCH_NOT_FOUND);
 
 	if (!ctx->permitUnknownAIs)
 		return NULL;
 
 	/*
-	 * If permitUnknownAIs is enabled then we vivify the AI by returning a
-	 * pseudo "unknownAI" entry, but only if the length matches that
-	 * indicated by the prefix where such a length is defined.
+	 *  If permitUnknownAIs is enabled then we vivify the AI by returning a
+	 *  pseudo "unknownAI" entry, but only if the length matches that
+	 *  indicated by the prefix where such a length is defined.
 	 *
-	 * Otherwise we return NULL ("not found") to indicate an error.
+	 *  Otherwise we return NULL ("not found") to indicate an error.
 	 *
 	 */
 	aiLenByPrefix = aiLengthByPrefix(ctx, ai);
@@ -320,6 +359,146 @@ const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx, const char
 
 
 /*
+ *  Lookup the extracted AI data using a given template, e.g. "12nn"
+ *
+ */
+struct aiDataLookupKey {
+	const char* ai;
+	size_t ailen;
+	size_t prefixlen;
+	const char* ignoreAI;
+};
+
+static inline __ATTR_PURE int compareAIdataTemplate(const void* const needle, const void* const haystack, const size_t index) {
+
+	const struct aiDataLookupKey* lookupKey = (const struct aiDataLookupKey*)needle;
+	const struct aiValue* const* aiArray = (const struct aiValue* const*)haystack;
+	const struct aiValue* const ai = aiArray[index];
+
+	/*
+	 *  We compare the numeric prefix only and let the validation function
+	 *  take care of the rest.
+	 *
+	 */
+	return strncmp(ai->ai, lookupKey->ai, lookupKey->prefixlen);
+
+}
+
+static inline __ATTR_PURE bool validateAIdataTemplate(const void* const needle, const void* const haystack, const size_t index) {
+
+	const struct aiDataLookupKey* lookupKey = (const struct aiDataLookupKey*)needle;
+	const struct aiValue* const* aiArray = (const struct aiValue* const*)haystack;
+	const struct aiValue* const ai = aiArray[index];
+
+	/*
+	 *  This is a template. The prefix already matched, but it is invalid
+	 *  for the overall length not to match
+	 *
+	 */
+	if (lookupKey->ailen != ai->ailen)
+		return false;
+
+	/*
+	 *  If we are ignoring a specific AI then a match is invalid
+	 *
+	 */
+	if (lookupKey->ignoreAI &&
+	    strncmp(ai->ai, lookupKey->ignoreAI, lookupKey->ailen) == 0)
+		return false;
+
+	return true;
+
+}
+
+
+/*
+ *  Compare function for sorting AI pointers by their lexical value
+ *
+ */
+static inline __ATTR_PURE int compareAIPointers(const void* const a, const void* const b) {
+
+	const struct aiValue * const *ai1 = (const struct aiValue * const *)a;
+	const struct aiValue * const *ai2 = (const struct aiValue * const *)b;
+
+	return strncmp((*ai1)->ai, (*ai2)->ai, (*ai1)->ailen);
+
+}
+
+
+/*
+ *  Search the extracted data AIs for any match with the given AI pattern,
+ *  optionally returning the matched AI.
+ *
+ *  Ignore AI can be set to the current AI to avoid matching triggering on
+ *  itself when matching by a self-referencing pattern.
+ *
+ */
+bool existsInAIdata(const gs1_encoder* const ctx, const char* const ai, const size_t ailen, const char* const ignoreAI, struct aiValue const **matchedAI) {
+
+	size_t prefixlen = 0;
+	struct aiDataLookupKey searchKey;
+	ssize_t index;
+
+	/* Count fixed digits in a template such as "35nn" (2) or "310n" (3) */
+	while (prefixlen < ailen && ai[prefixlen] >= '0' && ai[prefixlen] <= '9')
+		prefixlen++;
+
+	searchKey = (struct aiDataLookupKey) { ai, ailen, prefixlen, ignoreAI };
+
+	assert(ailen >= MIN_AI_LEN && ailen <= MAX_AI_LEN);
+
+	if (unlikely(prefixlen < 1))
+		goto fail;
+
+	index = gs1_binarySearch(&searchKey, ctx->sortedAIs, (size_t)ctx->numSortedAIs,
+				 compareAIdataTemplate, validateAIdataTemplate);
+
+	if (unlikely(index < 0))	/* Not found or invalid */
+		goto fail;
+
+	if (matchedAI)
+		*matchedAI = ctx->sortedAIs[index];
+
+	return true;
+
+fail:
+
+	if (matchedAI)
+		*matchedAI = NULL;
+	return false;
+
+}
+
+
+/*
+ *  Sort the extracted AIs to enable binary search
+ *
+ *  Populates the sortedAIs array with pointers to aiData entries.
+ *
+ */
+void gs1_sortAIs(gs1_encoder* const ctx) {
+
+	int i, j;
+
+	assert(ctx);
+	assert(ctx->numAIs <= MAX_AIS);
+
+	if (ctx->numSortedAIs > 0)
+		return;
+
+	// Populate sortedAIs with pointers to AI data entries
+	for (i = 0, j = 0; i < ctx->numAIs; i++)
+		if (ctx->aiData[i].kind == aiValue_aival)
+			ctx->sortedAIs[j++] = &ctx->aiData[i];
+
+	ctx->numSortedAIs = j;
+
+	qsort(ctx->sortedAIs, (size_t)ctx->numSortedAIs, sizeof(struct aiValue *), compareAIPointers);
+
+}
+
+
+/*
  *  Validate string between start and end pointers according to rules for an AI
  *
  */
@@ -334,32 +513,29 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 	assert(end);
 	assert(end >= start);
 
-	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)strlen(entry->ai), ai, (int)(r-p), start);
+	DEBUG_PRINT("  Considering AI (%.*s): %.*s\n", (int)entry->ailen, ai, (int)(r-p), start);
 
 	if (p == r) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is empty", (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_DATA_IS_EMPTY, (int)entry->ailen, ai);
 		return 0;
 	}
 
 	for (part = entry->parts; part->cset; part++) {
 
-		char compval[MAX_AI_VALUE_LEN+1];
-		gs1_linter_t linter;
+		gs1_linter_t cset_linter;
 		const gs1_linter_t *l;
+		size_t complen = (size_t)(r-p);		// Until given FNC1 or end...
 
-		size_t complen = (size_t)(r-p);	// Until given FNC1 or end...
 		if (part->max < r-p)
-			complen = part->max;	// ... reduced to max length of component
-		strncpy(compval, p, complen);
-		compval[complen] = '\0';
+			complen = part->max;		// ... reduced to max length of component
 
-		DEBUG_PRINT("    Validating component: %s\n", compval);
+		DEBUG_PRINT("    Validating component: %.*s\n", (int)complen, p);
 
 		if (part->opt == OPT && complen == 0)	// Nothing to be done for an empty optional component
 			continue;
 
 		if (complen < part->min) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data has incorrect length", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_DATA_HAS_INCORRECT_LENGTH, (int)entry->ailen, ai);
 			return 0;
 		}
 
@@ -369,32 +545,42 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 		 *
 		 */
 		switch (part->cset) {
-			case cset_N: linter = gs1_lint_csetnumeric; break;
-			case cset_X: linter = gs1_lint_cset82; break;
-			case cset_Y: linter = gs1_lint_cset39; break;
-			case cset_Z: linter = gs1_lint_cset64; break;
-			default: linter = NULL; break;
+			case cset_N: cset_linter = gs1_lint_csetnumeric; break;
+			case cset_X: cset_linter = gs1_lint_cset82; break;
+			case cset_Y: cset_linter = gs1_lint_cset39; break;
+			case cset_Z: cset_linter = gs1_lint_cset64; break;
+			default: cset_linter = NULL; break;
 		}
-		assert(linter);
-		l = &linter;
+		assert(cset_linter);
+		l = &cset_linter;
 		do {
 
 			gs1_lint_err_t err;
 			size_t errpos, errlen;
 
-			err = (*l)(compval, &errpos, &errlen);
+			err = (*l)(p, complen, &errpos, &errlen);
 			if (err) {
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s): %s", (int)strlen(entry->ai), ai, gs1_lint_err_str[err]);
+				char *m = ctx->linterErrMarkup;
+				size_t rem = sizeof(ctx->linterErrMarkup);
+
+				SET_ERR_V(AI_LINTER_ERROR, (int)entry->ailen, ai, gs1_lint_err_str[err]);
 				ctx->linterErr = err;
 				errpos += (size_t)(p-start);
-				snprintf(ctx->linterErrMarkup, sizeof(ctx->linterErrMarkup), "(%.*s)%.*s|%.*s|%.*s",
-					(int)strlen(entry->ai), ai,
-					(int)errpos, start,
-					(int)errlen, start + errpos,
-					(int)(strlen(compval) - errpos - errlen), start + errpos + errlen);
+
+				// "(AI)before|error|after"
+				m = gs1_buf_append(m, &rem, "(", 1);
+				m = gs1_buf_append(m, &rem, ai, entry->ailen);
+				m = gs1_buf_append(m, &rem, ")", 1);
+				m = gs1_buf_append(m, &rem, start, errpos);
+				m = gs1_buf_append(m, &rem, "|", 1);
+				m = gs1_buf_append(m, &rem, start + errpos, errlen);
+				m = gs1_buf_append(m, &rem, "|", 1);
+				m = gs1_buf_append(m, &rem, start + errpos + errlen, complen - errpos - errlen);
+				*m = '\0';
+
 				return 0;
 			}
-			l = (l == &linter) ? &(part->linters[0]) : l+1;
+			l = (l == &cset_linter) ? &(part->linters[0]) : l+1;
 
 		} while (*l);
 
@@ -438,18 +624,18 @@ bool gs1_aiValLengthContentCheck(gs1_encoder* const ctx, const char* const ai, c
 	assert(aiVal);
 
 	if (vallen < aiEntryMinLength(entry)) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too short", (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_VALUE_IS_TOO_SHORT, (int)entry->ailen, ai);
 		return false;
 	}
 
 	if (vallen > aiEntryMaxLength(entry)) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) value is too long", (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_VALUE_IS_TOO_LONG, (int)entry->ailen, ai);
 		return false;
 	}
 
 	// Also forbid data "^" characters at this stage so we don't conflate with FNC1
 	if (memchr(aiVal, '^', vallen) != NULL) {
-		snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) contains illegal ^ character", (int)strlen(entry->ai), ai);
+		SET_ERR_V(AI_CONTAINS_ILLEGAL_CARAT_CHARACTER, (int)entry->ailen, ai);
 		return false;
 	}
 
@@ -466,11 +652,14 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 
 	const char *p = aiData;
 	bool fnc1req = true;
+	size_t dataStr_len = 0;
+	size_t outval_len;
 
 	assert(ctx);
 	assert(aiData);
 
 	*dataStr = '\0';
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -484,57 +673,59 @@ bool gs1_parseAIdata(gs1_encoder* const ctx, const char* const aiData, char* con
 		size_t ailen;
 
 		if (*p++ != '(') goto fail; 			// Expect start of AI
-		if (!(r = strchr(p, ')'))) goto fail;		// Find end of A
+		if (!(r = strchr(p, ')'))) goto fail;		// Find end of AI
 		ailen = (size_t)(r-p);
 		entry = gs1_lookupAIentry(ctx, p, ailen);
 		if (entry == NULL) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Unrecognised AI: %.*s", (int)ailen, p);
+			SET_ERR_V(AI_UNRECOGNISED, (int)ailen, p);
 			goto fail;
 		}
 		ai = p;
 
 		if (fnc1req)
-			writeDataStr("^");			// Write FNC1, if required
-		outai = dataStr + strlen(dataStr);		// Record the current start of the output AI
-		nwriteDataStr(p, ailen);			// Write AI
+			writeDataStr("^", 1, &dataStr_len);	// Write FNC1, if required
+		outai = dataStr + dataStr_len;			// Record the current start of the output AI
+		writeDataStr(p, ailen, &dataStr_len);		// Might be an "unknown AI"
 		fnc1req = entry->fnc1;				// Record whether FNC1 required before next AI
 
 		if (!*++r) goto fail;				// Advance to start of AI value and fail if at end
 
-		outval = dataStr + strlen(dataStr);		// Record the current start of the output value
+		outval = dataStr + dataStr_len;			// Record the current start of the output value
 
 again:
 
-		if ((p = strchr(r, '(')) == NULL)
-			p = r + strlen(r);			// Move the pointer to the end if no more AIs
+		p = r;
+		while (*p && *p != '(') p++;			// Next AI or end if no more AIs
 
-		if (*p != '\0' && *(p-1) == '\\') {		// This bracket is an escaped data character
-			nwriteDataStr(r, (size_t)(p-r-1));	// Write up to the escape character
-			writeDataStr("(");			// Write the data bracket
-			r = p+1;				// And keep going
+		if (*p != '\0' && *(p-1) == '\\') {			// This bracket is an escaped data character
+			writeDataStr(r, (size_t)(p-r-1), &dataStr_len);	// Write up to the escape character
+			writeDataStr("(", 1, &dataStr_len);		// Write the data bracket
+			r = p+1;					// And keep going
 			goto again;
 		}
 
-		nwriteDataStr(r, (size_t)(p-r));		// Write the remainder of the value
+		writeDataStr(r, (size_t)(p-r), &dataStr_len);	// Write the remainder of the value
 
 		// Perform certain checks at parse time, before processing the
 		// components with the linters
-		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, strlen(outval)))
+		outval_len = dataStr_len - (size_t)(outval - dataStr);
+		if (!gs1_aiValLengthContentCheck(ctx, ai, entry, outval, outval_len))
 			goto fail;
 
 		// Update the AI data
 		if (ctx->numAIs >= MAX_AIS) {
-			strcpy(ctx->errMsg, "Too many AIs");
+			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
 
+		outval_len = dataStr_len - (size_t)(outval - dataStr);
 		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
 			.kind = aiValue_aival,
 			.aiEntry = entry,
 			.ai = outai,
 			.ailen = (uint8_t)ailen,
 			.value = outval,
-			.vallen = (uint8_t)strlen(outval),
+			.vallen = (uint8_t)outval_len,
 			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
 		};
 
@@ -548,7 +739,7 @@ again:
 fail:
 
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to parse AI data");
+		SET_ERR(AI_PARSE_FAILED);
 
 	DEBUG_PRINT("Parsing AI data failed: %s\n", ctx->errMsg);
 
@@ -569,6 +760,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 	assert(ctx);
 	assert(dataStr);
 
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
@@ -577,13 +769,13 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 	// Ensure FNC1 in first
 	if (!*p || *p++ != '^') {
-		strcpy(ctx->errMsg, "Missing FNC1 in first position");
+		SET_ERR(MISSING_FNC1_IN_FIRST_POSITION);
 		return false;
 	}
 
 	// Must have some AI data
 	if (!*p) {
-		strcpy(ctx->errMsg, "The AI data is empty");
+		SET_ERR(AI_DATA_EMPTY);
 		return false;
 	}
 
@@ -603,17 +795,17 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		 */
 		if ((entry = gs1_lookupAIentry(ctx, p, 0)) == NULL ||
 		    (extractAIs && entry == &unknownAI)) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "No known AI is a prefix of: %.4s...", p);
+			SET_ERR_V(NO_AI_FOR_PREFIX, p);
 			return false;
 		}
 
 		// Save start of AI for AI data then jump over
 		ai = p;
-		p += strlen(entry->ai);
+		p += entry->ailen;
 
 		// r points to the next FNC1 or end of string...
-		if ((r = strchr(p, '^')) == NULL)
-			r = p + strlen(p);
+		r = p;
+		while (*r && *r != '^') r++;
 
 		// Validate and return how much was consumed
 		if ((vallen = validate_ai_val(ctx, ai, entry, p, r)) == 0)
@@ -622,14 +814,14 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		// Add to the aiData
 		if (extractAIs) {
 			if (ctx->numAIs >= MAX_AIS) {
-				strcpy(ctx->errMsg, "Too many AIs");
+				SET_ERR(TOO_MANY_AIS);
 				return false;
 			}
 			ctx->aiData[ctx->numAIs++] = (struct aiValue) {
 				.kind = aiValue_aival,
 				.aiEntry = entry,
 				.ai = ai,
-				.ailen = (uint8_t)strlen(entry->ai),
+				.ailen = entry->ailen,
 				.value = p,
 				.vallen = (uint8_t)vallen,
 				.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
@@ -639,7 +831,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 		// After AIs requiring FNC1, we expect to find an FNC1 or be at the end
 		p += vallen;
 		if (entry->fnc1 && *p != '^' && *p != '\0') {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "AI (%.*s) data is too long", (int)strlen(entry->ai), ai);
+			SET_ERR_V(AI_DATA_IS_TOO_LONG, (int)entry->ailen, ai);
 			return false;
 		}
 
@@ -655,46 +847,6 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 
 
 /*
- *  Search the AIs for any match with the given AI pattern, optionally
- *  returning the matched AI.
- *
- *  Ignore AI can be set to the current AI to avoid matching triggering on
- *  itself when matching by a self-referencing pattern.
- *
- *  Note: Given the typically small number of AIs and template matching
- *  requirement, there is little to be gained by maintaining a more advanced
- *  data structure versus the current approach of simply walking the AIs.
- *
- */
-static bool aiExists(const gs1_encoder* const ctx, const char* const ai, const char* const ignoreAI, struct aiValue const **matchedAI) {
-
-	int i;
-	const size_t prefixlen = strspn(ai, "0123456789");
-
-	for (i = 0; i < ctx->numAIs; i++) {
-
-		const struct aiValue* const ai2 = &ctx->aiData[i];
-
-		if (ai2->kind != aiValue_aival ||
-		    strncmp(ai2->ai, ai, prefixlen) != 0 ||
-		    (ignoreAI && strncmp(ai2->ai, ignoreAI, strlen(ai)) == 0)
-		   )
-			continue;
-
-		if (matchedAI)
-			*matchedAI = ai2;
-		return true;
-
-	}
-
-	if (matchedAI)
-		*matchedAI = NULL;
-	return false;
-
-}
-
-
-/*
  * AI validation routine that process the "ex" attributes of an AI table entry
  * to ensure that AIs that are mutually exclusive do not appear in the data.
  *
@@ -704,39 +856,37 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 	int i;
 
 	assert(ctx);
-	assert(ctx->numAIs <= MAX_AIS);
+	assert(ctx->numSortedAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// Use sorted AI array to skip non-AI values entirely
+	for (i = 0; i < ctx->numSortedAIs; i++) {
 
-		const struct aiValue* const ai = &ctx->aiData[i];
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		const char *token;
-		char *saveptr = NULL;
-
-		if (ai->kind != aiValue_aival)
-			continue;
+		const struct aiValue* const ai = ctx->sortedAIs[i];
+		gs1_tok_t tok;
+		bool more;
 
 		assert(ai->aiEntry);
 
-		*attrs = '\0';
-		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ai->aiEntry->attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
 
-		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+			gs1_tok_t tok2;
+			bool more2;
 
-			char *saveptr2 = NULL;
-
-			if (strncmp(token, "ex=", 3) != 0)
+			if (strncmp(tok.ptr, "ex=", 3) != 0)
 				continue;
 
-			for (token = strtok_r((char*)(token+3), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+			tok2 = (gs1_tok_t) { .len = tok.len - 3 };
+			for (more2 = gs1_tokenise(tok.ptr + 3, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
 
 				const struct aiValue *matchedAI;
 
-				if (!aiExists(ctx, token, ai->ai, &matchedAI))
+				assert(tok2.len <= MAX_AI_LEN);
+
+				if (!existsInAIdata(ctx, tok2.ptr, tok2.len, ai->ai, &matchedAI))
 					continue;
 
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "It is invalid to pair AI (%.*s) with AI (%.*s)",
-					 ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
+				SET_ERR_V(INVALID_AI_PAIRS, ai->ailen, ai->ai, matchedAI->ailen, matchedAI->ai);
 				return false;
 
 			}
@@ -760,42 +910,39 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 	int i;
 
 	assert(ctx);
-	assert(ctx->numAIs <= MAX_AIS);
+	assert(ctx->numSortedAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// Use sorted AI array to skip non-AI values entirely
+	for (i = 0; i < ctx->numSortedAIs; i++) {
 
-		const struct aiValue* const ai = &ctx->aiData[i];
-		char attrs[MAX_AI_ATTR_LEN + 1] = { 0 };
-		const char *token;
-		char *saveptr = NULL;
-
-		if (ai->kind != aiValue_aival)
-			continue;
+		const struct aiValue* const ai = ctx->sortedAIs[i];
+		gs1_tok_t tok;
+		bool more;
 
 		assert(ai->aiEntry);
 
-		*attrs = '\0';
-		strncat(attrs, ai->aiEntry->attrs, MAX_AI_ATTR_LEN);
-
-		for (token = strtok_r(attrs, " ", &saveptr); token; token = strtok_r(NULL, " ", &saveptr)) {
+		tok = (gs1_tok_t) { .len = 0 };
+		for (more = gs1_tokenise(ai->aiEntry->attrs, ' ', &tok); more; more = gs1_tokenise(NULL, ' ', &tok)) {
 
 			bool satisfied = true;
-			char *saveptr2 = NULL;
-			char reqErr[MAX_AI_ATTR_LEN - 4 + 1] = { 0 };
+			gs1_tok_t tok2;
+			bool more2;
 
-			if (strncmp(token, "req=", 4) != 0)
+			if (strncmp(tok.ptr, "req=", 4) != 0)
 				continue;
 
-			strncat(reqErr, token+4, MAX_AI_ATTR_LEN - 4);
+			tok2 = (gs1_tok_t) { .len = tok.len - 4 };
+			for (more2 = gs1_tokenise(tok.ptr + 4, ',', &tok2); more2; more2 = gs1_tokenise(NULL, ',', &tok2)) {
 
-			for (token = strtok_r((char*)(token+4), ",", &saveptr2); token; token = strtok_r(NULL, ",", &saveptr2)) {
+				gs1_tok_t tok3;
+				bool more3;
 
-				char *saveptr3 = NULL;
 				satisfied = true;
 
 				// All members of a group (e.g. "01+21") must be present
-				for (token = strtok_r((char*)token, "+", &saveptr3); token; token = strtok_r(NULL, ",", &saveptr3))
-					if (!aiExists(ctx, token, ai->ai, NULL))
+				tok3 = (gs1_tok_t) { .len = tok2.len };
+				for (more3 = gs1_tokenise(tok2.ptr, '+', &tok3); more3; more3 = gs1_tokenise(NULL, '+', &tok3))
+					if (!existsInAIdata(ctx, tok3.ptr, tok3.len, ai->ai, NULL))
 						satisfied = false;
 
 				if (satisfied)		// Any wholly satisfied group is sufficient for req
@@ -804,7 +951,7 @@ static bool validateAIrequisites(gs1_encoder* const ctx) {
 			}
 
 			if (!satisfied) {	/* Loop finished without satisfying one of the AI groups in "req" */
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Required AIs for AI (%.*s) are not satisfied: %s", ai->ailen, ai->ai, reqErr);
+				SET_ERR_V(REQUIRED_AIS_NOT_SATISFIED, ai->ailen, ai->ai, (int)(tok.len - 4), tok.ptr + 4);
 				return false;
 			}
 
@@ -830,27 +977,20 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	// If there's 0 or 1 AI, there can't be any repeats
+	if (ctx->numSortedAIs <= 1)
+		return true;
 
-		const struct aiValue* const ai = &ctx->aiData[i];
-		int j;
+	for (i = 0; i < ctx->numSortedAIs - 1; i++) {
 
-		if (ai->kind != aiValue_aival)
-			continue;
+		const struct aiValue* const ai = ctx->sortedAIs[i];
+		const struct aiValue* const ai2 = ctx->sortedAIs[i+1];
 
-		for (j = i + 1; j < ctx->numAIs; j++) {
-
-			const struct aiValue* const ai2 = &ctx->aiData[j];
-
-			if (ai2->kind != aiValue_aival)
-				continue;
-
-			if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
-			   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
-				snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Multiple instances of AI (%.*s) have different values", ai->ailen, ai->ai);
-				return false;
-			}
-
+		// Check if consecutive sorted AIs have same AI but different values
+		if (ai->ailen == ai2->ailen && strncmp(ai->ai, ai2->ai, ai->ailen) == 0 &&
+		   (ai->vallen != ai2->vallen || strncmp(ai->value, ai2->value, ai->vallen) != 0)) {
+			SET_ERR_V(INSTANCES_OF_AI_HAVE_DIFFERENT_VALUES, ai->ailen, ai->ai);
+			return false;
 		}
 
 	}
@@ -867,27 +1007,22 @@ static bool validateAIrepeats(gs1_encoder* const ctx) {
  */
 static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 
-	int i;
+	static const char* serialAIs[] = { "253", "255", "8003" };
+	size_t i;
 
 	assert(ctx);
 	assert(ctx->numAIs <= MAX_AIS);
 
-	if (!aiExists(ctx, "8030", NULL, NULL))
+	if (!existsInAIdata(ctx, "8030", 4, NULL, NULL))
 		return true;
 
-	for (i = 0; i < ctx->numAIs; i++) {
+	for (i = 0; i < sizeof(serialAIs)/sizeof(serialAIs[0]); i++) {
 
-		const struct aiValue* ai = &ctx->aiData[i];
+		const struct aiValue *ai = NULL;
 
-		if (ai->kind != aiValue_aival ||
-		        (strcmp(ai->aiEntry->ai, "253") != 0 &&
-		         strcmp(ai->aiEntry->ai, "255") != 0 &&
-		         strcmp(ai->aiEntry->ai, "8003") != 0)
-		   )
-			continue;
-
-		if (ai->vallen == aiEntryMinLength(ai->aiEntry)) {
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Serial component must be present for AI (%.*s) when used with AI (8030)", ai->ailen, ai->ai);
+		if (existsInAIdata(ctx, serialAIs[i], strlen(serialAIs[i]), NULL, &ai) && ai &&	// Matching entry
+		    ai->vallen == aiEntryMinLength(ai->aiEntry)) {
+			SET_ERR_V(SERIAL_NOT_PRESENT, ai->ailen, ai->ai);
 			return false;
 		}
 
@@ -905,6 +1040,9 @@ static bool validateDigSigRequiresSerialisedKey(gs1_encoder* const ctx) {
 bool gs1_validateAIs(gs1_encoder* const ctx) {
 
 	int i;
+
+	// Sort AIs to enable efficient validation checks
+	gs1_sortAIs(ctx);
 
 	for (i = 0; i < gs1_encoder_vNUMVALIDATIONS; i++) {
 
@@ -935,7 +1073,6 @@ void gs1_loadValidationTable(gs1_encoder* const ctx) {
 #undef ENTRY
 
 }
-
 
 
 #ifdef UNIT_TESTS
@@ -986,7 +1123,93 @@ void test_ai_lookupAIentry(void) {
 	TEST_CHECK(gs1_lookupAIentry(ctx, "4199", 4) == NULL);				// Don't vivify (4199) since AI prefix "41" is defined as having length 3
 	TEST_CHECK(gs1_lookupAIentry(ctx, "419", 3) == &unknownAI3fixed13);		// So (419) is okay, not requiring FNC1
 
+	TEST_CHECK(gs1_lookupAIentry(ctx, "23XABC", 0) == NULL);			// Don't vivify when non-digit in AI position (prefix "23" = len 3, "23X" has non-digit)
+	TEST_CHECK(gs1_lookupAIentry(ctx, "3199", 4) == &unknownAI4fixed6);		// Vivify (3199) as fixed-6 since prefix "31" has value length 6
+
 	gs1_encoder_free(ctx);
+
+}
+
+
+static void do_test_existsInAIdata(gs1_encoder* const ctx, const char* const file, const int line, const bool should_succeed, const char* const dataStr, const char* const needle, const char* const ignore, const char* const expect) {
+
+	char casename[256];
+	const struct aiValue* match = NULL;
+
+	snprintf(casename, sizeof(casename), "%s:%d: %s | +(%s) | -(%s)", file, line, dataStr, needle, ignore ? ignore : "");
+	TEST_CASE(casename);
+
+	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, dataStr));
+
+	TEST_CHECK((existsInAIdata(ctx, needle, strlen(needle), ignore, (expect != NULL ? &match : NULL))) ^ (!should_succeed));
+
+	if (expect != NULL) {
+		TEST_ASSERT(match != NULL);
+		TEST_CHECK(strcmp(match->aiEntry->ai, expect) == 0);
+		TEST_MSG("Expected to match '%s' but got '%s'", expect, match->aiEntry->ai);
+	}
+
+}
+
+void test_ai_existsInAIdata(void) {
+
+	gs1_encoder* ctx;
+
+	static const char* dataStr1 = "(01)12345678901231";
+	static const char* dataStr2 = "(98)DEF(97)GHI(96)JKL(95)MNO";
+	static const char* dataStr3 = "(01)12345678901231(235)ABC123(8002)123456";
+
+	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	assert(ctx);
+
+#define test_existsInAIdata(s, d, n, i, e) do {					\
+	do_test_existsInAIdata(ctx, __FILE__, __LINE__, s, d, n, i, e);		\
+} while (0)
+
+	test_existsInAIdata(true,  dataStr1, "01",   NULL, "01");
+	test_existsInAIdata(true,  dataStr1, "01",   "99", "01");
+	test_existsInAIdata(false, dataStr1, "01",   "01", NULL); 	// Never match on ignore
+	test_existsInAIdata(false, dataStr1, "02",   NULL, NULL);
+	test_existsInAIdata(true,  dataStr1, "0n",   NULL, "01");
+	test_existsInAIdata(false, dataStr1, "0nn",  NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "0nnn", NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "01n",  NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "01nn", NULL, NULL);
+	test_existsInAIdata(false, dataStr1, "n0",   NULL, NULL);	// Mask must be at end
+	test_existsInAIdata(false, dataStr1, "n0n",  NULL, NULL);
+
+	test_existsInAIdata(false, dataStr2, "01", NULL, NULL);
+	test_existsInAIdata(false, dataStr2, "94", NULL, NULL);
+	test_existsInAIdata(true,  dataStr2, "95", NULL, "95");
+	test_existsInAIdata(true,  dataStr2, "96", NULL, "96");
+	test_existsInAIdata(true,  dataStr2, "97", NULL, "97");
+	test_existsInAIdata(true,  dataStr2, "98", NULL, "98");
+	test_existsInAIdata(false, dataStr2, "99", NULL, NULL);
+	test_existsInAIdata(true,  dataStr2, "9n", NULL, NULL);		// Matched value is meaningless due to dups
+
+	test_existsInAIdata(true,  dataStr3, "01",   NULL, "01");
+	test_existsInAIdata(false, dataStr3, "nn",   NULL, NULL);
+	test_existsInAIdata(true,  dataStr3, "235",  NULL, "235");
+	test_existsInAIdata(false, dataStr3, "23",   NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "2n",   NULL, NULL);
+	test_existsInAIdata(true,  dataStr3, "23n",  NULL, "235");
+	test_existsInAIdata(true,  dataStr3, "2nn",  NULL, "235");
+	test_existsInAIdata(false, dataStr3, "nnn",  NULL, NULL);
+	test_existsInAIdata(true,  dataStr3, "8002", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "800n", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "80nn", NULL, "8002");
+	test_existsInAIdata(true,  dataStr3, "8nnn", NULL, "8002");
+	test_existsInAIdata(false, dataStr3, "nnnn", NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "800",  NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "80n",  NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "80",   NULL, NULL);
+	test_existsInAIdata(false, dataStr3, "8n",   NULL, NULL);
+
+	gs1_encoder_free(ctx);
+
+#undef test_existsInAIdata
 
 }
 
@@ -1057,8 +1280,8 @@ void test_ai_AItableVsPrefixLength(void) {
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
 		TEST_CASE(entry->ai);
-		TEST_CHECK(strlen(entry->ai) == aiLengthByPrefix(ctx, entry->ai));
-		TEST_MSG("Expected %d; Got %d", aiLengthByPrefix(ctx, entry->ai), strlen(entry->ai));
+		TEST_CHECK(entry->ailen == aiLengthByPrefix(ctx, entry->ai));
+		TEST_MSG("Expected %d; Got %d", aiLengthByPrefix(ctx, entry->ai), entry->ailen);
 	}
 
 	gs1_encoder_free(ctx);
@@ -1092,9 +1315,12 @@ static void do_test_parseAIdata(gs1_encoder* const ctx, const char* const file, 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) ^ (!should_succeed));
-	if (should_succeed)
+	if (should_succeed) {
+		gs1_sortAIs(ctx);
 		TEST_CHECK(strcmp(out, expect) == 0);
+	}
 	TEST_MSG("Given: %s; Got: %s; Expected: %s; Err: %s", aiData, out, expect, ctx->errMsg);
 
 }
@@ -1116,27 +1342,92 @@ void test_ai_parseAIdata(void) {
 
 	test_parseAIdata(true,  "(01)12345678901231", "^0112345678901231");
 	test_parseAIdata(true,  "(10)12345", "^1012345");
-	test_parseAIdata(true,  "(01)12345678901231(10)12345", "^01123456789012311012345");		// No FNC1 after (01)
-	test_parseAIdata(true,  "(3100)123456(10)12345", "^31001234561012345");				// No FNC1 after (3100)
-	test_parseAIdata(true,  "(10)12345(11)991225", "^1012345^11991225");				// FNC1 after (10)
-	test_parseAIdata(true,  "(3900)12345(11)991225", "^390012345^11991225");				// FNC1 after (3900)
-	test_parseAIdata(true,  "(10)12345\\(11)991225", "^1012345(11)991225");				// Escaped bracket
-	test_parseAIdata(true,  "(10)12345\\(", "^1012345(");						// At end if fine
+	test_parseAIdata(true,  "(01)12345678901231(10)12345", "^01123456789012311012345");	// No FNC1 after (01)
+	test_parseAIdata(true,  "(3100)123456(10)12345", "^31001234561012345");			// No FNC1 after (3100)
+	test_parseAIdata(true,  "(10)12345(11)991225", "^1012345^11991225");			// FNC1 after (10)
+	test_parseAIdata(true,  "(3900)12345(11)991225", "^390012345^11991225");		// FNC1 after (3900)
+	test_parseAIdata(true,  "(10)12345\\(11)991225", "^1012345(11)991225");			// Escaped bracket
+	test_parseAIdata(true,  "(10)12345\\(", "^1012345(");					// At end if fine
 
-	test_parseAIdata(false, "(10)(11)98765", "");							// Value must not be empty
-	test_parseAIdata(false, "(10)12345(11)", "");							// Value must not be empty
-	test_parseAIdata(false, "(1A)12345", "");								// AI must be numeric
-	test_parseAIdata(false, "1(12345", "");								// Must start with AI
-	test_parseAIdata(false, "12345", "");								// Must start with AI
-	test_parseAIdata(false, "()12345", "");								// AI too short
-	test_parseAIdata(false, "(1)12345", "");								// AI too short
-	test_parseAIdata(false, "(12345)12345", "");							// AI too long
-	test_parseAIdata(false, "(15", "");								// AI must terminate
-	test_parseAIdata(false, "(1", "");									// AI must terminate
-	test_parseAIdata(false, "(", "");									// AI must terminate
-	test_parseAIdata(false, "(01)123456789012312(10)12345", "");					// Fixed-length AI too long
-	test_parseAIdata(false, "(10)12345^", "");								// Reject "^": Conflated with FNC1
-	test_parseAIdata(false, "(17)9(90)217", "");							// Should not parse to ^7990217
+	test_parseAIdata(false, "(10)(11)98765", "");						// Value must not be empty
+	test_parseAIdata(false, "(10)12345(11)", "");						// Value must not be empty
+	test_parseAIdata(false, "(1A)12345", "");						// AI must be numeric
+	test_parseAIdata(false, "1(12345", "");							// Must start with AI
+	test_parseAIdata(false, "12345", "");							// Must start with AI
+	test_parseAIdata(false, "()12345", "");							// AI too short
+	test_parseAIdata(false, "(1)12345", "");						// AI too short
+	test_parseAIdata(false, "(12345)12345", "");						// AI too long
+	test_parseAIdata(false, "(15", "");							// AI must terminate
+	test_parseAIdata(false, "(1", "");							// AI must terminate
+	test_parseAIdata(false, "(", "");							// AI must terminate
+	test_parseAIdata(false, "(01)123456789012312(10)12345", "");				// Fixed-length AI too long
+	test_parseAIdata(false, "(10)12345^", "");						// Reject "^": Conflated with FNC1
+	test_parseAIdata(false, "(17)9(90)217", "");						// Should not parse to ^7990217
+
+
+	/*
+	 *  MAX_AI_VALUE_LEN boundary: AI (99) accepts X..90
+	 *
+	 */
+	{
+		char inbuf[256];
+		char expbuf[256];
+		int j;
+
+		memcpy(inbuf, "(99)", 4);
+		for (j = 0; j < 90; j++)
+			inbuf[4 + j] = 'A';
+		inbuf[94] = '\0';
+
+		memcpy(expbuf, "^99", 3);
+		for (j = 0; j < 90; j++)
+			expbuf[3 + j] = 'A';
+		expbuf[93] = '\0';
+
+		test_parseAIdata(true, inbuf, expbuf);				// Exactly 90 chars
+
+		inbuf[95] = '\0';
+		inbuf[94] = 'A';
+		test_parseAIdata(false, inbuf, "");				// 91 chars, too long
+	}
+
+
+	/*
+	 *  MAX_AIS boundary: 64 AIs using (99)
+	 *
+	 *  Call gs1_parseAIdata directly with a larger output buffer
+	 *  since do_test_parseAIdata uses a 256-byte out buffer.
+	 *
+	 */
+	{
+		char inbuf[512];
+		char outbuf[512];
+		char *ip;
+		int j;
+
+		// Build bracketed AI string with exactly MAX_AIS (64) AIs
+		ip = inbuf;
+		for (j = 0; j < MAX_AIS; j++) {
+			*ip++ = '('; *ip++ = '9'; *ip++ = '9'; *ip++ = ')';
+			*ip++ = 'A' + (char)(j / 26);
+			*ip++ = 'A' + (char)(j % 26);
+		}
+		*ip = '\0';
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(gs1_parseAIdata(ctx, inbuf, outbuf));	// Exactly 64 AIs
+
+		// One more AI pushes over the limit
+		*ip++ = '('; *ip++ = '9'; *ip++ = '9'; *ip++ = ')';
+		*ip++ = 'Z'; *ip++ = 'Z';
+		*ip = '\0';
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(!gs1_parseAIdata(ctx, inbuf, outbuf));	// 65 AIs, too many
+	}
+
 
 	gs1_encoder_free(ctx);
 
@@ -1154,7 +1445,9 @@ static void test_linters(gs1_encoder* const ctx, const char* const aiData, gs1_l
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK(gs1_parseAIdata(ctx, aiData, out) || ctx->linterErr != GS1_LINTER_OK);
+	gs1_sortAIs(ctx);
 	TEST_MSG("Parse failed for non-linter reasons. Err: %s", ctx->errMsg);
 
 	TEST_CHECK(ctx->linterErr == expect);
@@ -1182,7 +1475,6 @@ void test_ai_linters(void) {
 		{ "(00)A23456789012345675",				GS1_LINTER_NON_DIGIT_CHARACTER },
 		{ "(10) ",						GS1_LINTER_INVALID_CSET82_CHARACTER },
 		{ "(8010)123456_",					GS1_LINTER_INVALID_CSET39_CHARACTER },
-		{ "(8013)123456ABOO",					GS1_LINTER_INVALID_CSET32_CHARACTER },
 		{ "(8030)ABC:123",					GS1_LINTER_INVALID_CSET64_CHARACTER },
 		{ "(8030)123=",						GS1_LINTER_INVALID_CSET64_PADDING },
 		{ "(00)123456789012345670",				GS1_LINTER_INCORRECT_CHECK_DIGIT },
@@ -1192,7 +1484,7 @@ void test_ai_linters(void) {
 		{ "(8013)A",						GS1_LINTER_TOO_SHORT_FOR_CHECK_PAIR },
 //		GS1_LINTER_TOO_LONG_FOR_CHECK_PAIR_IMPLEMENTATION	Parse-time length check prevent this
 //		GS1_LINTER_GCP_DATASOURCE_OFFLINE			Not possible to trigger with default implementation
-		{ "(401)123",						GS1_LINTER_TOO_SHORT_FOR_KEY },
+		{ "(401)123",						GS1_LINTER_TOO_SHORT_FOR_GCP },
 		{ "(7023)12A4",						GS1_LINTER_INVALID_GCP_PREFIX },
 //		GS1_LINTER_IMPORTER_IDX_MUST_BE_ONE_CHARACTER		Parse-time length checks prevent this
 		{ "(7040)1AB=",						GS1_LINTER_INVALID_IMPORT_IDX_CHARACTER },
@@ -1205,7 +1497,7 @@ void test_ai_linters(void) {
 		{ "(7030)987ABC",					GS1_LINTER_NOT_ISO3166_OR_999 },
 		{ "(4307)AA",						GS1_LINTER_NOT_ISO3166_ALPHA2 },
 		{ "(3910)9870",						GS1_LINTER_NOT_ISO4217 },
-		{ "(8007)AB1234",					GS1_LINTER_IBAN_TOO_SHORT },
+		{ "(8007)FR1234",					GS1_LINTER_IBAN_TOO_SHORT },
 		{ "(8007)FR12_45678901234",				GS1_LINTER_INVALID_IBAN_CHARACTER },
 		{ "(8007)AB12345678901234",				GS1_LINTER_ILLEGAL_IBAN_COUNTRY_CODE },
 		{ "(8007)FR12345678901234",				GS1_LINTER_INCORRECT_IBAN_CHECKSUM },
@@ -1351,15 +1643,15 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(false, "^011234567890123A");				// Bad numeric character
 	test_processAIdata(false, "^0112345678901234");				// Incorrect check digit (csum linter)
 	test_processAIdata(false, "^011234567890123");				// Too short
-	test_processAIdata(false, "^01123456789012312");				// No such AI (2). Can't be "too long" since FNC1 not required
+	test_processAIdata(false, "^01123456789012312");			// No such AI (2). Can't be "too long" since FNC1 not required
 
-	test_processAIdata(true,  "^0112345678901231^");				// Tolerate superflous FNC1
-	test_processAIdata(false, "^011234567890123^");				// Short, with superflous FNC1
-	test_processAIdata(false, "^01123456789012345^");				// Long, with superflous FNC1 (no following AIs)
-	test_processAIdata(false, "^01123456789012345^991234");			// Long, with superflous FNC1 and meaningless AI (5^..)
+	test_processAIdata(true,  "^0112345678901231^");			// Tolerate superfluous FNC1
+	test_processAIdata(false, "^011234567890123^");				// Short, with superfluous FNC1
+	test_processAIdata(false, "^01123456789012345^");			// Long, with superfluous FNC1 (no following AIs)
+	test_processAIdata(false, "^01123456789012345^991234");			// Long, with superfluous FNC1 and meaningless AI (5^..)
 
 	test_processAIdata(true,  "^0112345678901231991234");			// Fixed-length, run into next AI (01)...(99)...
-	test_processAIdata(true,  "^0112345678901231^991234");			// Tolerate superflous FNC1
+	test_processAIdata(true,  "^0112345678901231^991234");			// Tolerate superfluous FNC1
 
 	test_processAIdata(true,  "^2421");					// N1..6; FNC1 required
 	test_processAIdata(true,  "^24212");
@@ -1367,44 +1659,44 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(true,  "^2421234");
 	test_processAIdata(true,  "^24212345");
 	test_processAIdata(true,  "^242123456");
-	test_processAIdata(true,  "^242123456^10ABC123");				// Limit, then following AI
-	test_processAIdata(true,  "^242123456^");					// Tolerant of FNC1 at end of data
-	test_processAIdata(false, "^2421234567");					// Data too long
+	test_processAIdata(true,  "^242123456^10ABC123");			// Limit, then following AI
+	test_processAIdata(true,  "^242123456^");				// Tolerant of FNC1 at end of data
+	test_processAIdata(false, "^2421234567");				// Data too long
 
 	test_processAIdata(true,  "^81111234");					// N4; FNC1 required
 	test_processAIdata(false, "^8111123");					// Too short
-	test_processAIdata(false, "^811112345");					// Too long
-	test_processAIdata(true,  "^81111234^10ABC123");				// Followed by another AI
+	test_processAIdata(false, "^811112345");				// Too long
+	test_processAIdata(true,  "^81111234^10ABC123");			// Followed by another AI
 
-	test_processAIdata(true,  "^800112341234512398");				// N4-5-3-1-1; FNC1 required
-	test_processAIdata(false, "^80011234123451239");				// Too short
-	test_processAIdata(false, "^8001123412345123981");				// Too long
+	test_processAIdata(true,  "^800112341234512398");			// N4-5-3-1-1; FNC1 required
+	test_processAIdata(false, "^80011234123451239");			// Too short
+	test_processAIdata(false, "^8001123412345123981");			// Too long
 	test_processAIdata(true,  "^800112341234512398^0112345678901231");
-	test_processAIdata(false, "^80011234123451239^0112345678901231");		// Too short
+	test_processAIdata(false, "^80011234123451239^0112345678901231");	// Too short
 	test_processAIdata(false, "^8001123412345123981^01123456789012312");	// Too long
 
 	test_processAIdata(true,  "^7007211225211231");				// N6 [N6]; FNC1 required
-	test_processAIdata(true,  "^7007211225");					// No optional component
-	test_processAIdata(false, "^70072112252");					// Incorrect length
+	test_processAIdata(true,  "^7007211225");				// No optional component
+	test_processAIdata(false, "^70072112252");				// Incorrect length
 	test_processAIdata(false, "^700721122521");				// Incorrect length
 	test_processAIdata(false, "^7007211225211");				// Incorrect length
 	test_processAIdata(false, "^70072112252112");				// Incorrect length
 	test_processAIdata(false, "^700721122521123");				// Incorrect length
-	test_processAIdata(false, "^70072112252212311");				// Too long
+	test_processAIdata(false, "^70072112252212311");			// Too long
 
 	test_processAIdata(true,  "^800302112345678900ABC");			// N1 N13,csum X0..16; FNC1 required
 	test_processAIdata(false, "^800302112345678901ABC");			// Bad check digit on N13 component
-	test_processAIdata(true,  "^800302112345678900");				// Empty final component
-	test_processAIdata(true,  "^800302112345678900^10ABC123");			// Empty final component and following AI
-	test_processAIdata(true,  "^800302112345678900ABCDEFGHIJKLMNOP");		// Empty final component and following AI
-	test_processAIdata(false, "^800302112345678900ABCDEFGHIJKLMNOPQ");		// Empty final component and following AI
+	test_processAIdata(true,  "^800302112345678900");			// Empty final component
+	test_processAIdata(true,  "^800302112345678900^10ABC123");		// Empty final component and following AI
+	test_processAIdata(true,  "^800302112345678900ABCDEFGHIJKLMNOP");	// Empty final component and following AI
+	test_processAIdata(false, "^800302112345678900ABCDEFGHIJKLMNOPQ");	// Empty final component and following AI
 
-	test_processAIdata(true,  "^7230121234567890123456789012345678");		// X2 X1..28; FNC1 required
-	test_processAIdata(false, "^72301212345678901234567890123456789");		// Too long
+	test_processAIdata(true,  "^7230121234567890123456789012345678");	// X2 X1..28; FNC1 required
+	test_processAIdata(false, "^72301212345678901234567890123456789");	// Too long
 	test_processAIdata(true,  "^7230123");					// Shortest
 	test_processAIdata(false, "^723012");					// Too short
 
-	test_processAIdata(false, "^423");						// List of 3-digit ISO-3166 codes
+	test_processAIdata(false, "^423");					// List of 3-digit ISO-3166 codes
 	test_processAIdata(false, "^4235");
 	test_processAIdata(false, "^42352");
 	test_processAIdata(true,  "^423528");
@@ -1421,6 +1713,71 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(false, "^42352852852852852");
 	test_processAIdata(true,  "^423528528528528528");
 	test_processAIdata(false,  "^4235285285285285285");			// Too long
+
+
+	/*
+	 *  MAX_AI_VALUE_LEN boundary: AI (99) accepts X..90
+	 *
+	 */
+	{
+		char buf[256];
+		int j;
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+
+		memcpy(buf, "^99", 3);
+		for (j = 0; j < 90; j++)
+			buf[3 + j] = 'A';
+		buf[93] = '\0';
+		test_processAIdata(true, buf);				// Exactly 90 chars
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+
+		buf[94] = '\0';
+		buf[93] = 'A';
+		test_processAIdata(false, buf);				// 91 chars, too long
+	}
+
+
+	/*
+	 *  MAX_AIS boundary: 64 AIs using (99) with identical values
+	 *
+	 *  Each AI is "99XX^" (FNC1 separated) except the last.
+	 *
+	 */
+	{
+		// 65 AIs * "^99XY" = 325 + null
+		char buf[512];
+		char *p;
+		int j;
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+
+		// Build string with exactly MAX_AIS (64) variable-length AIs
+		p = buf;
+		*p++ = '^';
+		for (j = 0; j < MAX_AIS; j++) {
+			if (j > 0)
+				*p++ = '^';	// FNC1 separator
+			*p++ = '9'; *p++ = '9';
+			*p++ = 'X'; *p++ = 'Y';
+		}
+		*p = '\0';
+		test_processAIdata(true, buf);				// Exactly 64 AIs
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+
+		// One more AI pushes over the limit
+		*p++ = '^';
+		*p++ = '9'; *p++ = '9'; *p++ = 'X'; *p++ = 'Y';
+		*p = '\0';
+		test_processAIdata(false, buf);				// 65 AIs, too many
+	}
+
 
 	// Unlike parsed data input, we cannot vivify unknown AIs when
 	// extracting AI data from a raw string
@@ -1443,10 +1800,13 @@ static void do_test_validateAIs(gs1_encoder* const ctx, const char* const file, 
 	TEST_CASE(casename);
 
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 	TEST_CHECK((ret = gs1_parseAIdata(ctx, aiData, out)) == true);
 	TEST_MSG("Parse failed for non-pair validation reasons. Err: %s", ctx->errMsg);
 	if (!ret)
 		return;
+
+	gs1_sortAIs(ctx);
 
 	if (!should_succeed) {
 		TEST_CHECK(!fn(ctx));
@@ -1508,6 +1868,12 @@ void test_ai_validateAIs(void) {
 	test_validateAIs(false, validateAImutex, "(3940)1234(8111)9999");
 	test_validateAIs(false, validateAImutex, "(3940)1234(3941)9999");	// Match by "394n", ignoring self
 	test_validateAIs(false, validateAImutex, "(3955)123456(3929)123");	// Match by "392n"
+
+	// Mutex between known and unknown AIs: (3333) ex=333n should conflict with unknown (3338)
+	test_validateAIs(false, validateAImutex, "(3333)333333(3338)030333");
+	test_validateAIs(false, validateAImutex, "(01)12345678901231(3333)333333(3338)030333");
+	test_validateAIs(false, validateAImutex, "(3338)030333(3333)333333");
+	test_validateAIs(false, validateAImutex, "(3300)000000(3333)333333(3338)030333");	// Extra 33xx AI shifts sort order
 
 
 	/*

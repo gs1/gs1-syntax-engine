@@ -1,0 +1,5 @@
+
+/* Hide inherited methods from java.lang.Object */
+.inherited-list {
+    display: none;
+}

@@ -1,9 +1,28 @@
-UNRELEASED
+1.3.2
 
-* Update to Syntax Dictionary release XXXX-XX-XX
+* Windows native libraries were split into 32- and 64-bit release assets.
+* The .NET library release now bundles both 32- and 64-bit native library instances.
+* Pre-built applications were switched to 64-bit.
+
+
+1.3.0
+
+* Core: Additional sanity checks were added to the domain part of GS1 DL URIs.
+* Core: A framework was added for overriding the heap-management functions of the library which may be used for activities such as custom memory profiling.
+* Core: Support was added for DotCode and GS1 DotCode scandata.
+* Core: All data transformation and validation routines were significantly optimised for runtime performance.
+* JS: Added an example node.js web service application to transform GS1 data, which may be useful in the event that the library or its bindings cannot be integrated directly.
+* Java: Windows support was added for building the wrapper and example application.
+
+
+1.2.0
+
+* Update to Syntax Dictionary release 2025-01-30
 * JS: The browser example app was amended to replace all instances of "{GS}", not just the first.
 * Core: The scandata processor was amended to not strip terminal GS characters.
 * Core: The GS1 DL URI processor was fixed to not truncate AI values derived from URI components that contain percent-encoded null characters.
+* Core: The Syntax Dictionary parser was amended to be tolerant of DOS-style line endings.
+* Core: A new error message translations framework was adopted. No user-visible changes for a regular build.
 
 
 1.1.0
@@ -19,7 +38,7 @@ UNRELEASED
 * Wrappers: Update API to use symbologies typedef instead of plain int.
 * Java: Build process for example app amended to treat warnings as errors.
 * Java: The use of a deprecated API call by the example app was fixed.
-* Java: The JNI library now staticly links the Syntax Engine in order to ease distribution.
+* Java: The JNI library now statically links the Syntax Engine in order to ease distribution.
 * Java: Add support for MacOS.
 * JS: Support for publishing assets to npmjs.
 * JS: Build process updated to support recent Emscripten version that do not generate a .mem file with "jsonly" builds.
@@ -33,7 +52,7 @@ UNRELEASED
 * Core: Support for new Syntax Dictionary AI group syntax (e.g. "01+21") for req attributes where each listed AI must be present to be a satisfactory the constraint.
 * Core: Ensure that valid key-qualifier AIs appear in path info, where possible, rather than in query parameters.
 * Java: Build process amended to treat warnings as errors.
-* Where possible, use compiler and language features to mark depreceated functions as such in C library and bindings.
+* Where possible, use compiler and language features to mark deprecated functions as such in C library and bindings.
 * Update to Syntax Dictionary release 2023-12-11.
 
 
@@ -67,7 +86,7 @@ UNRELEASED
 * JS: Expose "permit zero-suppressed GTIN in GS1 DL URIs" option in the browser
   application.
 * Core: Don't report empty AI elements as "too long" in GS1 DL URIs.
-* Core: In a GS1 Digital Link URI, a "+" character should only be interpretted
+* Core: In a GS1 Digital Link URI, a "+" character should only be interpreted
   as space in a query parameter, not a path component, per rules for
   interpretation of URIs and CGI.
 * Core: In GS1 Digital Link URIs, represent "+" characters in AI expressed in

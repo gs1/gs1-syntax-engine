@@ -57,13 +57,19 @@
     <ClCompile Include="syntax\lint_csumalpha.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="syntax\lint_gcppos1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint_gcppos2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="syntax\lint_hasnondigit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_hh.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_hhmm.c">
+    <ClCompile Include="syntax\lint_hhmi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_hyphen.c">
@@ -84,16 +90,10 @@
     <ClCompile Include="syntax\lint_iso3166alpha2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_iso3166list.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="syntax\lint_iso4217.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_iso5218.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syntax\lint_key.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_latitude.c">
@@ -105,16 +105,16 @@
     <ClCompile Include="syntax\lint_mediatype.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_mm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syntax\lint_mmoptss.c">
+    <ClCompile Include="syntax\lint_mi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_nonzero.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_nozeroprefix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint_packagetype.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_pcenc.c">
@@ -141,9 +141,6 @@
     <ClCompile Include="syntax\lint_yymmdd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntax\lint_yymmddhh.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="syntax\lint_yyyymmd0.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,6 +148,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="syntax\lint_zero.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="syntax\lint__stubs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,7 +176,16 @@
     <ClInclude Include="syn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tr_EN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="syntax\gs1syntaxdictionary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="syntax\gs1syntaxdictionary-utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

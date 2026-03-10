@@ -1,11 +1,11 @@
 #
-#  GS1 Syntax Engine
+#  GS1 Barcode Syntax Engine
 #
 #  This is a contributed example that shows how a Python 3 language binding might
 #  be developed.
 #
 #
-#  @author Copyright (c) 2021-2024 GS1 AISBL.
+#  @author Copyright (c) 2021-2026 GS1 AISBL.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,27 +21,75 @@
 #  limitations under the License.
 #
 
-from gs1encoders import GS1Encoder
+from gs1encoders import (
+    GS1Encoder,
+    GS1EncoderDigitalLinkException,
+    Symbology,
+    Validation,
+)
+
 
 def main():
-
-    data_str = "^010952123454321310ABC123^99TEST"
-    data_titles = True
-
     gs1encoder = GS1Encoder()
 
-    print("\nVersion: {}\n".format(gs1encoder.get_version()))
+    print(f"\nVersion: {gs1encoder.version}\n")
 
-    gs1encoder.set_data_str(data_str)
+    # Set symbology to DataMatrix
+    gs1encoder.sym = Symbology.DM
+    print(f"Symbology: {gs1encoder.sym.name}")
 
-    print("IN: {}".format(gs1encoder.get_data_str()))
-    print("AI: {}".format(gs1encoder.get_ai_data_str() or "Not AI data"))
+    # Demonstrate validation control
+    print(
+        "RequisiteAIs validation enabled: "
+        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
+    )
+    gs1encoder.set_validation_enabled(Validation.REQUISITE_AIS, False)
+    print(
+        "RequisiteAIs validation enabled (after disable): "
+        f"{gs1encoder.get_validation_enabled(Validation.REQUISITE_AIS)}"
+    )
 
-    gs1encoder.set_include_data_titles_in_hri(data_titles)
-    print("\nHRI{}:".format(" (including data titles)" if data_titles else ""))
+    # Set AI data
+    ai_data = "(01)09521234543213(10)ABC123(99)TEST"
+    gs1encoder.ai_data_str = ai_data
+    print(f"\nAI IN:  {ai_data}")
+    print(f"AI OUT: {gs1encoder.ai_data_str or 'Not AI data'}")
+    print(f"DATA:   {gs1encoder.data_str}")
 
-    for h in gs1encoder.get_hri():
-      print("    {}".format(h))
+    # HRI with data titles
+    gs1encoder.include_data_titles_in_hri = True
+    title_suffix = " (including data titles)" if gs1encoder.include_data_titles_in_hri else ""
+    print(f"\nHRI{title_suffix}:")
+    for h in gs1encoder.hri:
+        print(f"    {h}")
+
+    # DL URI
+    try:
+        dl_uri = gs1encoder.get_dl_uri("https://example.com")
+        print(f"\nDL URI: {dl_uri}")
+    except GS1EncoderDigitalLinkException as e:
+        print(f"\nDL URI: Failed: {e}")
+
+    # Scan data round-trip
+    if gs1encoder.scan_data:
+        print(f"Scan data: {gs1encoder.scan_data}")
+    else:
+        print("Scan data: None")
+
+    # DL ignored query params
+    ignored = gs1encoder.dl_ignored_query_params
+    if ignored:
+        print("\nIgnored DL query params:")
+        for p in ignored:
+            print(f"    {p}")
+
+    # Demonstrate boolean properties
+    print(f"\nAdd check digit: {gs1encoder.add_check_digit}")
+    print(f"Permit unknown AIs: {gs1encoder.permit_unknown_ais}")
+    print(
+        "Permit zero-suppressed GTIN in DL URIs: "
+        f"{gs1encoder.permit_zero_suppressed_gtin_in_dl_uris}"
+    )
 
 
 if __name__ == "__main__":

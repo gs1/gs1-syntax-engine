@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2022-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2022-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,18 @@
 
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Used to ensure that an AI component conforms to a PPTT format, where PP and
  * TT have equal width.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -52,40 +52,41 @@
  * @return #GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL if the data contains a piece number that is larger than the total piece count.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond
 #define P(i)	data[i]
-#define T(i)	data[len / 2 + i]
+#define T(i)	data[data_len / 2 + i]
 /// \endcond
 
-	size_t pos, len, i;
+	size_t pos, i;
 	int pieceiszero, totaliszero, compare;
 
 	assert(data);
-
-	len = strlen(data);
-
-	/*
-	 * Data must be a non-zero, even number of characters.
-	 *
-	 */
-	if (len == 0 || len % 2 != 0) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL;
-	}
 
 	/*
 	 * Data must consist of all digits.
 	 *
 	 */
-	if ((pos = strspn(data, "0123456789")) != len) {
-		if (err_pos) *err_pos = pos;
-		if (err_len) *err_len = 1;
-		return GS1_LINTER_NON_DIGIT_CHARACTER;
-	}
+	for (pos = 0; pos < data_len; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9'))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_NON_DIGIT_CHARACTER,
+				pos,
+				1
+			);
+
+	/*
+	 * Data must be a non-zero, even number of characters.
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(data_len == 0 || data_len % 2 != 0))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_INVALID_LENGTH_FOR_PIECE_OF_TOTAL,
+			0,
+			data_len
+		);
 
 	/*
 	 * Determine whether either the piece number or total piece count is
@@ -94,7 +95,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 */
 	pieceiszero = totaliszero = 1;
 	compare = 0;				/* -1:P<T ; 0:P==T ; 1:P>T */
-	for (i = 0; i < len / 2; i++) {
+	for (i = 0; i < data_len / 2; i++) {
 		if (pieceiszero && P(i) != '0') pieceiszero = 0;
 		if (totaliszero && T(i) != '0') totaliszero = 0;
 		if (!compare && P(i) != T(i)) compare = P(i) < T(i) ? -1 : 1;
@@ -104,23 +105,25 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_pieceoftotal(const char* const
 	 * Neither piece nor total may be zero.
 	 *
 	 */
-	if (pieceiszero || totaliszero) {
-		if (err_pos) *err_pos = pieceiszero ? 0 : len / 2;
-		if (err_len) *err_len = len / 2;
-		return pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES;
-	}
+	if (GS1_LINTER_UNLIKELY(pieceiszero || totaliszero))
+		GS1_LINTER_RETURN_ERROR(
+			pieceiszero ? GS1_LINTER_ZERO_PIECE_NUMBER : GS1_LINTER_ZERO_TOTAL_PIECES,
+			pieceiszero ? 0 : data_len / 2,
+			data_len / 2
+		);
 
 	/*
 	 * The piece number must not exceed the total piece count.
 	 *
 	 */
-	if (compare == 1) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL;
-	}
+	if (GS1_LINTER_UNLIKELY(compare == 1))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_PIECE_NUMBER_EXCEEDS_TOTAL,
+			0,
+			data_len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

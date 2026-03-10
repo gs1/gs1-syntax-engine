@@ -1,5 +1,5 @@
 /*
- * GS1 Syntax Dictionary. Copyright (c) 2024-2024 GS1 AISBL.
+ * GS1 Barcode Syntax Dictionary. Copyright (c) 2024-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@
 
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
+#include "gs1syntaxdictionary-utils.h"
 
 
 /**
  * Used to ensure that an AI component conforms to a "`<pos>/<end>`" format for
  * variable width `<pos>` and `<end>`.
  *
- * @param [in] data Pointer to the null-terminated data to be linted. Must not
- *                  be `NULL`.
+ * @param [in] data Pointer to the data to be linted. Must not be `NULL`.
+ * @param [in] data_len Length of the data to be linted.
  * @param [out] err_pos To facilitate error highlighting, the start position of
  *                      the bad data is written to this pointer, if not `NULL`.
  * @param [out] err_len The length of the bad data is written to this pointer, if
@@ -49,7 +49,7 @@
  * @return #GS1_LINTER_POSITION_EXCEEDS_END if the data contains a position number that is larger than the end position.
  *
  */
-GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* const data, size_t* const err_pos, size_t* const err_len)
+GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* const data, size_t data_len, size_t* const err_pos, size_t* const err_len)
 {
 
 /// \cond
@@ -57,66 +57,102 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_posinseqslash(const char* cons
 #define E(i)    data[i + pos + 1]
 /// \endcond
 
-	size_t pos, len;
+	size_t pos, slash_pos;
 
 	assert(data);
 
-	len = strlen(data);
-
 	/*
-	 * Determine that the format is "<pos>/<end>".
+	 * First non-digit should be '/'
 	 *
 	 */
-	pos = strspn(data, "0123456789");
-	if (pos == 0 || pos >= len - 1 || data[pos] != '/' || strspn(data + pos + 1, "0123456789") != len - pos - 1) {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED;
+	for (pos = 0; pos < data_len && data[pos] >= '0' && data[pos] <= '9'; pos++);
+
+	/*
+	 * Format so far must be digits + '/'
+	 *
+	 */
+	if (GS1_LINTER_UNLIKELY(pos == 0 || pos >= data_len || data[pos] != '/')) {
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+			0,
+			data_len
+		);
 	}
+
+	slash_pos = pos;
+
+	/*
+	 * Validate that remaining characters are digits and measure length
+	 *
+	 */
+	for (pos++; pos < data_len; pos++)
+		if (GS1_LINTER_UNLIKELY(data[pos] < '0' || data[pos] > '9')) {
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+				0,
+				data_len
+			);
+		}
+
+	/*
+	 * Must have digits after slash
+	 */
+	if (GS1_LINTER_UNLIKELY(slash_pos >= data_len - 1))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_IN_SEQUENCE_MALFORMED,
+			0,
+			data_len
+		);
+
+	pos = slash_pos;
 
 	/*
 	 * Ensure position number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (P(0) == '0') {
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = pos;
-		return GS1_LINTER_ILLEGAL_ZERO_PREFIX;
-	}
+	if (GS1_LINTER_UNLIKELY(P(0) == '0'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
+			0,
+			pos
+		);
 
 	/*
 	 * Ensure end number is non-zero and does not have zero prefix.
 	 *
 	 */
-	if (E(0) == '0') {
-		if (err_pos) *err_pos = pos + 1;
-		if (err_len) *err_len = len - pos - 1;
-		return GS1_LINTER_ILLEGAL_ZERO_PREFIX;
-	}
+	if (GS1_LINTER_UNLIKELY(E(0) == '0'))
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_ILLEGAL_ZERO_PREFIX,
+			pos + 1,
+			data_len - pos - 1
+		);
 
 	/*
 	 * Determine whether the position exceeds the end.
 	 *
 	 */
-	if (pos == len - pos - 1) {
+	if (pos == data_len - pos - 1) {
 		size_t i;
 		int compare = 0;		/* -1:P<E ; 0:P==E ; 1:P>E */
 		for (i = 0; i < pos && !compare; i++)
 			if (P(i) != E(i))
 				compare = P(i) < E(i) ? -1 : 1;
-		if (compare == 1) {
-			if (err_pos) *err_pos = 0;
-			if (err_len) *err_len = len;
-			return GS1_LINTER_POSITION_EXCEEDS_END;
-		}
-	} else if (pos > len - pos - 1) {
+		if (GS1_LINTER_UNLIKELY(compare == 1))
+			GS1_LINTER_RETURN_ERROR(
+				GS1_LINTER_POSITION_EXCEEDS_END,
+				0,
+				data_len
+			);
+	} else if (GS1_LINTER_UNLIKELY(pos > data_len - pos - 1))
 		/* Non-zero prefix, so a length check is sufficient. */
-		if (err_pos) *err_pos = 0;
-		if (err_len) *err_len = len;
-		return GS1_LINTER_POSITION_EXCEEDS_END;
-	}
+		GS1_LINTER_RETURN_ERROR(
+			GS1_LINTER_POSITION_EXCEEDS_END,
+			0,
+			data_len
+		);
 
-	return GS1_LINTER_OK;
+	GS1_LINTER_RETURN_OK;
 
 }
 

@@ -1,7 +1,7 @@
 /**
- * GS1 Syntax Engine
+ * GS1 Barcode Syntax Engine
  *
- * @author Copyright (c) 2021-2024 GS1 AISBL.
+ * @author Copyright (c) 2021-2026 GS1 AISBL.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "syntax/gs1syntaxdictionary.h"
 #include "enc-private.h"
 #include "gs1encoders.h"
 #include "dl.h"
+#include "tr.h"
 
 
 typedef enum {
@@ -38,7 +38,7 @@ typedef enum {
 
 
 struct symIdEntry {
-	char symId[2];
+	char symId[3];
 	aiMode_t aiMode;
 	gs1_encoder_symbologies_t sym;
 };
@@ -81,6 +81,8 @@ static const struct symIdEntry symIdTable[] = {
 	SYM( "d2", AI,     gs1_encoder_sDM                 ),
 	SYM( "Q1", NON_AI, gs1_encoder_sQR                 ),
 	SYM( "Q3", AI,     gs1_encoder_sQR                 ),
+	SYM( "J0", NON_AI, gs1_encoder_sDotCode            ),
+	SYM( "J1", AI,     gs1_encoder_sDotCode            ),
 };
 
 #undef SYM
@@ -108,6 +110,7 @@ static const __ATTR_PURE char* lookupSymId(const gs1_encoder* const ctx) {
 
 }
 
+
 static void lookupSymAndModeBySymId(const char* const symId, gs1_encoder_symbologies_t* const sym, aiMode_t* const aiMode) {
 
 	size_t i;
@@ -127,13 +130,10 @@ static void lookupSymAndModeBySymId(const char* const symId, gs1_encoder_symbolo
 }
 
 
-static void scancat(char* const out, const char* const in) {
+static size_t scancat(char* const out, const char* const in, const size_t out_len) {
 
 	const char *p = in;
-	char *q = out;
-
-	while (*q)
-		q++;						// Got to end of output
+	char *q = out + out_len;
 
 	if (*p == '^') {					// GS1 mode
 
@@ -156,53 +156,64 @@ static void scancat(char* const out, const char* const in) {
 	}
 	*q = '\0';
 
+	return (size_t)(q - out);
+
 }
 
 
-static bool validateParity(uint8_t *str) {
+static bool validateParity(uint8_t *str, size_t len) {
 
-	int weight;
+	int w;
 	int parity = 0;
+	size_t i;
 
 	assert(*str);
+	assert(len == strlen((char *)str));
 
-	weight = strlen((char*)str) % 2 == 0 ? 3 : 1;
-	while (*(str+1)) {
-		parity += weight * (*str++ - '0');
-		weight = 4 - weight;
-	}
+	for (i = 0, w = ( len % 2 == 0 ? 3 : 1 ); i < len - 1; i++, w = 4 - w)
+		parity += w * (str[i] - '0');
+
 	parity = (10 - parity%10) % 10;
 
-	if (parity + '0' == *str) return true;
+	if (parity + '0' == str[len-1]) return true;
 
-	*str = (uint8_t)(parity + '0');		// Recalculate
+	str[len-1] = (uint8_t)(parity + '0');		// Recalculate
 	return false;
 
 }
 
 
-static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr, char* const primaryStr, int length) {
+static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dataStr,
+					 char* const outStr, size_t *outStr_len, int length) {
 
-	if (strlen(dataStr) != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
+	size_t dataStr_len = strlen(dataStr);
+	char *primary_out;
+
+	if (dataStr_len != (size_t)(ctx->addCheckDigit ? length-1 : length)) {
 		if (ctx->addCheckDigit)
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits without check digit", length - 1);
+			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS_WITHOUT_CHECK_DIGIT, length - 1);
 		else
-			snprintf(ctx->errMsg, sizeof(ctx->errMsg), "Primary data must be %d digits", length);
+			SET_ERR_V(PRIMARY_DATA_MUST_BE_N_DIGITS, length);
 		return false;
 	}
 
-	if (!gs1_allDigits((uint8_t*)dataStr, 0)) {
-		strcpy(ctx->errMsg, "Primary data must be all digits");
+	if (!gs1_allDigits((uint8_t*)dataStr, dataStr_len)) {
+		SET_ERR(PRIMARY_DATA_MUST_BE_ALL_DIGITS);
 		return false;
 	}
 
-	strcpy(primaryStr, dataStr);
+	primary_out = outStr + *outStr_len;
+	memcpy(primary_out, dataStr, dataStr_len);
+	*outStr_len += dataStr_len;
 
 	if (ctx->addCheckDigit)
-		strcat(primaryStr, "-");
+		outStr[(*outStr_len)++] = '-';
 
-	if (!validateParity((uint8_t*)primaryStr) && !ctx->addCheckDigit) {
-		strcpy(ctx->errMsg, "Primary data check digit is incorrect");
+	outStr[*outStr_len] = '\0';
+
+	if (!validateParity((uint8_t*)primary_out, (size_t)(outStr + *outStr_len - primary_out)) &&
+	    !ctx->addCheckDigit) {
+		SET_ERR(PRIMARY_DATA_CHECK_DIGIT_IS_INCORRECT);
 		return false;
 	}
 
@@ -214,11 +225,12 @@ static bool checkAndNormalisePrimaryData(gs1_encoder* const ctx, const char *dat
 char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	char* cc = NULL;
-	char primaryStr[15];
 	const char *pad;
 	const char *dataStr;
 	int length, aizeros;
 	char* ret;
+	size_t outStr_len = 0;
+	const char* primary_data_out;
 
 	assert(ctx);
 
@@ -231,9 +243,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 
 	case gs1_encoder_sQR:
 	case gs1_encoder_sDM:
+	case gs1_encoder_sDotCode:
 
-		// QR: "]Q1" for plain data; "]Q3" for GS1 data
-		// DM: "]d1" for plain data; "]d2" for GS1 data
+		// QR:      "]Q1" for plain data; "]Q3" for GS1 data
+		// DM:      "]d1" for plain data; "]d2" for GS1 data
+		// DotCode: "]J0" for plain data; "]J1" for GS1 data
 
 		// If plain data then put original faux CC delimiter back
 		if (*ctx->dataStr != '^' && cc) {
@@ -241,9 +255,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			cc = NULL;
 		}
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		scancat(ctx->outStr, ctx->dataStr);
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		ctx->outStr[outStr_len] = '\0';
+		scancat(ctx->outStr, ctx->dataStr, outStr_len);
 		break;
 
 	case gs1_encoder_sGS1_128_CCA:
@@ -253,9 +269,11 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			// "]C1" for linear-only GS1-128
 			if (*ctx->dataStr != '^')
 				goto fail;
-			strcat(ctx->outStr, "]");
-			strncat(ctx->outStr, lookupSymId(ctx), 2);
-			scancat(ctx->outStr, ctx->dataStr);
+			ctx->outStr[outStr_len++] = ']';
+			memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+			outStr_len += 2;
+			ctx->outStr[outStr_len] = '\0';
+			scancat(ctx->outStr, ctx->dataStr, outStr_len);
 			break;
 		}
 
@@ -266,8 +284,10 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// "]e0" followed by concatenated AI data from linear and CC
 		if (*ctx->dataStr != '^')
 			goto fail;
-		strcat(ctx->outStr, CC_SYM_ID);
-		scancat(ctx->outStr, ctx->dataStr);
+		memcpy(ctx->outStr + outStr_len, CC_SYM_ID, sizeof(CC_SYM_ID) - 1);
+		outStr_len += sizeof(CC_SYM_ID) - 1;
+		ctx->outStr[outStr_len] = '\0';
+		outStr_len = scancat(ctx->outStr, ctx->dataStr, outStr_len);
 
 		if (cc) {
 
@@ -280,10 +300,12 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 			// Append GS if last AI of linear component isn't fixed-length
 			for (i = 0; i < ctx->numAIs && ctx->aiData[i].aiEntry; i++)
 				lastAIfnc1 = ctx->aiData[i].aiEntry->fnc1;
-			if (lastAIfnc1)
-				strcat(ctx->outStr, "\x1D");
+			if (lastAIfnc1) {
+				ctx->outStr[outStr_len++] = '\x1D';
+				ctx->outStr[outStr_len] = '\0';
+			}
 
-			scancat(ctx->outStr, cc);
+			scancat(ctx->outStr, cc, outStr_len);
 
 		}
 
@@ -298,29 +320,33 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// "]e0" followed by concatenated AI data from linear and CC
 
 		dataStr = ctx->dataStr;
-		if (strlen(dataStr) >= 3 && strncmp(dataStr, "^01", 3) == 0)
+		if (strncmp(dataStr, "^01", 3) == 0)
 			dataStr += 3;
 
-		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, 14))
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		memcpy(ctx->outStr + outStr_len, "01", 2);
+		outStr_len += 2;
+		ctx->outStr[outStr_len] = '\0';
+
+		primary_data_out = ctx->outStr + outStr_len;
+
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, ctx->outStr, &outStr_len, 14))
 			goto fail;
 
 		// GS1 DataBar Limited is restricted to low-valued inputs
 		if (ctx->sym == gs1_encoder_sDataBarLimited) {
-			if (atof((char*)primaryStr) > 19999999999999.) {
-				strcpy(ctx->errMsg, "Primary data item value is too large");
+			if (primary_data_out[0] >= '2') {	// 14-digits must be less than 2 * 10^13
+				SET_ERR(PRIMARY_DATA_IS_TOO_LARGE);
 				goto fail;
 			}
 		}
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		strcat(ctx->outStr, "01");		// Convert to AI (01)
-		scancat(ctx->outStr, primaryStr);
-
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
-			scancat(ctx->outStr, cc);
+			scancat(ctx->outStr, cc, outStr_len);
 		}
 
 		break;
@@ -349,21 +375,27 @@ char* gs1_generateScanData(gs1_encoder* const ctx) {
 		// If AI data beginning (01) then skip leading zeros of the GTIN-14
 		dataStr = ctx->dataStr;
 		aizeros = 17 - length;
-		if (strlen(dataStr) >= (size_t)aizeros && strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
+		if (strncmp(dataStr, "^01000000", (size_t)aizeros) == 0)
 			dataStr += aizeros;
 
-		if (!checkAndNormalisePrimaryData(ctx, dataStr, primaryStr, length))
+		ctx->outStr[outStr_len++] = ']';
+		memcpy(ctx->outStr + outStr_len, lookupSymId(ctx), 2);
+		outStr_len += 2;
+		if (*pad)
+			ctx->outStr[outStr_len++] = *pad;
+		ctx->outStr[outStr_len] = '\0';
+
+		if (!checkAndNormalisePrimaryData(ctx, dataStr, ctx->outStr, &outStr_len, length))
 			goto fail;
 
-		strcat(ctx->outStr, "]");
-		strncat(ctx->outStr, lookupSymId(ctx), 2);
-		strcat(ctx->outStr, pad);
-		scancat(ctx->outStr, primaryStr);
 		if (cc) {
 			if (*cc != '^')
 				goto fail;
-			strcat(ctx->outStr, "|" CC_SYM_ID);		// "|" means start of new message
-			scancat(ctx->outStr, cc);
+			ctx->outStr[outStr_len++] = '|';
+			memcpy(ctx->outStr + outStr_len, CC_SYM_ID, sizeof(CC_SYM_ID) - 1);
+			outStr_len += sizeof(CC_SYM_ID) - 1;
+			ctx->outStr[outStr_len] = '\0';		// "|" means start of new message
+			scancat(ctx->outStr, cc, outStr_len);
 		}
 		break;
 
@@ -404,24 +436,32 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 	ctx->sym = gs1_encoder_sNONE;
 	*ctx->dataStr = '\0';
 	ctx->numAIs = 0;
+	ctx->numSortedAIs = 0;
 
+	ctx->err = gs1_encoder_eNO_ERROR;
 	*ctx->errMsg = '\0';
 	ctx->linterErr = GS1_LINTER_OK;
 	*ctx->linterErrMarkup = '\0';
 
 	if (*scanData != ']' || strlen(scanData) < 3) {
-		strcpy(ctx->errMsg, "Missing symbology identifier");
+		SET_ERR(MISSING_SYMBOLOGY_IDENTIFIER);
 		goto fail;
 	}
 
 	lookupSymAndModeBySymId(scanData + 1, &sym, &aiMode);
 
 	if (sym == gs1_encoder_sNONE) {
-		strcpy(ctx->errMsg, "Unsupported symbology identifier");
+		SET_ERR(UNSUPPORTED_SYMBOLOGY_IDENTIFIER);
 		goto fail;
 	}
 
 	scanData += 3;
+
+	if (strnlen(scanData, MAX_DATA) >= MAX_DATA) {
+		SET_ERR_V(DATA_TOO_LONG, MAX_DATA - 1);
+		goto fail;
+	}
+
 	ctx->sym = sym;
 	p = ctx->dataStr;
 
@@ -429,30 +469,31 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 		size_t primaryLen = (sym == gs1_encoder_sEAN13) ? 13 : 8;
 		const char *cc = NULL;
+		size_t scanData_len = strlen(scanData);
 
-		if (strlen(scanData) < primaryLen) {
-			strcpy(ctx->errMsg, "Primary scan data is too short");
+		if (scanData_len < primaryLen) {
+			SET_ERR(PRIMARY_SCAN_DATA_IS_TOO_SHORT);
 			goto fail;
 		}
 
-		if (strlen(scanData) >= primaryLen + sizeof(CC_SYM_ID) &&
+		if (scanData_len >= primaryLen + sizeof(CC_SYM_ID) &&
 		    strncmp(scanData + primaryLen, "|" CC_SYM_ID, sizeof(CC_SYM_ID)) == 0) {
 			cc = scanData + primaryLen + sizeof(CC_SYM_ID);
-		} else if (strlen(scanData) > primaryLen) {
-			strcpy(ctx->errMsg, "Primary message is too long");
+		} else if (scanData_len > primaryLen) {
+			SET_ERR(PRIMARY_MESSAGE_IS_TOO_LONG);
 			goto fail;
 		}
 
-		*p = '\0';
-		strncat(p, scanData, primaryLen);
+		memcpy(p, scanData, primaryLen);
+		p[primaryLen] = '\0';
 
-		if (!gs1_allDigits((uint8_t*)p, 0)) {
-			strcpy(ctx->errMsg, "Primary message number only contain digits");
+		if (!gs1_allDigits((uint8_t*)p, primaryLen)) {
+			SET_ERR(PRIMARY_MESSAGE_MAY_ONLY_CONTAIN_DIGITS);
 			goto fail;
 		}
 
-		if (!validateParity((uint8_t*)p)) {
-			strcpy(ctx->errMsg, "Primary message check digit is incorrect");
+		if (!validateParity((uint8_t*)p, primaryLen)) {
+			SET_ERR(PRIMARY_MESSAGE_CHECK_DIGIT_IS_INCORRECT);
 			goto fail;
 		}
 
@@ -474,7 +515,7 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 
 		// Forbid data "^" characters at this stage so we don't conflate with FNC1
 		if (strchr(scanData, '^') != NULL) {
-			strcpy(ctx->errMsg, "Scan data contains illegal ^ character");
+			SET_ERR(SCAN_DATA_CONTAINS_ILLEGAL_CARAT);
 			goto fail;
 		}
 
@@ -499,13 +540,14 @@ bool gs1_processScanData(gs1_encoder* const ctx, const char* scanData) {
 		q++;
 	if (*q == '^')
 		*p++ = '\\';
-	strcpy(p, scanData);
+	strncpy(p, scanData, (size_t)(ctx->dataStr + MAX_DATA - p));
+	ctx->dataStr[MAX_DATA] = '\0';
 
 	// If a GS1 Digital Link URI is given then process it immediately
-	if ((strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "https://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 8 && strncmp(ctx->dataStr, "HTTPS://", 8) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "http://",  7) == 0) ||
-	    (strlen(ctx->dataStr) >= 7 && strncmp(ctx->dataStr, "HTTP://",  7) == 0)) {
+	if (strncmp(ctx->dataStr, "https://", 8) == 0 ||
+	    strncmp(ctx->dataStr, "HTTPS://", 8) == 0 ||
+	    strncmp(ctx->dataStr, "http://",  7) == 0 ||
+	    strncmp(ctx->dataStr, "HTTP://",  7) == 0) {
 		// We extract AIs with the element string stored in dlAIbuffer
 		if (!gs1_parseDLuri(ctx, ctx->dataStr, ctx->dlAIbuffer))
 			goto fail;
@@ -518,7 +560,7 @@ fail:
 	*ctx->dataStr = '\0';
 	ctx->sym = gs1_encoder_sNONE;
 	if (*ctx->errMsg == '\0')
-		strcpy(ctx->errMsg, "Failed to process scan data");
+		SET_ERR(FAILED_TO_PROCESS_SCAN_DATA);
 
 	return false;
 
@@ -543,20 +585,20 @@ void test_scandata_validateParity(void) {
 	char good_gtin8[]  = "02345680";
 	char bad_gtin8[]   = "02345689";
 
-	TEST_CHECK(validateParity((uint8_t*)good_gtin14));
-	TEST_CHECK(!validateParity((uint8_t*)bad_gtin14));
+	TEST_CHECK(validateParity((uint8_t*)good_gtin14, strlen(good_gtin14)));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin14, strlen(bad_gtin14)));
 	TEST_CHECK(bad_gtin14[13] == '5');		// Recomputed
 
-	TEST_CHECK(validateParity((uint8_t*)good_gtin13));
-	TEST_CHECK(!validateParity((uint8_t*)bad_gtin13));
+	TEST_CHECK(validateParity((uint8_t*)good_gtin13, strlen(good_gtin13)));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin13, strlen(bad_gtin13)));
 	TEST_CHECK(bad_gtin13[12] == '7');		// Recomputed
 
-	TEST_CHECK(validateParity((uint8_t*)good_gtin12));
-	TEST_CHECK(!validateParity((uint8_t*)bad_gtin12));
+	TEST_CHECK(validateParity((uint8_t*)good_gtin12, strlen(good_gtin12)));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin12, strlen(bad_gtin12)));
 	TEST_CHECK(bad_gtin12[11] == '8');		// Recomputed
 
-	TEST_CHECK(validateParity((uint8_t*)good_gtin8));
-	TEST_CHECK(!validateParity((uint8_t*)bad_gtin8));
+	TEST_CHECK(validateParity((uint8_t*)good_gtin8, strlen(good_gtin8)));
+	TEST_CHECK(!validateParity((uint8_t*)bad_gtin8, strlen(bad_gtin8)));
 	TEST_CHECK(bad_gtin8[7] == '0');		// Recomputed
 
 }
@@ -605,6 +647,8 @@ void test_scandata_generateScanData(void) {
 	test_testGenerateScanData(QR, "\\\\^TESTING", "]Q1\\^TESTING");		// Escaped data "\^" characters
 	test_testGenerateScanData(QR, "^011231231231233310ABC123^99TESTING",
 		"]Q3011231231231233310ABC123" "\x1D" "99TESTING");
+	test_testGenerateScanData(QR, "^011231231231233310ABC123^99TESTING^",
+		"]Q3011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
 
 	/* DM */
 	test_testGenerateScanData(DM, "TESTING", "]d1TESTING");
@@ -614,6 +658,15 @@ void test_scandata_generateScanData(void) {
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING");
 	test_testGenerateScanData(DM, "^011231231231233310ABC123^99TESTING^",
 		"]d2011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
+
+	/* DotCode */
+	test_testGenerateScanData(DotCode, "TESTING", "]J0TESTING");
+	test_testGenerateScanData(DotCode, "\\^TESTING", "]J0^TESTING");	// Escaped data "^" character
+	test_testGenerateScanData(DotCode, "\\\\^TESTING", "]J0\\^TESTING");	// Escaped data "\^" characters
+	test_testGenerateScanData(DotCode, "^011231231231233310ABC123^99TESTING",
+		"]J1011231231231233310ABC123" "\x1D" "99TESTING");
+	test_testGenerateScanData(DotCode, "^011231231231233310ABC123^99TESTING^",
+		"]J1011231231231233310ABC123" "\x1D" "99TESTING" "\x1D");	// Trailing FNC1 is not stripped
 
 	/* DataBar Expanded */
 	test_testGenerateScanData(DataBarExpanded, "^011231231231233310ABC123^99TESTING",
@@ -669,6 +722,86 @@ void test_scandata_generateScanData(void) {
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
 	test_testGenerateScanData(EAN8, "02345673|^99COMPOSITE^98XYZ",
 		"]E402345673|]e099COMPOSITE" "\x1D" "98XYZ");
+
+
+	/*
+	 *  checkAndNormalisePrimaryData error paths
+	 *
+	 */
+
+	/* Wrong-length primary data */
+	test_testGenerateScanData(EAN13, "2112345678", NULL);		// Too short for 13-digit EAN-13
+
+	/* Non-digit primary data */
+	test_testGenerateScanData(EAN13, "ABCDEFGHIJKLM", NULL);
+
+	/* Bad check digit */
+	test_testGenerateScanData(EAN13, "2112345678901", NULL);	// Wrong check digit (correct: 2112345678900)
+
+	/* addCheckDigit: wrong-length data */
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	test_testGenerateScanData(EAN13, "2112345678", NULL);		// Too short for addCheckDigit (needs 12)
+	test_testGenerateScanData(EAN13, "2112345678901", NULL);	// Too long for addCheckDigit (needs 12)
+	gs1_encoder_setAddCheckDigit(ctx, false);
+
+
+	/*
+	 *  generateScanData failure paths
+	 *
+	 */
+
+	/* QR plain data with CC delimiter: pipe is restored (lines 252-256) */
+	test_testGenerateScanData(QR, "TESTING|^99XYZ", "]Q1TESTING|^99XYZ");
+
+	/* GS1-128 linear-only with plain data (no ^ prefix) fails (lines 270-271) */
+	test_testGenerateScanData(GS1_128_CCA, "PLAINDATA", NULL);
+
+	/* DataBar Expanded with plain data (no ^ prefix) fails (lines 285-286) */
+	test_testGenerateScanData(DataBarExpanded, "PLAINDATA", NULL);
+
+	/* DataBar Limited primary data too large (first digit >= '2') */
+	test_testGenerateScanData(DataBarLimited, "20000000000004", NULL);
+
+	/*
+	 *  Composite with plain CC (no ^ prefix): bypasses setDataStr
+	 *  because setDataStr rejects the CC part, so we set data directly
+	 *
+	 */
+	{
+		const char *out;
+
+		/* DataBar Omni composite with plain CC */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
+		strcpy(ctx->dataStr, "24012345678905|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* EAN-13 composite with plain CC */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sEAN13));
+		strcpy(ctx->dataStr, "2112345678900|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* GS1-128 composite with plain CC (line 298) */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
+		strcpy(ctx->dataStr, "^0112312312312333|PLAINCC");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+
+		/* DataBar Omni with bad primary data (line 336) */
+		TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarOmni));
+		strcpy(ctx->dataStr, "SHORT");
+		out = gs1_generateScanData(ctx);
+		TEST_CHECK(out == NULL);
+	}
+
+	/*
+	 *  addCheckDigit: successful path appends '-' placeholder (line 210)
+	 *
+	 */
+	gs1_encoder_setAddCheckDigit(ctx, true);
+	test_testGenerateScanData(EAN13, "211234567890", "]E02112345678900");	// Check digit computed from '-' placeholder
+	gs1_encoder_setAddCheckDigit(ctx, false);
 
 #undef test_testGenerateScanData
 
@@ -756,17 +889,20 @@ void test_scandata_processScanData(void) {
 		DM, "https://example.com/01/12312312312333?99=TEST");
 	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
-	/* DM with GS1 Digital Link URI (uppercase scheme) */
-	*ctx->dlAIbuffer = '\0';
-	test_testProcessScanData(true, "]d1HTTPS://example.com/01/12312312312333?99=TEST",
-		DM, "HTTPS://example.com/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
+	/* DotCode */
+	test_testProcessScanData(true, "]J0", DotCode, "");
+	test_testProcessScanData(true, "]J0TESTING", DotCode, "TESTING");
+	test_testProcessScanData(true, "]J0^TESTING", DotCode, "\\^TESTING");
+	test_testProcessScanData(true, "]J0\\^TESTING", DotCode, "\\\\^TESTING");
+	test_testProcessScanData(false, "]J1", NONE, "");		// Empty GS1 data
+	test_testProcessScanData(true, "]J1011231231231233310ABC123" "\x1D" "99TESTING",
+		DotCode, "^011231231231233310ABC123^99TESTING");
 
-	/* DM with GS1 Digital Link URI (forbidden mixed-case scheme) */
+	/* DotCode with GS1 Digital Link URI - carrier is suitable, but no active applications support this */
 	*ctx->dlAIbuffer = '\0';
-	test_testProcessScanData(true, "]d1HtTps://example.com/01/12312312312333?99=TEST",
-		DM, "HtTps://example.com/01/12312312312333?99=TEST");
-	TEST_CHECK(strcmp(ctx->dlAIbuffer, "") == 0);	// Check AI extraction
+	test_testProcessScanData(true, "]J0https://example.com/01/12312312312333?99=TEST",
+		DotCode, "https://example.com/01/12312312312333?99=TEST");
+	TEST_CHECK(strcmp(ctx->dlAIbuffer, "^011231231231233399TEST") == 0);	// Check AI extraction
 
 	/* DataBar Expanded, shared with all DataBar family and UCC-128 Composite */
 	test_testProcessScanData(false, "]e0", NONE, "");		// Empty GS1 data
@@ -803,6 +939,38 @@ void test_scandata_processScanData(void) {
 		EAN8, "02345673");
 	test_testProcessScanData(true, "]E402345673|]e099COMPOSITE" "\x1D" "98XYZ",
 		EAN8, "02345673|^99COMPOSITE^98XYZ");
+
+	/*
+	 *  MAX_DATA boundary
+	 *
+	 *  Use "]Q1" (QR plain data) to avoid GS1 AI processing.
+	 *  The 3-byte prefix is consumed, so the payload after it
+	 *  must have strlen < MAX_DATA.
+	 *
+	 */
+	{
+		static char scanbuf[MAX_DATA+5];
+		int j;
+
+		memcpy(scanbuf, "]Q1", 3);
+		for (j = 3; j < MAX_DATA + 4; j++)
+			scanbuf[j] = 'a';
+
+		// Payload = MAX_DATA - 1 chars: passes length check
+		scanbuf[3 + MAX_DATA - 1] = '\0';
+		TEST_CHECK(gs1_encoder_setScanData(ctx, scanbuf));
+
+		// Payload = MAX_DATA chars: triggers DATA_TOO_LONG
+		scanbuf[3 + MAX_DATA - 1] = 'a';
+		scanbuf[3 + MAX_DATA] = '\0';
+		TEST_CHECK(!gs1_encoder_setScanData(ctx, scanbuf));
+	}
+
+	/* Scan data with illegal carat in GS1-128 AI data */
+	test_testProcessScanData(false, "]C101123123123133^10ABC", NONE, "");
+
+	/* Plain scan data with invalid DL URI (no primary AI) */
+	test_testProcessScanData(false, "]Q1https://a/NOPRIMARYAI", NONE, "");
 
 #undef test_testProcessScanData
 
