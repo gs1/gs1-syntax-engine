@@ -1,26 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>gs1encoders_dotnet</RootNamespace>
     <AssemblyName>gs1encoders-dotnet</AssemblyName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  
-  <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
-    <NativePlatformDir Condition="'$(PlatformTarget)' == 'x86'">Win32</NativePlatformDir>
-    <NativePlatformDir Condition="'$(NativePlatformDir)' == ''">x64</NativePlatformDir>
+    <Gs1NativeRid Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</Gs1NativeRid>
+    <Gs1NativeRid Condition="'$(Gs1NativeRid)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">win-x64</Gs1NativeRid>
+    <Gs1NativeRid Condition="'$(Gs1NativeRid)' == '' and $([MSBuild]::IsOSPlatform('Linux'))">linux-x64</Gs1NativeRid>
+    <Gs1NativeRid Condition="'$(Gs1NativeRid)' == '' and $([MSBuild]::IsOSPlatform('OSX'))">osx-x64</Gs1NativeRid>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\c-lib\build\library\$(NativePlatformDir)\$(Configuration)\gs1encoders.dll"
-          CopyToOutputDirectory="PreserveNewest"
-          Link="gs1encoders.dll" />
+    <None Remove="runtimes\**\native\*.dll" />
+    <None Remove="runtimes\**\native\*.so" />
+    <None Remove="runtimes\**\native\*.dylib" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Gs1RuntimeNative Include="runtimes\**\native\*.dll" />
+    <Gs1RuntimeNative Include="runtimes\**\native\*.so" />
+    <Gs1RuntimeNative Include="runtimes\**\native\*.dylib" />
+    <None Include="@(Gs1RuntimeNative)" Pack="true" PackagePath="%(Identity)" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Gs1NativeRid)' != ''">
+    <Gs1NativeOutputAsset Include="runtimes\$(Gs1NativeRid)\native\*.dll" />
+    <Gs1NativeOutputAsset Include="runtimes\$(Gs1NativeRid)\native\*.so" />
+    <Gs1NativeOutputAsset Include="runtimes\$(Gs1NativeRid)\native\*.dylib" />
+  </ItemGroup>
+
+  <Target Name="CopyGs1NativeAssets" AfterTargets="CopyFilesToOutputDirectory" Condition="'@(Gs1NativeOutputAsset)' != ''">
+    <Copy
+      SourceFiles="@(Gs1NativeOutputAsset)"
+      DestinationFiles="@(Gs1NativeOutputAsset->'$(OutDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

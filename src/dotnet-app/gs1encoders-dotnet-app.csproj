@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <RootNamespace>gs1encoders_dotnet_app</RootNamespace>
     <UseWPF>true</UseWPF>
     <StartupObject>GS1.EncodersApp.App</StartupObject>
@@ -26,5 +25,9 @@
   <ItemGroup>
     <ProjectReference Include="..\dotnet-lib\gs1encoders-dotnet-lib.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y /d &quot;..\c-lib\build\library\x64\$(Configuration)\gs1encoders.dll&quot; &quot;bin\$(Configuration)\$(TargetFramework)\&quot;" />
+  </Target>
 
 </Project>
