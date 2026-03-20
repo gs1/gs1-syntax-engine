@@ -134,7 +134,8 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
     </ClCompile>
     <PostBuildEvent>
-      <Command>xcopy /y gs1encoders.h "$(OutDir)"</Command>
+      <Command>xcopy /y gs1encoders.h "$(OutDir)"
+xcopy /y "$(OutDir)gs1encoders.dll" "$(ProjectDir)..\dotnet-lib\runtimes\win-x64\native\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
