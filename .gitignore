@@ -37,3 +37,4 @@ src/js-wasm/example-web-service-user-dotnet-app/obj/
 .DS_Store
 **/project.xcworkspace/xcuserdata/*
 /src/dotnet-lib/artifacts/verify
+/src/dotnet-lib/artifacts/review
