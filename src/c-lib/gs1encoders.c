@@ -422,7 +422,7 @@ bool gs1_encoder_setAIdataStr(gs1_encoder* const ctx, const char* const aiData) 
 	// Validate AI data
 	ctx->numAIs = 0;
 	ctx->numSortedAIs = 0;
-	if ((cc = strchr(aiData, '|')) != NULL)		// Composite symbol
+	if ((cc = strchr((char*)aiData, '|')) != NULL)	// Composite symbol
 	{
 
 		char* p;

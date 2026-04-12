@@ -143,7 +143,7 @@ fail:
 int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
 	const struct aiEntry *lastEntry;
-	const char *token;
+	char *token;
 	char *saveptr = NULL;
 	char *p;
 	size_t len;

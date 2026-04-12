@@ -489,10 +489,10 @@ static ssize_t URIescape(char* const out, const size_t maxlen, const char* const
 bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const dataStr) {
 
 	char* p, *r;
-	const char* pi = NULL;	// Path info
+	char* pi = NULL;	// Path info
 	char* qp = NULL;	// Query params
 	char* fr = NULL;	// Fragment
-	const char* dp = NULL;	// DL path info
+	char* dp = NULL;	// DL path info
 	bool ret;
 	bool fnc1req = true;
 	char (*pathAIseq)[MAX_AI_LEN+1];
@@ -559,7 +559,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 
 	// Search backwards from the end of the path info looking for an
 	// "/AI/value" pair where AI is a DL primary key
-	r = (char *)pi + strlen(pi);			// Start from end
+	r = pi + strlen(pi);				// Start from end
 	while (r > pi) {
 		const struct aiEntry* entry = NULL;
 		size_t ailen;
@@ -614,7 +614,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 	DEBUG_PRINT("  DL path info: %s\n", dp);
 
 	// Process each AI value pair in the DL path info
-	p = (char*)dp;
+	p = dp;
 	numPathAIs = 0;
 	while (*p) {
 
