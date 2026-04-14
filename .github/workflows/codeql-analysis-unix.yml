@@ -57,7 +57,14 @@ jobs:
           rm -rf src/java
           rm -rf src/ios
 
-      - name: Initialize CodeQL
+      - if: matrix.language == 'c-cpp'
+        name: Initialize CodeQL (C/C++)
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+
+      - if: matrix.language != 'c-cpp'
+        name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
