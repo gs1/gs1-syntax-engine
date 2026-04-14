@@ -20,7 +20,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -60,7 +60,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -94,7 +94,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -133,7 +133,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -159,12 +159,12 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: MSVC CI
         run: |
@@ -196,7 +196,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -237,7 +237,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -253,7 +253,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -278,7 +278,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -296,7 +296,7 @@ jobs:
           [ "$(find plist/ -name '*.html')" = '' ];
 
       - name: "clang static analyzer: Store assets on failure"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: clang-scan.tgz
           path: plist/**/*.html
@@ -364,11 +364,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -384,11 +384,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -405,15 +405,15 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Add JDK to PATH
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -441,9 +441,9 @@ jobs:
 
     steps:
 
-      - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v16
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -452,7 +452,7 @@ jobs:
           make -C src/c-lib -j "$(nproc)" wasm
           ls -l src/c-lib/build-wasm
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
 
@@ -497,9 +497,9 @@ jobs:
 
     steps:
 
-      - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v16
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -509,7 +509,7 @@ jobs:
             JSONLY=yes
           ls -l src/c-lib/build-wasm
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
 
@@ -554,11 +554,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: src/ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
@@ -581,11 +581,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -609,12 +609,12 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Windows release build
         run: |
@@ -677,7 +677,7 @@ jobs:
             windows-libs\
 
       - name: Store Windows development libs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-libs
           path: windows-libs/
@@ -692,7 +692,7 @@ jobs:
             ../../../../gs1-syntax-dictionary.txt
 
       - name: Store Windows console app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-console-app
           path: "\
@@ -710,7 +710,7 @@ jobs:
             ../../../../../../c-lib/gs1-syntax-dictionary.txt
 
       - name: Store Windows GUI app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-gui-app
           path: "\
@@ -727,7 +727,7 @@ jobs:
             gs1encoders-example-web-service-user-dotnet-app.exe
 
       - name: Store Windows Web service user app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-web-service-user-app
           path: "\
@@ -755,7 +755,7 @@ jobs:
           7z a ..\gs1encoders-windows-dotnet-lib.zip *
 
       - name: Store .NET wrapper library
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-dotnet-lib
           path: gs1encoders-windows-dotnet-lib.zip
@@ -771,7 +771,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -788,7 +788,7 @@ jobs:
             gs1-syntax-dictionary.txt
 
       - name: Store Linux build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-app
           path: src/c-lib/build/gs1encoders-linux-app.tgz
@@ -803,9 +803,9 @@ jobs:
 
     steps:
 
-      - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v16
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -823,7 +823,7 @@ jobs:
             example-web-service.node.mjs
 
       - name: Store WASM build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wasm-app
           path: src/js-wasm/gs1encoders-wasm-app.zip
@@ -839,9 +839,9 @@ jobs:
 
     steps:
 
-      - uses: mymindstorm/setup-emsdk@v14
+      - uses: mymindstorm/setup-emsdk@v16
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -859,7 +859,7 @@ jobs:
             example-web-service.node.mjs
 
       - name: Store JSONLY build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jsonly-app
           path: src/js-wasm/gs1encoders-jsonly-app.zip
@@ -903,42 +903,42 @@ jobs:
     steps:
 
       - name: Load Windows libs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows-libs
 
       - name: Load Windows .NET wrapper library
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows-dotnet-lib
 
       - name: Load Windows console app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows-console-app
 
       - name: Load Windows GUI app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows-gui-app
 
       - name: Load Windows Web Service User app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows-web-service-user-app
 
       - name: Load Linux app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: linux-app
 
       - name: Load WASM app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: wasm-app
 
       - name: Load JSONLY app
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jsonly-app
 
