@@ -943,21 +943,19 @@ jobs:
           name: jsonly-app
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          files: |
-            gs1encoders-windows-libs-x64.zip
-            gs1encoders-windows-libs-x86.zip
-            gs1encoders-windows-dotnet-lib.zip
-            gs1encoders-windows-console-app.zip
-            gs1encoders-windows-gui-app.zip
-            gs1encoders-linux-app.tgz
-            gs1encoders-wasm-app.zip
-            gs1encoders-jsonly-app.zip
-            example-web-service-user-app.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "${TAG}" \
+            --title "${TAG}" \
+            gs1encoders-windows-libs-x64.zip \
+            gs1encoders-windows-libs-x86.zip \
+            gs1encoders-windows-dotnet-lib.zip \
+            gs1encoders-windows-console-app.zip \
+            gs1encoders-windows-gui-app.zip \
+            gs1encoders-linux-app.tgz \
+            gs1encoders-wasm-app.zip \
+            gs1encoders-jsonly-app.zip \
+            example-web-service-user-app.zip
