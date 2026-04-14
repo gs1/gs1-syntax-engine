@@ -78,7 +78,6 @@ jobs:
         run: |
           make -C src/c-lib -j "$(nproc)"
           make -C src/c-lib -j "$(nproc)" test
-          make -C src/c-lib -j "$(nproc)" fuzzer
 
       - if: matrix.language == 'java-kotlin'
         uses: actions/setup-java@v5
