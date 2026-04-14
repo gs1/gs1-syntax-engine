@@ -1,4 +1,4 @@
-import jsoncParser from "jsonc-eslint-parser";
+import * as jsoncParser from "jsonc-eslint-parser";
 import tsParser from "@typescript-eslint/parser";
 
 export default [
