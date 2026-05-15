@@ -41,7 +41,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	size_t i;
 
 	if (!ctx) {
-		ctx = gs1_encoder_init(NULL);
+		ctx = gs1_encoder_init_ex(NULL, NULL);
 		assert(ctx);
 	}
 

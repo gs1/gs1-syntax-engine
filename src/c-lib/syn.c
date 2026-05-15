@@ -33,7 +33,6 @@
 #include "syntax/gs1syntaxdictionary.h"
 
 
-#define DEFAULT_SYNTAX_FILENAME "gs1-syntax-dictionary.txt"
 #define AI_TABLE_CAPACITY 750
 #define MAX_SD_ENTRY_LEN 150
 
@@ -381,7 +380,7 @@ fail:
 
 }
 
-static struct aiEntry* parseSyntaxDictionaryFile(gs1_encoder* const ctx, const char* const fname) {
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* const fname) {
 
 	const uint16_t cap = AI_TABLE_CAPACITY;
 	FILE *fp = NULL;
@@ -435,27 +434,6 @@ fail:
 #undef error_v
 
 
-struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char *fname, bool quiet) {
-
-	struct aiEntry *sd;
-
-	const char* const filename = fname ? fname : DEFAULT_SYNTAX_FILENAME;
-
-	/*
-	 * If a name isn't provided then attempt to load the default Syntax Dictionary file.
-	 *
-	 */
-	if ((sd = parseSyntaxDictionaryFile(ctx, filename)) == NULL) {
-		if (!quiet) {
-			printf("\n*** Failed to parse Syntax Dictionary file: %s\n", filename);
-			printf("*** %s\n", ctx->errMsg);
-		}
-	}
-
-	return sd;
-
-}
-
 void gs1_freeSyntaxDictionaryEntries(const gs1_encoder* const ctx, struct aiEntry *sd) {
 
 	(void)ctx;
@@ -478,6 +456,7 @@ void gs1_freeSyntaxDictionaryEntries(const gs1_encoder* const ctx, struct aiEntr
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+#include "unittest.h"
 
 static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const sdEntry, const struct aiEntry expectedAIentries[], bool expectSuccess) {
 
@@ -850,7 +829,7 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 	size_t i;
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(tests_parse_sd_entry); i++)
@@ -865,15 +844,15 @@ void test_syn_allocFailures(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	/*
-	 *  parseSyntaxDictionaryFile: malloc failure for AI table
+	 *  gs1_loadSyntaxDictionary: malloc failure for AI table
 	 *
 	 */
 	test_alloc_fail_at = 1;
-	TEST_CHECK(gs1_loadSyntaxDictionary(ctx, NULL, true) == NULL);
+	TEST_CHECK(gs1_loadSyntaxDictionary(ctx, "gs1-syntax-dictionary.txt") == NULL);
 	test_alloc_fail_at = 0;
 
 	gs1_encoder_free(ctx);

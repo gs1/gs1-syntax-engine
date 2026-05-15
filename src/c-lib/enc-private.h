@@ -303,6 +303,7 @@ ssize_t gs1_binarySearch(const void* needle, const void* haystack, const size_t 
 void test_api_getVersion(void);
 void test_api_instanceSize(void);
 void test_api_init(void);
+void test_api_init_deprecatedFlags(void);
 void test_api_defaults(void);
 void test_api_sym(void);
 void test_api_addCheckDigit(void);

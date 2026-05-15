@@ -33,7 +33,7 @@
 struct aiEntry;
 
 
-struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *fname, bool quiet);
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *const fname);
 void gs1_freeSyntaxDictionaryEntries(const gs1_encoder *ctx, struct aiEntry *sd);
 
 // Exposed for fuzzing

@@ -572,6 +572,7 @@ fail:
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+#include "unittest.h"
 
 
 void test_scandata_validateParity(void) {
@@ -632,7 +633,7 @@ void test_scandata_generateScanData(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 
 #define test_testGenerateScanData(n, d, e) do {							\
 	do_test_testGenerateScanData(ctx, __FILE__, __LINE__, #n, gs1_encoder_s##n, d, e);	\
@@ -832,7 +833,7 @@ void test_scandata_processScanData(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);											// Satisfy analyzer
 
 #define test_testProcessScanData(ss, sd, s, d) do {							\

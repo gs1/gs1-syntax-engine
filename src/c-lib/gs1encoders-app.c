@@ -165,7 +165,8 @@ int main(int argc, const char* const argv[]) {
 	gs1_encoder* ctx;
 	gs1_encoder_init_status_t status;
 	char msg[256] = { 0 };
-
+	const char *syntaxDictionary = NULL;
+	int i;
 
 	/*
 	 *  Initialise the library using the extended interface.
@@ -176,12 +177,32 @@ int main(int argc, const char* const argv[]) {
 	 *
 	 */
 	gs1_encoder_init_opts_t opts = {
-		.struct_size	= sizeof(gs1_encoder_init_opts_t),
-		.flags		= gs1_encoder_iQUIET|gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
-		.status		= &status,
-		.msgBuf		= msg,
-		.msgBufSize	= sizeof(msg)
+		.struct_size		= sizeof(gs1_encoder_init_opts_t),
+		.status			= &status,
+		.msgBuf			= msg,
+		.msgBufSize		= sizeof(msg),
 	};
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--syndict") == 0 && i + 1 < argc) {
+			syntaxDictionary = argv[++i];
+		}
+	}
+
+	/*
+	 *  An explicit --syndict path is honoured strictly: init fails if
+	 *  the file cannot be loaded. Without --syndict the console app
+	 *  attempts to pick up gs1-syntax-dictionary.txt from the current
+	 *  directory, falling back to the embedded AI table if the file
+	 *  is absent or malformed.
+	 *
+	 */
+	if (syntaxDictionary) {
+		opts.syntaxDictionary = syntaxDictionary;
+	} else {
+		opts.flags		= gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR;
+		opts.syntaxDictionary	= "gs1-syntax-dictionary.txt";
+	}
 
 	ctx = gs1_encoder_init_ex(NULL, &opts);
 
@@ -203,7 +224,9 @@ int main(int argc, const char* const argv[]) {
 	}
 
 
-	if (argc == 2 && strcmp(argv[1],"--version") == 0) {
+	if ((argc == 2 && strcmp(argv[1],"--version") == 0) ||
+	    (argc == 4 && argv[1] && argv[3] &&
+	     strcmp(argv[1],"--syndict") == 0 && strcmp(argv[3],"--version") == 0)) {
 		printf("Application version: " RELEASE "\n");
 		printf("Library version: %s\n", gs1_encoder_getVersion());
 		goto out;

@@ -62,6 +62,12 @@
 #  define GS1_ENCODERS_DEPRECATED
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#  define GS1_ENCODERS_DEPRECATED_ENUM __attribute__((__deprecated__))
+#else
+#  define GS1_ENCODERS_DEPRECATED_ENUM
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,11 +124,11 @@ typedef enum gs1_encoder_validations gs1_encoder_validations_t;
 
 /// Initialisation flags for gs1_encoder_init_ex().
 enum gs1_encoder_init_flags {
-	gs1_encoder_iDEFAULT                   = 0,		///< Default: Use Syntax Dictionary if the file exists, otherwise fallback to the embedded AI table (if compiled in).
-	gs1_encoder_iNO_SYNDICT                = 1 << 0,	///< Disable use of the Syntax Dictionary, even if the file exists.
-	gs1_encoder_iNO_EMBEDDED               = 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
-	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR = 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing error with the Syntax Dictionary.
-	gs1_encoder_iQUIET                     = 1 << 3,	///< Suppress initialisation error output to stdout.
+	gs1_encoder_iDEFAULT							= 0,		///< Default: Use the embedded AI table (if compiled in). Set @ref gs1_encoder_init_opts::syntaxDictionary to load a Syntax Dictionary file instead.
+	gs1_encoder_iNO_SYNDICT			GS1_ENCODERS_DEPRECATED_ENUM	= 1 << 0,	///< @deprecated No-op, retained for source/ABI compatibility. Syntax Dictionary loading is now controlled by @ref gs1_encoder_init_opts::syntaxDictionary: it is loaded only when a non-NULL path is provided.
+	gs1_encoder_iNO_EMBEDDED						= 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
+	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR					= 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit @ref gs1_encoder_init_opts::syntaxDictionary fails.
+	gs1_encoder_iQUIET			GS1_ENCODERS_DEPRECATED_ENUM	= 1 << 3,	///< @deprecated No-op, retained for source/ABI compatibility. The library no longer writes initialisation messages to stdout; error information is returned via @ref gs1_encoder_init_opts::status and @ref gs1_encoder_init_opts::msgBuf.
 };
 
 
@@ -136,10 +142,10 @@ typedef enum gs1_encoder_init_flags gs1_encoder_init_flags_t;
 /// Initialisation status codes returned by gs1_encoder_init_ex().
 enum gs1_encoder_init_status {
 	GS1_ENCODERS_INIT_SUCCESS                    =  0,	///< Initialised successfully
-	GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< An indication that the Syntax Dictionary was either not found, or a parse error encountered with ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR enabled, therefore the embedded AI table was loaded.
+	GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE =  1,	///< The explicit @ref gs1_encoder_init_opts::syntaxDictionary could not be loaded (e.g. file not found or parse error), but ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR was set, so the embedded AI table was loaded instead.
 	GS1_ENCODERS_INIT_FAILED_NO_MEM              = -1,	///< Memory allocation failed during initialisation.
 	GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE   = -2,	///< The embedded AI table would be used but it is compiled out or disabled (::gs1_encoder_iNO_EMBEDDED is set).
-	GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR not set).
+	GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT     = -3,	///< The explicit @ref gs1_encoder_init_opts::syntaxDictionary could not be loaded (e.g. file not found or parse error) and ::gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR was not set.
 	GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT    = -4,	///< The embedded AI table failed to process.
 };
 
@@ -157,11 +163,12 @@ typedef enum gs1_encoder_init_status gs1_encoder_init_status_t;
  * @note Legacy code will continue to work if new fields are added at the end.
  */
 struct gs1_encoder_init_opts {
-	size_t struct_size;				///< Must be initialised to sizeof(gs1_encoder_init_opts_t)
-	gs1_encoder_init_flags_t flags;			///< Initialization flags (bitwise OR of gs1_encoder_init_flags values)
-	gs1_encoder_init_status_t *status;		///< Optional pointer to receive initialisation status code (may be NULL)
-	char *msgBuf;					///< Optional buffer to receive error message (may be NULL)
-	size_t msgBufSize;				///< Size of msgBuf in bytes (0 if no buffer)
+	size_t struct_size;			///< Must be initialised to sizeof(gs1_encoder_init_opts_t)
+	gs1_encoder_init_flags_t flags;		///< Initialization flags (bitwise OR of gs1_encoder_init_flags values)
+	gs1_encoder_init_status_t *status;	///< Optional pointer to receive initialisation status code (may be NULL)
+	char *msgBuf;				///< Optional buffer to receive error message (may be NULL)
+	size_t msgBufSize;			///< Size of msgBuf in bytes (0 if no buffer)
+	const char *syntaxDictionary;		///< Optional path to a Syntax Dictionary file. NULL (default) uses the embedded AI table.
 };
 
 
@@ -311,19 +318,20 @@ GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
  * char msg[256]		// Sufficient, otherwise would truncate
  *
  * gs1_encoder_init_opts_t opts = {
- * 	.struct_size = sizeof(gs1_encoder_init_opts_t),
+ * 	.struct_size      = sizeof(gs1_encoder_init_opts_t),
  *
- *	// Silent fallback to the embedded AI table on Syntax Dictionary parse errors
- * 	.flags       = gs1_encoder_iQUIET|gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+ *	// Fallback to the embedded AI table if the Syntax Dictionary cannot be loaded
+ * 	.flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+ * 	.syntaxDictionary = "gs1-syntax-dictionary.txt",
  *
- * 	.status      = &status,		// What happened?
- * 	.msgBuf      = msg,		// Description of error or warning
- * 	.msgBufSize  = sizeof(msg)
+ * 	.status           = &status,	// What happened?
+ * 	.msgBuf           = msg,	// Description of error or warning
+ * 	.msgBufSize       = sizeof(msg)
  * };
  *
  * ctx = gs1_encoder_init_ex(NULL, &opts);
  *
- * // Initialisation failed, so do something with status or simply report the error
+ * // Initialisation failed, so do something based on status or simply report the error
  * if (ctx == NULL) {
  * 	printf("Failed to initialise GS1 Encoders library!\n");
  * 	if (*msg)

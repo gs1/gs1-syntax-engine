@@ -108,7 +108,7 @@ static inline __ATTR_PURE uint8_t aiLengthByPrefix(const gs1_encoder* const ctx,
 }
 
 
-bool gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable, bool quiet) {
+bool gs1_setAItable(gs1_encoder* const ctx, struct aiEntry *aiTable) {
 
 	struct aiEntry *e;
 
@@ -134,10 +134,6 @@ redo:
 		aiTable = embedded_ai_table;
 		ctx->aiTableIsDynamic = false;
 #else
-		if (!quiet) {
-			printf("*** Embedded AI table is not available.\n");
-			printf("***  Unable to continue. STOPPING.\n");
-		}
 		strcpy(ctx->errMsg, "Embedded AI table is not available");
 		return false;
 #endif
@@ -159,23 +155,13 @@ redo:
 
 fail:
 
-	if (!quiet) {
-		printf("*** Failed to process the AI table.\n");
-		printf("*** %s\n", ctx->errMsg);
-	}
-
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 	if (aiTable != embedded_ai_table) {
-		if (!quiet)
-			printf("*** Loading embedded AI table as a fallback!\n");
 		aiTable = embedded_ai_table;
 		goto redo;
 	}
 #endif
 
-	// cppcheck-suppress duplicateCondition
-	if (!quiet)
-		printf("*** Unable to continue. STOPPING.\n");
 	return false;
 
 }
@@ -1079,12 +1065,13 @@ void gs1_loadValidationTable(gs1_encoder* const ctx) {
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+#include "unittest.h"
 
 
 void test_ai_lookupAIentry(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "01",     2)->ai, "01") == 0);		// Exact lookup, data following
@@ -1161,7 +1148,7 @@ void test_ai_existsInAIdata(void) {
 	static const char* dataStr2 = "(98)DEF(97)GHI(96)JKL(95)MNO";
 	static const char* dataStr3 = "(01)12345678901231(235)ABC123(8002)123456";
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 #define test_existsInAIdata(s, d, n, i, e) do {					\
@@ -1217,7 +1204,7 @@ void test_ai_existsInAIdata(void) {
 void test_ai_checkAIlengthByPrefix(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(aiLengthByPrefix(ctx, "00") == 2);
@@ -1275,7 +1262,7 @@ void test_ai_AItableVsPrefixLength(void) {
 	const struct aiEntry *entry;
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
@@ -1292,7 +1279,7 @@ void test_ai_AItableVsIsFNC1required(void) {
 	const struct aiEntry *entry;
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	for (entry = ctx->aiTable; *entry->ai; entry++) {
@@ -1333,7 +1320,7 @@ static void do_test_parseAIdata(gs1_encoder* const ctx, const char* const file, 
 void test_ai_parseAIdata(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 #define test_parseAIdata(s, d, e) do {					\
@@ -1595,7 +1582,7 @@ void test_ai_linters(void) {
 	};
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(tests); i++)
@@ -1621,7 +1608,7 @@ static void do_test_processAIdata(gs1_encoder* const ctx, const char* const file
 void test_ai_processAIdata(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 #define test_processAIdata(s, d) do {					\
@@ -1821,7 +1808,7 @@ static void do_test_validateAIs(gs1_encoder* const ctx, const char* const file, 
 void test_ai_validateAIs(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 #define test_validateAIs(s, f, d) do {					\

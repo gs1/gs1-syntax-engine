@@ -519,7 +519,8 @@ make -j $(nproc) test SLOW_TESTS=yes
 # Build and run specific test suite (regex match on test name)
 make test TEST="test_ai_"
 
-# Test with embedded AI table (instead of external Syntax Dictionary)
+# Run tests without the bundled Syntax Dictionary file
+# (the optional explicit-path test case is skipped; embedded-AI-table tests still run)
 rm gs1-syntax-dictionary.txt
 make test
 git checkout gs1-syntax-dictionary.txt  # Restore it

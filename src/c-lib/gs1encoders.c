@@ -57,18 +57,19 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 	gs1_encoder *ctx			= NULL;
 	struct aiEntry *sd			= NULL;
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
-	bool syndictParseError			= false;
+	bool syndictLoadFailed			= false;
 #endif
 
 	gs1_encoder_init_flags_t flags		= gs1_encoder_iDEFAULT;
 	gs1_encoder_init_status_t *status	= NULL;
 	char *msgBuf				= NULL;
 	size_t msgBufSize			= 0;
+	const char *syntaxDictionary		= NULL;
 
-	bool loadSyndict;
-	bool useEmbedded;
 	bool fallbackOnError;
-	bool quiet;
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
+	bool useEmbedded;
+#endif
 
 	/*
 	 *  Extract from the part of the struct known by the user, as indicated by struct_size
@@ -83,13 +84,14 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 	EXTRACT_OPT(status);
 	EXTRACT_OPT(msgBuf);
 	EXTRACT_OPT(msgBufSize);
+	EXTRACT_OPT(syntaxDictionary);
 
 #undef EXTRACT_OPT
 
-	loadSyndict	= !(flags & gs1_encoder_iNO_SYNDICT);
-	useEmbedded	= !(flags & gs1_encoder_iNO_EMBEDDED);
 	fallbackOnError	= flags & gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR;
-	quiet		= flags & gs1_encoder_iQUIET;
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
+	useEmbedded	= !(flags & gs1_encoder_iNO_EMBEDDED);
+#endif
 
 #define RETURN_FAIL(s, e) do {					\
 	if (status) *status = s;				\
@@ -137,35 +139,29 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 	if (msgBuf && msgBufSize > 0)
 		msgBuf[0] = '\0';
 
-	// Try to load syntax dictionary if not disabled
 #ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
-	if (loadSyndict) {
-		sd = gs1_loadSyntaxDictionary(ctx, NULL, quiet);
-		if (!sd && ctx->err != gs1_encoder_eCANNOT_READ_FILE) {
-#ifndef EXCLUDE_EMBEDDED_AI_TABLE
-			syndictParseError = true;
-#endif
+	if (syntaxDictionary) {
+		sd = gs1_loadSyntaxDictionary(ctx, syntaxDictionary);
+		if (!sd) {
 			if (!fallbackOnError)
 				RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT, ctx->errMsg);
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
+			syndictLoadFailed = true;
+#endif
 		}
 	}
 #else
-	(void)loadSyndict;  // Suppress unused variable warning
+	(void)syntaxDictionary;
+	(void)fallbackOnError;
 #endif
 
-	/*
-	 *  If parsing failed or EXCLUDE_SYNTAX_DICTIONARY_LOADER is defined
-	 *  or syndict loading is disabled, then we will be calling gs1_setAItable
-	 *  with NULL which will load the embedded AI table, if it is available
-	 *
-	 */
 	if (!sd) {
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 		if (!useEmbedded)		// Disabled by flag
 			RETURN_FAIL(GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE, "Embedded AI table is disabled");
 
-		// Will fall back to embedded table. Set status, but not an error.
-		if (syndictParseError || (!loadSyndict && useEmbedded)) {
+		// Signal fallback when we actually attempted a load and were forced to embedded
+		if (syndictLoadFailed) {
 			if (status) *status = GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE;
 			if (msgBuf && msgBufSize > 0) {
 				strncpy(msgBuf, ctx->errMsg, msgBufSize - 1);
@@ -177,7 +173,7 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 #endif
 	}
 
-	if (!gs1_setAItable(ctx, sd, quiet)) {
+	if (!gs1_setAItable(ctx, sd)) {
 
 		gs1_encoder_init_status_t localStatus;
 
@@ -206,7 +202,20 @@ gs1_encoder* gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)
 
 
 gs1_encoder* gs1_encoder_init(void* const mem) {
-	return gs1_encoder_init_ex(mem, NULL);
+
+	/*
+	 *  Legacy entry point: attempt to load gs1-syntax-dictionary.txt from
+	 *  the current working directory, falling back to the embedded AI table
+	 *  if the file is absent or malformed. Callers that need strict control
+	 *  or want to detect the fallback should use gs1_encoder_init_ex().
+	 *
+	 */
+	gs1_encoder_init_opts_t opts = {
+		.struct_size		= sizeof(gs1_encoder_init_opts_t),
+		.flags			= gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+		.syntaxDictionary	= "gs1-syntax-dictionary.txt",
+	};
+	return gs1_encoder_init_ex(mem, &opts);
 }
 
 
@@ -893,6 +902,7 @@ __ATTR_PURE ssize_t gs1_binarySearch(const void* const needle, const void* const
 
 #define TEST_NO_MAIN
 #include "acutest.h"
+#include "unittest.h"
 
 // Used to test compile-time buffer allocation for the gs1encoder instance
 static uint8_t static_buf[sizeof(gs1_encoder)];
@@ -947,11 +957,67 @@ void test_api_init(void) {
 }
 
 
+/*
+ *  Locks in the deprecated flags ::gs1_encoder_iQUIET and ::gs1_encoder_iNO_SYNDICT
+ *  as no-op stubs. The symbols must remain in the enum for source/ABI compatibility,
+ *  and setting them must not perturb init behaviour. If this test fails to compile,
+ *  the deprecated enumerators have been removed; do not delete them.
+ *
+ */
+void test_api_init_deprecatedFlags(void) {
+
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
+	gs1_encoder *ctx;
+	gs1_encoder_init_status_t status = GS1_ENCODERS_INIT_SUCCESS;
+	char msgBuf[256] = { 0 };
+
+	gs1_encoder_init_opts_t opts = {
+		.struct_size = sizeof(gs1_encoder_init_opts_t),
+		.status      = &status,
+		.msgBuf      = msgBuf,
+		.msgBufSize  = sizeof(msgBuf),
+	};
+
+	/* iQUIET alone: deprecated no-op, embedded init succeeds */
+	opts.flags = gs1_encoder_iQUIET;
+	TEST_ASSERT((ctx = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+	TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+	gs1_encoder_free(ctx);
+
+	/* iNO_SYNDICT alone: deprecated no-op, embedded init succeeds */
+	opts.flags = gs1_encoder_iNO_SYNDICT;
+	TEST_ASSERT((ctx = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+	TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+	gs1_encoder_free(ctx);
+
+	/* Both together: same */
+	opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET;
+	TEST_ASSERT((ctx = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+	TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+	gs1_encoder_free(ctx);
+
+	/* Deprecated flags do not block loading an explicit syntaxDictionary path.
+	 * (Skipped silently if the file is not present in cwd.) */
+	opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET;
+	opts.syntaxDictionary = "gs1-syntax-dictionary.txt";
+	ctx = gs1_encoder_init_ex(NULL, &opts);
+	if (ctx) {
+		TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+		gs1_encoder_free(ctx);
+	}
+
+DIAG_POP
+
+}
+
+
 void test_api_defaults(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
@@ -966,7 +1032,7 @@ void test_api_sym(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNONE - 1));     // Too small
@@ -1022,7 +1088,7 @@ void test_api_addCheckDigit(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getAddCheckDigit(ctx));		// Default
@@ -1042,7 +1108,7 @@ void test_api_permitUnknownAIs(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));		// Default
@@ -1062,7 +1128,7 @@ void test_api_permitZeroSuppressedGTINinDLuris(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));		// Default
@@ -1085,7 +1151,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	/*
@@ -1119,7 +1185,7 @@ void test_api_validations(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// Unlocked validation that is enabled by default
@@ -1144,7 +1210,7 @@ void test_api_getters(void) {
 	const char *out;
 	char buf[256];
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	/*
@@ -1226,19 +1292,113 @@ void test_api_getters(void) {
 		TEST_CHECK(msgBuf[0] == '\0');		// Cleared on success
 		gs1_encoder_free(ctx2);
 
-		/* NO_SYNDICT: skip syndict, fallback to embedded table */
-		opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET;
+		/* No syntaxDictionary: embedded AI table, plain success */
+		opts.flags = gs1_encoder_iDEFAULT;
+		opts.syntaxDictionary = NULL;
 		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, &opts)) != NULL);
 		assert(ctx2);
-		TEST_CHECK(status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
 		gs1_encoder_free(ctx2);
 
-		/* NO_SYNDICT + NO_EMBEDDED: both disabled, must fail */
-		opts.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iNO_EMBEDDED | gs1_encoder_iQUIET;
+		/* NO_EMBEDDED with no syntaxDictionary: nothing left to load, must fail */
+		opts.flags = gs1_encoder_iNO_EMBEDDED;
+		opts.syntaxDictionary = NULL;
 		ctx2 = gs1_encoder_init_ex(NULL, &opts);
 		TEST_CHECK(ctx2 == NULL);
 		TEST_CHECK(status == GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE);
 		TEST_CHECK(msgBuf[0] != '\0');		// Error message populated
+
+		/* syntaxDictionary: explicit path to existing file (skipped when file absent) */
+		opts.flags = gs1_encoder_iDEFAULT;
+		opts.syntaxDictionary = "gs1-syntax-dictionary.txt";
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		if (ctx2) {
+			TEST_CHECK(status == GS1_ENCODERS_INIT_SUCCESS);
+			TEST_CHECK(gs1_encoder_setAIdataStr(ctx2, "(01)12312312312333"));
+			gs1_encoder_free(ctx2);
+		}
+
+		/* syntaxDictionary: nonexistent file, must fail without fallback */
+		opts.flags = gs1_encoder_iDEFAULT;
+		opts.syntaxDictionary = "nonexistent-file.txt";
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx2 == NULL);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT);
+		TEST_CHECK(msgBuf[0] != '\0');
+
+		/* syntaxDictionary: nonexistent file with fallback, lands on embedded with FALLBACK status */
+		opts.flags = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR;
+		opts.syntaxDictionary = "nonexistent-file.txt";
+		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		assert(ctx2);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE);
+		TEST_CHECK(msgBuf[0] != '\0');		// errMsg surfaced via msgBuf
+		gs1_encoder_free(ctx2);
+
+		/* iFALLBACK_ON_SYNDICT_ERROR + iNO_EMBEDDED + bad path: fallback target is
+		   disabled, so init must fail with NO_EMBEDDED_TABLE rather than fall back */
+		opts.flags = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR | gs1_encoder_iNO_EMBEDDED;
+		opts.syntaxDictionary = "nonexistent-file.txt";
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx2 == NULL);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE);
+		TEST_CHECK(msgBuf[0] != '\0');
+
+		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, NULL)) != NULL);
+		assert(ctx2);
+		gs1_encoder_free(ctx2);
+
+		/* Old struct_size: caller compiled with smaller struct (no syntaxDictionary) */
+		opts.flags = gs1_encoder_iDEFAULT;
+		opts.syntaxDictionary = "nonexistent-file.txt";
+		opts.struct_size = offsetof(gs1_encoder_init_opts_t, syntaxDictionary);
+		TEST_ASSERT((ctx2 = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		assert(ctx2);
+		gs1_encoder_free(ctx2);
+		opts.struct_size = sizeof(gs1_encoder_init_opts_t);
+	}
+
+	/*
+	 *  msgBuf truncation: when msgBufSize is smaller than the error
+	 *  string, the buffer must still be NUL-terminated and not overrun.
+	 *
+	 */
+	{
+		gs1_encoder *ctx2;
+		gs1_encoder_init_status_t status;
+		char tinyBuf[8];
+		gs1_encoder_init_opts_t opts = {
+			.struct_size      = sizeof(gs1_encoder_init_opts_t),
+			.status           = &status,
+			.msgBuf           = tinyBuf,
+			.msgBufSize       = sizeof(tinyBuf),
+			.syntaxDictionary = "nonexistent-very-long-filename-that-overflows-the-msgBuf.txt",
+		};
+
+		memset(tinyBuf, 'X', sizeof(tinyBuf));		// Pre-fill with non-NUL
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx2 == NULL);
+		TEST_CHECK(status == GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT);
+		TEST_CHECK(tinyBuf[sizeof(tinyBuf) - 1] == '\0');	// NUL-terminated
+		TEST_CHECK(strlen(tinyBuf) < sizeof(tinyBuf));		// No overrun
+	}
+
+	/*
+	 *  NULL status and NULL msgBuf with a failure path: must not crash
+	 *  (RETURN_FAIL must guard before writing through these pointers).
+	 *
+	 */
+	{
+		gs1_encoder *ctx2;
+		gs1_encoder_init_opts_t opts = {
+			.struct_size      = sizeof(gs1_encoder_init_opts_t),
+			.status           = NULL,
+			.msgBuf           = NULL,
+			.msgBufSize       = 0,
+			.syntaxDictionary = "nonexistent-file.txt",
+		};
+		ctx2 = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx2 == NULL);
 	}
 
 	/*
@@ -1268,7 +1428,7 @@ void test_api_dataStr(void) {
 	gs1_encoder* ctx;
 	int i;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "barcode"));
@@ -1465,7 +1625,7 @@ void test_api_getAIdataStr(void) {
 	gs1_encoder* ctx;
 	char *out;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// Plain data
@@ -1515,7 +1675,7 @@ void test_api_getScanData(void) {
 	gs1_encoder* ctx;
 	char *out;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
@@ -1533,7 +1693,7 @@ void test_api_setScanData(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
@@ -1588,7 +1748,7 @@ void test_api_getHRI(void) {
 	char **hri;
 	char buf[256];
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// HRI from linear-only, raw AI data
@@ -1710,7 +1870,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	char buf[64];
 	size_t needed;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// No HRI should return empty string
@@ -1747,7 +1907,7 @@ void test_api_getDLignoredQueryParams(void) {
 	char **qp;
 	char buf[256];
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// No ignored query params from non-DL URI data
@@ -1813,7 +1973,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	char buf[64];
 	size_t needed;
 
-	TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
 	assert(ctx);
 
 	// No data should return empty string
@@ -1846,9 +2006,10 @@ void test_api_allocFailures(void) {
 	 *  Each alloc (malloc/calloc/realloc) decrements it; when it
 	 *  reaches 0 the allocation returns NULL.
 	 *
-	 *  Default gs1_encoder_init(NULL) allocation sequence:
+	 *  Allocation sequence when loading an explicit Syntax Dictionary
+	 *  (with no fallback, so each failure surfaces as init failure):
 	 *    1: ctx malloc in gs1_encoder_init_ex
-	 *    2: sd malloc in parseSyntaxDictionaryFile
+	 *    2: sd malloc in gs1_loadSyntaxDictionary
 	 *    3: first gs1_strdup_alloc — attrs
 	 *    4: first gs1_strdup_alloc — title
 	 *    5..N: further attrs/title strdups for each AI entry
@@ -1856,33 +2017,39 @@ void test_api_allocFailures(void) {
 	 *    N+2..: addDLkeyQualifiers allocs
 	 *
 	 */
+	{
+		gs1_encoder_init_opts_t opts = {
+			.struct_size		= sizeof(gs1_encoder_init_opts_t),
+			.syntaxDictionary	= "gs1-syntax-dictionary.txt",
+		};
 
-	/* Alloc 1: ctx malloc failure in gs1_encoder_init_ex */
-	test_alloc_fail_at = 1;
-	ctx = gs1_encoder_init(NULL);
-	TEST_CHECK(ctx == NULL);
-	test_alloc_fail_at = 0;
+		/* Alloc 1: ctx malloc failure in gs1_encoder_init_ex */
+		test_alloc_fail_at = 1;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
 
-	/* Alloc 2: sd malloc failure in parseSyntaxDictionaryFile */
-	test_alloc_fail_at = 2;
-	ctx = gs1_encoder_init(NULL);
-	TEST_CHECK(ctx == NULL);
-	test_alloc_fail_at = 0;
+		/* Alloc 2: sd malloc failure in gs1_loadSyntaxDictionary */
+		test_alloc_fail_at = 2;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
 
-	/* Alloc 3: attrs strdup failure in parseSyntaxDictionaryEntry */
-	test_alloc_fail_at = 3;
-	ctx = gs1_encoder_init(NULL);
-	TEST_CHECK(ctx == NULL);
-	test_alloc_fail_at = 0;
+		/* Alloc 3: attrs strdup failure in parseSyntaxDictionaryEntry */
+		test_alloc_fail_at = 3;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
 
-	/* Alloc 4: title strdup failure in parseSyntaxDictionaryEntry */
-	test_alloc_fail_at = 4;
-	ctx = gs1_encoder_init(NULL);
-	TEST_CHECK(ctx == NULL);
-	test_alloc_fail_at = 0;
+		/* Alloc 4: title strdup failure in parseSyntaxDictionaryEntry */
+		test_alloc_fail_at = 4;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
+	}
 
 	/*
-	 *  gs1_setAItable failure path: skip syndict so we go straight
+	 *  gs1_setAItable failure path: no syndict so we go straight
 	 *  to the embedded table. Alloc 2 is the dlKeyQualifiers
 	 *  initial malloc in gs1_populateDLkeyQualifiers, whose failure
 	 *  sets FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS and exercises the
@@ -1892,7 +2059,22 @@ void test_api_allocFailures(void) {
 	{
 		gs1_encoder_init_opts_t opts = {
 			.struct_size = sizeof(gs1_encoder_init_opts_t),
-			.flags = gs1_encoder_iNO_SYNDICT | gs1_encoder_iQUIET,
+		};
+		test_alloc_fail_at = 2;
+		ctx = gs1_encoder_init_ex(NULL, &opts);
+		TEST_CHECK(ctx == NULL);
+		test_alloc_fail_at = 0;
+	}
+
+	/*
+	 *  Loading an explicit Syntax Dictionary exercises the parser
+	 *  allocation path; alloc 2 (sd malloc) should still fail gracefully.
+	 *
+	 */
+	{
+		gs1_encoder_init_opts_t opts = {
+			.struct_size = sizeof(gs1_encoder_init_opts_t),
+			.syntaxDictionary = "gs1-syntax-dictionary.txt",
 		};
 		test_alloc_fail_at = 2;
 		ctx = gs1_encoder_init_ex(NULL, &opts);

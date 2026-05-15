@@ -60,6 +60,9 @@
     <ClInclude Include="test-heap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unittest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gs1encoders-test.c">

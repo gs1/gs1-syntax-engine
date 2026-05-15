@@ -61,6 +61,7 @@ TEST_LIST = {
     { "api_getVersion", test_api_getVersion },
     { "api_instanceSize", test_api_instanceSize },
     { "api_init", test_api_init },
+    { "api_init_deprecatedFlags", test_api_init_deprecatedFlags },
     { "api_defaults", test_api_defaults },
     { "api_sym", test_api_sym },
     { "api_addCheckDigit", test_api_addCheckDigit },
