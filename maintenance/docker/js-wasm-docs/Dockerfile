@@ -2,6 +2,9 @@ FROM debian:trixie-slim
 
 ARG NODE_VERSION=25.1.0
 ARG NVM_VERSION=0.40.3
+# Pin to match the devDependency in src/js-wasm/package.json so the
+# docs build emits the same .d.ts as CI's `npx tsc` run.
+ARG TYPESCRIPT_VERSION=5
 
 RUN chmod 666 /etc/passwd && \
     mkdir -p /home/user && chmod 777 /home/user && \
@@ -17,7 +20,7 @@ ENV NVM_DIR=/root/.nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$NVM_VERSION/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && \
     nvm install $NODE_VERSION && \
-    npm i -g jsdoc typescript
+    npm i -g jsdoc "typescript@${TYPESCRIPT_VERSION}"
 
 ENV PATH="${PATH}:${NVM_DIR}/versions/node/v${NODE_VERSION}/bin"
 

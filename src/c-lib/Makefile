@@ -380,12 +380,14 @@ test: $(TEST_BIN)
 # Run the Swift binding test suite via Docker. The Swift Package builds the
 # C library itself, so this is end-to-end. The dictionary file is staged into
 # the test bundle source dir per the Package.swift "resources:" declaration.
+# Uses a test-specific SPM build path so this run does not collide with any
+# cache left behind by docs-swift (which uses a different Swift toolchain).
 .PHONY: test-swift
 test-swift:
 	cp -f gs1-syntax-dictionary.txt ../swift/Tests/GS1EncodersTests/
 	docker run --rm -v $$(pwd)/../..:/src -w /src/src/swift \
 	    -u $$(id -u):$$(id -g) swift:6.0 \
-	    swift test
+	    swift test --build-path .build-test
 
 # Run the .NET binding test suite on Linux via Docker. Depends on the local
 # Linux shared library; the csproj is cross-platform aware and stages
