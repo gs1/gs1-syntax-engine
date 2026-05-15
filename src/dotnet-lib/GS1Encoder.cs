@@ -134,12 +134,52 @@ namespace GS1.Encoders
         /// </summary>
         private IntPtr ctx;
 
+        /// <summary>
+        /// Initialisation options for the GS1Encoder.
+        /// New properties may be added in future versions without breaking existing code.
+        /// </summary>
+        public class InitOptions
+        {
+            /// <summary>
+            /// Path to a GS1 Syntax Dictionary file. If null, the embedded AI table is used.
+            /// </summary>
+            public string SyntaxDictionary { get; set; } = null;
+
+            /// <summary>
+            /// Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+            /// </summary>
+            public bool FallbackOnSyndictError { get; set; } = false;
+
+            /// <summary>
+            /// Refuse to use the embedded AI table. Initialisation fails if no other AI table can be loaded.
+            /// </summary>
+            public bool NoEmbedded { get; set; } = false;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NativeInitOpts
+        {
+            public UIntPtr structSize;
+            public int flags;
+            public IntPtr status;
+            public IntPtr msgBuf;
+            public UIntPtr msgBufSize;
+            public IntPtr syntaxDictionary;
+        }
+
+        private const int iNO_EMBEDDED = 1 << 1;
+        private const int iFALLBACK_ON_SYNDICT_ERROR = 1 << 2;
+
+        private const int INIT_FALLBACK_TO_EMBEDDED_TABLE = 1;
+
+        private const int MsgBufSize = 256;
+
         /*
          *  Functions imported from the native GS1 Barcode Syntax Engine dynamic-link library
          *
          */
-        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init", CallingConvention = CallingConvention.Cdecl)]
-        private static extern System.IntPtr gs1_encoder_init(IntPtr mem);
+        [DllImport(gs1_dll, EntryPoint = "gs1_encoder_init_ex", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr gs1_encoder_init_ex(IntPtr mem, ref NativeInitOpts opts);
 
         [DllImport(gs1_dll, EntryPoint = "gs1_encoder_getVersion", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr gs1_encoder_getVersion();
@@ -252,12 +292,67 @@ namespace GS1.Encoders
         /// Initialises a new instance of the GS1Encoder class.
         /// </summary>
         /// <exception cref="GS1EncoderGeneralException">Thrown when the library fails to initialise</exception>
-        public GS1Encoder()
+        public GS1Encoder() : this((InitOptions)null) { }
+
+        /// <summary>
+        /// Initialises a new instance of the GS1Encoder class with the given options.
+        /// </summary>
+        /// <param name="options">Initialisation options, or null for defaults.</param>
+        /// <exception cref="GS1EncoderGeneralException">Thrown when the library fails to initialise</exception>
+        public GS1Encoder(InitOptions options)
         {
-            ctx = gs1_encoder_init(IntPtr.Zero);
-            if (ctx == IntPtr.Zero)
-                throw new GS1EncoderGeneralException("Failed to initialise the native library");
+            NativeInitOpts opts = new NativeInitOpts();
+            opts.structSize = (UIntPtr)Marshal.SizeOf<NativeInitOpts>();
+            IntPtr syntaxDictPtr = IntPtr.Zero;
+            IntPtr msgBufPtr = Marshal.AllocHGlobal(MsgBufSize);
+            IntPtr statusPtr = Marshal.AllocHGlobal(sizeof(int));
+            try
+            {
+                Marshal.WriteByte(msgBufPtr, 0);
+                Marshal.WriteInt32(statusPtr, 0);
+                opts.msgBuf = msgBufPtr;
+                opts.msgBufSize = (UIntPtr)MsgBufSize;
+                opts.status = statusPtr;
+                if (options != null)
+                {
+                    if (options.FallbackOnSyndictError) opts.flags |= iFALLBACK_ON_SYNDICT_ERROR;
+                    if (options.NoEmbedded) opts.flags |= iNO_EMBEDDED;
+                    if (options.SyntaxDictionary != null)
+                    {
+                        syntaxDictPtr = Marshal.StringToHGlobalAnsi(options.SyntaxDictionary);
+                        opts.syntaxDictionary = syntaxDictPtr;
+                    }
+                }
+                ctx = gs1_encoder_init_ex(IntPtr.Zero, ref opts);
+                if (ctx == IntPtr.Zero)
+                {
+                    string msg = Marshal.PtrToStringAnsi(msgBufPtr);
+                    throw new GS1EncoderGeneralException(
+                        !string.IsNullOrEmpty(msg) ? msg : "Failed to initialise the native library");
+                }
+                if (Marshal.ReadInt32(statusPtr) == INIT_FALLBACK_TO_EMBEDDED_TABLE)
+                {
+                    string warning = Marshal.PtrToStringAnsi(msgBufPtr);
+                    if (!string.IsNullOrEmpty(warning))
+                        InitFallbackWarning = warning;
+                }
+            }
+            finally
+            {
+                if (syntaxDictPtr != IntPtr.Zero)
+                    Marshal.FreeHGlobal(syntaxDictPtr);
+                Marshal.FreeHGlobal(msgBufPtr);
+                Marshal.FreeHGlobal(statusPtr);
+            }
         }
+
+        /// <summary>
+        /// The warning message produced when initialisation fell back to the embedded AI
+        /// table because the supplied Syntax Dictionary could not be loaded
+        /// (only when <see cref="InitOptions.FallbackOnSyndictError"/> was set).
+        /// <c>null</c> on plain success.
+        /// </summary>
+        public string InitFallbackWarning { get; private set; } = null;
 
         /// <summary>
         /// Get the version string of the library.

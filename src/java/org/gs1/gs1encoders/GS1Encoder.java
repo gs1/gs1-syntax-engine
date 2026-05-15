@@ -28,7 +28,7 @@ public class GS1Encoder implements AutoCloseable {
      *
      */
     private static native String gs1encoderGetErrMsgJNI(long ctx);
-    private static native long gs1encoderInitJNI();
+    private static native long gs1encoderInitExJNI(InitOptions initOptions, String[] outErrorMessage);
     private static native void gs1encoderFreeJNI(long ctx);
     private static native String gs1encoderGetVersionJNI();
     private static native int gs1encoderGetSymJNI(long ctx);
@@ -237,6 +237,51 @@ public class GS1Encoder implements AutoCloseable {
 
 
     /**
+     * Initialisation options for the GS1Encoder.
+     * New setters may be added in future versions without breaking existing code.
+     */
+    public static class InitOptions {
+        String syntaxDictionary = null;
+        boolean fallbackOnSyndictError = false;
+        boolean noEmbedded = false;
+
+        /**
+         * Set the path to a GS1 Syntax Dictionary file.
+         * If not set, the embedded AI table is used.
+         *
+         * @param path path to the Syntax Dictionary file
+         * @return this InitOptions instance for chaining
+         */
+        public InitOptions setSyntaxDictionary(String path) {
+            this.syntaxDictionary = path;
+            return this;
+        }
+
+        /**
+         * Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+         *
+         * @param enabled whether to enable fallback
+         * @return this InitOptions instance for chaining
+         */
+        public InitOptions setFallbackOnSyndictError(boolean enabled) {
+            this.fallbackOnSyndictError = enabled;
+            return this;
+        }
+
+        /**
+         * Refuse to use the embedded AI table. Initialisation fails if no other AI table can be loaded.
+         *
+         * @param enabled whether to disable the embedded AI table
+         * @return this InitOptions instance for chaining
+         */
+        public InitOptions setNoEmbedded(boolean enabled) {
+            this.noEmbedded = enabled;
+            return this;
+        }
+    }
+
+
+    /**
      * An opaque pointer used by the native code to represent an
      * "instance" of the library. It is hidden behind the object
      * interface that is provided to users of this wrapper.
@@ -262,9 +307,42 @@ public class GS1Encoder implements AutoCloseable {
      * @throws GS1EncoderGeneralException if the library fails to initialise
      */
     public GS1Encoder() throws GS1EncoderGeneralException {
-        ctx = gs1encoderInitJNI();
-        if (ctx == 0)
-            throw new GS1EncoderGeneralException("Failed to initialise the native library");
+        this((InitOptions)null);
+    }
+
+    /**
+     * Initialises a new instance of the GS1Encoder class with the given options.
+     *
+     * @param options initialisation options, or null for defaults
+     * @throws GS1EncoderGeneralException if the library fails to initialise
+     */
+    public GS1Encoder(InitOptions options) throws GS1EncoderGeneralException {
+        String[] errMsg = new String[1];
+        ctx = gs1encoderInitExJNI(options, errMsg);
+        if (ctx == 0) {
+            throw new GS1EncoderGeneralException(
+                (errMsg[0] != null && !errMsg[0].isEmpty())
+                    ? errMsg[0]
+                    : "Failed to initialise the native library");
+        }
+        // Init succeeded; if the C library populated a message it is the
+        // fallback warning carrying the load error that triggered the
+        // embedded-AI-table fallback (only when fallbackOnSyndictError
+        // was set and the supplied syntaxDictionary failed to load).
+        initFallbackWarning = errMsg[0];
+    }
+
+    private String initFallbackWarning = null;
+
+    /**
+     * Returns the warning message produced when initialisation fell back to
+     * the embedded AI table because the supplied Syntax Dictionary could not
+     * be loaded (only when {@code fallbackOnSyndictError} was set).
+     *
+     * @return the underlying load-error message, or {@code null} on plain success
+     */
+    public String getInitFallbackWarning() {
+        return initFallbackWarning;
     }
 
     /**

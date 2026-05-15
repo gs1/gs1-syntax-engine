@@ -117,6 +117,11 @@ public class GS1Encoder {
     /// interface that is provided to users of this wrapper.
     private(set) var ctx: OpaquePointer? = nil
 
+    /// The warning message produced when initialisation fell back to the embedded AI
+    /// table because the supplied Syntax Dictionary could not be loaded
+    /// (only when `fallbackOnSyndictError` was set). `nil` on plain success.
+    public private(set) var initFallbackWarning: String? = nil
+
     // This Swift wrapper library throws an exception containing the error message whenever
     // an error is returned by the native library. Therefore direct access to the native
     // error message is not necessary.
@@ -127,11 +132,51 @@ public class GS1Encoder {
 
     /// Initialises a new instance of the GS1Encoder class.
     ///
+    /// New parameters may be appended to this initialiser in future versions
+    /// without breaking existing call sites.
+    ///
+    /// - Parameter syntaxDictionary: Path to a GS1 Syntax Dictionary file. If nil, the embedded AI table is used.
+    /// - Parameter fallbackOnSyndictError: Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+    /// - Parameter noEmbedded: Refuse to use the embedded AI table. Initialisation fails if no other AI table can be loaded.
     /// - Throws: `GS1EncoderError.generalError` if the library fails to initialise
-    public init() throws {
-        ctx = gs1_encoder_init(nil)
-        if ctx == nil {
-            throw GS1EncoderError.generalError(msg: "Failed to initialise the native library")
+    public init(syntaxDictionary: String? = nil,
+                fallbackOnSyndictError: Bool = false,
+                noEmbedded: Bool = false) throws {
+        let msgBufSize = 256
+        var msgBuf = [CChar](repeating: 0, count: msgBufSize)
+        var status: gs1_encoder_init_status_t = GS1_ENCODERS_INIT_SUCCESS
+        try msgBuf.withUnsafeMutableBufferPointer { buf in
+            guard let bufPtr = buf.baseAddress else {
+                throw GS1EncoderError.generalError(msg: "Failed to allocate message buffer")
+            }
+            try withUnsafeMutablePointer(to: &status) { statusPtr in
+                var opts = gs1_encoder_init_opts()
+                opts.struct_size = MemoryLayout<gs1_encoder_init_opts>.size
+                opts.msgBuf = bufPtr
+                opts.msgBufSize = buf.count
+                opts.status = statusPtr
+                var flags: UInt32 = 0
+                if fallbackOnSyndictError { flags |= gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR.rawValue }
+                if noEmbedded             { flags |= gs1_encoder_iNO_EMBEDDED.rawValue }
+                opts.flags = gs1_encoder_init_flags_t(rawValue: flags)
+                if let path = syntaxDictionary {
+                    ctx = path.withCString { cPath in
+                        opts.syntaxDictionary = cPath
+                        return gs1_encoder_init_ex(nil, &opts)
+                    }
+                } else {
+                    ctx = gs1_encoder_init_ex(nil, &opts)
+                }
+                if ctx == nil {
+                    let msg = String(cString: bufPtr)
+                    throw GS1EncoderError.generalError(
+                        msg: msg.isEmpty ? "Failed to initialise the native library" : msg)
+                }
+                if statusPtr.pointee == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE {
+                    let warning = String(cString: bufPtr)
+                    if !warning.isEmpty { initFallbackWarning = warning }
+                }
+            }
         }
     }
 

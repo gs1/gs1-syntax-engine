@@ -75,7 +75,8 @@
  * <h3>Minimal Node.js CLI example</h3>
  *
  * For a minimal CLI example that verifies that the library is working create a
- * file called <code>app.mjs</code> as follows:
+ * file called <code>app.mjs</code> as follows. This uses the embedded AI table
+ * that is compiled into the library:
  *
  * <pre>
  * import { GS1encoder } from "gs1encoder";
@@ -87,6 +88,32 @@
  *
  * gs.free();  // Release native resources when done
  * </pre>
+ *
+ * To load an external GS1 Syntax Dictionary file instead of using the embedded
+ * AI table, pass an options object to {@link GS1encoder.create create()}. In
+ * Node.js the path is a real host filesystem path. Set
+ * <code>fallbackOnSyndictError: true</code> to fall back to the embedded AI
+ * table if the external file cannot be opened or parsed, rather than failing.
+ * The following inverse example parses a GS1 Digital Link URI and reports the
+ * extracted AI data:
+ *
+ * <pre>
+ * import { GS1encoder } from "gs1encoder";
+ *
+ * const gs = await GS1encoder.create({
+ *     syntaxDictionary: "/path/to/gs1-syntax-dictionary.txt",
+ *     fallbackOnSyndictError: true,
+ * });
+ *
+ * gs.dataStr = "https://example.com/01/09521234543213?99=TESTING123";
+ * console.log("Extracted AIs: " + gs.aiDataStr);
+ *
+ * gs.free();
+ * </pre>
+ *
+ * In the browser, the wasm runs in a sandbox with no host filesystem, so the
+ * <code>syntaxDictionary</code> path has no real file to resolve to; omit the
+ * option to use the embedded AI table.
  *
  * <strong>Note:</strong> Each GS1encoder instance allocates native resources. Call
  * {@link GS1encoder#free free()} when you are finished with an instance to

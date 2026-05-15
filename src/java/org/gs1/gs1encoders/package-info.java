@@ -123,7 +123,8 @@
  * <li>On Windows, ensure the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> is installed on the target system, with the architecture (x86 or x64) matching the native library build
  * </ol>
  *
- * For a minimal example a {@code MyApp.java} file as follows:
+ * For a minimal example a {@code MyApp.java} file as follows uses the
+ * embedded AI table that is compiled into the library:
  *
  * <pre>
  * import org.gs1.gs1encoders.*;
@@ -142,6 +143,26 @@
  *             System.err.println("Error: " + e.getMessage());
  *         }
  *     }
+ * }
+ * </pre>
+ *
+ * To load an external GS1 Syntax Dictionary file instead of using the
+ * embedded AI table, pass an {@link GS1Encoder.InitOptions} instance to
+ * the constructor. The {@code setFallbackOnSyndictError(true)} option
+ * makes initialisation fall back to the embedded AI table if the
+ * external file cannot be opened or parsed, rather than failing. The
+ * following inverse example parses a GS1 Digital Link URI and reports
+ * the extracted AI data:
+ *
+ * <pre>
+ * try (GS1Encoder gs = new GS1Encoder(
+ *         new GS1Encoder.InitOptions()
+ *             .setSyntaxDictionary("/path/to/gs1-syntax-dictionary.txt")
+ *             .setFallbackOnSyndictError(true))) {
+ *     gs.setDataStr("https://example.com/01/09521234543213?99=TESTING123");
+ *     System.out.println("Extracted AIs: " + gs.getAIdataStr());
+ * } catch (Exception e) {
+ *     System.err.println("Error: " + e.getMessage());
  * }
  * </pre>
  *

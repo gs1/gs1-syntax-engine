@@ -97,7 +97,8 @@ library:
 </Project>
 ```
 
-Edit `Program.cs` to contain:
+Edit `Program.cs` to contain. This uses the embedded AI table that is
+compiled into the library:
 
 ```csharp
 using System;
@@ -107,6 +108,28 @@ using (GS1Encoder gs = new GS1Encoder())
 {
     gs.AIdataStr = "(01)09521234543213(99)TESTING123";
     Console.WriteLine("GS1 Digital Link URI: " + gs.GetDLuri("https://example.com"));
+}
+```
+
+To load an external GS1 Syntax Dictionary file instead of using the embedded
+AI table, pass a `GS1Encoder.InitOptions` instance to the constructor. Set
+`FallbackOnSyndictError = true` to fall back to the embedded AI table if
+the external file cannot be opened or parsed, rather than failing. The
+following inverse example parses a GS1 Digital Link URI and reports the
+extracted AI data:
+
+```csharp
+using System;
+using GS1.Encoders;
+
+using (GS1Encoder gs = new GS1Encoder(new GS1Encoder.InitOptions
+{
+    SyntaxDictionary = "/path/to/gs1-syntax-dictionary.txt",
+    FallbackOnSyndictError = true,
+}))
+{
+    gs.DataStr = "https://example.com/01/09521234543213?99=TESTING123";
+    Console.WriteLine("Extracted AIs: " + gs.AIdataStr);
 }
 ```
 

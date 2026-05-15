@@ -1013,6 +1013,58 @@ DIAG_POP
 }
 
 
+void test_api_init_opts_layout(void) {
+
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, struct_size) == 0);
+#if SIZE_MAX > UINT32_MAX
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, flags)            ==  8);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, status)           == 16);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, msgBuf)           == 24);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, msgBufSize)       == 32);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, syntaxDictionary) == 40);
+#else
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, flags)            ==  4);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, status)           ==  8);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, msgBuf)           == 12);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, msgBufSize)       == 16);
+	TEST_CHECK(offsetof(gs1_encoder_init_opts_t, syntaxDictionary) == 20);
+#endif
+
+	TEST_CHECK(sizeof(gs1_encoder_init_opts_t) ==
+	           offsetof(gs1_encoder_init_opts_t, syntaxDictionary)
+	           + sizeof(((gs1_encoder_init_opts_t *)0)->syntaxDictionary));
+
+}
+
+
+void test_api_init_enum_values(void) {
+
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
+	// The comparisons below are compile-time constant by design: the
+	// point of this test is to lock the numeric values of the public
+	// enums so a future reorder fails the build.
+	// cppcheck-suppress-begin knownConditionTrueFalse
+	TEST_CHECK(gs1_encoder_iDEFAULT                   == 0);
+	TEST_CHECK(gs1_encoder_iNO_SYNDICT                == 1 << 0);
+	TEST_CHECK(gs1_encoder_iNO_EMBEDDED               == 1 << 1);
+	TEST_CHECK(gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR == 1 << 2);
+	TEST_CHECK(gs1_encoder_iQUIET                     == 1 << 3);
+
+	TEST_CHECK(GS1_ENCODERS_INIT_SUCCESS                    ==  0);
+	TEST_CHECK(GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE ==  1);
+	TEST_CHECK(GS1_ENCODERS_INIT_FAILED_NO_MEM              == -1);
+	TEST_CHECK(GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE   == -2);
+	TEST_CHECK(GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT     == -3);
+	TEST_CHECK(GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT    == -4);
+	// cppcheck-suppress-end knownConditionTrueFalse
+
+DIAG_POP
+
+}
+
+
 void test_api_defaults(void) {
 
 	gs1_encoder* ctx;
@@ -1364,7 +1416,7 @@ void test_api_getters(void) {
 	 *
 	 */
 	{
-		gs1_encoder *ctx2;
+		const gs1_encoder *ctx2;
 		gs1_encoder_init_status_t status;
 		char tinyBuf[8];
 		gs1_encoder_init_opts_t opts = {
@@ -1389,7 +1441,7 @@ void test_api_getters(void) {
 	 *
 	 */
 	{
-		gs1_encoder *ctx2;
+		const gs1_encoder *ctx2;
 		gs1_encoder_init_opts_t opts = {
 			.struct_size      = sizeof(gs1_encoder_init_opts_t),
 			.status           = NULL,

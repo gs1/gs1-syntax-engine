@@ -21,7 +21,9 @@
 
 "use strict";
 
-import { GS1encoder, GS1encoderParameterException, GS1encoderDigitalLinkException } from "./gs1encoder.mjs";
+import { GS1encoder, GS1encoderGeneralException, GS1encoderParameterException, GS1encoderDigitalLinkException } from "./gs1encoder.mjs";
+
+const SYNDICT_HOST_PATH = "../c-lib/gs1-syntax-dictionary.txt";
 
 const gs1encoder = new GS1encoder();
 
@@ -236,4 +238,54 @@ test('errMarkup', async () => {
   expect(gs1encoder.errMarkup).toMatch(/\|/);
 
   gs1encoder.free();
+});
+
+test('defaultInit', async () => {
+  const gs1encoder = new GS1encoder();
+  await expect(gs1encoder.init()).resolves.toBeUndefined();
+  expect(gs1encoder.version).toBeTruthy();
+  gs1encoder.free();
+});
+
+test('syntaxDictionary loads from Node host filesystem', async () => {
+  const gs1encoder = new GS1encoder();
+  await gs1encoder.init({ syntaxDictionary: SYNDICT_HOST_PATH });
+  // Parsing a value through an AI defined in the dictionary proves the
+  // loader actually consumed the host file.
+  expect(() => { gs1encoder.aiDataStr = "(01)12312312312333" }).not.toThrow();
+  expect(gs1encoder.aiDataStr).toBe("(01)12312312312333");
+  gs1encoder.free();
+});
+
+test('bad syntaxDictionary path throws', async () => {
+  const gs1encoder = new GS1encoder();
+  await expect(gs1encoder.init({ syntaxDictionary: "nonexistent-file.txt" }))
+    .rejects.toThrow(GS1encoderGeneralException);
+});
+
+test('fallbackOnSyndictError falls back to embedded', async () => {
+  const gs1encoder = new GS1encoder();
+  await expect(gs1encoder.init({
+    syntaxDictionary: "nonexistent-file.txt",
+    fallbackOnSyndictError: true,
+  })).resolves.toBeUndefined();
+  // Embedded table available — basic parsing still works.
+  expect(() => { gs1encoder.aiDataStr = "(01)12312312312333" }).not.toThrow();
+  // The fallback warning carries the underlying load error.
+  expect(gs1encoder.initFallbackWarning).toBeTruthy();
+  expect(gs1encoder.initFallbackWarning).toMatch(/nonexistent-file\.txt/);
+  gs1encoder.free();
+});
+
+test('initFallbackWarning is null on plain success', async () => {
+  const gs1encoder = new GS1encoder();
+  await gs1encoder.init();
+  expect(gs1encoder.initFallbackWarning).toBeNull();
+  gs1encoder.free();
+});
+
+test('noEmbedded refuses embedded fallback', async () => {
+  const gs1encoder = new GS1encoder();
+  await expect(gs1encoder.init({ noEmbedded: true }))
+    .rejects.toThrow(GS1encoderGeneralException);
 });

@@ -251,4 +251,59 @@ public class GS1EncoderTest {
         gs1encoder.free();
     }
 
+    @Test
+    public void testDefaultConstructorBackwardsCompat() throws Exception {
+        GS1Encoder gs1encoder = new GS1Encoder();
+        assertEquals(GS1Encoder.Symbology.NONE, gs1encoder.getSym());
+        gs1encoder.free();
+    }
+
+    @Test
+    public void testSyntaxDictionaryPath() throws Exception {
+        GS1Encoder gs1encoder = new GS1Encoder(
+            new GS1Encoder.InitOptions().setSyntaxDictionary("gs1-syntax-dictionary.txt")
+        );
+        gs1encoder.setAIdataStr("(01)12312312312333");
+        assertEquals("(01)12312312312333", gs1encoder.getAIdataStr());
+        gs1encoder.free();
+    }
+
+    @Test
+    public void testBadSyntaxDictionaryPath() {
+        GS1EncoderGeneralException e = assertThrows(GS1EncoderGeneralException.class, () -> {
+            new GS1Encoder(
+                new GS1Encoder.InitOptions().setSyntaxDictionary("nonexistent-file.txt")
+            );
+        });
+        assertTrue(e.getMessage().contains("nonexistent-file.txt"));
+    }
+
+    @Test
+    public void testFallbackOnSyndictError() throws Exception {
+        GS1Encoder gs1encoder = new GS1Encoder(
+            new GS1Encoder.InitOptions()
+                .setSyntaxDictionary("nonexistent-file.txt")
+                .setFallbackOnSyndictError(true)
+        );
+        gs1encoder.setAIdataStr("(01)12312312312333");
+        assertEquals("(01)12312312312333", gs1encoder.getAIdataStr());
+        assertNotNull(gs1encoder.getInitFallbackWarning());
+        assertTrue(gs1encoder.getInitFallbackWarning().contains("nonexistent-file.txt"));
+        gs1encoder.free();
+    }
+
+    @Test
+    public void testInitFallbackWarningNullOnPlainSuccess() throws Exception {
+        GS1Encoder gs1encoder = new GS1Encoder();
+        assertNull(gs1encoder.getInitFallbackWarning());
+        gs1encoder.free();
+    }
+
+    @Test
+    public void testNoEmbedded() {
+        assertThrows(GS1EncoderGeneralException.class, () -> {
+            new GS1Encoder(new GS1Encoder.InitOptions().setNoEmbedded(true));
+        });
+    }
+
 }

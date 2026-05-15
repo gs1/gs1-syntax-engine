@@ -53,29 +53,49 @@ export class GS1encoder {
          * @private
          */
         this.ctx = null;
+        /**
+         * @private
+         */
+        this._nodefsMounts = null;
+        /**
+         * If init succeeded but the C library fell back to the embedded AI
+         * table because the supplied `syntaxDictionary` could not be loaded
+         * (only when `fallbackOnSyndictError` was set), this carries the
+         * underlying load error message. `null` on plain success.
+         * @type {string|null}
+         */
+        this.initFallbackWarning = null;
     }
 
     /**
      * Creates and initialises a new GS1Encoder instance.
      *
+     * @param {object} [options]                         initialisation options
+     * @param {string} [options.syntaxDictionary]        path to a GS1 Syntax Dictionary file. In Node.js this is a real host filesystem path. In the browser there is no host filesystem, so paths will fail to load; omit this option to use the embedded AI table.
+     * @param {boolean} [options.fallbackOnSyndictError] fall back to the embedded AI table if the Syntax Dictionary cannot be loaded
+     * @param {boolean} [options.noEmbedded]             refuse to use the embedded AI table (fails initialisation if no other table can be loaded)
      * @returns {Promise<GS1encoder>} a fully-initialised GS1encoder instance
      * @throws {GS1encoderGeneralException} if the library fails to initialise
      * @async
      */
-    static async create() {
+    static async create(options) {
         const instance = new GS1encoder();
-        await instance.init();
+        await instance.init(options);
         return instance;
     }
 
     /**
      * Initialises a new instance of the GS1Encoder.
      *
+     * @param {object} [options]                         initialisation options (see {@link GS1encoder.create})
+     * @param {string} [options.syntaxDictionary]
+     * @param {boolean} [options.fallbackOnSyndictError]
+     * @param {boolean} [options.noEmbedded]
      * @returns {Promise<void>}
      * @throws {GS1encoderGeneralException} if the library fails to initialise
      * @async
      */
-    async init() {
+    async init(options) {
 
         /**
          *  Load the WASM
@@ -91,8 +111,8 @@ export class GS1encoder {
         this.api = {
             gs1_encoder_getVersion:
                 this.module.cwrap('gs1_encoder_getVersion', 'string', []),
-            gs1_encoder_init:
-                this.module.cwrap('gs1_encoder_init', 'number', []),
+            gs1_encoder_init_ex:
+                this.module.cwrap('gs1_encoder_init_ex', 'number', ['number', 'number']),
             gs1_encoder_free:
                 this.module.cwrap('gs1_encoder_free', '', ['number']),
             gs1_encoder_getErrMsg:
@@ -143,14 +163,130 @@ export class GS1encoder {
                 this.module.cwrap('gs1_encoder_getDLignoredQueryParams', 'number', ['number', 'number']),
         };
 
-        this.ctx = this.api.gs1_encoder_init(null);
-        if (this.ctx === null)
-            throw new GS1encoderGeneralException("Failed to initialise GS1 Barcode Syntax Engine");
+        /*
+         *  gs1_encoder_init_opts_t layout on wasm32 (all fields 4 bytes,
+         *  matching the C-side test_api_init_opts_layout assertions). The
+         *  per-field offsets are derived below from WORD_SIZE so that the
+         *  layout description here is the only place that has to change
+         *  if a new field is appended:
+         *    struct_size, flags, status*, msgBuf*, msgBufSize, syntaxDictionary*
+         *
+         */
+        const WORD_SIZE                          = 4;
+        const OFFSET_STRUCT_SIZE                 = 0 * WORD_SIZE;
+        const OFFSET_FLAGS                       = 1 * WORD_SIZE;
+        const OFFSET_STATUS                      = 2 * WORD_SIZE;
+        const OFFSET_MSG_BUF                     = 3 * WORD_SIZE;
+        const OFFSET_MSG_BUF_SIZE                = 4 * WORD_SIZE;
+        const OFFSET_SYNTAX_DICTIONARY           = 5 * WORD_SIZE;
+        const OPTS_SIZE                          = 6 * WORD_SIZE;
+
+        const MSG_BUF_SIZE                       = 256;
+        const iNO_EMBEDDED                       = 1 << 1;
+        const iFALLBACK_ON_SYNDICT_ERROR         = 1 << 2;
+        const INIT_FALLBACK_TO_EMBEDDED_TABLE    = 1;
+
+        const opts = options || {};
+        let flags = 0;
+        if (opts.fallbackOnSyndictError) flags |= iFALLBACK_ON_SYNDICT_ERROR;
+        if (opts.noEmbedded)             flags |= iNO_EMBEDDED;
+
+        let syntaxDictionary = 0;          // pointer in WASM heap, 0 = NULL
+        let optsPtr = 0;
+        let msgBufPtr = 0;
+        let statusPtr = 0;
+        let errMsg = "";
+        try {
+            if (opts.syntaxDictionary != null) {
+                const vfsPath = this._stageSyntaxDictionary(opts.syntaxDictionary);
+                const bytes = this.module.lengthBytesUTF8(vfsPath) + 1;
+                syntaxDictionary = this.module._malloc(bytes);
+                this.module.stringToUTF8(vfsPath, syntaxDictionary, bytes);
+            }
+
+            optsPtr = this.module._malloc(OPTS_SIZE);
+            msgBufPtr = this.module._malloc(MSG_BUF_SIZE);
+            statusPtr = this.module._malloc(WORD_SIZE);
+            this.module.setValue(msgBufPtr, 0, 'i8');             // empty C string
+            this.module.setValue(statusPtr, 0, 'i32');            // GS1_ENCODERS_INIT_SUCCESS
+            this.module.setValue(optsPtr + OFFSET_STRUCT_SIZE,        OPTS_SIZE,        'i32');
+            this.module.setValue(optsPtr + OFFSET_FLAGS,              flags,            'i32');
+            this.module.setValue(optsPtr + OFFSET_STATUS,             statusPtr,        'i32');
+            this.module.setValue(optsPtr + OFFSET_MSG_BUF,            msgBufPtr,        'i32');
+            this.module.setValue(optsPtr + OFFSET_MSG_BUF_SIZE,       MSG_BUF_SIZE,     'i32');
+            this.module.setValue(optsPtr + OFFSET_SYNTAX_DICTIONARY,  syntaxDictionary, 'i32');
+
+            this.ctx = this.api.gs1_encoder_init_ex(0, optsPtr);
+
+            if (this.ctx === 0) {
+                errMsg = this.module.UTF8ToString(msgBufPtr);
+            } else if (this.module.getValue(statusPtr, 'i32') === INIT_FALLBACK_TO_EMBEDDED_TABLE) {
+                const warning = this.module.UTF8ToString(msgBufPtr);
+                if (warning) this.initFallbackWarning = warning;
+            }
+        } finally {
+            if (syntaxDictionary !== 0) this.module._free(syntaxDictionary);
+            if (msgBufPtr !== 0)        this.module._free(msgBufPtr);
+            if (statusPtr !== 0)        this.module._free(statusPtr);
+            if (optsPtr !== 0)          this.module._free(optsPtr);
+        }
+        if (this.ctx === 0)
+            throw new GS1encoderGeneralException(
+                errMsg || "Failed to initialise GS1 Barcode Syntax Engine");
 
         const ctx = this.ctx;
         const freeFunc = this.api.gs1_encoder_free;
         _registry.register(this, () => freeFunc(ctx), this);
 
+    }
+
+
+    /**
+     * Resolves a host-supplied Syntax Dictionary path to a path readable
+     * from inside the WASM module.
+     *
+     * In Node.js the host directory containing the file is lazily mounted
+     * into the WASM's virtual filesystem via NODEFS so that the C library's
+     * fopen() resolves to the real host file. In the browser there is no
+     * host filesystem; the path is returned unchanged and the C library
+     * will surface a "Cannot read file" error from the load attempt.
+     *
+     * @param {string} path host path supplied by the caller
+     * @returns {string} path to pass to gs1_encoder_init_ex
+     * @private
+     */
+    _stageSyntaxDictionary(path) {
+        const isNode = typeof process !== 'undefined'
+                       && process.versions != null
+                       && process.versions.node != null;
+        if (!isNode)
+            return path;
+
+        // Resolve to an absolute path using process.cwd() (a Node global), then
+        // split into dirname/basename with plain string ops to avoid importing
+        // 'node:path' (keeps this module browser-loadable).
+        let absPath = path.replace(/\\/g, '/');
+        const isAbsolute = /^([a-zA-Z]:)?\//.test(absPath);
+        if (!isAbsolute) {
+            const cwd = process.cwd().replace(/\\/g, '/');
+            absPath = cwd + '/' + absPath;
+        }
+        const lastSlash = absPath.lastIndexOf('/');
+        const hostDir = lastSlash <= 0 ? '/' : absPath.substring(0, lastSlash);
+        const file = absPath.substring(lastSlash + 1);
+
+        // Cache mounts per host directory so repeated init() calls reuse them.
+        if (this._nodefsMounts === null) this._nodefsMounts = new Map();
+        let mountPoint = this._nodefsMounts.get(hostDir);
+        if (!mountPoint) {
+            const FS = this.module.FS;
+            mountPoint = '/gs1-host-' + this._nodefsMounts.size;
+            try { FS.mkdir(mountPoint); }
+            catch (e) { if (!e || e.code !== 'EEXIST') throw e; }
+            FS.mount(FS.filesystems.NODEFS, { root: hostDir }, mountPoint);
+            this._nodefsMounts.set(hostDir, mountPoint);
+        }
+        return mountPoint + '/' + file;
     }
 
 

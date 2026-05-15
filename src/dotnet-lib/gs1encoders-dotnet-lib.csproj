@@ -17,10 +17,19 @@
     <NativePlatformDir Condition="'$(NativePlatformDir)' == ''">x64</NativePlatformDir>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <None Include="..\c-lib\build\library\$(NativePlatformDir)\$(Configuration)\gs1encoders.dll"
           CopyToOutputDirectory="PreserveNewest"
           Link="gs1encoders.dll" />
+  </ItemGroup>
+
+  <!-- On Linux/macOS .NET P/Invoke prepends "lib" to the DLL name, so the
+       Linux ELF .so is staged under the name "libgs1encoders.dll" for the
+       runtime resolver to dlopen(). -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+    <None Include="..\c-lib\build\libgs1encoders.so"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="libgs1encoders.dll" />
   </ItemGroup>
 
 </Project>

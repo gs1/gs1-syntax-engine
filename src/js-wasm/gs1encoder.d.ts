@@ -5,23 +5,51 @@ export class GS1encoder {
     /**
      * Creates and initialises a new GS1Encoder instance.
      *
+     * @param {object} [options]                         initialisation options
+     * @param {string} [options.syntaxDictionary]        path to a GS1 Syntax Dictionary file. In Node.js this is a real host filesystem path. In the browser there is no host filesystem, so paths will fail to load; omit this option to use the embedded AI table.
+     * @param {boolean} [options.fallbackOnSyndictError] fall back to the embedded AI table if the Syntax Dictionary cannot be loaded
+     * @param {boolean} [options.noEmbedded]             refuse to use the embedded AI table (fails initialisation if no other table can be loaded)
      * @returns {Promise<GS1encoder>} a fully-initialised GS1encoder instance
      * @throws {GS1encoderGeneralException} if the library fails to initialise
      * @async
      */
-    static create(): Promise<GS1encoder>;
+    static create(options?: {
+        syntaxDictionary?: string;
+        fallbackOnSyndictError?: boolean;
+        noEmbedded?: boolean;
+    }): Promise<GS1encoder>;
     /**
      * @private
      */
     private ctx;
     /**
+     * @private
+     */
+    private _nodefsMounts;
+    /**
+     * If init succeeded but the C library fell back to the embedded AI
+     * table because the supplied `syntaxDictionary` could not be loaded
+     * (only when `fallbackOnSyndictError` was set), this carries the
+     * underlying load error message. `null` on plain success.
+     * @type {string|null}
+     */
+    initFallbackWarning: string | null;
+    /**
      * Initialises a new instance of the GS1Encoder.
      *
+     * @param {object} [options]                         initialisation options (see {@link GS1encoder.create})
+     * @param {string} [options.syntaxDictionary]
+     * @param {boolean} [options.fallbackOnSyndictError]
+     * @param {boolean} [options.noEmbedded]
      * @returns {Promise<void>}
      * @throws {GS1encoderGeneralException} if the library fails to initialise
      * @async
      */
-    init(): Promise<void>;
+    init(options?: {
+        syntaxDictionary?: string;
+        fallbackOnSyndictError?: boolean;
+        noEmbedded?: boolean;
+    }): Promise<void>;
     /**
      *  Load the WASM
      *  @private
@@ -33,6 +61,21 @@ export class GS1encoder {
      *  @private
      */
     private api;
+    /**
+     * Resolves a host-supplied Syntax Dictionary path to a path readable
+     * from inside the WASM module.
+     *
+     * In Node.js the host directory containing the file is lazily mounted
+     * into the WASM's virtual filesystem via NODEFS so that the C library's
+     * fopen() resolves to the real host file. In the browser there is no
+     * host filesystem; the path is returned unchanged and the C library
+     * will surface a "Cannot read file" error from the load attempt.
+     *
+     * @param {string} path host path supplied by the caller
+     * @returns {string} path to pass to gs1_encoder_init_ex
+     * @private
+     */
+    private _stageSyntaxDictionary;
     /**
      * Frees the resources associated with this encoder instance.
      * @returns {void}

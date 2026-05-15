@@ -24,6 +24,9 @@
 #include "gs1encoders.h"
 
 
+#define MSG_BUF_SIZE 256
+
+
 JNIEXPORT jstring JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetErrMsgJNI(
         JNIEnv* env,
         jobject obj,
@@ -32,10 +35,46 @@ JNIEXPORT jstring JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderGetErrMs
     return (*env)->NewStringUTF(env, out);
 }
 
-JNIEXPORT jlong JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderInitJNI(
+JNIEXPORT jlong JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderInitExJNI(
         JNIEnv* env,
-        jobject obj) {
-    return (jlong)gs1_encoder_init(NULL);
+        jobject obj,
+        jobject initOptions,
+        jobjectArray outErrorMessage) {
+    const char* path = NULL;
+    jstring syntaxDictionary = NULL;
+    jlong ret;
+    char msgBuf[MSG_BUF_SIZE] = { 0 };
+    gs1_encoder_init_opts_t opts = {
+        .struct_size = sizeof(gs1_encoder_init_opts_t),
+        .msgBuf = msgBuf,
+        .msgBufSize = sizeof(msgBuf),
+    };
+    (void)obj;
+    if (initOptions) {
+        jclass cls = (*env)->GetObjectClass(env, initOptions);
+        jfieldID synFid    = (*env)->GetFieldID(env, cls, "syntaxDictionary",       "Ljava/lang/String;");
+        jfieldID fbFid     = (*env)->GetFieldID(env, cls, "fallbackOnSyndictError", "Z");
+        jfieldID noEmbFid  = (*env)->GetFieldID(env, cls, "noEmbedded",             "Z");
+        syntaxDictionary = (*env)->GetObjectField(env, initOptions, synFid);
+        if ((*env)->GetBooleanField(env, initOptions, fbFid))    opts.flags |= gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR;
+        if ((*env)->GetBooleanField(env, initOptions, noEmbFid)) opts.flags |= gs1_encoder_iNO_EMBEDDED;
+    }
+    if (syntaxDictionary) {
+        path = (*env)->GetStringUTFChars(env, syntaxDictionary, NULL);
+        opts.syntaxDictionary = path;
+    }
+    ret = (jlong)gs1_encoder_init_ex(NULL, &opts);
+    if (path != NULL)
+        (*env)->ReleaseStringUTFChars(env, syntaxDictionary, path);
+    /* On failure (ret==0) the message is the error description; on success
+     * with a non-empty msgBuf the message is a fallback warning (status
+     * == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE — currently the only
+     * success-with-message case the C library produces). */
+    if (outErrorMessage && msgBuf[0] != '\0') {
+        (*env)->SetObjectArrayElement(env, outErrorMessage, 0,
+                                      (*env)->NewStringUTF(env, msgBuf));
+    }
+    return ret;
 }
 
 JNIEXPORT void JNICALL Java_org_gs1_gs1encoders_GS1Encoder_gs1encoderFreeJNI(

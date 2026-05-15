@@ -21,10 +21,22 @@
     <ProjectReference Include="..\dotnet-lib\gs1encoders-dotnet-lib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <None Include="..\c-lib\build\library\$(NativePlatformDir)\$(Configuration)\gs1encoders.dll"
           CopyToOutputDirectory="PreserveNewest"
           Link="gs1encoders.dll" />
+  </ItemGroup>
+
+  <!-- On Linux/macOS .NET P/Invoke prepends "lib" to the DLL name, so the
+       Linux ELF .so is staged in the test output directory under the name
+       "libgs1encoders.dll" for the runtime resolver to dlopen(). -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+    <None Include="..\c-lib\build\libgs1encoders.so"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="libgs1encoders.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\c-lib\gs1-syntax-dictionary.txt"
              CopyToOutputDirectory="PreserveNewest"
              Link="gs1-syntax-dictionary.txt" />

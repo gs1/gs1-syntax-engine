@@ -18,6 +18,7 @@
  *
  */
 
+import Foundation
 import XCTest
 @testable import GS1Encoders
 
@@ -247,6 +248,57 @@ final class GS1EncoderTests: XCTestCase {
         XCTAssertTrue(gs1encoder.getErrMarkup().contains("|"), "Error markup should contain '|' delimiters")
 
         gs1encoder.free()
+    }
+
+    func testDefaultInit() throws {
+        let gs1encoder = try GS1Encoder()
+        XCTAssertEqual(gs1encoder.getSym(), .NONE)
+        gs1encoder.free()
+    }
+
+    func testSyntaxDictionaryPath() throws {
+        let path = Bundle.module.path(forResource: "gs1-syntax-dictionary", ofType: "txt")!
+        let gs1encoder = try GS1Encoder(syntaxDictionary: path)
+        try gs1encoder.setAIdataStr("(01)12312312312333")
+        XCTAssertEqual(gs1encoder.getAIdataStr(), "(01)12312312312333")
+        gs1encoder.free()
+    }
+
+    func testBadSyntaxDictionaryPath() throws {
+        XCTAssertThrowsError(try GS1Encoder(syntaxDictionary: "nonexistent-file.txt")) { error in
+            guard case GS1EncoderError.generalError(let msg) = error else {
+                XCTFail("Expected generalError")
+                return
+            }
+            XCTAssertTrue(msg.contains("nonexistent-file.txt"), "Error message should contain the filename")
+        }
+    }
+
+    func testFallbackOnSyndictError() throws {
+        let gs1encoder = try GS1Encoder(
+            syntaxDictionary: "nonexistent-file.txt",
+            fallbackOnSyndictError: true
+        )
+        try gs1encoder.setAIdataStr("(01)12312312312333")
+        XCTAssertEqual(gs1encoder.getAIdataStr(), "(01)12312312312333")
+        XCTAssertNotNil(gs1encoder.initFallbackWarning)
+        XCTAssertTrue(gs1encoder.initFallbackWarning!.contains("nonexistent-file.txt"))
+        gs1encoder.free()
+    }
+
+    func testInitFallbackWarningNilOnPlainSuccess() throws {
+        let gs1encoder = try GS1Encoder()
+        XCTAssertNil(gs1encoder.initFallbackWarning)
+        gs1encoder.free()
+    }
+
+    func testNoEmbedded() throws {
+        XCTAssertThrowsError(try GS1Encoder(noEmbedded: true)) { error in
+            guard case GS1EncoderError.generalError = error else {
+                XCTFail("Expected generalError")
+                return
+            }
+        }
     }
 
 }

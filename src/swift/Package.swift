@@ -88,6 +88,9 @@ let package = Package(
             dependencies: ["GS1Encoders"]),
         .testTarget(
             name: "GS1EncodersTests",
-            dependencies: ["GS1Encoders"]),
+            dependencies: ["GS1Encoders"],
+            resources: [
+                .copy("gs1-syntax-dictionary.txt")
+            ]),
     ]
 )

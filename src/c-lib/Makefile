@@ -71,8 +71,7 @@ CFLAGS_G =
 CFLAGS_O = -O3
 CFLAGS_V =
 BUILD_DIR = build-wasm
-LDFLAGS_WASM = -s WASM=$(DO_WASM) -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s EXPORTED_RUNTIME_METHODS='["cwrap","getValue","UTF8ToString"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1
-SYN_DICT = gs1-syntax-dictionary.txt
+LDFLAGS_WASM = -s WASM=$(DO_WASM) -s MODULARIZE=1 -s EXPORT_NAME=createGS1encoderModule -s EXPORT_ES6=1 -s EXPORTED_RUNTIME_METHODS='["cwrap","getValue","setValue","UTF8ToString","stringToUTF8","lengthBytesUTF8","FS"]' -s EXPORTED_FUNCTIONS='["_malloc","_free"]' -s ALLOW_MEMORY_GROWTH=1 -lnodefs.js
 else
 CFLAGS_G = -g
 CFLAGS_O = -O2
@@ -306,7 +305,7 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 #  WASM JS
 #
 $(WASM_JS): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS_WASM) $(LDLIBS) $^ -o $@ --embed-file $(SYN_DICT)
+	$(CC) $(CFLAGS) $(LDFLAGS_WASM) $(LDLIBS) $^ -o $@
 
 
 #
@@ -377,6 +376,26 @@ wasm: $(WASM_JS)
 .PHONY: test
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
+
+# Run the Swift binding test suite via Docker. The Swift Package builds the
+# C library itself, so this is end-to-end. The dictionary file is staged into
+# the test bundle source dir per the Package.swift "resources:" declaration.
+.PHONY: test-swift
+test-swift:
+	cp -f gs1-syntax-dictionary.txt ../swift/Tests/GS1EncodersTests/
+	docker run --rm -v $$(pwd)/../..:/src -w /src/src/swift \
+	    -u $$(id -u):$$(id -g) swift:6.0 \
+	    swift test
+
+# Run the .NET binding test suite on Linux via Docker. Depends on the local
+# Linux shared library; the csproj is cross-platform aware and stages
+# libgs1encoders.so as libgs1encoders.dll in the test output dir.
+.PHONY: test-cs
+test-cs: lib
+	docker run --rm -v $$(pwd)/../..:/src \
+	    -e HOME=/tmp -u $$(id -u):$$(id -g) \
+	    mcr.microsoft.com/dotnet/sdk:8.0 \
+	    bash -c "cd /src/src/dotnet-test && dotnet test --nologo"
 
 .PHONY: coverage
 coverage:

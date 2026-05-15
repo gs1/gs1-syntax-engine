@@ -247,6 +247,60 @@ namespace GS1EncodersTest
             StringAssert.Contains(gs1encoder.ErrMarkup, "|");
         }
 
+        [TestMethod]
+        public void TestDefaultConstructor()
+        {
+            GS1Encoder gs1encoder = new GS1Encoder();
+            Assert.AreEqual(GS1Encoder.Symbology.NONE, gs1encoder.Sym);
+        }
+
+        [TestMethod]
+        public void TestSyntaxDictionaryPath()
+        {
+            GS1Encoder gs1encoder = new GS1Encoder(new GS1Encoder.InitOptions { SyntaxDictionary = "gs1-syntax-dictionary.txt" });
+            gs1encoder.AIdataStr = "(01)12312312312333";
+            Assert.AreEqual("(01)12312312312333", gs1encoder.AIdataStr);
+        }
+
+        [TestMethod]
+        public void TestBadSyntaxDictionaryPath()
+        {
+            Assert.ThrowsExactly<GS1EncoderGeneralException>(() =>
+            {
+                new GS1Encoder(new GS1Encoder.InitOptions { SyntaxDictionary = "nonexistent-file.txt" });
+            });
+        }
+
+        [TestMethod]
+        public void TestFallbackOnSyndictError()
+        {
+            GS1Encoder gs1encoder = new GS1Encoder(new GS1Encoder.InitOptions
+            {
+                SyntaxDictionary = "nonexistent-file.txt",
+                FallbackOnSyndictError = true,
+            });
+            gs1encoder.AIdataStr = "(01)12312312312333";
+            Assert.AreEqual("(01)12312312312333", gs1encoder.AIdataStr);
+            Assert.IsNotNull(gs1encoder.InitFallbackWarning);
+            StringAssert.Contains(gs1encoder.InitFallbackWarning, "nonexistent-file.txt");
+        }
+
+        [TestMethod]
+        public void TestInitFallbackWarningNullOnPlainSuccess()
+        {
+            GS1Encoder gs1encoder = new GS1Encoder();
+            Assert.IsNull(gs1encoder.InitFallbackWarning);
+        }
+
+        [TestMethod]
+        public void TestNoEmbedded()
+        {
+            Assert.ThrowsExactly<GS1EncoderGeneralException>(() =>
+            {
+                new GS1Encoder(new GS1Encoder.InitOptions { NoEmbedded = true });
+            });
+        }
+
     }
 
 }

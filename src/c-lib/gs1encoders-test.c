@@ -62,6 +62,8 @@ TEST_LIST = {
     { "api_instanceSize", test_api_instanceSize },
     { "api_init", test_api_init },
     { "api_init_deprecatedFlags", test_api_init_deprecatedFlags },
+    { "api_init_opts_layout", test_api_init_opts_layout },
+    { "api_init_enum_values", test_api_init_enum_values },
     { "api_defaults", test_api_defaults },
     { "api_sym", test_api_sym },
     { "api_addCheckDigit", test_api_addCheckDigit },

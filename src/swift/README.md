@@ -96,7 +96,8 @@ targets: [
 ]
 ```
 
-For a minimal example, create a `main.swift` file as follows:
+For a minimal example, create a `main.swift` file as follows. This uses
+the embedded AI table that is compiled into the library:
 
 ```swift
 import GS1Encoders
@@ -106,6 +107,27 @@ do {
     try gs.setAIdataStr("(01)09521234543213(99)TESTING123")
     let uri = try gs.getDLuri("https://example.com")
     print("GS1 Digital Link URI: \(uri)")
+} catch {
+    print("Error: \(error)")
+}
+```
+
+To load an external GS1 Syntax Dictionary file instead of using the
+embedded AI table, pass `syntaxDictionary:` to the constructor. Set
+`fallbackOnSyndictError: true` to fall back to the embedded AI table if
+the external file cannot be opened or parsed, rather than failing. The
+following inverse example parses a GS1 Digital Link URI and reports the
+extracted AI data:
+
+```swift
+import GS1Encoders
+
+do {
+    let gs = try GS1Encoder(
+        syntaxDictionary: "/path/to/gs1-syntax-dictionary.txt",
+        fallbackOnSyndictError: true)
+    try gs.setDataStr("https://example.com/01/09521234543213?99=TESTING123")
+    print("Extracted AIs: \(gs.getAIdataStr())")
 } catch {
     print("Error: \(error)")
 }
