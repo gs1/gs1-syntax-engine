@@ -92,6 +92,13 @@ jobs:
         run: |
           make -C src/c-lib test-cpp
 
+      - name: C++ console app
+        run: |
+          make -C src/c-lib -j "$(nproc)" app-cpp
+          ( cd src/c-lib && \
+            LD_LIBRARY_PATH=build \
+            build/gs1encoders-cpp-app.bin --version )
+
   ci-valgrind:
 
     runs-on: ubuntu-latest
@@ -180,13 +187,17 @@ jobs:
           # Load AI table from external Syntax Dictionary
           copy src\c-lib\gs1-syntax-dictionary.txt .
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
+          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
 
           # Re-run using the embedded AI table
           del gs1-syntax-dictionary.txt
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
+          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
           copy src\c-lib\gs1-syntax-dictionary.txt .
 
           src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
+            --version
+          src\c-lib\build\console-app-cpp\x64\Release\gs1encoders-cpp-app.exe `
             --version
           src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
             --version

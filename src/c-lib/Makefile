@@ -213,11 +213,14 @@ LIBDIR = $(PREFIX)/lib
 APP_SRC = gs1encoders-app.c
 APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 
+APP_CPP_SRC = gs1encoders-cpp-app.cpp
+APP_CPP_BIN = $(BUILD_DIR)/$(NAME)-cpp-app.$(BIN_SUFFIX)
+
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
-CPP_TEST_SRC = gs1encoders-test.cpp
-CPP_TEST_BIN = $(BUILD_DIR)/$(NAME)-test-cpp.$(BIN_SUFFIX)
+CPP_TEST_SRC = gs1encoders-cpp-test.cpp
+CPP_TEST_BIN = $(BUILD_DIR)/$(NAME)-cpp-test.$(BIN_SUFFIX)
 
 LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
 
@@ -369,6 +372,9 @@ libstatic: $(LIB_STATIC)
 .PHONY: app
 app: $(APP)
 
+.PHONY: app-cpp
+app-cpp: $(APP_CPP_BIN)
+
 .PHONY: app-static
 app-static: $(APP_STATIC)
 
@@ -390,6 +396,9 @@ CXXFLAGS_CPP_TEST = -std=c++17 -g -O2 -Wall -Wextra -pedantic -Werror -I.
 
 $(CPP_TEST_BIN): $(CPP_TEST_SRC) gs1encoders.h gs1encoders.hpp acutest.h | libshared
 	$(CXX) $(CXXFLAGS_CPP_TEST) $(CPP_TEST_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+
+$(APP_CPP_BIN): $(APP_CPP_SRC) gs1encoders.h gs1encoders.hpp | libshared
+	$(CXX) $(CXXFLAGS_CPP_TEST) $(APP_CPP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 # Run the Swift binding test suite via Docker. The Swift Package builds the
 # C library itself, so this is end-to-end. The dictionary file is staged into

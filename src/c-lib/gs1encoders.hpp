@@ -71,7 +71,7 @@
 #ifndef GS1ENCODERS_HPP
 #define GS1ENCODERS_HPP
 
-#include <gs1encoders.h>
+#include "gs1encoders.h"
 
 #include <optional>
 #include <stdexcept>

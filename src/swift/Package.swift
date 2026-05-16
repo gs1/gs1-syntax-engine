@@ -46,8 +46,9 @@ let package = Package(
             exclude: [
                 // Exclude test, fuzzer, and utility files from the C library
                 "c-lib/gs1encoders-app.c",
+                "c-lib/gs1encoders-cpp-app.cpp",
                 "c-lib/gs1encoders-test.c",
-                "c-lib/gs1encoders-test.cpp",
+                "c-lib/gs1encoders-cpp-test.cpp",
                 "c-lib/gs1encoders-fuzzer-ais.c",
                 "c-lib/gs1encoders-fuzzer-data.c",
                 "c-lib/gs1encoders-fuzzer-dl.c",

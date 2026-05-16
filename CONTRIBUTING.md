@@ -199,9 +199,10 @@ Use prefixes to avoid collisions with user code:
 | `syntax/*`                   | Vendored copy of Syntax Dictionary linter routines   |
 | `debug.h`                    | Debugging macros (`DEBUG_PRINT`)                     |
 | `tr.h`, `tr_EN.h`            | Error message translation system                     |
-| `gs1encoders-app.c`          | Console demo application source                      |
+| `gs1encoders-app.c`          | C console demo application source                    |
+| `gs1encoders-cpp-app.cpp`    | C++ console demo application source (`make app-cpp`) |
 | `gs1encoders-test.c`         | C unit test harness                                  |
-| `gs1encoders-test.cpp`       | C++ wrapper unit test harness (`make test-cpp`)      |
+| `gs1encoders-cpp-test.cpp`   | C++ wrapper unit test harness (`make test-cpp`)      |
 | `gs1encoders-fuzzer-*.c`     | Fuzzer entry points (ais, data, dl, scandata, syn)   |
 | `build-embedded-ai-table.pl` | Generates `aitable.inc` from Syntax Dictionary       |
 
