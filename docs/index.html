@@ -99,7 +99,7 @@ Using in your own C/C++ project</h3>
 <li>Link against the library (<code>libgs1encoders.so</code>, <code>libgs1encoders.a</code>, <code>gs1encoders.dll</code>, or <code>gs1encoders.lib</code>)</li>
 </ol>
 <p><b>Note:</b> On Windows, <code>gs1encoders.dll</code> requires the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> to be installed on the target system. The architecture (x86 or x64) must match the platform used to build the library.</p>
-<p>For a minimal example, create a <code>myapp.c</code> file as follows:</p>
+<p>For a minimal example, create a <code>myapp.c</code> file as follows. This uses the embedded AI table that is compiled into the library:</p>
 <div class="fragment"><div class="line">#include &lt;stdio.h&gt;</div>
 <div class="line">#include &quot;gs1encoders.h&quot;</div>
 <div class="line"> </div>
@@ -114,6 +114,52 @@ Using in your own C/C++ project</h3>
 <div class="line">    }</div>
 <div class="line"> </div>
 <div class="line">    printf(&quot;GS1 Digital Link URI: %s\n&quot;, gs1_encoder_getDLuri(gs, &quot;https://example.com&quot;));</div>
+<div class="line"> </div>
+<div class="line">    gs1_encoder_free(gs);</div>
+<div class="line">    return 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>To load an external GS1 Syntax Dictionary file instead of using the embedded AI table, populate a <a class="el" href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a> and pass it to <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>. The fields are:</p>
+<ul>
+<li><a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> — path to a Syntax Dictionary file. <code>NULL</code> (default) uses the embedded AI table.</li>
+<li><a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</li>
+<li><a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">gs1_encoder_iNO_EMBEDDED</a> — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).</li>
+<li><a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a> — receive the structured initialisation outcome and any error or warning message.</li>
+</ul>
+<p>The following inverse example parses a GS1 Digital Link URI and reports the extracted AI data, loading the Syntax Dictionary from a host filesystem path and falling back to the embedded AI table if the file cannot be opened or parsed:</p>
+<div class="fragment"><div class="line">#include &lt;stdio.h&gt;</div>
+<div class="line">#include &quot;gs1encoders.h&quot;</div>
+<div class="line"> </div>
+<div class="line">int main(void) {</div>
+<div class="line">    gs1_encoder_init_status_t status;</div>
+<div class="line">    char msg[256] = { 0 };</div>
+<div class="line"> </div>
+<div class="line">    gs1_encoder_init_opts_t opts = {</div>
+<div class="line">        .struct_size      = sizeof(gs1_encoder_init_opts_t),</div>
+<div class="line">        .flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,</div>
+<div class="line">        .syntaxDictionary = &quot;/path/to/gs1-syntax-dictionary.txt&quot;,</div>
+<div class="line">        .status           = &amp;status,</div>
+<div class="line">        .msgBuf           = msg,</div>
+<div class="line">        .msgBufSize       = sizeof(msg),</div>
+<div class="line">    };</div>
+<div class="line"> </div>
+<div class="line">    gs1_encoder *gs = gs1_encoder_init_ex(NULL, &amp;opts);</div>
+<div class="line">    if (!gs) {</div>
+<div class="line">        if (*msg) printf(&quot;Init failed: %s\n&quot;, msg);</div>
+<div class="line">        return 1;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    // status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE indicates the</div>
+<div class="line">    // dictionary file could not be loaded; msg carries the underlying error.</div>
+<div class="line">    if (status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE &amp;&amp; *msg)</div>
+<div class="line">        printf(&quot;Init warning: %s\n&quot;, msg);</div>
+<div class="line"> </div>
+<div class="line">    if (!gs1_encoder_setDataStr(gs, &quot;https://example.com/01/09521234543213?99=TESTING123&quot;)) {</div>
+<div class="line">        printf(&quot;Error: %s\n&quot;, gs1_encoder_getErrMsg(gs));</div>
+<div class="line">        gs1_encoder_free(gs);</div>
+<div class="line">        return 1;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    printf(&quot;Extracted AIs: %s\n&quot;, gs1_encoder_getAIdataStr(gs));</div>
 <div class="line"> </div>
 <div class="line">    gs1_encoder_free(gs);</div>
 <div class="line">    return 0;</div>
