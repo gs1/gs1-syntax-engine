@@ -97,7 +97,8 @@ To use the library in your C/C++ project you must:
 to be installed on the target system. The architecture (x86 or x64) must match
 the platform used to build the library.
 
-For a minimal example, create a `myapp.c` file as follows:
+For a minimal example, create a `myapp.c` file as follows. This uses the
+embedded AI table that is compiled into the library:
 
 \code
 #include <stdio.h>
@@ -114,6 +115,61 @@ int main(void) {
     }
 
     printf("GS1 Digital Link URI: %s\n", gs1_encoder_getDLuri(gs, "https://example.com"));
+
+    gs1_encoder_free(gs);
+    return 0;
+}
+\endcode
+
+To load an external GS1 Syntax Dictionary file instead of using the embedded
+AI table, populate a @ref gs1_encoder_init_opts_t and pass it to
+gs1_encoder_init_ex(). The fields are:
+
+  * @ref gs1_encoder_init_opts::syntaxDictionary — path to a Syntax Dictionary file. `NULL` (default) uses the embedded AI table.
+  * @ref gs1_encoder_init_flags "gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR" — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+  * @ref gs1_encoder_init_flags "gs1_encoder_iNO_EMBEDDED" — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).
+  * @ref gs1_encoder_init_opts::status and @ref gs1_encoder_init_opts::msgBuf — receive the structured initialisation outcome and any error or warning message.
+
+The following inverse example parses a GS1 Digital Link URI and reports the
+extracted AI data, loading the Syntax Dictionary from a host filesystem path
+and falling back to the embedded AI table if the file cannot be opened or
+parsed:
+
+\code
+#include <stdio.h>
+#include "gs1encoders.h"
+
+int main(void) {
+    gs1_encoder_init_status_t status;
+    char msg[256] = { 0 };
+
+    gs1_encoder_init_opts_t opts = {
+        .struct_size      = sizeof(gs1_encoder_init_opts_t),
+        .flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+        .syntaxDictionary = "/path/to/gs1-syntax-dictionary.txt",
+        .status           = &status,
+        .msgBuf           = msg,
+        .msgBufSize       = sizeof(msg),
+    };
+
+    gs1_encoder *gs = gs1_encoder_init_ex(NULL, &opts);
+    if (!gs) {
+        if (*msg) printf("Init failed: %s\n", msg);
+        return 1;
+    }
+
+    // status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE indicates the
+    // dictionary file could not be loaded; msg carries the underlying error.
+    if (status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE && *msg)
+        printf("Init warning: %s\n", msg);
+
+    if (!gs1_encoder_setDataStr(gs, "https://example.com/01/09521234543213?99=TESTING123")) {
+        printf("Error: %s\n", gs1_encoder_getErrMsg(gs));
+        gs1_encoder_free(gs);
+        return 1;
+    }
+
+    printf("Extracted AIs: %s\n", gs1_encoder_getAIdataStr(gs));
 
     gs1_encoder_free(gs);
     return 0;
