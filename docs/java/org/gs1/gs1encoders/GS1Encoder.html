@@ -109,14 +109,19 @@ implements <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="GS1Encoder.Symbology.html" class="type-name-link" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a></code></div>
+<div class="col-first even-row-color"><code>static class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="GS1Encoder.InitOptions.html" class="type-name-link" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">Recognised GS1 barcode formats ("symbologies") for processing scan data.</div>
+<div class="block">Initialisation options for the GS1Encoder.</div>
 </div>
 <div class="col-first odd-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="GS1Encoder.Validation.html" class="type-name-link" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a></code></div>
+<div class="col-second odd-row-color"><code><a href="GS1Encoder.Symbology.html" class="type-name-link" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">Recognised GS1 barcode formats ("symbologies") for processing scan data.</div>
+</div>
+<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="GS1Encoder.Validation.html" class="type-name-link" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Optional AI validation procedures that may be applied to detect invalid inputs.</div>
 </div>
 </div>
@@ -133,6 +138,10 @@ implements <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">GS1Encoder</a>()</code></div>
 <div class="col-last even-row-color">
 <div class="block">Initialises a new instance of the GS1Encoder class.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.gs1.gs1encoders.GS1Encoder.InitOptions)" class="member-name-link">GS1Encoder</a><wbr>(<a href="GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a>&nbsp;options)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Initialises a new instance of the GS1Encoder class with the given options.</div>
 </div>
 </div>
 </section>
@@ -193,94 +202,101 @@ implements <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the status of the "include data titles in HRI" flag.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPermitUnknownAIs()" class="member-name-link">getPermitUnknownAIs</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInitFallbackWarning()" class="member-name-link">getInitFallbackWarning</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the status of the "permit unknown AIs" mode.</div>
+<div class="block">Returns the warning message produced when initialisation fell back to
+ the embedded AI table because the supplied Syntax Dictionary could not
+ be loaded (only when <code>fallbackOnSyndictError</code> was set).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPermitZeroSuppressedGTINinDLuris()" class="member-name-link">getPermitZeroSuppressedGTINinDLuris</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPermitUnknownAIs()" class="member-name-link">getPermitUnknownAIs</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the status of the "permit unknown AIs" mode.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPermitZeroSuppressedGTINinDLuris()" class="member-name-link">getPermitZeroSuppressedGTINinDLuris</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the status of the "permit zero-suppressed GTINs in GS1 DL URIs" mode.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScanData()" class="member-name-link">getScanData</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScanData()" class="member-name-link">getScanData</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the expected scan data string that a reader should return.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="GS1Encoder.Symbology.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSym()" class="member-name-link">getSym</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="GS1Encoder.Symbology.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSym()" class="member-name-link">getSym</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the current symbology type.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getValidateAIassociations()" class="member-name-link">getValidateAIassociations</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getValidateAIassociations()" class="member-name-link">getValidateAIassociations</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span>
 <div class="deprecation-comment">Use <a href="#getValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation)"><code>getValidationEnabled(Validation)</code></a> instead</div>
 </div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation)" class="member-name-link">getValidationEnabled</a><wbr>(<a href="GS1Encoder.Validation.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a>&nbsp;validation)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation)" class="member-name-link">getValidationEnabled</a><wbr>(<a href="GS1Encoder.Validation.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a>&nbsp;validation)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the current enabled status of the provided AI validation procedure.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getVersion()" class="member-name-link">getVersion</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getVersion()" class="member-name-link">getVersion</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the version string of the library.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAddCheckDigit(boolean)" class="member-name-link">setAddCheckDigit</a><wbr>(boolean&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAddCheckDigit(boolean)" class="member-name-link">setAddCheckDigit</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enable or disable "add check digit" mode for EAN/UPC and GS1 DataBar symbols.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAIdataStr(java.lang.String)" class="member-name-link">setAIdataStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAIdataStr(java.lang.String)" class="member-name-link">setAIdataStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the barcode data input buffer using GS1 Application Identifier syntax.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDataStr(java.lang.String)" class="member-name-link">setDataStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDataStr(java.lang.String)" class="member-name-link">setDataStr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the raw data that would be directly encoded within a GS1 barcode message.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIncludeDataTitlesInHRI(boolean)" class="member-name-link">setIncludeDataTitlesInHRI</a><wbr>(boolean&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIncludeDataTitlesInHRI(boolean)" class="member-name-link">setIncludeDataTitlesInHRI</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the "include data titles in HRI" flag.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPermitUnknownAIs(boolean)" class="member-name-link">setPermitUnknownAIs</a><wbr>(boolean&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPermitUnknownAIs(boolean)" class="member-name-link">setPermitUnknownAIs</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the "permit unknown AIs" mode.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPermitZeroSuppressedGTINinDLuris(boolean)" class="member-name-link">setPermitZeroSuppressedGTINinDLuris</a><wbr>(boolean&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPermitZeroSuppressedGTINinDLuris(boolean)" class="member-name-link">setPermitZeroSuppressedGTINinDLuris</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the status of the "permit zero-suppressed GTINs in GS1 DL URIs" mode.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setScanData(java.lang.String)" class="member-name-link">setScanData</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setScanData(java.lang.String)" class="member-name-link">setScanData</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Process scan data received from a barcode reader.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSym(org.gs1.gs1encoders.GS1Encoder.Symbology)" class="member-name-link">setSym</a><wbr>(<a href="GS1Encoder.Symbology.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSym(org.gs1.gs1encoders.GS1Encoder.Symbology)" class="member-name-link">setSym</a><wbr>(<a href="GS1Encoder.Symbology.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the symbology type.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setValidateAIassociations(boolean)" class="member-name-link">setValidateAIassociations</a><wbr>(boolean&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setValidateAIassociations(boolean)" class="member-name-link">setValidateAIassociations</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span>
 <div class="deprecation-comment">Use <a href="#setValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation,boolean)"><code>setValidationEnabled(Validation, boolean)</code></a> instead</div>
 </div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation,boolean)" class="member-name-link">setValidationEnabled</a><wbr>(<a href="GS1Encoder.Validation.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a>&nbsp;validation,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setValidationEnabled(org.gs1.gs1encoders.GS1Encoder.Validation,boolean)" class="member-name-link">setValidationEnabled</a><wbr>(<a href="GS1Encoder.Validation.html" title="enum class in org.gs1.gs1encoders">GS1Encoder.Validation</a>&nbsp;validation,
  boolean&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enable or disable the given AI validation procedure.</div>
 </div>
 </div>
@@ -312,6 +328,20 @@ implements <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base
 </dl>
 </section>
 </li>
+<li>
+<section class="detail" id="&lt;init&gt;(org.gs1.gs1encoders.GS1Encoder.InitOptions)">
+<h3>GS1Encoder</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GS1Encoder</span><wbr><span class="parameters">(<a href="GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a>&nbsp;options)</span>
+           throws <span class="exceptions"><a href="GS1EncoderGeneralException.html" title="class in org.gs1.gs1encoders">GS1EncoderGeneralException</a></span></div>
+<div class="block">Initialises a new instance of the GS1Encoder class with the given options.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>options</code> - initialisation options, or null for defaults</dd>
+<dt>Throws:</dt>
+<dd><code><a href="GS1EncoderGeneralException.html" title="class in org.gs1.gs1encoders">GS1EncoderGeneralException</a></code> - if the library fails to initialise</dd>
+</dl>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -320,6 +350,19 @@ implements <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="getInitFallbackWarning()">
+<h3>getInitFallbackWarning</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getInitFallbackWarning</span>()</div>
+<div class="block">Returns the warning message produced when initialisation fell back to
+ the embedded AI table because the supplied Syntax Dictionary could not
+ be loaded (only when <code>fallbackOnSyndictError</code> was set).</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the underlying load-error message, or <code>null</code> on plain success</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="close()">
 <h3>close</h3>

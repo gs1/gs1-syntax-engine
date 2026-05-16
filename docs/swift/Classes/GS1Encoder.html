@@ -151,9 +151,38 @@ All validation procedures are listed to maintain correct enum value alignment wi
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:11GS1Encoders0A7EncoderCACyKcfc"></a>
-                    <a name="//apple_ref/swift/Method/init()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:11GS1Encoders0A7EncoderCACyKcfc">init()</a>
+                    <a name="/s:11GS1Encoders0A7EncoderC19initFallbackWarningSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/initFallbackWarning" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC19initFallbackWarningSSSgvp">initFallbackWarning</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The warning message produced when initialisation fell back to the embedded AI
+table because the supplied Syntax Dictionary could not be loaded
+(only when <code>fallbackOnSyndictError</code> was set). <code>nil</code> on plain success.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">initFallbackWarning</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11GS1Encoders0A7EncoderC16syntaxDictionary22fallbackOnSyndictError10noEmbeddedACSSSg_S2btKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(syntaxDictionary:fallbackOnSyndictError:noEmbedded:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11GS1Encoders0A7EncoderC16syntaxDictionary22fallbackOnSyndictError10noEmbeddedACSSSg_S2btKcfc">init(syntaxDictionary:<wbr>fallbackOnSyndictError:<wbr>noEmbedded:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -162,6 +191,9 @@ All validation procedures are listed to maintain correct enum value alignment wi
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Initialises a new instance of the GS1Encoder class.</p>
+
+<p>New parameters may be appended to this initialiser in future versions
+without breaking existing call sites.</p>
 <div class="aside aside-throws">
     <p class="aside-title">Throws</p>
     <code>GS1EncoderError.generalError</code> if the library fails to initialise
@@ -173,9 +205,54 @@ All validation procedures are listed to maintain correct enum value alignment wi
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">syntaxDictionary</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+            <span class="nv">fallbackOnSyndictError</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nv">noEmbedded</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>syntaxDictionary</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Path to a GS1 Syntax Dictionary file. If nil, the embedded AI table is used.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fallbackOnSyndictError</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>noEmbedded</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Refuse to use the embedded AI table. Initialisation fails if no other AI table can be loaded.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

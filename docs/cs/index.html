@@ -113,7 +113,8 @@ library:</p>
   &lt;/ItemGroup&gt;
 &lt;/Project&gt;
 </code></pre>
-<p>Edit <code>Program.cs</code> to contain:</p>
+<p>Edit <code>Program.cs</code> to contain. This uses the embedded AI table that is
+compiled into the library:</p>
 <pre><code class="lang-csharp">using System;
 using GS1.Encoders;
 
@@ -121,6 +122,25 @@ using (GS1Encoder gs = new GS1Encoder())
 {
     gs.AIdataStr = &quot;(01)09521234543213(99)TESTING123&quot;;
     Console.WriteLine(&quot;GS1 Digital Link URI: &quot; + gs.GetDLuri(&quot;https://example.com&quot;));
+}
+</code></pre>
+<p>To load an external GS1 Syntax Dictionary file instead of using the embedded
+AI table, pass a <code>GS1Encoder.InitOptions</code> instance to the constructor. Set
+<code>FallbackOnSyndictError = true</code> to fall back to the embedded AI table if
+the external file cannot be opened or parsed, rather than failing. The
+following inverse example parses a GS1 Digital Link URI and reports the
+extracted AI data:</p>
+<pre><code class="lang-csharp">using System;
+using GS1.Encoders;
+
+using (GS1Encoder gs = new GS1Encoder(new GS1Encoder.InitOptions
+{
+    SyntaxDictionary = &quot;/path/to/gs1-syntax-dictionary.txt&quot;,
+    FallbackOnSyndictError = true,
+}))
+{
+    gs.DataStr = &quot;https://example.com/01/09521234543213?99=TESTING123&quot;;
+    Console.WriteLine(&quot;Extracted AIs: &quot; + gs.AIdataStr);
 }
 </code></pre>
 <p><strong>Note:</strong> Each <code>GS1Encoder</code> instance allocates native resources. <code>GS1Encoder</code>
@@ -259,6 +279,10 @@ Classes
 </h3>
       <h4><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a></h4>
       <section><p>Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.</p>
+</section>
+      <h4><a class="xref" href="GS1.Encoders.GS1Encoder.InitOptions.html">GS1Encoder.InitOptions</a></h4>
+      <section><p>Initialisation options for the GS1Encoder.
+New properties may be added in future versions without breaking existing code.</p>
 </section>
       <h4><a class="xref" href="GS1.Encoders.GS1EncoderDigitalLinkException.html">GS1EncoderDigitalLinkException</a></h4>
       <section><p>A custom exception class that is thrown to indicate an error processing

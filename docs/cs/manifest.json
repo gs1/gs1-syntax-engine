@@ -4,6 +4,20 @@
   "files": [
     {
       "type": "ManagedReference",
+      "source_relative_path": "build/GS1.Encoders.GS1Encoder.InitOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "GS1.Encoders.GS1Encoder.InitOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "GS1.Encoders.GS1Encoder.InitOptions",
+      "Summary": "<p sourcefile=\"build/GS1.Encoders.GS1Encoder.InitOptions.yml\" sourcestartlinenumber=\"1\">Initialisation options for the GS1Encoder.\nNew properties may be added in future versions without breaking existing code.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "build/GS1.Encoders.GS1Encoder.Symbology.yml",
       "output": {
         ".html": {

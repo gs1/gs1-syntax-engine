@@ -104,7 +104,7 @@ Using in your own C/C++ project</h3>
 <div class="line">#include &quot;gs1encoders.h&quot;</div>
 <div class="line"> </div>
 <div class="line">int main(void) {</div>
-<div class="line">    gs1_encoder *gs = gs1_encoder_init(NULL);</div>
+<div class="line">    gs1_encoder *gs = gs1_encoder_init_ex(NULL, NULL);</div>
 <div class="line">    if (!gs) return 1;</div>
 <div class="line"> </div>
 <div class="line">    if (!gs1_encoder_setAIdataStr(gs, &quot;(01)09521234543213(99)TESTING123&quot;)) {</div>
@@ -128,7 +128,7 @@ Using in your own C/C++ project</h3>
 </pre><h2><a class="anchor" id="example-uses"></a>
 Example Uses</h2>
 <p>The following are examples of how to use the library.</p>
-<dl class="section note"><dt>Note</dt><dd>Using the library always begins by initialising the library with <a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init()</a> or <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex()</a> and finishes by releasing the library with <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free()</a>.</dd>
+<dl class="section note"><dt>Note</dt><dd>Using the library always begins by initialising the library with <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex()</a> and finishes by releasing the library with <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free()</a>.</dd>
 <dd>
 Unless otherwise specified, the getter functions return pointers to per-instance storage managed by this library and therefore must not be freed by the user. If their content must persist following a subsequent call to the same instance of the library then they must be copied to a user-managed buffer.</dd>
 <dd>
@@ -137,7 +137,7 @@ Most of the setter and action functions of this library return a boolean indicat
 <h3><a class="anchor" id="autotoc_md4"></a>
 GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <p>The following code processes AI data input, validates it (reporting any failures) and displays the extracted AIs if the validation succeeds.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);              // Create a new instance of the library</div>
+<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);              // Create a new instance of the library</div>
 <div class="line"> </div>
 <div class="line">// gs1_encoder_permitUnknownAIs(ctx, true);             // Uncomment only if it is necessary to handle AIs</div>
 <div class="line">                                                        // that are not known to the library</div>
@@ -175,7 +175,7 @@ GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md5"></a>
 Converting an AI element string to barcode message data</h3>
 <p>In this example we process a bracketed AI element string to convert it into barcode message data, suitable for carrying in a GS1 barcode symbol.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);</div>
+<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);</div>
 <div class="line"> </div>
 <div class="line">bool ret = gs1_encoder_setAIdataStr(ctx,        // Accept a bracketed AI element string</div>
 <div class="line">    &quot;(01)12312312312333(10)ABC123(99)TEST&quot;);</div>
@@ -201,7 +201,7 @@ Consequently, the barcode message data emitted by this library may need to be po
 <h3><a class="anchor" id="autotoc_md6"></a>
 Barcode scan data processing</h3>
 <p>In this example we process scan data from a barcode reader to extract the AI data.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init(NULL);</div>
+<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);</div>
 <div class="line"> </div>
 <div class="line">// Disable validation of mandatory association between AIs if the symbol may</div>
 <div class="line">// be one of multiple on a label</div>

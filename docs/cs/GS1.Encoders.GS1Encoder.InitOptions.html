@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class GS1Encoder.InitOptions </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class GS1Encoder.InitOptions ">
+    
+    <meta name="description" content="Initialisation options for the GS1Encoder. New properties may be added in future versions without breaking existing code.">
+      <link rel="shortcut icon" href="favicon.ico">
+      <link rel="stylesheet" href="styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="styles/docfx.css">
+      <link rel="stylesheet" href="styles/main.css">
+      <meta property="docfx:navrel" content="toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="GS1.Encoders.GS1Encoder.InitOptions">
+
+
+
+  <h1 id="GS1_Encoders_GS1Encoder_InitOptions" data-uid="GS1.Encoders.GS1Encoder.InitOptions" class="text-break">Class GS1Encoder.InitOptions</h1>
+  <div class="markdown level0 summary"><p>Initialisation options for the GS1Encoder.
+New properties may be added in future versions without breaking existing code.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">GS1Encoder.InitOptions</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="GS1.html">GS1</a>.<a class="xref" href="GS1.Encoders.html">Encoders</a></h6>
+  <h6><strong>Assembly</strong>: .dll</h6>
+  <h5 id="GS1_Encoders_GS1Encoder_InitOptions_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class GS1Encoder.InitOptions</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+  <a id="GS1_Encoders_GS1Encoder_InitOptions_FallbackOnSyndictError_" data-uid="GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_InitOptions_FallbackOnSyndictError" data-uid="GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError">FallbackOnSyndictError</h4>
+  <div class="markdown level1 summary"><p>Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool FallbackOnSyndictError { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="GS1_Encoders_GS1Encoder_InitOptions_NoEmbedded_" data-uid="GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_InitOptions_NoEmbedded" data-uid="GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded">NoEmbedded</h4>
+  <div class="markdown level1 summary"><p>Refuse to use the embedded AI table. Initialisation fails if no other AI table can be loaded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool NoEmbedded { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="GS1_Encoders_GS1Encoder_InitOptions_SyntaxDictionary_" data-uid="GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_InitOptions_SyntaxDictionary" data-uid="GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary">SyntaxDictionary</h4>
+  <div class="markdown level1 summary"><p>Path to a GS1 Syntax Dictionary file. If null, the embedded AI table is used.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string SyntaxDictionary { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

@@ -109,6 +109,49 @@
       </tr>
     </tbody>
   </table>
+  <a id="GS1_Encoders_GS1Encoder__ctor_" data-uid="GS1.Encoders.GS1Encoder.#ctor*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder__ctor_GS1_Encoders_GS1Encoder_InitOptions_" data-uid="GS1.Encoders.GS1Encoder.#ctor(GS1.Encoders.GS1Encoder.InitOptions)">GS1Encoder(InitOptions)</h4>
+  <div class="markdown level1 summary"><p>Initialises a new instance of the GS1Encoder class with the given options.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public GS1Encoder(GS1Encoder.InitOptions options)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1Encoder.html">GS1Encoder</a>.<a class="xref" href="GS1.Encoders.GS1Encoder.InitOptions.html">InitOptions</a></td>
+        <td><span class="parametername">options</span></td>
+        <td><p>Initialisation options, or null for defaults.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="GS1.Encoders.GS1EncoderGeneralException.html">GS1EncoderGeneralException</a></td>
+        <td><p>Thrown when the library fails to initialise</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="properties">Properties
 </h3>
   <a id="GS1_Encoders_GS1Encoder_AIdataStr_" data-uid="GS1.Encoders.GS1Encoder.AIdataStr*"></a>
@@ -459,6 +502,33 @@ included in the HRI text.
 Default: <code>false</code>
 </p>
 </div>
+  <a id="GS1_Encoders_GS1Encoder_InitFallbackWarning_" data-uid="GS1.Encoders.GS1Encoder.InitFallbackWarning*"></a>
+  <h4 id="GS1_Encoders_GS1Encoder_InitFallbackWarning" data-uid="GS1.Encoders.GS1Encoder.InitFallbackWarning">InitFallbackWarning</h4>
+  <div class="markdown level1 summary"><p>The warning message produced when initialisation fell back to the embedded AI
+table because the supplied Syntax Dictionary could not be loaded
+(only when <a class="xref" href="GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_FallbackOnSyndictError">FallbackOnSyndictError</a> was set).
+<code>null</code> on plain success.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string InitFallbackWarning { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="GS1_Encoders_GS1Encoder_PermitUnknownAIs_" data-uid="GS1.Encoders.GS1Encoder.PermitUnknownAIs*"></a>
   <h4 id="GS1_Encoders_GS1Encoder_PermitUnknownAIs" data-uid="GS1.Encoders.GS1Encoder.PermitUnknownAIs">PermitUnknownAIs</h4>
   <div class="markdown level1 summary"><p>Get/set the &quot;permit unknown AIs&quot; mode.</p>

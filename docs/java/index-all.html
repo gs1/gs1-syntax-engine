@@ -49,7 +49,7 @@ loadScripts(document, 'script');</script>
 <div class="header">
 <h1>Index</h1>
 </div>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
 <h2 class="title" id="I:A">A</h2>
 <dl class="index">
 <dt><a href="org/gs1/gs1encoders/package-summary.html#android-mobile-app-quick-start" class="search-tag-link">Android Mobile App Quick Start</a> - Search tag in package org.gs1.gs1encoders</dt>
@@ -157,6 +157,12 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the status of the "include data titles in HRI" flag.</div>
 </dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.html#getInitFallbackWarning()" class="member-name-link">getInitFallbackWarning()</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
+<dd>
+<div class="block">Returns the warning message produced when initialisation fell back to
+ the embedded AI table because the supplied Syntax Dictionary could not
+ be loaded (only when <code>fallbackOnSyndictError</code> was set).</div>
+</dd>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.html#getPermitUnknownAIs()" class="member-name-link">getPermitUnknownAIs()</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
 <dd>
 <div class="block">Get the status of the "permit unknown AIs" mode.</div>
@@ -215,6 +221,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Initialises a new instance of the GS1Encoder class.</div>
 </dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.html#%3Cinit%3E(org.gs1.gs1encoders.GS1Encoder.InitOptions)" class="member-name-link">GS1Encoder(GS1Encoder.InitOptions)</a> - Constructor for class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
+<dd>
+<div class="block">Initialises a new instance of the GS1Encoder class with the given options.</div>
+</dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html" class="type-name-link" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a> - Class in <a href="org/gs1/gs1encoders/package-summary.html">org.gs1.gs1encoders</a></dt>
+<dd>
+<div class="block">Initialisation options for the GS1Encoder.</div>
+</dd>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.Symbology.html" class="type-name-link" title="enum class in org.gs1.gs1encoders">GS1Encoder.Symbology</a> - Enum Class in <a href="org/gs1/gs1encoders/package-summary.html">org.gs1.gs1encoders</a></dt>
 <dd>
 <div class="block">Recognised GS1 barcode formats ("symbologies") for processing scan data.</div>
@@ -259,6 +273,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Constructs a new GS1EncoderScanDataException with the specified error message.</div>
 </dd>
+</dl>
+<h2 class="title" id="I:I">I</h2>
+<dl class="index">
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html#%3Cinit%3E()" class="member-name-link">InitOptions()</a> - Constructor for class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:M">M</h2>
 <dl class="index">
@@ -325,9 +344,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Set the raw data that would be directly encoded within a GS1 barcode message.</div>
 </dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html#setFallbackOnSyndictError(boolean)" class="member-name-link">setFallbackOnSyndictError(boolean)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a></dt>
+<dd>
+<div class="block">Fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</div>
+</dd>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.html#setIncludeDataTitlesInHRI(boolean)" class="member-name-link">setIncludeDataTitlesInHRI(boolean)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
 <dd>
 <div class="block">Set the "include data titles in HRI" flag.</div>
+</dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html#setNoEmbedded(boolean)" class="member-name-link">setNoEmbedded(boolean)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a></dt>
+<dd>
+<div class="block">Refuse to use the embedded AI table.</div>
 </dd>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.html#setPermitUnknownAIs(boolean)" class="member-name-link">setPermitUnknownAIs(boolean)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
 <dd>
@@ -344,6 +371,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.html#setSym(org.gs1.gs1encoders.GS1Encoder.Symbology)" class="member-name-link">setSym(GS1Encoder.Symbology)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
 <dd>
 <div class="block">Set the symbology type.</div>
+</dd>
+<dt><a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html#setSyntaxDictionary(java.lang.String)" class="member-name-link">setSyntaxDictionary(String)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.InitOptions.html" title="class in org.gs1.gs1encoders">GS1Encoder.InitOptions</a></dt>
+<dd>
+<div class="block">Set the path to a GS1 Syntax Dictionary file.</div>
 </dd>
 <dt><a href="org/gs1/gs1encoders/GS1Encoder.html#setValidateAIassociations(boolean)" class="member-name-link">setValidateAIassociations(boolean)</a> - Method in class org.gs1.gs1encoders.<a href="org/gs1/gs1encoders/GS1Encoder.html" title="class in org.gs1.gs1encoders">GS1Encoder</a></dt>
 <dd>
@@ -394,7 +425,7 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
 </div>
 </div>
 </body>

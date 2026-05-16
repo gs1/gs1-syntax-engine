@@ -22,6 +22,15 @@ references:
   fullName.vb: GS1.Encoders.GS1Encoder.New()
   nameWithType: GS1Encoder.GS1Encoder()
   nameWithType.vb: GS1Encoder.New()
+- uid: GS1.Encoders.GS1Encoder.#ctor(GS1.Encoders.GS1Encoder.InitOptions)
+  name: GS1Encoder(InitOptions)
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder__ctor_GS1_Encoders_GS1Encoder_InitOptions_
+  commentId: M:GS1.Encoders.GS1Encoder.#ctor(GS1.Encoders.GS1Encoder.InitOptions)
+  name.vb: New(InitOptions)
+  fullName: GS1.Encoders.GS1Encoder.GS1Encoder(GS1.Encoders.GS1Encoder.InitOptions)
+  fullName.vb: GS1.Encoders.GS1Encoder.New(GS1.Encoders.GS1Encoder.InitOptions)
+  nameWithType: GS1Encoder.GS1Encoder(GS1Encoder.InitOptions)
+  nameWithType.vb: GS1Encoder.New(GS1Encoder.InitOptions)
 - uid: GS1.Encoders.GS1Encoder.#ctor*
   name: GS1Encoder
   href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder__ctor_
@@ -174,6 +183,64 @@ references:
   isSpec: "True"
   fullName: GS1.Encoders.GS1Encoder.IncludeDataTitlesInHRI
   nameWithType: GS1Encoder.IncludeDataTitlesInHRI
+- uid: GS1.Encoders.GS1Encoder.InitFallbackWarning
+  name: InitFallbackWarning
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_InitFallbackWarning
+  commentId: P:GS1.Encoders.GS1Encoder.InitFallbackWarning
+  fullName: GS1.Encoders.GS1Encoder.InitFallbackWarning
+  nameWithType: GS1Encoder.InitFallbackWarning
+- uid: GS1.Encoders.GS1Encoder.InitFallbackWarning*
+  name: InitFallbackWarning
+  href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_InitFallbackWarning_
+  commentId: Overload:GS1.Encoders.GS1Encoder.InitFallbackWarning
+  isSpec: "True"
+  fullName: GS1.Encoders.GS1Encoder.InitFallbackWarning
+  nameWithType: GS1Encoder.InitFallbackWarning
+- uid: GS1.Encoders.GS1Encoder.InitOptions
+  name: GS1Encoder.InitOptions
+  href: GS1.Encoders.GS1Encoder.InitOptions.html
+  commentId: T:GS1.Encoders.GS1Encoder.InitOptions
+  fullName: GS1.Encoders.GS1Encoder.InitOptions
+  nameWithType: GS1Encoder.InitOptions
+- uid: GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError
+  name: FallbackOnSyndictError
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_FallbackOnSyndictError
+  commentId: P:GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError
+  nameWithType: GS1Encoder.InitOptions.FallbackOnSyndictError
+- uid: GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError*
+  name: FallbackOnSyndictError
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_FallbackOnSyndictError_
+  commentId: Overload:GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError
+  isSpec: "True"
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.FallbackOnSyndictError
+  nameWithType: GS1Encoder.InitOptions.FallbackOnSyndictError
+- uid: GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded
+  name: NoEmbedded
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_NoEmbedded
+  commentId: P:GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded
+  nameWithType: GS1Encoder.InitOptions.NoEmbedded
+- uid: GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded*
+  name: NoEmbedded
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_NoEmbedded_
+  commentId: Overload:GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded
+  isSpec: "True"
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.NoEmbedded
+  nameWithType: GS1Encoder.InitOptions.NoEmbedded
+- uid: GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary
+  name: SyntaxDictionary
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_SyntaxDictionary
+  commentId: P:GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary
+  nameWithType: GS1Encoder.InitOptions.SyntaxDictionary
+- uid: GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary*
+  name: SyntaxDictionary
+  href: GS1.Encoders.GS1Encoder.InitOptions.html#GS1_Encoders_GS1Encoder_InitOptions_SyntaxDictionary_
+  commentId: Overload:GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary
+  isSpec: "True"
+  fullName: GS1.Encoders.GS1Encoder.InitOptions.SyntaxDictionary
+  nameWithType: GS1Encoder.InitOptions.SyntaxDictionary
 - uid: GS1.Encoders.GS1Encoder.PermitUnknownAIs
   name: PermitUnknownAIs
   href: GS1.Encoders.GS1Encoder.html#GS1_Encoders_GS1Encoder_PermitUnknownAIs

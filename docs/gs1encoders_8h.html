@@ -67,6 +67,17 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation options structure for <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>.  <a href="structgs1__encoder__init__opts.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a1e62eee80b2d37419ee7b019109989a4" id="r_a1e62eee80b2d37419ee7b019109989a4"><td class="memItemLeft" align="right" valign="top"><a id="a1e62eee80b2d37419ee7b019109989a4" name="a1e62eee80b2d37419ee7b019109989a4"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>GS1_ENCODERS_API</b></td></tr>
+<tr class="separator:a1e62eee80b2d37419ee7b019109989a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62c958c34413f4aa04ee6c39f17f53f7" id="r_a62c958c34413f4aa04ee6c39f17f53f7"><td class="memItemLeft" align="right" valign="top"><a id="a62c958c34413f4aa04ee6c39f17f53f7" name="a62c958c34413f4aa04ee6c39f17f53f7"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>GS1_ENCODERS_DEPRECATED</b></td></tr>
+<tr class="separator:a62c958c34413f4aa04ee6c39f17f53f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab435e7da5e82f9273a9b76af80ecdd03" id="r_ab435e7da5e82f9273a9b76af80ecdd03"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ab435e7da5e82f9273a9b76af80ecdd03">GS1_ENCODERS_DEPRECATED_ENUM</a>&#160;&#160;&#160;= 1 &lt;&lt; 3</td></tr>
+<tr class="separator:ab435e7da5e82f9273a9b76af80ecdd03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a144e851913c5a265ef16602d35386773" id="r_a144e851913c5a265ef16602d35386773"><td class="memItemLeft" align="right" valign="top"><a id="a144e851913c5a265ef16602d35386773" name="a144e851913c5a265ef16602d35386773"></a>
@@ -134,11 +145,11 @@ Enumerations</h2></td></tr>
 <tr class="separator:a11a47c2b410ffcc87a332c973cce85c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7c463156739caaa586975a67b70accc" id="r_ac7c463156739caaa586975a67b70accc"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">gs1_encoder_init_flags</a> { <br />
 &#160;&#160;<a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca2dea70a954fdbf60b82187d4e73f50c9">gs1_encoder_iDEFAULT</a> = 0
-, <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca172b1f69c96cb2cb538c770c6c1ca0c6">gs1_encoder_iNO_SYNDICT</a> = 1 &lt;&lt; 0
+, <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b">GS1_ENCODERS_DEPRECATED_ENUM</a> = 1 &lt;&lt; 0
 , <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca56cb3b3316bc2b0515dff9fbd747c611">gs1_encoder_iNO_EMBEDDED</a> = 1 &lt;&lt; 1
 , <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> = 1 &lt;&lt; 2
 , <br />
-&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0">gs1_encoder_iQUIET</a> = 1 &lt;&lt; 3
+&#160;&#160;<a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b">GS1_ENCODERS_DEPRECATED_ENUM</a> = 1 &lt;&lt; 0
 <br />
  }</td></tr>
 <tr class="memdesc:ac7c463156739caaa586975a67b70accc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation flags for <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>.  <a href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">More...</a><br /></td></tr>
@@ -167,9 +178,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa24d43ed449f07eae209f974686b195c" id="r_aa24d43ed449f07eae209f974686b195c"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#aa24d43ed449f07eae209f974686b195c">gs1_encoder_getMaxDataStrLength</a> (void)</td></tr>
 <tr class="memdesc:aa24d43ed449f07eae209f974686b195c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum size of the input data buffer for barcode message content.  <br /></td></tr>
 <tr class="separator:aa24d43ed449f07eae209f974686b195c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a111897e9846a97c2d3e446d2815b4410" id="r_a111897e9846a97c2d3e446d2815b4410"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a> (void *mem)</td></tr>
-<tr class="memdesc:a111897e9846a97c2d3e446d2815b4410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context.  <br /></td></tr>
-<tr class="separator:a111897e9846a97c2d3e446d2815b4410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7da4ffb9e4bd862408ea1a1eb99ed67" id="r_ae7da4ffb9e4bd862408ea1a1eb99ed67"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#ae7da4ffb9e4bd862408ea1a1eb99ed67">gs1_encoder_init</a> (void *mem)</td></tr>
+<tr class="memdesc:ae7da4ffb9e4bd862408ea1a1eb99ed67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context.  <br /></td></tr>
+<tr class="separator:ae7da4ffb9e4bd862408ea1a1eb99ed67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3a0f85afa4d367a1bca6875864e3a6d" id="r_af3a0f85afa4d367a1bca6875864e3a6d"><td class="memItemLeft" align="right" valign="top">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a> (void *mem, const <a class="el" href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a> *opts)</td></tr>
 <tr class="memdesc:af3a0f85afa4d367a1bca6875864e3a6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context with the extended interface.  <br /></td></tr>
 <tr class="separator:af3a0f85afa4d367a1bca6875864e3a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,6 +275,22 @@ Functions</h2></td></tr>
 <tr class="memdesc:a0078a51318ba3551052c309fe48110ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy a <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> instance.  <br /></td></tr>
 <tr class="separator:a0078a51318ba3551052c309fe48110ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ab435e7da5e82f9273a9b76af80ecdd03" name="ab435e7da5e82f9273a9b76af80ecdd03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab435e7da5e82f9273a9b76af80ecdd03">&#9670;&#160;</a></span>GS1_ENCODERS_DEPRECATED_ENUM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GS1_ENCODERS_DEPRECATED_ENUM&#160;&#160;&#160;= 1 &lt;&lt; 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>No-op, retained for source/ABI compatibility. The library no longer writes initialisation messages to stdout; error information is returned via <a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a>. </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a34f786d8479759fd8894c6d22a9f5c34" name="a34f786d8479759fd8894c6d22a9f5c34"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a34f786d8479759fd8894c6d22a9f5c34">&#9670;&#160;</a></span>gs1_encoder</h2>
@@ -281,7 +308,7 @@ Functions</h2></td></tr>
 <p>This is an opaque struct that represents an instance of the library.</p>
 <p>This context maintains all state required for an instance. Any number of instances of the library can be created, each operating separately and equivalently to the others.</p>
 <p>This library does not introduce any global variables. All runtime state is maintained in instances of the <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> struct and this state should only be modified using the public API functions provided by this library, decorated with GS1_ENCODERS_API.</p>
-<p>A context is created by calling <a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> or <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a> and destroyed by calling <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a>, releasing all of the storage allocated by the library for that instance.</p>
+<p>A context is created by calling <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a> (or the legacy <a class="el" href="gs1encoders_8h.html#ae7da4ffb9e4bd862408ea1a1eb99ed67" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a>, which is deprecated) and destroyed by calling <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a>, releasing all of the storage allocated by the library for that instance.</p>
 <dl class="section note"><dt>Note</dt><dd>This struct is deliberately opaque and it's layout should be assumed to vary between releases of the library and even between builds created with different options.</dd>
 <dd>
 The library is thread-safe provided that each thread operates on its own instance of the library. </dd></dl>
@@ -303,15 +330,17 @@ The library is thread-safe provided that each thread operates on its own instanc
 
 <p>Initialisation flags for <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca2dea70a954fdbf60b82187d4e73f50c9" name="ac7c463156739caaa586975a67b70accca2dea70a954fdbf60b82187d4e73f50c9"></a>gs1_encoder_iDEFAULT&#160;</td><td class="fielddoc"><p>Default: Use Syntax Dictionary if the file exists, otherwise fallback to the embedded AI table (if compiled in). </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca2dea70a954fdbf60b82187d4e73f50c9" name="ac7c463156739caaa586975a67b70accca2dea70a954fdbf60b82187d4e73f50c9"></a>gs1_encoder_iDEFAULT&#160;</td><td class="fielddoc"><p>Default: Use the embedded AI table (if compiled in). Set <a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> to load a Syntax Dictionary file instead. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca172b1f69c96cb2cb538c770c6c1ca0c6" name="ac7c463156739caaa586975a67b70accca172b1f69c96cb2cb538c770c6c1ca0c6"></a>gs1_encoder_iNO_SYNDICT&#160;</td><td class="fielddoc"><p>Disable use of the Syntax Dictionary, even if the file exists. </p>
+<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b" name="ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b"></a>GS1_ENCODERS_DEPRECATED_ENUM&#160;</td><td class="fielddoc"><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>No-op, retained for source/ABI compatibility. Syntax Dictionary loading is now controlled by gs1_encoder_init_opts::syntaxDictionary: it is loaded only when a non-NULL path is provided. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>No-op, retained for source/ABI compatibility. The library no longer writes initialisation messages to stdout; error information is returned via <a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a>. </dd></dl>
 </td></tr>
 <tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca56cb3b3316bc2b0515dff9fbd747c611" name="ac7c463156739caaa586975a67b70accca56cb3b3316bc2b0515dff9fbd747c611"></a>gs1_encoder_iNO_EMBEDDED&#160;</td><td class="fielddoc"><p>Disable use of the embedded AI table, even if it is compiled in. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" name="ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be"></a>gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR&#160;</td><td class="fielddoc"><p>Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing error with the Syntax Dictionary. </p>
+<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" name="ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be"></a>gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR&#160;</td><td class="fielddoc"><p>Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit <a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> fails. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0" name="ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0"></a>gs1_encoder_iQUIET&#160;</td><td class="fielddoc"><p>Suppress initialisation error output to stdout. </p>
+<tr><td class="fieldname"><a id="ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b" name="ac7c463156739caaa586975a67b70accca65dc8718869dd475ca4b7a9c1c53a09b"></a>GS1_ENCODERS_DEPRECATED_ENUM&#160;</td><td class="fielddoc"><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>No-op, retained for source/ABI compatibility. Syntax Dictionary loading is now controlled by gs1_encoder_init_opts::syntaxDictionary: it is loaded only when a non-NULL path is provided. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>No-op, retained for source/ABI compatibility. The library no longer writes initialisation messages to stdout; error information is returned via <a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a>. </dd></dl>
 </td></tr>
 </table>
 
@@ -333,13 +362,13 @@ The library is thread-safe provided that each thread operates on its own instanc
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64" name="ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64"></a>GS1_ENCODERS_INIT_SUCCESS&#160;</td><td class="fielddoc"><p>Initialised successfully. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07" name="ad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07"></a>GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE&#160;</td><td class="fielddoc"><p>An indication that the Syntax Dictionary was either not found, or a parse error encountered with <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" title="Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing er...">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> enabled, therefore the embedded AI table was loaded. </p>
+<tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07" name="ad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07"></a>GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE&#160;</td><td class="fielddoc"><p>The explicit <a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> could not be loaded (e.g. file not found or parse error), but <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" title="Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit gs1_...">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> was set, so the embedded AI table was loaded instead. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aa848bba0c9233c25dad6bbb6d6e127801" name="ad52da08e73fd856764be330398ea931aa848bba0c9233c25dad6bbb6d6e127801"></a>GS1_ENCODERS_INIT_FAILED_NO_MEM&#160;</td><td class="fielddoc"><p>Memory allocation failed during initialisation. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aaae80d143758a92210ddae8f5ca1509f3" name="ad52da08e73fd856764be330398ea931aaae80d143758a92210ddae8f5ca1509f3"></a>GS1_ENCODERS_INIT_FAILED_NO_EMBEDDED_TABLE&#160;</td><td class="fielddoc"><p>The embedded AI table would be used but it is compiled out or disabled (<a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca56cb3b3316bc2b0515dff9fbd747c611" title="Disable use of the embedded AI table, even if it is compiled in.">gs1_encoder_iNO_EMBEDDED</a> is set). </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aa646514909dee4d7b62bd526fa141f07a" name="ad52da08e73fd856764be330398ea931aa646514909dee4d7b62bd526fa141f07a"></a>GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT&#160;</td><td class="fielddoc"><p>The Syntax Dictionary failed to parse and fallback to the embedded table was disabled (<a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" title="Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing er...">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> not set). </p>
+<tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aa646514909dee4d7b62bd526fa141f07a" name="ad52da08e73fd856764be330398ea931aa646514909dee4d7b62bd526fa141f07a"></a>GS1_ENCODERS_INIT_FAILED_LOADING_SYNDICT&#160;</td><td class="fielddoc"><p>The explicit <a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> could not be loaded (e.g. file not found or parse error) and <a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be" title="Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit gs1_...">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> was not set. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ad52da08e73fd856764be330398ea931aa852fbb1f03181612d0e87791fcba08a9" name="ad52da08e73fd856764be330398ea931aa852fbb1f03181612d0e87791fcba08a9"></a>GS1_ENCODERS_INIT_FAILED_AI_TABLE_CORRUPT&#160;</td><td class="fielddoc"><p>The embedded AI table failed to process. </p>
 </td></tr>
@@ -452,7 +481,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the form of a "&amp;"-separated string. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
 <p>The buffer into which the output buffer is copied must be preallocated with at least the size returned by <a class="el" href="gs1encoders_8h.html#ad6a02e17b3f3f2f1a024d02164a6938e" title="Get the require buffer size for ignored GS1 Digital Link query parameters.">gs1_encoder_getDLignoredQueryParamsSize()</a>.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ad6a02e17b3f3f2f1a024d02164a6938e" title="Get the require buffer size for ignored GS1 Digital Link query parameters.">gs1_encoder_getDLignoredQueryParamsSize()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function exists mainly for environments where it is difficult to access library-allocated buffers via a pointer modified in function parameters.</dd></dl>
@@ -500,7 +529,7 @@ The library is thread-safe provided that each thread operates on its own instanc
 </div><div class="memdoc">
 
 <p>Copy the HRI to a user-provided buffer in the form of a "|"-separated string. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
 <p>The buffer into which the output buffer is copied must be preallocated with at least the size returned by <a class="el" href="gs1encoders_8h.html#a4571619a8ae2128b1d714a86e3c61ad0" title="Get the require HRI buffer size.">gs1_encoder_getHRIsize()</a>.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a4571619a8ae2128b1d714a86e3c61ad0" title="Get the require HRI buffer size.">gs1_encoder_getHRIsize()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function exists mainly for environments where it is difficult to access library-allocated buffers via a pointer modified in function parameters.</dd></dl>
@@ -695,7 +724,7 @@ The return data does not need to be free()ed and the content should be copied if
 </div><div class="memdoc">
 
 <p>Get the require buffer size for ignored GS1 Digital Link query parameters. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#aa9da53565e5b126d4a002272575bdebe" title="Update a given pointer towards an array of strings containing the non-numeric (ignored) query paramet...">gs1_encoder_getDLignoredQueryParams()</a> instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a5e9a5a9510b07910b97a169b3d4371ac" title="Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the for...">gs1_encoder_copyDLignoredQueryParams()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is useful when used in tandem with <a class="el" href="gs1encoders_8h.html#a5e9a5a9510b07910b97a169b3d4371ac" title="Copy the non-numeric (ignored) GS1 Digital Link query parameters to a user-provided buffer in the for...">gs1_encoder_copyDLignoredQueryParams()</a> to determine the size of the user-provided buffer to pre-allocate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -739,7 +768,7 @@ The return data does not need to be free()ed and the content should be copied if
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a>(NULL);               <span class="comment">// Create a new instance of the library</span></div>
+<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);      <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(ctx,                            <span class="comment">// Set the input data (AI format on this occasion)</span></div>
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line">printf(<span class="stringliteral">&quot;DL URI: %s\n&quot;</span>, <a class="code hl_function" href="gs1encoders_8h.html#af95b1858f07e4c2cd872705cab9d4b29">gs1_encoder_getDLuri</a>(ctx,         <span class="comment">// Print the GS1 Digital Link URI with a custom domain and stem</span></div>
@@ -747,9 +776,9 @@ The return data does not need to be free()ed and the content should be copied if
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html"><div class="ttname"><a href="gs1encoders_8h.html">gs1encoders.h</a></div></div>
 <div class="ttc" id="ags1encoders_8h_html_a0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a111897e9846a97c2d3e446d2815b4410"><div class="ttname"><a href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init(void *mem)</div><div class="ttdoc">Initialise a new gs1_encoder context.</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:203</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:211</div></div>
 <div class="ttc" id="ags1encoders_8h_html_abdce5a9347ff7cbbd153b1a13e3273dd"><div class="ttname"><a href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...</div></div>
+<div class="ttc" id="ags1encoders_8h_html_af3a0f85afa4d367a1bca6875864e3a6d"><div class="ttname"><a href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)</div><div class="ttdoc">Initialise a new gs1_encoder context with the extended interface.</div></div>
 <div class="ttc" id="ags1encoders_8h_html_af95b1858f07e4c2cd872705cab9d4b29"><div class="ttname"><a href="gs1encoders_8h.html#af95b1858f07e4c2cd872705cab9d4b29">gs1_encoder_getDLuri</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem)</div><div class="ttdoc">Returns a GS1 Digital Link URI representing AI-based input data.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd>
 <dd>
@@ -934,7 +963,7 @@ Data validation checks</h3>
 </div><div class="memdoc">
 
 <p>Get the require HRI buffer size. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#a3fe65a09fa62afe033b6697970778e25" title="Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...">gs1_encoder_getHRI()</a> instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a6c2cd9bcc27ede5157f91f21f2040dc7" title="Copy the HRI to a user-provided buffer in the form of a &quot;|&quot;-separated string.">gs1_encoder_copyHRI()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is useful when used in tandem with <a class="el" href="gs1encoders_8h.html#a6c2cd9bcc27ede5157f91f21f2040dc7" title="Copy the HRI to a user-provided buffer in the form of a &quot;|&quot;-separated string.">gs1_encoder_copyHRI()</a> to determine the size of the user-provided buffer to pre-allocate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1112,14 +1141,14 @@ Data validation checks</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a>(NULL);               <span class="comment">// Create a new instance of the library</span></div>
+<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);      <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a>(ctx, <a class="code hl_enumvalue" href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a>);   <span class="comment">// Choose the symbology</span></div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(ctx,                            <span class="comment">// Set the input data (AI format on this occasion)</span></div>
 <div class="line">       <span class="stringliteral">&quot;(01)12345678901231(10)ABC123(11)210630&quot;</span>);</div>
 <div class="line">printf(<span class="stringliteral">&quot;Scan data: %s\n&quot;</span>, <a class="code hl_function" href="gs1encoders_8h.html#a543a637c593d86379e8916ece470ac21">gs1_encoder_getScanData</a>(ctx)); <span class="comment">// Print the scan data that a reader should return</span></div>
 <div class="line"><a class="code hl_function" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                   <span class="comment">// Release the instance of the library</span></div>
 <div class="ttc" id="ags1encoders_8h_html_a543a637c593d86379e8916ece470ac21"><div class="ttname"><a href="gs1encoders_8h.html#a543a637c593d86379e8916ece470ac21">gs1_encoder_getScanData</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getScanData(gs1_encoder *ctx)</div><div class="ttdoc">Returns the string that should be returned by scanners when reading a symbol that is an instance of t...</div></div>
-<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a></div><div class="ttdeci">@ gs1_encoder_sDataBarExpanded</div><div class="ttdoc">GS1 DataBar Expanded (Stacked)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:79</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847"><div class="ttname"><a href="gs1encoders_8h.html#a7dab341c6821917b8eddfd1d17de4053acf7f816a924a4e9d0dd8d4d39f709847">gs1_encoder_sDataBarExpanded</a></div><div class="ttdeci">@ gs1_encoder_sDataBarExpanded</div><div class="ttdoc">GS1 DataBar Expanded (Stacked)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:85</div></div>
 <div class="ttc" id="ags1encoders_8h_html_ac0dde3809298ee931ebfcfd7bec442d2"><div class="ttname"><a href="gs1encoders_8h.html#ac0dde3809298ee931ebfcfd7bec442d2">gs1_encoder_setSym</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setSym(gs1_encoder *ctx, gs1_encoder_symbologies_t sym)</div><div class="ttdoc">Set the symbology type.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The return data does not need to be free()ed and the content should be copied if it must persist in user code after subsequent calls to library functions that modify the input data buffer such as <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a>, <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a> and <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a> </dd>
@@ -1185,7 +1214,7 @@ Data validation checks</h3>
 </div><div class="memdoc">
 
 <p>Provided for backwards compatibility to get the current enabled status of the <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" title="Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.">gs1_encoder_vREQUISITE_AIS</a> validation procedure. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_getValidationEnabled(ctx,
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_getValidationEnabled(ctx,
 gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ab73fae7db60e4cdc3ec0b7720322bad9" title="Get the current enabled status of the provided AI validation procedure.">gs1_encoder_getValidationEnabled()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -1260,14 +1289,14 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 
 </div>
 </div>
-<a id="a111897e9846a97c2d3e446d2815b4410" name="a111897e9846a97c2d3e446d2815b4410"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a111897e9846a97c2d3e446d2815b4410">&#9670;&#160;</a></span>gs1_encoder_init()</h2>
+<a id="ae7da4ffb9e4bd862408ea1a1eb99ed67" name="ae7da4ffb9e4bd862408ea1a1eb99ed67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7da4ffb9e4bd862408ea1a1eb99ed67">&#9670;&#160;</a></span>gs1_encoder_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GS1_ENCODERS_API <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> * gs1_encoder_init </td>
+          <td class="memname">GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> * gs1_encoder_init </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>mem</em></td><td>)</td>
@@ -1277,9 +1306,12 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 </div><div class="memdoc">
 
 <p>Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context. </p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Use <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a> instead. This legacy entry point attempts to load <code>gs1-syntax-dictionary.txt</code> from the current working directory and silently falls back to the embedded AI table if the file is missing or malformed. New code should call <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>, which makes Syntax Dictionary loading explicit (via <a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a>), reports the outcome via <a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and gives detailed error/warning messages via <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a>.</dd></dl>
 <p>If it expected that most users of the library will pass NULL to this function which causes the library will allocate its own storage.</p>
 <p>If a pointer to a storage buffer is provided then this will be used instead, however this buffer must be sufficient for the needs of the instance as returned by <a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a> and this buffer should not be reused or freed until <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a> is called.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a> </dd>
+<dd>
+<a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">mem</td><td>buffer to use for storage, or NULL for automatic allocation </td></tr>
@@ -1317,26 +1349,27 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 </div><div class="memdoc">
 
 <p>Initialise a new <a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context with the extended interface. </p>
-<p>This is an extended version of <a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> that provides control over Syntax Dictionary and embedded AI table loading behavior and reports detailed initialisation status.</p>
+<p>This is the recommended initialisation entry point. It supersedes the deprecated <a class="el" href="gs1encoders_8h.html#ae7da4ffb9e4bd862408ea1a1eb99ed67" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> and provides control over Syntax Dictionary and embedded AI table loading behaviour, reporting detailed initialisation status.</p>
 <p>Example of an extended initialisation:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx;</div>
 <div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a5c607c7299d2fa84c0c5dccbf3a7a638">gs1_encoder_init_status_t</a> status;</div>
 <div class="line"><span class="keywordtype">char</span> msg[256]       <span class="comment">// Sufficient, otherwise would truncate</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_struct" href="structgs1__encoder__init__opts.html">gs1_encoder_init_opts_t</a> opts = {</div>
-<div class="line">    .<a class="code hl_variable" href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">struct_size</a> = <span class="keyword">sizeof</span>(<a class="code hl_typedef" href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a>),</div>
+<div class="line">    .<a class="code hl_variable" href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">struct_size</a>      = <span class="keyword">sizeof</span>(<a class="code hl_typedef" href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a>),</div>
 <div class="line"> </div>
-<div class="line"> <span class="comment">// Silent fallback to the embedded AI table on Syntax Dictionary parse errors</span></div>
-<div class="line">    .flags       = <a class="code hl_enumvalue" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0">gs1_encoder_iQUIET</a>|<a class="code hl_enumvalue" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a>,</div>
+<div class="line"> <span class="comment">// Fallback to the embedded AI table if the Syntax Dictionary cannot be loaded</span></div>
+<div class="line">    .flags            = <a class="code hl_enumvalue" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a>,</div>
+<div class="line">    .syntaxDictionary = <span class="stringliteral">&quot;gs1-syntax-dictionary.txt&quot;</span>,</div>
 <div class="line"> </div>
-<div class="line">    .status      = &amp;status,     <span class="comment">// What happened?</span></div>
-<div class="line">    .msgBuf      = msg,     <span class="comment">// Description of error or warning</span></div>
-<div class="line">    .msgBufSize  = <span class="keyword">sizeof</span>(msg)</div>
+<div class="line">    .status           = &amp;status,    <span class="comment">// What happened?</span></div>
+<div class="line">    .msgBuf           = msg,    <span class="comment">// Description of error or warning</span></div>
+<div class="line">    .msgBufSize       = <span class="keyword">sizeof</span>(msg)</div>
 <div class="line">};</div>
 <div class="line"> </div>
 <div class="line">ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, &amp;opts);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Initialisation failed, so do something with status or simply report the error</span></div>
+<div class="line"><span class="comment">// Initialisation failed, so do something based on status or simply report the error</span></div>
 <div class="line"><span class="keywordflow">if</span> (ctx == NULL) {</div>
 <div class="line">    printf(<span class="stringliteral">&quot;Failed to initialise GS1 Encoders library!\n&quot;</span>);</div>
 <div class="line">    <span class="keywordflow">if</span> (*msg)</div>
@@ -1349,14 +1382,12 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 <div class="line">    printf(<span class="stringliteral">&quot;\n!!! Warning: %s\n&quot;</span>, msg);</div>
 <div class="line"> </div>
 <div class="line">...</div>
-<div class="ttc" id="ags1encoders_8h_html_a5c607c7299d2fa84c0c5dccbf3a7a638"><div class="ttname"><a href="gs1encoders_8h.html#a5c607c7299d2fa84c0c5dccbf3a7a638">gs1_encoder_init_status_t</a></div><div class="ttdeci">enum gs1_encoder_init_status gs1_encoder_init_status_t</div><div class="ttdoc">Equivalent to the enum gs1_encoder_init_status type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:151</div></div>
-<div class="ttc" id="ags1encoders_8h_html_ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be"><div class="ttname"><a href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a></div><div class="ttdeci">@ gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</div><div class="ttdoc">Fallback to the embedded AI table (if not disabled and is compiled in) when encountering a parsing er...</div><div class="ttdef"><b>Definition</b> gs1encoders.h:124</div></div>
-<div class="ttc" id="ags1encoders_8h_html_ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0"><div class="ttname"><a href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70acccacef552c77e64b78d78170570a1fe75b0">gs1_encoder_iQUIET</a></div><div class="ttdeci">@ gs1_encoder_iQUIET</div><div class="ttdoc">Suppress initialisation error output to stdout.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:125</div></div>
-<div class="ttc" id="ags1encoders_8h_html_ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64"><div class="ttname"><a href="gs1encoders_8h.html#ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64">GS1_ENCODERS_INIT_SUCCESS</a></div><div class="ttdeci">@ GS1_ENCODERS_INIT_SUCCESS</div><div class="ttdoc">Initialised successfully.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:138</div></div>
-<div class="ttc" id="ags1encoders_8h_html_ae34970304bbc7ade783dcaa879f840b4"><div class="ttname"><a href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a></div><div class="ttdeci">struct gs1_encoder_init_opts gs1_encoder_init_opts_t</div><div class="ttdoc">Equivalent to the struct gs1_encoder_init_opts type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:172</div></div>
-<div class="ttc" id="ags1encoders_8h_html_af3a0f85afa4d367a1bca6875864e3a6d"><div class="ttname"><a href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)</div><div class="ttdoc">Initialise a new gs1_encoder context with the extended interface.</div></div>
-<div class="ttc" id="astructgs1__encoder__init__opts_html"><div class="ttname"><a href="structgs1__encoder__init__opts.html">gs1_encoder_init_opts</a></div><div class="ttdoc">Initialisation options structure for gs1_encoder_init_ex().</div><div class="ttdef"><b>Definition</b> gs1encoders.h:159</div></div>
-<div class="ttc" id="astructgs1__encoder__init__opts_html_a2c89c52b8e569f43c4e85676261c68ff"><div class="ttname"><a href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">gs1_encoder_init_opts::struct_size</a></div><div class="ttdeci">size_t struct_size</div><div class="ttdoc">Must be initialised to sizeof(gs1_encoder_init_opts_t)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:160</div></div>
+<div class="ttc" id="ags1encoders_8h_html_a5c607c7299d2fa84c0c5dccbf3a7a638"><div class="ttname"><a href="gs1encoders_8h.html#a5c607c7299d2fa84c0c5dccbf3a7a638">gs1_encoder_init_status_t</a></div><div class="ttdeci">enum gs1_encoder_init_status gs1_encoder_init_status_t</div><div class="ttdoc">Equivalent to the enum gs1_encoder_init_status type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:157</div></div>
+<div class="ttc" id="ags1encoders_8h_html_ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be"><div class="ttname"><a href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a></div><div class="ttdeci">@ gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</div><div class="ttdoc">Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit gs1_...</div><div class="ttdef"><b>Definition</b> gs1encoders.h:130</div></div>
+<div class="ttc" id="ags1encoders_8h_html_ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64"><div class="ttname"><a href="gs1encoders_8h.html#ad52da08e73fd856764be330398ea931aa11931813431a9b39942e29a17e7d9e64">GS1_ENCODERS_INIT_SUCCESS</a></div><div class="ttdeci">@ GS1_ENCODERS_INIT_SUCCESS</div><div class="ttdoc">Initialised successfully.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:144</div></div>
+<div class="ttc" id="ags1encoders_8h_html_ae34970304bbc7ade783dcaa879f840b4"><div class="ttname"><a href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a></div><div class="ttdeci">struct gs1_encoder_init_opts gs1_encoder_init_opts_t</div><div class="ttdoc">Equivalent to the struct gs1_encoder_init_opts type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:179</div></div>
+<div class="ttc" id="astructgs1__encoder__init__opts_html"><div class="ttname"><a href="structgs1__encoder__init__opts.html">gs1_encoder_init_opts</a></div><div class="ttdoc">Initialisation options structure for gs1_encoder_init_ex().</div><div class="ttdef"><b>Definition</b> gs1encoders.h:165</div></div>
+<div class="ttc" id="astructgs1__encoder__init__opts_html_a2c89c52b8e569f43c4e85676261c68ff"><div class="ttname"><a href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">gs1_encoder_init_opts::struct_size</a></div><div class="ttdeci">size_t struct_size</div><div class="ttdoc">Must be initialised to sizeof(gs1_encoder_init_opts_t)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:166</div></div>
 </div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">mem</td><td>buffer to use for storage, or NULL for automatic allocation </td></tr>
@@ -1366,7 +1397,7 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context on success, else NULL.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>If opts is provided, <code>opts-&gt;struct_size</code> must be initialised to <code>sizeof(gs1_encoder_init_opts_t)</code></dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#ae7da4ffb9e4bd862408ea1a1eb99ed67" title="Initialise a new gs1_encoder context.">gs1_encoder_init()</a> </dd>
 <dd>
 <a class="el" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5" title="Find the memory storage requirements for an instance of gs1_encoder.">gs1_encoder_instanceSize()</a> </dd>
 <dd>
@@ -1402,7 +1433,7 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 <div class="line"><span class="keywordtype">size_t</span> mem = <a class="code hl_function" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a>();</div>
 <div class="line"><span class="keywordtype">void</span> *heap = malloc(mem);</div>
 <div class="line">assert(heap);</div>
-<div class="line">ctx = <a class="code hl_function" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a>(heap);</div>
+<div class="line">ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(heap, NULL);</div>
 <div class="line">...</div>
 <div class="line">gs1_encoder_free(ctx);</div>
 <div class="line">free(heap);</div>
@@ -1414,7 +1445,7 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 <div class="line">    <a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx;</div>
 <div class="line">    <span class="keywordtype">size_t</span> mem = <a class="code hl_function" href="gs1encoders_8h.html#afd581bb226f56c149cc1f903cbd77ca5">gs1_encoder_instanceSize</a>();</div>
 <div class="line">    assert(<span class="keyword">sizeof</span>(prealloc) &lt;= mem);</div>
-<div class="line">    ctx = <a class="code hl_function" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a>((<span class="keywordtype">void</span> *)prealloc);</div>
+<div class="line">    ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>((<span class="keywordtype">void</span> *)prealloc, NULL);</div>
 <div class="line">    ...</div>
 <div class="line">}</div>
 </div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>memory required to hold a context instance </dd></dl>
@@ -1748,7 +1779,7 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#a111897e9846a97c2d3e446d2815b4410">gs1_encoder_init</a>(NULL);                  <span class="comment">// Create a new instance of the library</span></div>
+<div class="line"><a class="code hl_typedef" href="gs1encoders_8h.html#a34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);         <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"><span class="keywordflow">if</span> (!<a class="code hl_function" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a>(ctx,                           <span class="comment">// Process the scan data, setting dataStr and Sym)</span></div>
 <div class="line">       <span class="stringliteral">&quot;]C1011231231231233310ABC123&quot;</span> <span class="stringliteral">&quot;\x1D&quot;</span> <span class="stringliteral">&quot;99TESTING&quot;</span>))</div>
 <div class="line">    exit 1;                                                 <span class="comment">// Handle failure if bad AI data is received</span></div>
@@ -1844,7 +1875,7 @@ gs1_encoder_vREQUISITE_AIS)</code>, which should be called instead.</dd></dl>
 </div><div class="memdoc">
 
 <p>Provided for backwards compatibility to enable or disable the <a class="el" href="gs1encoders_8h.html#a11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6" title="Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.">gs1_encoder_vREQUISITE_AIS</a> validation procedure, that determines whether mandatory AI pairings are enforced when data is provided using <a class="el" href="gs1encoders_8h.html#abdce5a9347ff7cbbd153b1a13e3273dd" title="Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...">gs1_encoder_setAIdataStr()</a>, <a class="el" href="gs1encoders_8h.html#a6325f0f12c0a2110939b876aefbdd1d1" title="Sets the raw data that would be directly encoded within a GS1 barcode message.">gs1_encoder_setDataStr()</a> or <a class="el" href="gs1encoders_8h.html#ac137de565a438241f6e8b80598cef464" title="Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...">gs1_encoder_setScanData()</a>. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_setValidationEnabled(ctx,
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>This is equivalent to <code>gs1_encoder_setValidationEnabled(ctx,
 gs1_encoder_vREQUISITE_AIS, enabled)</code>, which should be called instead.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="gs1encoders_8h.html#aa946d38ee07b2d0347bddbfb36fbb0c8" title="Enable or disable the given AI validation procedure of type gs1_encoder_validations,...">gs1_encoder_setValidationEnabled()</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
