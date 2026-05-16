@@ -49,8 +49,6 @@
 #include "scandata.h"
 #include "syn.h"
 
-int test_alloc_fail_at = 0;
-
 
 TEST_LIST = {
 

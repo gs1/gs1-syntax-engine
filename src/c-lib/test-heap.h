@@ -7,7 +7,7 @@
  *
  *  The counter is shared across all TUs (extern) so that a test in one
  *  file can trigger allocation failures in functions defined in other
- *  files. The definition lives in gs1encoders-test.c.
+ *  files. The definition lives in gs1encoders.c under #ifdef UNIT_TESTS.
  */
 #ifndef TEST_HEAP_H
 #define TEST_HEAP_H

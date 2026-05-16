@@ -23,14 +23,29 @@
  *
  * @endlicenseblock
  *
- * API reference for the GS1 Barcode Syntax Engine. For an overview, examples and usage
- * instructions, see the main documentation page.
+ * Public C API header for the GS1 Barcode Syntax Engine. For an overview, examples
+ * and usage instructions, see the main documentation page. C++ users may prefer the
+ * RAII C++ wrapper in gs1encoders.hpp; see the [C++ API](@ref cppapi) topic.
  *
+ */
+
+/**
+ * @defgroup capi C API
+ * @brief Native C interface declared in `gs1encoders.h`.
+ *
+ * The C API exposes free functions that operate on an opaque
+ * ::gs1_encoder context, plus the supporting enums and the
+ * ::gs1_encoder_init_opts_t initialisation structure. Use this surface
+ * directly from C, or via the [C++ wrapper](@ref cppapi) for an
+ * idiomatic RAII / exception-based interface.
  */
 
 
 #ifndef GS1_ENCODERS_H
 #define GS1_ENCODERS_H
+
+/// @addtogroup capi
+/// @{
 
 /// \cond
 #include <stdbool.h>
@@ -125,7 +140,7 @@ typedef enum gs1_encoder_validations gs1_encoder_validations_t;
 /// Initialisation flags for gs1_encoder_init_ex().
 enum gs1_encoder_init_flags {
 	gs1_encoder_iDEFAULT							= 0,		///< Default: Use the embedded AI table (if compiled in). Set @ref gs1_encoder_init_opts::syntaxDictionary to load a Syntax Dictionary file instead.
-	gs1_encoder_iNO_SYNDICT			GS1_ENCODERS_DEPRECATED_ENUM	= 1 << 0,	///< @deprecated No-op, retained for source/ABI compatibility. Syntax Dictionary loading is now controlled by @ref gs1_encoder_init_opts::syntaxDictionary: it is loaded only when a non-NULL path is provided.
+	gs1_encoder_iNO_SYNDICT			GS1_ENCODERS_DEPRECATED_ENUM	= 1 << 0,	///< @deprecated No-op, retained for source/ABI compatibility. Syntax Dictionary loading is now controlled by @ref gs1_encoder_init_opts::syntaxDictionary : it is loaded only when a non-NULL path is provided.
 	gs1_encoder_iNO_EMBEDDED						= 1 << 1,	///< Disable use of the embedded AI table, even if it is compiled in.
 	gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR					= 1 << 2,	///< Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit @ref gs1_encoder_init_opts::syntaxDictionary fails.
 	gs1_encoder_iQUIET			GS1_ENCODERS_DEPRECATED_ENUM	= 1 << 3,	///< @deprecated No-op, retained for source/ABI compatibility. The library no longer writes initialisation messages to stdout; error information is returned via @ref gs1_encoder_init_opts::status and @ref gs1_encoder_init_opts::msgBuf.
@@ -1190,6 +1205,9 @@ GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx);
 
 #undef GS1_ENCODERS_API
 #undef GS1_ENCODERS_DEPRECATED
+
+
+/// @}  // end of capi group
 
 
 #endif /* GS1_ENCODERS_H */

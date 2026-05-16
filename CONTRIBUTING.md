@@ -186,7 +186,8 @@ Use prefixes to avoid collisions with user code:
 
 | File                         | Purpose                                              |
 |------------------------------|------------------------------------------------------|
-| `gs1encoders.h`              | Public API header with all exported functions        |
+| `gs1encoders.h`              | Public C API header with all exported functions      |
+| `gs1encoders.hpp`            | Header-only C++ wrapper (requires C++17 or later)    |
 | `enc-private.h`              | Private header with internal definitions             |
 | `gs1encoders.c`              | API implementation and context management            |
 | `ai.c`                       | Application Identifier processing and validation     |
@@ -199,7 +200,8 @@ Use prefixes to avoid collisions with user code:
 | `debug.h`                    | Debugging macros (`DEBUG_PRINT`)                     |
 | `tr.h`, `tr_EN.h`            | Error message translation system                     |
 | `gs1encoders-app.c`          | Console demo application source                      |
-| `gs1encoders-test.c`         | Unit test harness                                    |
+| `gs1encoders-test.c`         | C unit test harness                                  |
+| `gs1encoders-test.cpp`       | C++ wrapper unit test harness (`make test-cpp`)      |
 | `gs1encoders-fuzzer-*.c`     | Fuzzer entry points (ais, data, dl, scandata, syn)   |
 | `build-embedded-ai-table.pl` | Generates `aitable.inc` from Syntax Dictionary       |
 
@@ -248,10 +250,11 @@ context contains all state and working memory for each instance of the library.
 
 ### Public vs Private Headers
 
-| Header          | Purpose                                                  |
-|-----------------|----------------------------------------------------------|
-| `gs1encoders.h` | Public API - included by user application code           |
-| `enc-private.h` | Private internals - included only by this library        |
+| Header            | Purpose                                                |
+|-------------------|--------------------------------------------------------|
+| `gs1encoders.h`   | Public C API - included by user application code       |
+| `gs1encoders.hpp` | Header-only C++ wrapper around `gs1encoders.h`         |
+| `enc-private.h`   | Private internals - included only by this library      |
 
 The public header declares `gs1_encoder` as an opaque incomplete type. The
 private header contains the complete struct definition. This separation:

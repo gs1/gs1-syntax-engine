@@ -46,7 +46,7 @@ ifeq ($(DEBUG),yes)
 DEBUG_CFLAGS = -DPRNT
 endif
 
-ifeq ($(MAKECMDGOALS),test)
+ifneq ($(filter test,$(MAKECMDGOALS)),)
 BUILD_DIR = build-test
 UNIT_TEST_CFLAGS = -DUNIT_TESTS -DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h
 endif
@@ -216,6 +216,9 @@ APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
 
+CPP_TEST_SRC = gs1encoders-test.cpp
+CPP_TEST_BIN = $(BUILD_DIR)/$(NAME)-test-cpp.$(BIN_SUFFIX)
+
 LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
 
 FUZZER_PREFIX = $(NAME)-fuzzer-
@@ -377,6 +380,17 @@ wasm: $(WASM_JS)
 test: $(TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
 
+# Build and run the C++ wrapper test suite against the in-tree shared library.
+.PHONY: test-cpp
+test-cpp: $(CPP_TEST_BIN)
+	LD_LIBRARY_PATH=$(BUILD_DIR):$$LD_LIBRARY_PATH ./$(CPP_TEST_BIN)
+
+CXX ?= g++
+CXXFLAGS_CPP_TEST = -std=c++17 -g -O2 -Wall -Wextra -pedantic -Werror -I.
+
+$(CPP_TEST_BIN): $(CPP_TEST_SRC) gs1encoders.h gs1encoders.hpp acutest.h | libshared
+	$(CXX) $(CXXFLAGS_CPP_TEST) $(CPP_TEST_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+
 # Run the Swift binding test suite via Docker. The Swift Package builds the
 # C library itself, so this is end-to-end. The dictionary file is staged into
 # the test bundle source dir per the Package.swift "resources:" declaration.
@@ -501,7 +515,8 @@ install: install-static install-shared
 .PHONY: .install-headers
 install-headers:
 	install -d $(DESTDIR)$(PREFIX)/include
-	install -m 0644 $(NAME).h $(DESTDIR)$(PREFIX)/include
+	install -m 0644 $(NAME).h   $(DESTDIR)$(PREFIX)/include
+	install -m 0644 $(NAME).hpp $(DESTDIR)$(PREFIX)/include
 
 .PHONY: install-static
 install-static: libstatic install-headers
@@ -526,9 +541,7 @@ uninstall:
 .PHONY: docs-clib
 docs-clib:
 	../../maintenance/docker/c-docs/docker-build.sh
-	cp ../../maintenance/docker/c-docs/build/index.html ../../docs/
-	cp ../../maintenance/docker/c-docs/build/gs1encoders_8h.html ../../docs/
-	cp ../../maintenance/docker/c-docs/build/structgs1__encoder__init__opts.html ../../docs/
+	cp ../../maintenance/docker/c-docs/build/*.html ../../docs/
 	cp ../../maintenance/docker/c-docs/build/input_output_buffers.svg ../../docs/
 	cp ../../maintenance/docker/c-docs/build/*.css ../../docs/
 	cp ../../maintenance/docker/c-docs/build/*.js ../../docs/

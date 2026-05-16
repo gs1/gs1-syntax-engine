@@ -47,6 +47,46 @@ internal "data buffers":
 The main operations of the library involve reading and updating the state of
 these buffers.
 
+### Choose your API {#choose-your-api}
+
+This documentation set covers two equivalent surfaces:
+
+  * **@ref capi "C API"** — the canonical interface, declared in `gs1encoders.h`.
+    Free functions operating on an opaque ::gs1_encoder context. Pair with the
+    ::gs1_encoder_init_opts_t structure for explicit initialisation control.
+    Suitable for C and for C++ code that prefers to talk to the C ABI directly.
+
+  * **@ref cppapi "C++ API"** — a header-only C++ wrapper (requires C++17 or
+    later), declared in `gs1encoders.hpp` and rooted in the @ref gs1encoders
+    namespace. Provides a fluent gs1encoders::InitOpts builder, idiomatic STL
+    types (`std::string`, `std::vector`, `std::optional`) and a typed exception
+    hierarchy. The wrapper introduces no runtime overhead beyond the inline
+    calls into the underlying C library and ships in the same package as the
+    C header, so no extra dependency is required.
+
+The two surfaces are interchangeable for any operation. The minimal example
+below shows the same task — encode a bracketed AI element string as a GS1
+Digital Link URI — written each way:
+
+\code{.c}
+// C
+gs1_encoder *gs = gs1_encoder_init_ex(NULL, NULL);
+gs1_encoder_setAIdataStr(gs, "(01)09521234543213(99)TESTING123");
+printf("%s\n", gs1_encoder_getDLuri(gs, "https://example.com"));
+gs1_encoder_free(gs);
+\endcode
+
+\code{.cpp}
+// C++
+gs1encoders::GS1Encoder gs;
+gs.set_ai_data_str("(01)09521234543213(99)TESTING123");
+std::cout << gs.get_dl_uri("https://example.com") << "\n";
+\endcode
+
+Pick the API that fits the surrounding code; the rest of this page uses C in
+its examples, and the equivalent C++ method names are spelled out in the
+@ref cppapi reference.
+
 ### Quick Start {#quick-start}
 
 #### Building the C library
@@ -97,10 +137,12 @@ To use the library in your C/C++ project you must:
 to be installed on the target system. The architecture (x86 or x64) must match
 the platform used to build the library.
 
-For a minimal example, create a `myapp.c` file as follows. This uses the
-embedded AI table that is compiled into the library:
+For a minimal example, create a source file as follows. Both versions use
+the embedded AI table that is compiled into the library.
 
-\code
+**C** (`myapp.c`):
+
+\code{.c}
 #include <stdio.h>
 #include "gs1encoders.h"
 
@@ -121,6 +163,26 @@ int main(void) {
 }
 \endcode
 
+**C++** (`myapp.cpp`):
+
+\code{.cpp}
+#include <iostream>
+#include "gs1encoders.hpp"
+
+int main() {
+    try {
+        gs1encoders::GS1Encoder gs;
+        gs.set_ai_data_str("(01)09521234543213(99)TESTING123");
+        std::cout << "GS1 Digital Link URI: "
+                  << gs.get_dl_uri("https://example.com") << "\n";
+    } catch (const gs1encoders::GS1EncoderException &e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
+    return 0;
+}
+\endcode
+
 To load an external GS1 Syntax Dictionary file instead of using the embedded
 AI table, populate a @ref gs1_encoder_init_opts_t and pass it to
 gs1_encoder_init_ex(). The fields are:
@@ -133,9 +195,11 @@ gs1_encoder_init_ex(). The fields are:
 The following inverse example parses a GS1 Digital Link URI and reports the
 extracted AI data, loading the Syntax Dictionary from a host filesystem path
 and falling back to the embedded AI table if the file cannot be opened or
-parsed:
+parsed.
 
-\code
+**C** (`myapp.c`):
+
+\code{.c}
 #include <stdio.h>
 #include "gs1encoders.h"
 
@@ -176,27 +240,74 @@ int main(void) {
 }
 \endcode
 
-**Note:** Each `gs1_encoder` instance allocates native resources. Always call
-gs1_encoder_free() when you are finished with an instance to release these
-resources.
+**C++** (`myapp.cpp`):
+
+In the wrapper, initialisation failures throw a
+gs1encoders::GS1EncoderGeneralException (whose `.what()` carries the
+underlying error message); on success, gs1encoders::GS1Encoder::init_fallback_warning()
+returns the load-error message if the embedded AI table was used as a
+fallback, or `std::nullopt` on plain success. The native context is freed
+when the encoder object goes out of scope, so no manual cleanup is required.
+
+\code{.cpp}
+#include <iostream>
+#include "gs1encoders.hpp"
+
+int main() {
+    try {
+        gs1encoders::GS1Encoder gs(gs1encoders::InitOpts{}
+            .syntax_dictionary("/path/to/gs1-syntax-dictionary.txt")
+            .fallback_on_syndict_error(true));
+
+        if (auto warning = gs.init_fallback_warning())
+            std::cout << "Init warning: " << *warning << "\n";
+
+        gs.set_data_str("https://example.com/01/09521234543213?99=TESTING123");
+        std::cout << "Extracted AIs: " << gs.ai_data_str() << "\n";
+
+    } catch (const gs1encoders::GS1EncoderException &e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
+
+    return 0;
+}
+\endcode
+
+**Note:** Each `gs1_encoder` instance allocates native resources. The C
+caller must release them with gs1_encoder_free(); in C++ the encoder
+object's destructor handles this automatically when the holding scope
+ends or the holder is destroyed.
 
 **On Unix/macOS:**
 
-Compile and link:
+Compile and link.
+
+**C:**
 
     gcc myapp.c -I<path-to-gs1-syntax-engine>/src/c-lib -L<path-to-gs1-syntax-engine>/src/c-lib/build -lgs1encoders -o myapp
 
-Run:
+**C++:**
+
+    g++ -std=c++17 myapp.cpp -I<path-to-gs1-syntax-engine>/src/c-lib -L<path-to-gs1-syntax-engine>/src/c-lib/build -lgs1encoders -o myapp
+
+Run (same for both):
 
     LD_LIBRARY_PATH=<path-to-gs1-syntax-engine>/src/c-lib/build ./myapp
 
 **On Windows:**
 
-Compile and link:
+Compile and link.
+
+**C:**
 
     cl myapp.c /I<path-to-gs1-syntax-engine>\src\c-lib <path-to-gs1-syntax-engine>\src\c-lib\build\library\x64\Release\gs1encoders.lib
 
-Run (ensure `gs1encoders.dll` is in the same directory or on PATH):
+**C++:**
+
+    cl /std:c++17 /EHsc myapp.cpp /I<path-to-gs1-syntax-engine>\src\c-lib <path-to-gs1-syntax-engine>\src\c-lib\build\library\x64\Release\gs1encoders.lib
+
+Run (same for both; ensure `gs1encoders.dll` is in the same directory or on PATH):
 
     myapp.exe
 
@@ -235,10 +346,12 @@ comprehensive example of how to use this library.
 The following code processes AI data input, validates it (reporting any
 failures) and displays the extracted AIs if the validation succeeds.
 
-\code
+**C:**
+
+\code{.c}
 gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);              // Create a new instance of the library
 
-// gs1_encoder_permitUnknownAIs(ctx, true);             // Uncomment only if it is necessary to handle AIs
+// gs1_encoder_setPermitUnknownAIs(ctx, true);          // Uncomment only if it is necessary to handle AIs
                                                         // that are not known to the library
 
 // Input provided as a bracketed AI element string
@@ -254,7 +367,7 @@ bool ret = gs1_encoder_setAIdataStr(ctx, "(01)12312312312333(10)ABC123(99)TEST")
 //                "https://example.com/01/12312312312333/10/ABC123/99/TEST");
 //
 // bool ret = gs1_encoder_setScanData(ctx,              // Barcode scan data, containing a "GS" (ASCII 0x1D) separator
-//                "]Q1011231231231233310ABC123" "\x1D" "99TEST");
+//                "]Q3011231231231233310ABC123" "\x1D" "99TEST");
 
 if (!ret) {
     printf("ERROR: %s\n", gs1_encoder_getErrMsg(ctx));  // Display a descriptive error message
@@ -273,13 +386,52 @@ for (int i = 0; i < numHRI; i++) {
 gs1_encoder_free(ctx);                                  // Release the instance of the library
 \endcode
 
+**C++:**
+
+\code{.cpp}
+gs1encoders::GS1Encoder gs;                                      // Create a new instance of the library
+
+// gs.set_permit_unknown_ais(true);                              // Uncomment only if it is necessary to handle AIs
+                                                                 // that are not known to the library
+
+try {
+    // Input provided as a bracketed AI element string
+    //
+    gs.set_ai_data_str("(01)12312312312333(10)ABC123(99)TEST");
+
+    // Alternatively, the input may be given in the following formats:
+    //
+    // gs.set_data_str(                                          // Unbracketed element string, "^" = FNC1
+    //     "^011231231231233310ABC123^99TEST");
+    //
+    // gs.set_data_str(                                          // GS1 Digital Link URI
+    //     "https://example.com/01/12312312312333/10/ABC123/99/TEST");
+    //
+    // gs.set_scan_data(                                         // Barcode scan data, containing a "GS" (ASCII 0x1D) separator
+    //     "]Q3011231231231233310ABC123" "\x1D" "99TEST");
+
+} catch (const gs1encoders::GS1EncoderException &e) {
+    std::cerr << "ERROR: " << e.what() << "\n";                  // Display a descriptive error message
+    auto markup = gs.err_markup();
+    if (!markup.empty())                                         // Display the invalid AI in the case of a Linting failure
+        std::cerr << "Bad AI data: " << markup << "\n";
+    std::abort();                                                // Finally, handle the error in an application-specific way
+}
+
+for (const auto &line : gs.hri()) {                              // Display the extracted AI data as HRI text
+    std::cout << line << "\n";
+}
+\endcode
+
 
 #### Converting an AI element string to barcode message data
 
 In this example we process a bracketed AI element string to convert it into
 barcode message data, suitable for carrying in a GS1 barcode symbol.
 
-\code
+**C:**
+
+\code{.c}
 gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);
 
 bool ret = gs1_encoder_setAIdataStr(ctx,        // Accept a bracketed AI element string
@@ -292,6 +444,21 @@ if (!ret) {
 printf("%s\n", gs1_encoder_getDataStr(ctx));    // Render the barcode message buffer
 
 gs1_encoder_free(ctx);
+\endcode
+
+**C++:**
+
+\code{.cpp}
+gs1encoders::GS1Encoder gs;
+
+try {
+    gs.set_ai_data_str(                          // Accept a bracketed AI element string
+        "(01)12312312312333(10)ABC123(99)TEST");
+} catch (const gs1encoders::GS1EncoderException &) {
+    // Handle error and return
+}
+
+std::cout << gs.data_str() << "\n";              // Render the barcode message buffer
 \endcode
 
 \note
@@ -325,15 +492,17 @@ generation library is in use.
 In this example we process scan data from a barcode reader to extract the AI
 data.
 
-\code
+**C:**
+
+\code{.c}
 gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);
 
 // Disable validation of mandatory association between AIs if the symbol may
 // be one of multiple on a label
-setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);
+gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);
 
 bool ret = gs1_encoder_setScanData(ctx,
-               "]Q1011231231231233310ABC123" "\x1D" "99TEST");
+               "]Q3011231231231233310ABC123" "\x1D" "99TEST");
 
 if (!ret) {
     // Handle error and return
@@ -350,6 +519,30 @@ for (int i = 0; i < numHRI; i++) {
 // description of gs1_encoder_setScanData()
 
 gs1_encoder_free(ctx);
+\endcode
+
+**C++:**
+
+\code{.cpp}
+gs1encoders::GS1Encoder gs;
+
+// Disable validation of mandatory association between AIs if the symbol may
+// be one of multiple on a label
+gs.set_validation_enabled(gs1encoders::Validation::RequisiteAIs, false);
+
+try {
+    gs.set_scan_data("]Q3011231231231233310ABC123" "\x1D" "99TEST");
+} catch (const gs1encoders::GS1EncoderException &) {
+    // Handle error and return
+}
+
+for (const auto &line : gs.hri()) {
+    std::cout << line << "\n";
+}
+
+// If it is necessary to know the "symbology" that was scanned then this can
+// be read via gs.sym(), however note the caveats given in the description
+// of gs1encoders::GS1Encoder::set_scan_data
 \endcode
 
 \note

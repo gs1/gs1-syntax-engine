@@ -42,7 +42,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "GS1 Barcode Syntax Engine"
+PROJECT_NAME           = "GS1 Barcode Syntax Engine — C / C++ API"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -946,7 +946,8 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = mainpage.md \
-                         ../../../src/c-lib/gs1encoders.h
+                         ../../../src/c-lib/gs1encoders.h \
+                         ../../../src/c-lib/gs1encoders.hpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

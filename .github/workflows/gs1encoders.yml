@@ -88,6 +88,10 @@ jobs:
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
 
+      - name: C++ wrapper tests
+        run: |
+          make -C src/c-lib test-cpp
+
   ci-valgrind:
 
     runs-on: ubuntu-latest
@@ -356,7 +360,8 @@ jobs:
             -i gs1encoders-fuzzer-syn.c \
             -i gs1syntaxdictionary-fuzzer-linters.c \
             --suppress=missingIncludeSystem \
-            --suppress=preprocessorErrorDirective:ai.h .
+            --suppress=preprocessorErrorDirective:ai.h \
+            --suppress=unusedFunction:gs1encoders.hpp .
 
   ci-java-linux:
 

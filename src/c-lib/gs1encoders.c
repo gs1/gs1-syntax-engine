@@ -904,6 +904,9 @@ __ATTR_PURE ssize_t gs1_binarySearch(const void* const needle, const void* const
 #include "acutest.h"
 #include "unittest.h"
 
+// Definition for the test-heap fault-injection counter declared in test-heap.h.
+int test_alloc_fail_at = 0;
+
 // Used to test compile-time buffer allocation for the gs1encoder instance
 static uint8_t static_buf[sizeof(gs1_encoder)];
 
