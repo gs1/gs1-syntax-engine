@@ -1,5 +1,6 @@
 1.4.0 - UNRELEASED
 
+* Core: The legacy `gs1_encoder_init()` entry point was deprecated. New code should use `gs1_encoder_init_ex()`.
 * Core: `gs1_encoder_init_ex()` no longer searches the current working directory for `gs1-syntax-dictionary.txt`. Without an explicit `syntaxDictionary` field on `gs1_encoder_init_opts_t` it uses the embedded AI table (unless compiled out with `EXCLUDE_EMBEDDED_AI_TABLE`). The legacy `gs1_encoder_init()` entry point retains the previous convenience: it attempts to load `gs1-syntax-dictionary.txt` from the current working directory and falls back to the embedded AI table if the file is absent or malformed.
 * Core: When a `syntaxDictionary` path is supplied and the file cannot be opened or parsed, the failure is reported through the existing `status` and `msgBuf` mechanism; set `gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR` to fall back to the embedded table on failure instead.
 * Core: The library no longer writes any messages to standard output during initialisation; all diagnostics are delivered through `status` and `msgBuf`.

@@ -173,7 +173,7 @@ int main(int argc, const char* const argv[]) {
 	 *
 	 *  If detailed control is not required then this will suffice:
 	 *
-	 *      ctx = gs1_encoder_init(NULL);
+	 *      ctx = gs1_encoder_init_ex(NULL, NULL);
 	 *
 	 */
 	gs1_encoder_init_opts_t opts = {

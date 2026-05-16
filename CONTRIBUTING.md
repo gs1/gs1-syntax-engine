@@ -160,7 +160,7 @@ Use prefixes to avoid collisions with user code:
 
 | Scope                | Prefix          | Example                     |
 |----------------------|-----------------|-----------------------------|
-| Public API functions | `gs1_encoder_`  | `gs1_encoder_init()`        |
+| Public API functions | `gs1_encoder_`  | `gs1_encoder_init_ex()`     |
 | Public types         | `gs1_encoder_`  | `gs1_encoder_symbologies_t` |
 | Public macros        | `GS1_ENCODERS_` | `GS1_ENCODERS_API`          |
 | Internal functions   | `gs1_`          | `gs1_parseAIdata()`         |
@@ -238,7 +238,7 @@ The library uses an opaque context pattern. All state is maintained in
 `gs1_encoder` instances:
 
 ```c
-gs1_encoder *ctx = gs1_encoder_init(NULL);
+gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);
 // ... use ctx ...
 gs1_encoder_free(ctx);
 ```
@@ -275,7 +275,7 @@ object-oriented bindings:
 
 | C library Pattern                                      | Wrapper Pattern                               |
 |--------------------------------------------------------|-----------------------------------------------|
-| `gs1_encoder_init()` returns opaque `ctx`              | Constructor stores `ctx` as private handle    |
+| `gs1_encoder_init_ex()` returns opaque `ctx`           | Constructor stores `ctx` as private handle    |
 | `gs1_encoder_free(ctx)`                                | Custom destructor, either GC or explicit call |
 | `gs1_encoder_getX(ctx)` / `gs1_encoder_setX(ctx, val)` | Property or getter/setter methods             |
 | `bool` return indicates success/failure                | Throw exception on failure                    |
@@ -287,7 +287,7 @@ Languages handle this differently, based on development norms:
 - **C#**: Destructor (`~GS1Encoder()`) calls free automatically via garbage collection
 - **JavaScript**: Explicit `free()` method must be called by the user
 
-All context initialisation occurs in `gs1_encoder_init()`, and all working
+All context initialisation occurs in `gs1_encoder_init_ex()`, and all working
 buffers are contained within the context struct.
 
 Wrappers access all state through accessor functions
@@ -416,11 +416,15 @@ Tests use the Acutest framework.
 ```c
 void test_ai_lookupAIentry(void) {
     gs1_encoder* ctx;
-    TEST_ASSERT((ctx = gs1_encoder_init(NULL)) != NULL);
+    TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
     TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "01", 2)->ai, "01") == 0);
     gs1_encoder_free(ctx);
 }
 ```
+
+`GS1_ENCODER_UNIT_TEST_INIT()` (from `unittest.h`) wraps `gs1_encoder_init_ex()`
+with `iFALLBACK_ON_SYNDICT_ERROR` and a `gs1-syntax-dictionary.txt` path so CI
+exercises both the Syntax-Dictionary load path and the embedded-table fallback.
 
 ## Build
 

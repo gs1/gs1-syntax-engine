@@ -104,7 +104,7 @@ For a minimal example, create a `myapp.c` file as follows:
 #include "gs1encoders.h"
 
 int main(void) {
-    gs1_encoder *gs = gs1_encoder_init(NULL);
+    gs1_encoder *gs = gs1_encoder_init_ex(NULL, NULL);
     if (!gs) return 1;
 
     if (!gs1_encoder_setAIdataStr(gs, "(01)09521234543213(99)TESTING123")) {
@@ -151,7 +151,7 @@ The following are examples of how to use the library.
 
 \note
 Using the library always begins by initialising the library with
-@ref gs1_encoder_init() or @ref gs1_encoder_init_ex() and finishes by releasing the
+@ref gs1_encoder_init_ex() and finishes by releasing the
 library with @ref gs1_encoder_free().
 
 \note
@@ -180,7 +180,7 @@ The following code processes AI data input, validates it (reporting any
 failures) and displays the extracted AIs if the validation succeeds.
 
 \code
-gs1_encoder *ctx = gs1_encoder_init(NULL);              // Create a new instance of the library
+gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);              // Create a new instance of the library
 
 // gs1_encoder_permitUnknownAIs(ctx, true);             // Uncomment only if it is necessary to handle AIs
                                                         // that are not known to the library
@@ -224,7 +224,7 @@ In this example we process a bracketed AI element string to convert it into
 barcode message data, suitable for carrying in a GS1 barcode symbol.
 
 \code
-gs1_encoder *ctx = gs1_encoder_init(NULL);
+gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);
 
 bool ret = gs1_encoder_setAIdataStr(ctx,        // Accept a bracketed AI element string
     "(01)12312312312333(10)ABC123(99)TEST");
@@ -270,7 +270,7 @@ In this example we process scan data from a barcode reader to extract the AI
 data.
 
 \code
-gs1_encoder *ctx = gs1_encoder_init(NULL);
+gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);
 
 // Disable validation of mandatory association between AIs if the symbol may
 // be one of multiple on a label

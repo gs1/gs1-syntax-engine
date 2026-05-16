@@ -925,6 +925,9 @@ void test_api_instanceSize(void) {
 
 void test_api_init(void) {
 
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+
 	gs1_encoder* ctx;
 	void *heap;
 	size_t mem;
@@ -953,6 +956,8 @@ void test_api_init(void) {
 #ifndef __clang_analyzer__
 	gs1_encoder_free(ctx);
 #endif
+
+DIAG_POP
 
 }
 

@@ -193,9 +193,10 @@ typedef struct gs1_encoder_init_opts gs1_encoder_init_opts_t;
  * only be modified using the public API functions provided by this library,
  * decorated with GS1_ENCODERS_API.
  *
- * A context is created by calling gs1_encoder_init() or gs1_encoder_init_ex()
- * and destroyed by calling gs1_encoder_free(), releasing all of the storage
- * allocated by the library for that instance.
+ * A context is created by calling gs1_encoder_init_ex() (or the legacy
+ * gs1_encoder_init(), which is deprecated) and destroyed by calling
+ * gs1_encoder_free(), releasing all of the storage allocated by the library
+ * for that instance.
  *
  * \note
  * This struct is deliberately opaque and it's layout should be assumed to vary
@@ -240,7 +241,7 @@ GS1_ENCODERS_API char* gs1_encoder_getVersion(void);
  * size_t mem = gs1_encoder_instanceSize();
  * void *heap = malloc(mem);
  * assert(heap);
- * ctx = gs1_encoder_init(heap);
+ * ctx = gs1_encoder_init_ex(heap, NULL);
  * ...
  * gs1_encoder_free(ctx);
  * free(heap);
@@ -256,7 +257,7 @@ GS1_ENCODERS_API char* gs1_encoder_getVersion(void);
  * 	gs1_encoder *ctx;
  * 	size_t mem = gs1_encoder_instanceSize();
  * 	assert(sizeof(prealloc) <= mem);
- * 	ctx = gs1_encoder_init((void *)prealloc);
+ * 	ctx = gs1_encoder_init_ex((void *)prealloc, NULL);
  * 	...
  * }
  * \endcode
@@ -286,6 +287,15 @@ GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength(void);
 /**
  * @brief Initialise a new ::gs1_encoder context.
  *
+ * @deprecated Use gs1_encoder_init_ex() instead. This legacy entry point
+ * attempts to load `gs1-syntax-dictionary.txt` from the current working
+ * directory and silently falls back to the embedded AI table if the file
+ * is missing or malformed. New code should call gs1_encoder_init_ex(),
+ * which makes Syntax Dictionary loading explicit (via
+ * @ref gs1_encoder_init_opts::syntaxDictionary), reports the outcome via
+ * @ref gs1_encoder_init_opts::status and gives detailed error/warning
+ * messages via @ref gs1_encoder_init_opts::msgBuf.
+ *
  * If it expected that most users of the library will pass NULL to this
  * function which causes the library will allocate its own storage.
  *
@@ -294,20 +304,22 @@ GS1_ENCODERS_API int gs1_encoder_getMaxDataStrLength(void);
  * returned by gs1_encoder_instanceSize() and this buffer should not be reused
  * or freed until gs1_encoder_free() is called.
  *
+ * @see gs1_encoder_init_ex()
  * @see gs1_encoder_instanceSize()
  *
  * @param [in,out] mem buffer to use for storage, or NULL for automatic allocation
  * @return ::gs1_encoder context on success, else NULL.
  */
-GS1_ENCODERS_API gs1_encoder* gs1_encoder_init(void *mem);
+GS1_ENCODERS_API GS1_ENCODERS_DEPRECATED gs1_encoder* gs1_encoder_init(void *mem);
 
 
 /**
  * @brief Initialise a new ::gs1_encoder context with the extended interface.
  *
- * This is an extended version of gs1_encoder_init() that provides control over
- * Syntax Dictionary and embedded AI table loading behavior and reports
- * detailed initialisation status.
+ * This is the recommended initialisation entry point. It supersedes the
+ * deprecated gs1_encoder_init() and provides control over Syntax Dictionary
+ * and embedded AI table loading behaviour, reporting detailed initialisation
+ * status.
  *
  * Example of an extended initialisation:
  *
@@ -864,7 +876,7 @@ GS1_ENCODERS_API char* gs1_encoder_getAIdataStr(gs1_encoder *ctx);
  * #include <stdio.h>
  * #include "gs1encoders.h"
  *
- * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
+ * gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);      // Create a new instance of the library
  * gs1_encoder_setAIdataStr(ctx,                            // Set the input data (AI format on this occasion)
  *        "(01)12345678901231(10)ABC123(11)210630");
  * printf("DL URI: %s\n", gs1_encoder_getDLuri(ctx,         // Print the GS1 Digital Link URI with a custom domain and stem
@@ -924,7 +936,7 @@ GS1_ENCODERS_API char* gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem);
  * #include <stdio.h>
  * #include "gs1encoders.h"
  *
- * gs1_encoder *ctx = gs1_encoder_init(NULL);                  // Create a new instance of the library
+ * gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);         // Create a new instance of the library
  * if (!gs1_encoder_setScanData(ctx,                           // Process the scan data, setting dataStr and Sym)
  *        "]C1011231231231233310ABC123" "\x1D" "99TESTING"))
  *     exit 1;                                                 // Handle failure if bad AI data is received
@@ -990,7 +1002,7 @@ GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder* ctx, const char *scan
  * #include <stdio.h>
  * #include "gs1encoders.h"
  *
- * gs1_encoder *ctx = gs1_encoder_init(NULL);               // Create a new instance of the library
+ * gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);      // Create a new instance of the library
  * gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded);   // Choose the symbology
  * gs1_encoder_setAIdataStr(ctx,                            // Set the input data (AI format on this occasion)
  *        "(01)12345678901231(10)ABC123(11)210630");
