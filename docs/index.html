@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>GS1 Barcode Syntax Engine: GS1 Barcode Syntax Engine</title>
+<title>GS1 Barcode Syntax Engine — C / C++ API: GS1 Barcode Syntax Engine</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,7 +18,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">GS1 Barcode Syntax Engine
+   <div id="projectname">GS1 Barcode Syntax Engine — C / C++ API
    </div>
    <div id="projectbrief">Library for processing GS1 Application Identifier syntax</div>
   </td>
@@ -73,6 +73,32 @@ Overview</h2>
 <li><b>Extracted AI buffer:</b> This contains the in-order AI data that was extracted from the input data.</li>
 </ul>
 <p>The main operations of the library involve reading and updating the state of these buffers.</p>
+<h2><a class="anchor" id="choose-your-api"></a>
+Choose your API</h2>
+<p>This documentation set covers two equivalent surfaces:</p>
+<ul>
+<li><b><a class="el" href="group__capi.html">C API</a></b> — the canonical interface, declared in <code><a class="el" href="gs1encoders_8h.html">gs1encoders.h</a></code>. Free functions operating on an opaque <a class="el" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34" title="A gs1_encoder context.">gs1_encoder</a> context. Pair with the <a class="el" href="group__capi.html#gae34970304bbc7ade783dcaa879f840b4" title="Equivalent to the struct gs1_encoder_init_opts type.">gs1_encoder_init_opts_t</a> structure for explicit initialisation control. Suitable for C and for C++ code that prefers to talk to the C ABI directly.</li>
+<li><b><a class="el" href="group__cppapi.html">C++ API</a></b> — a header-only C++ wrapper (requires C++17 or later), declared in <code><a class="el" href="gs1encoders_8hpp.html">gs1encoders.hpp</a></code> and rooted in the <a class="el" href="namespacegs1encoders.html">gs1encoders</a> namespace. Provides a fluent <a class="el" href="structgs1encoders_1_1InitOpts.html" title="Initialisation options for the gs1encoders::GS1Encoder constructor.">gs1encoders::InitOpts</a> builder, idiomatic STL types (<code>std::string</code>, <code>std::vector</code>, <code>std::optional</code>) and a typed exception hierarchy. The wrapper introduces no runtime overhead beyond the inline calls into the underlying C library and ships in the same package as the C header, so no extra dependency is required.</li>
+</ul>
+<p>The two surfaces are interchangeable for any operation. The minimal example below shows the same task — encode a bracketed AI element string as a GS1 Digital Link URI — written each way:</p>
+<div class="fragment"><div class="line"><span class="comment">// C</span></div>
+<div class="line"><a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *gs = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);</div>
+<div class="line"><a class="code hl_function" href="group__capi.html#gabdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(gs, <span class="stringliteral">&quot;(01)09521234543213(99)TESTING123&quot;</span>);</div>
+<div class="line">printf(<span class="stringliteral">&quot;%s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gaf95b1858f07e4c2cd872705cab9d4b29">gs1_encoder_getDLuri</a>(gs, <span class="stringliteral">&quot;https://example.com&quot;</span>));</div>
+<div class="line"><a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(gs);</div>
+<div class="ttc" id="agroup__capi_html_ga0078a51318ba3551052c309fe48110ae"><div class="ttname"><a href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a></div><div class="ttdeci">GS1_ENCODERS_API void gs1_encoder_free(gs1_encoder *ctx)</div><div class="ttdoc">Destroy a gs1_encoder instance.</div></div>
+<div class="ttc" id="agroup__capi_html_ga34f786d8479759fd8894c6d22a9f5c34"><div class="ttname"><a href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a></div><div class="ttdeci">struct gs1_encoder gs1_encoder</div><div class="ttdoc">A gs1_encoder context.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:226</div></div>
+<div class="ttc" id="agroup__capi_html_gabdce5a9347ff7cbbd153b1a13e3273dd"><div class="ttname"><a href="group__capi.html#gabdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setAIdataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the data in the buffer that is used when buffer input is selected by parsing input provided in G...</div></div>
+<div class="ttc" id="agroup__capi_html_gaf3a0f85afa4d367a1bca6875864e3a6d"><div class="ttname"><a href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a></div><div class="ttdeci">GS1_ENCODERS_API gs1_encoder * gs1_encoder_init_ex(void *mem, const gs1_encoder_init_opts_t *opts)</div><div class="ttdoc">Initialise a new gs1_encoder context with the extended interface.</div></div>
+<div class="ttc" id="agroup__capi_html_gaf95b1858f07e4c2cd872705cab9d4b29"><div class="ttname"><a href="group__capi.html#gaf95b1858f07e4c2cd872705cab9d4b29">gs1_encoder_getDLuri</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getDLuri(gs1_encoder *ctx, const char *stem)</div><div class="ttdoc">Returns a GS1 Digital Link URI representing AI-based input data.</div></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="comment">// C++</span></div>
+<div class="line"><a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs;</div>
+<div class="line">gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#aea79b5649f8062fb6e3bad5583eb0ce0">set_ai_data_str</a>(<span class="stringliteral">&quot;(01)09521234543213(99)TESTING123&quot;</span>);</div>
+<div class="line">std::cout &lt;&lt; gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a33c4a785354c9bc8e74be99cde977db7">get_dl_uri</a>(<span class="stringliteral">&quot;https://example.com&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a></div><div class="ttdoc">Main class for processing GS1 barcode data, including validation, format conversion,...</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:261</div></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_a33c4a785354c9bc8e74be99cde977db7"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#a33c4a785354c9bc8e74be99cde977db7">gs1encoders::GS1Encoder::get_dl_uri</a></div><div class="ttdeci">std::string get_dl_uri(const std::string &amp;stem) const</div><div class="ttdoc">Render the current AI-based input data as a GS1 Digital Link URI.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:734</div></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_aea79b5649f8062fb6e3bad5583eb0ce0"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#aea79b5649f8062fb6e3bad5583eb0ce0">gs1encoders::GS1Encoder::set_ai_data_str</a></div><div class="ttdeci">void set_ai_data_str(const std::string &amp;v)</div><div class="ttdoc">Set the barcode data input from a bracketed GS1 AI element string.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:714</div></div>
+</div><!-- fragment --><p>Pick the API that fits the surrounding code; the rest of this page uses C in its examples, and the equivalent C++ method names are spelled out in the <a class="el" href="group__cppapi.html">C++ API</a> reference.</p>
 <h2><a class="anchor" id="quick-start"></a>
 Quick Start</h2>
 <h3><a class="anchor" id="autotoc_md1"></a>
@@ -99,140 +125,254 @@ Using in your own C/C++ project</h3>
 <li>Link against the library (<code>libgs1encoders.so</code>, <code>libgs1encoders.a</code>, <code>gs1encoders.dll</code>, or <code>gs1encoders.lib</code>)</li>
 </ol>
 <p><b>Note:</b> On Windows, <code>gs1encoders.dll</code> requires the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist">Microsoft Visual C++ Redistributable</a> to be installed on the target system. The architecture (x86 or x64) must match the platform used to build the library.</p>
-<p>For a minimal example, create a <code>myapp.c</code> file as follows. This uses the embedded AI table that is compiled into the library:</p>
-<div class="fragment"><div class="line">#include &lt;stdio.h&gt;</div>
-<div class="line">#include &quot;gs1encoders.h&quot;</div>
+<p>For a minimal example, create a source file as follows. Both versions use the embedded AI table that is compiled into the library.</p>
+<p><b>C</b> (<code>myapp.c</code>):</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line">int main(void) {</div>
-<div class="line">    gs1_encoder *gs = gs1_encoder_init_ex(NULL, NULL);</div>
-<div class="line">    if (!gs) return 1;</div>
+<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line">    <a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *gs = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);</div>
+<div class="line">    <span class="keywordflow">if</span> (!gs) <span class="keywordflow">return</span> 1;</div>
 <div class="line"> </div>
-<div class="line">    if (!gs1_encoder_setAIdataStr(gs, &quot;(01)09521234543213(99)TESTING123&quot;)) {</div>
-<div class="line">        printf(&quot;Error: %s\n&quot;, gs1_encoder_getErrMsg(gs));</div>
-<div class="line">        gs1_encoder_free(gs);</div>
-<div class="line">        return 1;</div>
+<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="group__capi.html#gabdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(gs, <span class="stringliteral">&quot;(01)09521234543213(99)TESTING123&quot;</span>)) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Error: %s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gaf5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg</a>(gs));</div>
+<div class="line">        <a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(gs);</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    printf(&quot;GS1 Digital Link URI: %s\n&quot;, gs1_encoder_getDLuri(gs, &quot;https://example.com&quot;));</div>
+<div class="line">    printf(<span class="stringliteral">&quot;GS1 Digital Link URI: %s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gaf95b1858f07e4c2cd872705cab9d4b29">gs1_encoder_getDLuri</a>(gs, <span class="stringliteral">&quot;https://example.com&quot;</span>));</div>
 <div class="line"> </div>
-<div class="line">    gs1_encoder_free(gs);</div>
-<div class="line">    return 0;</div>
+<div class="line">    <a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(gs);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>To load an external GS1 Syntax Dictionary file instead of using the embedded AI table, populate a <a class="el" href="gs1encoders_8h.html#ae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a> and pass it to <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>. The fields are:</p>
+<div class="ttc" id="agroup__capi_html_gaf5407346cafcc509fe8bbd2dc170ae62"><div class="ttname"><a href="group__capi.html#gaf5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getErrMsg(gs1_encoder *ctx)</div><div class="ttdoc">Read an error message generated by the library.</div></div>
+<div class="ttc" id="ags1encoders_8h_html"><div class="ttname"><a href="gs1encoders_8h.html">gs1encoders.h</a></div></div>
+</div><!-- fragment --><p><b>C++</b> (<code>myapp.cpp</code>):</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8hpp.html">gs1encoders.hpp</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main() {</div>
+<div class="line">    <span class="keywordflow">try</span> {</div>
+<div class="line">        <a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs;</div>
+<div class="line">        gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#aea79b5649f8062fb6e3bad5583eb0ce0">set_ai_data_str</a>(<span class="stringliteral">&quot;(01)09521234543213(99)TESTING123&quot;</span>);</div>
+<div class="line">        std::cout &lt;&lt; <span class="stringliteral">&quot;GS1 Digital Link URI: &quot;</span></div>
+<div class="line">                  &lt;&lt; gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a33c4a785354c9bc8e74be99cde977db7">get_dl_uri</a>(<span class="stringliteral">&quot;https://example.com&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a> &amp;e) {</div>
+<div class="line">        std::cerr &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1EncoderException_html"><div class="ttname"><a href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a></div><div class="ttdoc">Common base class for all exceptions thrown by this wrapper.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:101</div></div>
+<div class="ttc" id="ags1encoders_8hpp_html"><div class="ttname"><a href="gs1encoders_8hpp.html">gs1encoders.hpp</a></div></div>
+</div><!-- fragment --><p>To load an external GS1 Syntax Dictionary file instead of using the embedded AI table, populate a <a class="el" href="group__capi.html#gae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a> and pass it to <a class="el" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d" title="Initialise a new gs1_encoder context with the extended interface.">gs1_encoder_init_ex()</a>. The fields are:</p>
 <ul>
 <li><a class="el" href="structgs1__encoder__init__opts.html#a87cda2b1362cee4360bee89fd68287a8">gs1_encoder_init_opts::syntaxDictionary</a> — path to a Syntax Dictionary file. <code>NULL</code> (default) uses the embedded AI table.</li>
-<li><a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</li>
-<li><a class="el" href="gs1encoders_8h.html#ac7c463156739caaa586975a67b70accc">gs1_encoder_iNO_EMBEDDED</a> — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).</li>
+<li><a class="el" href="group__capi.html#gac7c463156739caaa586975a67b70accc">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a> — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.</li>
+<li><a class="el" href="group__capi.html#gac7c463156739caaa586975a67b70accc">gs1_encoder_iNO_EMBEDDED</a> — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).</li>
 <li><a class="el" href="structgs1__encoder__init__opts.html#ad3f157f98521131f5134905b4358354e">gs1_encoder_init_opts::status</a> and <a class="el" href="structgs1__encoder__init__opts.html#aea247587c28a72d239da81767402e57d">gs1_encoder_init_opts::msgBuf</a> — receive the structured initialisation outcome and any error or warning message.</li>
 </ul>
-<p>The following inverse example parses a GS1 Digital Link URI and reports the extracted AI data, loading the Syntax Dictionary from a host filesystem path and falling back to the embedded AI table if the file cannot be opened or parsed:</p>
-<div class="fragment"><div class="line">#include &lt;stdio.h&gt;</div>
-<div class="line">#include &quot;gs1encoders.h&quot;</div>
+<p>The following inverse example parses a GS1 Digital Link URI and reports the extracted AI data, loading the Syntax Dictionary from a host filesystem path and falling back to the embedded AI table if the file cannot be opened or parsed.</p>
+<p><b>C</b> (<code>myapp.c</code>):</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8h.html">gs1encoders.h</a>&quot;</span></div>
 <div class="line"> </div>
-<div class="line">int main(void) {</div>
-<div class="line">    gs1_encoder_init_status_t status;</div>
-<div class="line">    char msg[256] = { 0 };</div>
+<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>) {</div>
+<div class="line">    <a class="code hl_typedef" href="group__capi.html#ga5c607c7299d2fa84c0c5dccbf3a7a638">gs1_encoder_init_status_t</a> status;</div>
+<div class="line">    <span class="keywordtype">char</span> msg[256] = { 0 };</div>
 <div class="line"> </div>
-<div class="line">    gs1_encoder_init_opts_t opts = {</div>
-<div class="line">        .struct_size      = sizeof(gs1_encoder_init_opts_t),</div>
-<div class="line">        .flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,</div>
-<div class="line">        .syntaxDictionary = &quot;/path/to/gs1-syntax-dictionary.txt&quot;,</div>
+<div class="line">    <a class="code hl_struct" href="structgs1__encoder__init__opts.html">gs1_encoder_init_opts_t</a> opts = {</div>
+<div class="line">        .<a class="code hl_variable" href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">struct_size</a>      = <span class="keyword">sizeof</span>(<a class="code hl_typedef" href="group__capi.html#gae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a>),</div>
+<div class="line">        .flags            = <a class="code hl_enumvalue" href="group__capi.html#ggac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a>,</div>
+<div class="line">        .syntaxDictionary = <span class="stringliteral">&quot;/path/to/gs1-syntax-dictionary.txt&quot;</span>,</div>
 <div class="line">        .status           = &amp;status,</div>
 <div class="line">        .msgBuf           = msg,</div>
-<div class="line">        .msgBufSize       = sizeof(msg),</div>
+<div class="line">        .msgBufSize       = <span class="keyword">sizeof</span>(msg),</div>
 <div class="line">    };</div>
 <div class="line"> </div>
-<div class="line">    gs1_encoder *gs = gs1_encoder_init_ex(NULL, &amp;opts);</div>
-<div class="line">    if (!gs) {</div>
-<div class="line">        if (*msg) printf(&quot;Init failed: %s\n&quot;, msg);</div>
-<div class="line">        return 1;</div>
+<div class="line">    <a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *gs = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, &amp;opts);</div>
+<div class="line">    <span class="keywordflow">if</span> (!gs) {</div>
+<div class="line">        <span class="keywordflow">if</span> (*msg) printf(<span class="stringliteral">&quot;Init failed: %s\n&quot;</span>, msg);</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    // status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE indicates the</div>
-<div class="line">    // dictionary file could not be loaded; msg carries the underlying error.</div>
-<div class="line">    if (status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE &amp;&amp; *msg)</div>
-<div class="line">        printf(&quot;Init warning: %s\n&quot;, msg);</div>
+<div class="line">    <span class="comment">// status == GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE indicates the</span></div>
+<div class="line">    <span class="comment">// dictionary file could not be loaded; msg carries the underlying error.</span></div>
+<div class="line">    <span class="keywordflow">if</span> (status == <a class="code hl_enumvalue" href="group__capi.html#ggad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07">GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE</a> &amp;&amp; *msg)</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Init warning: %s\n&quot;</span>, msg);</div>
 <div class="line"> </div>
-<div class="line">    if (!gs1_encoder_setDataStr(gs, &quot;https://example.com/01/09521234543213?99=TESTING123&quot;)) {</div>
-<div class="line">        printf(&quot;Error: %s\n&quot;, gs1_encoder_getErrMsg(gs));</div>
-<div class="line">        gs1_encoder_free(gs);</div>
-<div class="line">        return 1;</div>
+<div class="line">    <span class="keywordflow">if</span> (!<a class="code hl_function" href="group__capi.html#ga6325f0f12c0a2110939b876aefbdd1d1">gs1_encoder_setDataStr</a>(gs, <span class="stringliteral">&quot;https://example.com/01/09521234543213?99=TESTING123&quot;</span>)) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Error: %s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gaf5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg</a>(gs));</div>
+<div class="line">        <a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(gs);</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">    printf(&quot;Extracted AIs: %s\n&quot;, gs1_encoder_getAIdataStr(gs));</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Extracted AIs: %s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#ga14e77e67dec91eb4ed3b711fcd932a73">gs1_encoder_getAIdataStr</a>(gs));</div>
 <div class="line"> </div>
-<div class="line">    gs1_encoder_free(gs);</div>
-<div class="line">    return 0;</div>
+<div class="line">    <a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(gs);</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-</div><!-- fragment --><p><b>Note:</b> Each <code>gs1_encoder</code> instance allocates native resources. Always call <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a> when you are finished with an instance to release these resources.</p>
+<div class="ttc" id="agroup__capi_html_ga14e77e67dec91eb4ed3b711fcd932a73"><div class="ttname"><a href="group__capi.html#ga14e77e67dec91eb4ed3b711fcd932a73">gs1_encoder_getAIdataStr</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getAIdataStr(gs1_encoder *ctx)</div><div class="ttdoc">Return the barcode input data buffer in human-friendly AI syntax.</div></div>
+<div class="ttc" id="agroup__capi_html_ga5c607c7299d2fa84c0c5dccbf3a7a638"><div class="ttname"><a href="group__capi.html#ga5c607c7299d2fa84c0c5dccbf3a7a638">gs1_encoder_init_status_t</a></div><div class="ttdeci">enum gs1_encoder_init_status gs1_encoder_init_status_t</div><div class="ttdoc">Equivalent to the enum gs1_encoder_init_status type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:172</div></div>
+<div class="ttc" id="agroup__capi_html_ga6325f0f12c0a2110939b876aefbdd1d1"><div class="ttname"><a href="group__capi.html#ga6325f0f12c0a2110939b876aefbdd1d1">gs1_encoder_setDataStr</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setDataStr(gs1_encoder *ctx, const char *dataStr)</div><div class="ttdoc">Sets the raw data that would be directly encoded within a GS1 barcode message.</div></div>
+<div class="ttc" id="agroup__capi_html_gae34970304bbc7ade783dcaa879f840b4"><div class="ttname"><a href="group__capi.html#gae34970304bbc7ade783dcaa879f840b4">gs1_encoder_init_opts_t</a></div><div class="ttdeci">struct gs1_encoder_init_opts gs1_encoder_init_opts_t</div><div class="ttdoc">Equivalent to the struct gs1_encoder_init_opts type.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:194</div></div>
+<div class="ttc" id="agroup__capi_html_ggac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be"><div class="ttname"><a href="group__capi.html#ggac7c463156739caaa586975a67b70accca70b833a817df39c0c8a876544d5e86be">gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</a></div><div class="ttdeci">@ gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR</div><div class="ttdoc">Fallback to the embedded AI table (if not disabled and is compiled in) when loading the explicit gs1_...</div><div class="ttdef"><b>Definition</b> gs1encoders.h:145</div></div>
+<div class="ttc" id="agroup__capi_html_ggad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07"><div class="ttname"><a href="group__capi.html#ggad52da08e73fd856764be330398ea931aaf7013eb35a5dc034ff5c172550664c07">GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE</a></div><div class="ttdeci">@ GS1_ENCODERS_INIT_FALLBACK_TO_EMBEDDED_TABLE</div><div class="ttdoc">The explicit gs1_encoder_init_opts::syntaxDictionary could not be loaded (e.g. file not found or pars...</div><div class="ttdef"><b>Definition</b> gs1encoders.h:160</div></div>
+<div class="ttc" id="astructgs1__encoder__init__opts_html"><div class="ttname"><a href="structgs1__encoder__init__opts.html">gs1_encoder_init_opts</a></div><div class="ttdoc">Initialisation options structure for gs1_encoder_init_ex().</div><div class="ttdef"><b>Definition</b> gs1encoders.h:180</div></div>
+<div class="ttc" id="astructgs1__encoder__init__opts_html_a2c89c52b8e569f43c4e85676261c68ff"><div class="ttname"><a href="structgs1__encoder__init__opts.html#a2c89c52b8e569f43c4e85676261c68ff">gs1_encoder_init_opts::struct_size</a></div><div class="ttdeci">size_t struct_size</div><div class="ttdoc">Must be initialised to sizeof(gs1_encoder_init_opts_t)</div><div class="ttdef"><b>Definition</b> gs1encoders.h:181</div></div>
+</div><!-- fragment --><p><b>C++</b> (<code>myapp.cpp</code>):</p>
+<p>In the wrapper, initialisation failures throw a <a class="el" href="classgs1encoders_1_1GS1EncoderGeneralException.html" title="Thrown to indicate a general problem initialising the library, such as when the underlying AI table c...">gs1encoders::GS1EncoderGeneralException</a> (whose <code>.what()</code> carries the underlying error message); on success, <a class="el" href="classgs1encoders_1_1GS1Encoder.html#acbc9edb4b90c5b4b43e9a622b64556ce" title="The warning message produced when initialisation fell back to the embedded AI table because the suppl...">gs1encoders::GS1Encoder::init_fallback_warning()</a> returns the load-error message if the embedded AI table was used as a fallback, or <code>std::nullopt</code> on plain success. The native context is freed when the encoder object goes out of scope, so no manual cleanup is required.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="gs1encoders_8hpp.html">gs1encoders.hpp</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main() {</div>
+<div class="line">    <span class="keywordflow">try</span> {</div>
+<div class="line">        <a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs(<a class="code hl_struct" href="structgs1encoders_1_1InitOpts.html">gs1encoders::InitOpts</a>{}</div>
+<div class="line">            .<a class="code hl_function" href="structgs1encoders_1_1InitOpts.html#a430a99d1abda1608f4492fd247de53f6">syntax_dictionary</a>(<span class="stringliteral">&quot;/path/to/gs1-syntax-dictionary.txt&quot;</span>)</div>
+<div class="line">            .fallback_on_syndict_error(<span class="keyword">true</span>));</div>
+<div class="line"> </div>
+<div class="line">        <span class="keywordflow">if</span> (<span class="keyword">auto</span> warning = gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#acbc9edb4b90c5b4b43e9a622b64556ce">init_fallback_warning</a>())</div>
+<div class="line">            std::cout &lt;&lt; <span class="stringliteral">&quot;Init warning: &quot;</span> &lt;&lt; *warning &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"> </div>
+<div class="line">        gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#ae1cdd928022074c641e0de13f5f21ac1">set_data_str</a>(<span class="stringliteral">&quot;https://example.com/01/09521234543213?99=TESTING123&quot;</span>);</div>
+<div class="line">        std::cout &lt;&lt; <span class="stringliteral">&quot;Extracted AIs: &quot;</span> &lt;&lt; gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a492726b6735050a4eceadb04e0a273f0">ai_data_str</a>() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"> </div>
+<div class="line">    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a> &amp;e) {</div>
+<div class="line">        std::cerr &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">        <span class="keywordflow">return</span> 1;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_a492726b6735050a4eceadb04e0a273f0"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#a492726b6735050a4eceadb04e0a273f0">gs1encoders::GS1Encoder::ai_data_str</a></div><div class="ttdeci">std::string ai_data_str() const</div><div class="ttdoc">Get the barcode data input rendered as a bracketed AI element string.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:675</div></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_acbc9edb4b90c5b4b43e9a622b64556ce"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#acbc9edb4b90c5b4b43e9a622b64556ce">gs1encoders::GS1Encoder::init_fallback_warning</a></div><div class="ttdeci">std::optional&lt; std::string &gt; init_fallback_warning() const</div><div class="ttdoc">The warning message produced when initialisation fell back to the embedded AI table because the suppl...</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:387</div></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_ae1cdd928022074c641e0de13f5f21ac1"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#ae1cdd928022074c641e0de13f5f21ac1">gs1encoders::GS1Encoder::set_data_str</a></div><div class="ttdeci">void set_data_str(const std::string &amp;v)</div><div class="ttdoc">Set the raw barcode message data.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:660</div></div>
+<div class="ttc" id="astructgs1encoders_1_1InitOpts_html"><div class="ttname"><a href="structgs1encoders_1_1InitOpts.html">gs1encoders::InitOpts</a></div><div class="ttdoc">Initialisation options for the gs1encoders::GS1Encoder constructor.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:203</div></div>
+<div class="ttc" id="astructgs1encoders_1_1InitOpts_html_a430a99d1abda1608f4492fd247de53f6"><div class="ttname"><a href="structgs1encoders_1_1InitOpts.html#a430a99d1abda1608f4492fd247de53f6">gs1encoders::InitOpts::syntax_dictionary</a></div><div class="ttdeci">InitOpts &amp; syntax_dictionary(std::string path)</div><div class="ttdoc">Set the path to a GS1 Syntax Dictionary file. If not set, the embedded AI table is used.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:210</div></div>
+</div><!-- fragment --><p><b>Note:</b> Each <code>gs1_encoder</code> instance allocates native resources. The C caller must release them with <a class="el" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae" title="Destroy a gs1_encoder instance.">gs1_encoder_free()</a>; in C++ the encoder object's destructor handles this automatically when the holding scope ends or the holder is destroyed.</p>
 <p><b>On Unix/macOS:</b></p>
-<p>Compile and link: </p><pre class="fragment">gcc myapp.c -I&lt;path-to-gs1-syntax-engine&gt;/src/c-lib -L&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build -lgs1encoders -o myapp
-</pre><p> Run: </p><pre class="fragment">LD_LIBRARY_PATH=&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build ./myapp
+<p>Compile and link.</p>
+<p><b>C:</b> </p><pre class="fragment">gcc myapp.c -I&lt;path-to-gs1-syntax-engine&gt;/src/c-lib -L&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build -lgs1encoders -o myapp
+</pre><p> <b>C++:</b> </p><pre class="fragment">g++ -std=c++17 myapp.cpp -I&lt;path-to-gs1-syntax-engine&gt;/src/c-lib -L&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build -lgs1encoders -o myapp
+</pre><p> Run (same for both): </p><pre class="fragment">LD_LIBRARY_PATH=&lt;path-to-gs1-syntax-engine&gt;/src/c-lib/build ./myapp
 </pre><p> <b>On Windows:</b></p>
-<p>Compile and link: </p><pre class="fragment">cl myapp.c /I&lt;path-to-gs1-syntax-engine&gt;\src\c-lib &lt;path-to-gs1-syntax-engine&gt;\src\c-lib\build\library\x64\Release\gs1encoders.lib
-</pre><p> Run (ensure <code>gs1encoders.dll</code> is in the same directory or on PATH): </p><pre class="fragment">myapp.exe
+<p>Compile and link.</p>
+<p><b>C:</b> </p><pre class="fragment">cl myapp.c /I&lt;path-to-gs1-syntax-engine&gt;\src\c-lib &lt;path-to-gs1-syntax-engine&gt;\src\c-lib\build\library\x64\Release\gs1encoders.lib
+</pre><p> <b>C++:</b> </p><pre class="fragment">cl /std:c++17 /EHsc myapp.cpp /I&lt;path-to-gs1-syntax-engine&gt;\src\c-lib &lt;path-to-gs1-syntax-engine&gt;\src\c-lib\build\library\x64\Release\gs1encoders.lib
+</pre><p> Run (same for both; ensure <code>gs1encoders.dll</code> is in the same directory or on PATH): </p><pre class="fragment">myapp.exe
 </pre><h2><a class="anchor" id="example-uses"></a>
 Example Uses</h2>
 <p>The following are examples of how to use the library.</p>
-<dl class="section note"><dt>Note</dt><dd>Using the library always begins by initialising the library with <a class="el" href="gs1encoders_8h.html#af3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex()</a> and finishes by releasing the library with <a class="el" href="gs1encoders_8h.html#a0078a51318ba3551052c309fe48110ae">gs1_encoder_free()</a>.</dd>
+<dl class="section note"><dt>Note</dt><dd>Using the library always begins by initialising the library with <a class="el" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex()</a> and finishes by releasing the library with <a class="el" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free()</a>.</dd>
 <dd>
 Unless otherwise specified, the getter functions return pointers to per-instance storage managed by this library and therefore must not be freed by the user. If their content must persist following a subsequent call to the same instance of the library then they must be copied to a user-managed buffer.</dd>
 <dd>
-Most of the setter and action functions of this library return a boolean indicating whether the function was successful and write an error message that can be accessed with <a class="el" href="gs1encoders_8h.html#af5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg()</a> in the event of failure. Production code should check the output of the functions and where relevant do something appropriate which might include rendering the error message to the user. Error message string are provided in the English language in a single file that can be replaced at compile time.</dd></dl>
+Most of the setter and action functions of this library return a boolean indicating whether the function was successful and write an error message that can be accessed with <a class="el" href="group__capi.html#gaf5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg()</a> in the event of failure. Production code should check the output of the functions and where relevant do something appropriate which might include rendering the error message to the user. Error message string are provided in the English language in a single file that can be replaced at compile time.</dd></dl>
 <p>Refer to the example console application (<code>gs1encoders-app.c</code>) for a comprehensive example of how to use this library.</p>
 <h3><a class="anchor" id="autotoc_md4"></a>
 GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <p>The following code processes AI data input, validates it (reporting any failures) and displays the extracted AIs if the validation succeeds.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);              // Create a new instance of the library</div>
+<p><b>C:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);              <span class="comment">// Create a new instance of the library</span></div>
 <div class="line"> </div>
-<div class="line">// gs1_encoder_permitUnknownAIs(ctx, true);             // Uncomment only if it is necessary to handle AIs</div>
-<div class="line">                                                        // that are not known to the library</div>
+<div class="line"><span class="comment">// gs1_encoder_setPermitUnknownAIs(ctx, true);          // Uncomment only if it is necessary to handle AIs</span></div>
+<div class="line">                                                        <span class="comment">// that are not known to the library</span></div>
 <div class="line"> </div>
-<div class="line">// Input provided as a bracketed AI element string</div>
-<div class="line">//</div>
-<div class="line">bool ret = gs1_encoder_setAIdataStr(ctx, &quot;(01)12312312312333(10)ABC123(99)TEST&quot;);</div>
+<div class="line"><span class="comment">// Input provided as a bracketed AI element string</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="keywordtype">bool</span> ret = <a class="code hl_function" href="group__capi.html#gabdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(ctx, <span class="stringliteral">&quot;(01)12312312312333(10)ABC123(99)TEST&quot;</span>);</div>
 <div class="line"> </div>
-<div class="line">// Alternatively, the input may be given in the following formats:</div>
-<div class="line">//</div>
-<div class="line">// bool ret = gs1_encoder_setDataStr(ctx,               // Unbracketed element string, &quot;^&quot; = FNC1</div>
-<div class="line">//                &quot;^011231231231233310ABC123^99TEST&quot;);</div>
-<div class="line">//</div>
-<div class="line">// bool ret = gs1_encoder_setDataStr(ctx,               // GS1 Digital Link URI</div>
-<div class="line">//                &quot;https://example.com/01/12312312312333/10/ABC123/99/TEST&quot;);</div>
-<div class="line">//</div>
-<div class="line">// bool ret = gs1_encoder_setScanData(ctx,              // Barcode scan data, containing a &quot;GS&quot; (ASCII 0x1D) separator</div>
-<div class="line">//                &quot;]Q1011231231231233310ABC123&quot; &quot;\x1D&quot; &quot;99TEST&quot;);</div>
+<div class="line"><span class="comment">// Alternatively, the input may be given in the following formats:</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// bool ret = gs1_encoder_setDataStr(ctx,               // Unbracketed element string, &quot;^&quot; = FNC1</span></div>
+<div class="line"><span class="comment">//                &quot;^011231231231233310ABC123^99TEST&quot;);</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// bool ret = gs1_encoder_setDataStr(ctx,               // GS1 Digital Link URI</span></div>
+<div class="line"><span class="comment">//                &quot;https://example.com/01/12312312312333/10/ABC123/99/TEST&quot;);</span></div>
+<div class="line"><span class="comment">//</span></div>
+<div class="line"><span class="comment">// bool ret = gs1_encoder_setScanData(ctx,              // Barcode scan data, containing a &quot;GS&quot; (ASCII 0x1D) separator</span></div>
+<div class="line"><span class="comment">//                &quot;]Q3011231231231233310ABC123&quot; &quot;\x1D&quot; &quot;99TEST&quot;);</span></div>
 <div class="line"> </div>
-<div class="line">if (!ret) {</div>
-<div class="line">    printf(&quot;ERROR: %s\n&quot;, gs1_encoder_getErrMsg(ctx));  // Display a descriptive error message</div>
-<div class="line">    char *errMarkup = gs1_encoder_getErrMarkup(ctx);</div>
-<div class="line">    if (*errMarkup != &#39;\0&#39;)                             // Display the invalid AI in the case of a Linting failure</div>
-<div class="line">        printf(&quot;Bad AI data: %s\n&quot;, errMarkup);</div>
-<div class="line">    abort();                                            // Finally, handle the error in an application-specific way</div>
+<div class="line"><span class="keywordflow">if</span> (!ret) {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;ERROR: %s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gaf5407346cafcc509fe8bbd2dc170ae62">gs1_encoder_getErrMsg</a>(ctx));  <span class="comment">// Display a descriptive error message</span></div>
+<div class="line">    <span class="keywordtype">char</span> *errMarkup = <a class="code hl_function" href="group__capi.html#ga3f3190f20a24e00c66fb409fd4f33e17">gs1_encoder_getErrMarkup</a>(ctx);</div>
+<div class="line">    <span class="keywordflow">if</span> (*errMarkup != <span class="charliteral">&#39;\0&#39;</span>)                             <span class="comment">// Display the invalid AI in the case of a Linting failure</span></div>
+<div class="line">        printf(<span class="stringliteral">&quot;Bad AI data: %s\n&quot;</span>, errMarkup);</div>
+<div class="line">    abort();                                            <span class="comment">// Finally, handle the error in an application-specific way</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">char **hri;</div>
-<div class="line">int numHRI = gs1_encoder_getHRI(ctx, &amp;hri);             // Display the extracted AI data as HRI text</div>
-<div class="line">for (int i = 0; i &lt; numHRI; i++) {</div>
-<div class="line">    printf(&quot;%s\n&quot;, hri[i]);</div>
+<div class="line"><span class="keywordtype">char</span> **hri;</div>
+<div class="line"><span class="keywordtype">int</span> numHRI = <a class="code hl_function" href="group__capi.html#ga3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a>(ctx, &amp;hri);             <span class="comment">// Display the extracted AI data as HRI text</span></div>
+<div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; numHRI; i++) {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, hri[i]);</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">gs1_encoder_free(ctx);                                  // Release the instance of the library</div>
+<div class="line"><a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);                                  <span class="comment">// Release the instance of the library</span></div>
+<div class="ttc" id="agroup__capi_html_ga3f3190f20a24e00c66fb409fd4f33e17"><div class="ttname"><a href="group__capi.html#ga3f3190f20a24e00c66fb409fd4f33e17">gs1_encoder_getErrMarkup</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getErrMarkup(gs1_encoder *ctx)</div><div class="ttdoc">Read the error markup generated when parsing AI data fails due to a linting failure.</div></div>
+<div class="ttc" id="agroup__capi_html_ga3fe65a09fa62afe033b6697970778e25"><div class="ttname"><a href="group__capi.html#ga3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a></div><div class="ttdeci">GS1_ENCODERS_API int gs1_encoder_getHRI(gs1_encoder *ctx, char ***hri)</div><div class="ttdoc">Update a given pointer towards an array of strings containing Human-Readable Interpretation (&quot;HRI&quot;) t...</div></div>
+</div><!-- fragment --><p><b>C++:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs;                                      <span class="comment">// Create a new instance of the library</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// gs.set_permit_unknown_ais(true);                              // Uncomment only if it is necessary to handle AIs</span></div>
+<div class="line">                                                                 <span class="comment">// that are not known to the library</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">try</span> {</div>
+<div class="line">    <span class="comment">// Input provided as a bracketed AI element string</span></div>
+<div class="line">    <span class="comment">//</span></div>
+<div class="line">    gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#aea79b5649f8062fb6e3bad5583eb0ce0">set_ai_data_str</a>(<span class="stringliteral">&quot;(01)12312312312333(10)ABC123(99)TEST&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Alternatively, the input may be given in the following formats:</span></div>
+<div class="line">    <span class="comment">//</span></div>
+<div class="line">    <span class="comment">// gs.set_data_str(                                          // Unbracketed element string, &quot;^&quot; = FNC1</span></div>
+<div class="line">    <span class="comment">//     &quot;^011231231231233310ABC123^99TEST&quot;);</span></div>
+<div class="line">    <span class="comment">//</span></div>
+<div class="line">    <span class="comment">// gs.set_data_str(                                          // GS1 Digital Link URI</span></div>
+<div class="line">    <span class="comment">//     &quot;https://example.com/01/12312312312333/10/ABC123/99/TEST&quot;);</span></div>
+<div class="line">    <span class="comment">//</span></div>
+<div class="line">    <span class="comment">// gs.set_scan_data(                                         // Barcode scan data, containing a &quot;GS&quot; (ASCII 0x1D) separator</span></div>
+<div class="line">    <span class="comment">//     &quot;]Q3011231231231233310ABC123&quot; &quot;\x1D&quot; &quot;99TEST&quot;);</span></div>
+<div class="line"> </div>
+<div class="line">} <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a> &amp;e) {</div>
+<div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;ERROR: &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;                  <span class="comment">// Display a descriptive error message</span></div>
+<div class="line">    <span class="keyword">auto</span> markup = gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a04a7417753371207db2106814945a0c1">err_markup</a>();</div>
+<div class="line">    <span class="keywordflow">if</span> (!markup.empty())                                         <span class="comment">// Display the invalid AI in the case of a Linting failure</span></div>
+<div class="line">        std::cerr &lt;&lt; <span class="stringliteral">&quot;Bad AI data: &quot;</span> &lt;&lt; markup &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">    std::abort();                                                <span class="comment">// Finally, handle the error in an application-specific way</span></div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;line : gs.hri()) {                              <span class="comment">// Display the extracted AI data as HRI text</span></div>
+<div class="line">    std::cout &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_a04a7417753371207db2106814945a0c1"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#a04a7417753371207db2106814945a0c1">gs1encoders::GS1Encoder::err_markup</a></div><div class="ttdeci">std::string err_markup() const</div><div class="ttdoc">Get the marked-up offending AI from the most recent linting failure.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:877</div></div>
 </div><!-- fragment --><h3><a class="anchor" id="autotoc_md5"></a>
 Converting an AI element string to barcode message data</h3>
 <p>In this example we process a bracketed AI element string to convert it into barcode message data, suitable for carrying in a GS1 barcode symbol.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);</div>
+<p><b>C:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);</div>
 <div class="line"> </div>
-<div class="line">bool ret = gs1_encoder_setAIdataStr(ctx,        // Accept a bracketed AI element string</div>
-<div class="line">    &quot;(01)12312312312333(10)ABC123(99)TEST&quot;);</div>
+<div class="line"><span class="keywordtype">bool</span> ret = <a class="code hl_function" href="group__capi.html#gabdce5a9347ff7cbbd153b1a13e3273dd">gs1_encoder_setAIdataStr</a>(ctx,        <span class="comment">// Accept a bracketed AI element string</span></div>
+<div class="line">    <span class="stringliteral">&quot;(01)12312312312333(10)ABC123(99)TEST&quot;</span>);</div>
 <div class="line"> </div>
-<div class="line">if (!ret) {</div>
-<div class="line">    // Handle error and return</div>
+<div class="line"><span class="keywordflow">if</span> (!ret) {</div>
+<div class="line">    <span class="comment">// Handle error and return</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">printf(&quot;%s\n&quot;, gs1_encoder_getDataStr(ctx));    // Render the barcode message buffer</div>
+<div class="line">printf(<span class="stringliteral">&quot;%s\n&quot;</span>, <a class="code hl_function" href="group__capi.html#gafa3c7c782a9dc3de96c1ef45ce96e1d7">gs1_encoder_getDataStr</a>(ctx));    <span class="comment">// Render the barcode message buffer</span></div>
 <div class="line"> </div>
-<div class="line">gs1_encoder_free(ctx);</div>
+<div class="line"><a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);</div>
+<div class="ttc" id="agroup__capi_html_gafa3c7c782a9dc3de96c1ef45ce96e1d7"><div class="ttname"><a href="group__capi.html#gafa3c7c782a9dc3de96c1ef45ce96e1d7">gs1_encoder_getDataStr</a></div><div class="ttdeci">GS1_ENCODERS_API char * gs1_encoder_getDataStr(gs1_encoder *ctx)</div><div class="ttdoc">Reads the raw barcode data input buffer.</div></div>
+</div><!-- fragment --><p><b>C++:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs;</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">try</span> {</div>
+<div class="line">    gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#aea79b5649f8062fb6e3bad5583eb0ce0">set_ai_data_str</a>(                          <span class="comment">// Accept a bracketed AI element string</span></div>
+<div class="line">        <span class="stringliteral">&quot;(01)12312312312333(10)ABC123(99)TEST&quot;</span>);</div>
+<div class="line">} <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a> &amp;) {</div>
+<div class="line">    <span class="comment">// Handle error and return</span></div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a033b173d9c60396fd67a878af473510a">data_str</a>() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;              <span class="comment">// Render the barcode message buffer</span></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_a033b173d9c60396fd67a878af473510a"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#a033b173d9c60396fd67a878af473510a">gs1encoders::GS1Encoder::data_str</a></div><div class="ttdeci">std::string data_str() const</div><div class="ttdoc">Get the raw data that would be directly encoded within a GS1 barcode message.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:621</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The barcode message data read and emitted by this library uses a harmonised format that does not concern itself with internal encoding quirks of various symbologies. In the harmonised barcode message data: </dd>
 <dd>
 <ul>
@@ -247,30 +387,57 @@ Consequently, the barcode message data emitted by this library may need to be po
 <h3><a class="anchor" id="autotoc_md6"></a>
 Barcode scan data processing</h3>
 <p>In this example we process scan data from a barcode reader to extract the AI data.</p>
-<div class="fragment"><div class="line">gs1_encoder *ctx = gs1_encoder_init_ex(NULL, NULL);</div>
+<p><b>C:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__capi.html#ga34f786d8479759fd8894c6d22a9f5c34">gs1_encoder</a> *ctx = <a class="code hl_function" href="group__capi.html#gaf3a0f85afa4d367a1bca6875864e3a6d">gs1_encoder_init_ex</a>(NULL, NULL);</div>
 <div class="line"> </div>
-<div class="line">// Disable validation of mandatory association between AIs if the symbol may</div>
-<div class="line">// be one of multiple on a label</div>
-<div class="line">setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);</div>
+<div class="line"><span class="comment">// Disable validation of mandatory association between AIs if the symbol may</span></div>
+<div class="line"><span class="comment">// be one of multiple on a label</span></div>
+<div class="line"><a class="code hl_function" href="group__capi.html#gaa946d38ee07b2d0347bddbfb36fbb0c8">gs1_encoder_setValidationEnabled</a>(ctx, <a class="code hl_enumvalue" href="group__capi.html#gga11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a>, <span class="keyword">false</span>);</div>
 <div class="line"> </div>
-<div class="line">bool ret = gs1_encoder_setScanData(ctx,</div>
-<div class="line">               &quot;]Q1011231231231233310ABC123&quot; &quot;\x1D&quot; &quot;99TEST&quot;);</div>
+<div class="line"><span class="keywordtype">bool</span> ret = <a class="code hl_function" href="group__capi.html#gac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a>(ctx,</div>
+<div class="line">               <span class="stringliteral">&quot;]Q3011231231231233310ABC123&quot;</span> <span class="stringliteral">&quot;\x1D&quot;</span> <span class="stringliteral">&quot;99TEST&quot;</span>);</div>
 <div class="line"> </div>
-<div class="line">if (!ret) {</div>
-<div class="line">    // Handle error and return</div>
+<div class="line"><span class="keywordflow">if</span> (!ret) {</div>
+<div class="line">    <span class="comment">// Handle error and return</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">char **hri;</div>
-<div class="line">int numHRI = gs1_encoder_getHRI(ctx, &amp;hri);</div>
-<div class="line">for (int i = 0; i &lt; numHRI; i++) {</div>
-<div class="line">    printf(&quot;%s\n&quot;, hri[i]);</div>
+<div class="line"><span class="keywordtype">char</span> **hri;</div>
+<div class="line"><span class="keywordtype">int</span> numHRI = <a class="code hl_function" href="group__capi.html#ga3fe65a09fa62afe033b6697970778e25">gs1_encoder_getHRI</a>(ctx, &amp;hri);</div>
+<div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; numHRI; i++) {</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, hri[i]);</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">// If it is necessary to know the &quot;symbology&quot; that was scanned then this can</div>
-<div class="line">// be read using gs1_encoder_getSym(), however note the caveats given in the</div>
-<div class="line">// description of gs1_encoder_setScanData()</div>
+<div class="line"><span class="comment">// If it is necessary to know the &quot;symbology&quot; that was scanned then this can</span></div>
+<div class="line"><span class="comment">// be read using gs1_encoder_getSym(), however note the caveats given in the</span></div>
+<div class="line"><span class="comment">// description of gs1_encoder_setScanData()</span></div>
 <div class="line"> </div>
-<div class="line">gs1_encoder_free(ctx);</div>
+<div class="line"><a class="code hl_function" href="group__capi.html#ga0078a51318ba3551052c309fe48110ae">gs1_encoder_free</a>(ctx);</div>
+<div class="ttc" id="agroup__capi_html_gaa946d38ee07b2d0347bddbfb36fbb0c8"><div class="ttname"><a href="group__capi.html#gaa946d38ee07b2d0347bddbfb36fbb0c8">gs1_encoder_setValidationEnabled</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setValidationEnabled(gs1_encoder *ctx, gs1_encoder_validations_t validation, bool enabled)</div><div class="ttdoc">Enable or disable the given AI validation procedure of type gs1_encoder_validations,...</div></div>
+<div class="ttc" id="agroup__capi_html_gac137de565a438241f6e8b80598cef464"><div class="ttname"><a href="group__capi.html#gac137de565a438241f6e8b80598cef464">gs1_encoder_setScanData</a></div><div class="ttdeci">GS1_ENCODERS_API bool gs1_encoder_setScanData(gs1_encoder *ctx, const char *scanData)</div><div class="ttdoc">Process normalised scan data received from a barcode reader with reporting of AIM symbology identifie...</div></div>
+<div class="ttc" id="agroup__capi_html_gga11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6"><div class="ttname"><a href="group__capi.html#gga11a47c2b410ffcc87a332c973cce85c9a2a5f772fde717a4f68593eeb592d54c6">gs1_encoder_vREQUISITE_AIS</a></div><div class="ttdeci">@ gs1_encoder_vREQUISITE_AIS</div><div class="ttdoc">Default: Enabled. Validates that the input satisfies the mandatory associations for each AI.</div><div class="ttdef"><b>Definition</b> gs1encoders.h:125</div></div>
+</div><!-- fragment --><p><b>C++:</b></p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classgs1encoders_1_1GS1Encoder.html">gs1encoders::GS1Encoder</a> gs;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Disable validation of mandatory association between AIs if the symbol may</span></div>
+<div class="line"><span class="comment">// be one of multiple on a label</span></div>
+<div class="line">gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#a8257ae33aed0614d826458fcfa68fdd7">set_validation_enabled</a>(<a class="code hl_enumvalue" href="group__cppapi.html#gga92cb8c5eee9ce6878caaf5162742eb34a57bca9edb0cd0986a33e5dd66f72db22">gs1encoders::Validation::RequisiteAIs</a>, <span class="keyword">false</span>);</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">try</span> {</div>
+<div class="line">    gs.<a class="code hl_function" href="classgs1encoders_1_1GS1Encoder.html#ab24d48d6c0ba43359f26cb1c18bfd85f">set_scan_data</a>(<span class="stringliteral">&quot;]Q3011231231231233310ABC123&quot;</span> <span class="stringliteral">&quot;\x1D&quot;</span> <span class="stringliteral">&quot;99TEST&quot;</span>);</div>
+<div class="line">} <span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code hl_class" href="classgs1encoders_1_1GS1EncoderException.html">gs1encoders::GS1EncoderException</a> &amp;) {</div>
+<div class="line">    <span class="comment">// Handle error and return</span></div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;line : gs.hri()) {</div>
+<div class="line">    std::cout &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// If it is necessary to know the &quot;symbology&quot; that was scanned then this can</span></div>
+<div class="line"><span class="comment">// be read via gs.sym(), however note the caveats given in the description</span></div>
+<div class="line"><span class="comment">// of gs1encoders::GS1Encoder::set_scan_data</span></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_a8257ae33aed0614d826458fcfa68fdd7"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#a8257ae33aed0614d826458fcfa68fdd7">gs1encoders::GS1Encoder::set_validation_enabled</a></div><div class="ttdeci">void set_validation_enabled(Validation v, bool enabled)</div><div class="ttdoc">Enable or disable an AI validation procedure.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:599</div></div>
+<div class="ttc" id="aclassgs1encoders_1_1GS1Encoder_html_ab24d48d6c0ba43359f26cb1c18bfd85f"><div class="ttname"><a href="classgs1encoders_1_1GS1Encoder.html#ab24d48d6c0ba43359f26cb1c18bfd85f">gs1encoders::GS1Encoder::set_scan_data</a></div><div class="ttdeci">void set_scan_data(const std::string &amp;v)</div><div class="ttdoc">Process normalised scan data received from a barcode reader.</div><div class="ttdef"><b>Definition</b> gs1encoders.hpp:793</div></div>
+<div class="ttc" id="agroup__cppapi_html_gga92cb8c5eee9ce6878caaf5162742eb34a57bca9edb0cd0986a33e5dd66f72db22"><div class="ttname"><a href="group__cppapi.html#gga92cb8c5eee9ce6878caaf5162742eb34a57bca9edb0cd0986a33e5dd66f72db22">gs1encoders::Validation::RequisiteAIs</a></div><div class="ttdeci">@ RequisiteAIs</div><div class="ttdoc">Mandatory associations between AIs.</div></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is required that AIM Symbology Identifiers are enabled on the barcode reader.</dd>
 <dd>
 It is assumed the scanned barcode message "survives the channel" intact, i.e. that no character substitutions have been made by the reader, in particular that any embedded FNC1 separator characters are correctly represented by GS characters (ASCII 29). If this is not the case then the scanned data should be pre-processed to meet this requirement.</dd></dl>
