@@ -256,6 +256,11 @@ jobs:
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
 
+          # C++ wrapper test under ASAN+UBSAN (no LSAN on macOS)
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            test-cpp SANITIZE=yes
+
   ci-swift:
 
     runs-on: macos-latest

@@ -390,16 +390,18 @@ test: $(TEST_BIN)
 # Build and run the C++ wrapper test suite against the in-tree shared library.
 .PHONY: test-cpp
 test-cpp: $(CPP_TEST_BIN)
-	LD_LIBRARY_PATH=$(BUILD_DIR):$$LD_LIBRARY_PATH ./$(CPP_TEST_BIN)
+	LD_LIBRARY_PATH=$(BUILD_DIR):$$LD_LIBRARY_PATH \
+	DYLD_LIBRARY_PATH=$(BUILD_DIR):$$DYLD_LIBRARY_PATH \
+	./$(CPP_TEST_BIN)
 
 CXX ?= g++
 CXXFLAGS_CPP_TEST = -std=c++17 -g -O2 -Wall -Wextra -pedantic -Werror -I. $(SAN_CFLAGS)
 
 $(CPP_TEST_BIN): $(CPP_TEST_SRC) gs1encoders.h gs1encoders.hpp acutest.h | libshared
-	$(CXX) $(CXXFLAGS_CPP_TEST) $(SAN_LDFLAGS) $(CPP_TEST_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+	$(CXX) $(CXXFLAGS_CPP_TEST) $(CPP_TEST_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 $(APP_CPP_BIN): $(APP_CPP_SRC) gs1encoders.h gs1encoders.hpp | libshared
-	$(CXX) $(CXXFLAGS_CPP_TEST) $(SAN_LDFLAGS) $(APP_CPP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+	$(CXX) $(CXXFLAGS_CPP_TEST) $(APP_CPP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 # Run the Swift binding test suite via Docker. The Swift Package builds the
 # C library itself, so this is end-to-end. The dictionary file is staged into
