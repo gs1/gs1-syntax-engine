@@ -53,6 +53,10 @@ jobs:
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
 
+          # C++ wrapper test under ASAN+LSAN+UBSAN
+          make -C src/c-lib -j "$(nproc)" test-cpp \
+            CC=clang SANITIZE=yes
+
   ci-gcc:
 
     runs-on: ubuntu-latest
@@ -135,6 +139,17 @@ jobs:
             --error-exitcode=1 \
             --track-origins=yes \
             -s src/c-lib/build-test/gs1encoders-test.bin
+
+          # C++ wrapper test under memcheck
+          make -C src/c-lib -j "$(nproc)" test-cpp
+          LD_LIBRARY_PATH=src/c-lib/build \
+            valgrind --tool=memcheck \
+              --leak-check=full \
+              --show-leak-kinds=all \
+              --errors-for-leak-kinds=all \
+              --error-exitcode=1 \
+              --track-origins=yes \
+              -s src/c-lib/build/gs1encoders-cpp-test.bin
 
   ci-msan:
 
