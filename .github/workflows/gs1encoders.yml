@@ -31,14 +31,13 @@ jobs:
           sudo apt-get -y --no-install-recommends install llvm
 
           # Load AI table from external Syntax Dictionary
-          make -C src/c-lib -j "$(nproc)" test \
-            CC=clang SANITIZE=yes SLOW_TESTS=yes
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            make -C src/c-lib -j "$(nproc)" test \
+              CC=clang SANITIZE=yes SLOW_TESTS=yes
 
           # Re-run using the embedded AI table
-          rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib -j "$(nproc)" test \
             CC=clang SANITIZE=yes SLOW_TESTS=yes
-          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
           make -C src/c-lib -j "$(nproc)" lib \
             CC=clang SANITIZE=yes
@@ -67,14 +66,13 @@ jobs:
       - name: gcc CI
         run: |
           # Load AI table from external Syntax Dictionary
-          make -C src/c-lib -j "$(nproc)" test \
-            CC=gcc ANALYZER=yes SLOW_TESTS=yes
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            make -C src/c-lib -j "$(nproc)" test \
+              CC=gcc ANALYZER=yes SLOW_TESTS=yes
 
           # Re-run using the embedded AI table
-          rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib -j "$(nproc)" test \
             CC=gcc ANALYZER=yes SLOW_TESTS=yes
-          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
           make -C src/c-lib -j "$(nproc)" lib CC=gcc ANALYZER=yes
 
@@ -115,18 +113,19 @@ jobs:
           sudo apt-get -y --no-install-recommends install valgrind
 
           # Load AI table from external Syntax Dictionary
-          make -C src/c-lib -j "$(nproc)" test \
-            CC=gcc SLOW_TESTS=yes
-          valgrind --tool=memcheck \
-            --leak-check=full \
-            --show-leak-kinds=all \
-            --errors-for-leak-kinds=all \
-            --error-exitcode=1 \
-            --track-origins=yes \
-            -s src/c-lib/build-test/gs1encoders-test.bin
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            make -C src/c-lib -j "$(nproc)" test \
+              CC=gcc SLOW_TESTS=yes
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            valgrind --tool=memcheck \
+              --leak-check=full \
+              --show-leak-kinds=all \
+              --errors-for-leak-kinds=all \
+              --error-exitcode=1 \
+              --track-origins=yes \
+              -s src/c-lib/build-test/gs1encoders-test.bin
 
           # Re-run using the embedded AI table
-          rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib -j "$(nproc)" test \
             CC=gcc SLOW_TESTS=yes
           valgrind --tool=memcheck \
@@ -136,7 +135,6 @@ jobs:
             --error-exitcode=1 \
             --track-origins=yes \
             -s src/c-lib/build-test/gs1encoders-test.bin
-          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
   ci-msan:
 
@@ -155,14 +153,13 @@ jobs:
           sudo apt-get -y --no-install-recommends install llvm lld
 
           # Load AI table from external Syntax Dictionary
-          make -C src/c-lib -j "$(nproc)" MSAN=yes \
-            SLOW_TESTS=yes test
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            make -C src/c-lib -j "$(nproc)" MSAN=yes \
+              SLOW_TESTS=yes test
 
           # Re-run using the embedded AI table
-          rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib -j "$(nproc)" MSAN=yes \
             SLOW_TESTS=yes test
-          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
   ci-msvc:
 
@@ -185,15 +182,14 @@ jobs:
             /warnaserror src\gs1encoders.sln
 
           # Load AI table from external Syntax Dictionary
-          copy src\c-lib\gs1-syntax-dictionary.txt .
+          $env:GS1_TEST_SYNDICT = "$pwd\src\c-lib\gs1-syntax-dictionary.txt"
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
           src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
 
           # Re-run using the embedded AI table
-          del gs1-syntax-dictionary.txt
+          $env:GS1_TEST_SYNDICT = ""
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
           src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
-          copy src\c-lib\gs1-syntax-dictionary.txt .
 
           src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
             --version
@@ -218,16 +214,15 @@ jobs:
       - name: clang CI
         run: |
           # Load AI table from external Syntax Dictionary
-          make -C src/c-lib \
-            -j "$(sysctl -n hw.logicalcpu)" \
-            test SANITIZE=yes SLOW_TESTS=yes
+          GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
+            make -C src/c-lib \
+              -j "$(sysctl -n hw.logicalcpu)" \
+              test SANITIZE=yes SLOW_TESTS=yes
 
           # Re-run using the embedded AI table
-          rm src/c-lib/gs1-syntax-dictionary.txt
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             test SANITIZE=yes SLOW_TESTS=yes
-          git checkout src/c-lib/gs1-syntax-dictionary.txt
 
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \

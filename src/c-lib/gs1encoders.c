@@ -1077,7 +1077,7 @@ void test_api_defaults(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_getSym(ctx) == gs1_encoder_sNONE);
@@ -1092,7 +1092,7 @@ void test_api_sym(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_setSym(ctx, gs1_encoder_sNONE - 1));     // Too small
@@ -1148,7 +1148,7 @@ void test_api_addCheckDigit(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getAddCheckDigit(ctx));		// Default
@@ -1168,7 +1168,7 @@ void test_api_permitUnknownAIs(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getPermitUnknownAIs(ctx));		// Default
@@ -1188,7 +1188,7 @@ void test_api_permitZeroSuppressedGTINinDLuris(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(!gs1_encoder_getPermitZeroSuppressedGTINinDLuris(ctx));		// Default
@@ -1211,7 +1211,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	/*
@@ -1245,7 +1245,7 @@ void test_api_validations(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// Unlocked validation that is enabled by default
@@ -1270,7 +1270,7 @@ void test_api_getters(void) {
 	const char *out;
 	char buf[256];
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	/*
@@ -1488,7 +1488,7 @@ void test_api_dataStr(void) {
 	gs1_encoder* ctx;
 	int i;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_CHECK(gs1_encoder_setDataStr(ctx, "barcode"));
@@ -1685,7 +1685,7 @@ void test_api_getAIdataStr(void) {
 	gs1_encoder* ctx;
 	char *out;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// Plain data
@@ -1735,7 +1735,7 @@ void test_api_getScanData(void) {
 	gs1_encoder* ctx;
 	char *out;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sDataBarExpanded));
@@ -1753,7 +1753,7 @@ void test_api_setScanData(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	TEST_ASSERT(gs1_encoder_setScanData(ctx, "]e0011231231231233310ABC123" "\x1D" "99XYZ"));
@@ -1808,7 +1808,7 @@ void test_api_getHRI(void) {
 	char **hri;
 	char buf[256];
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// HRI from linear-only, raw AI data
@@ -1930,7 +1930,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	char buf[64];
 	size_t needed;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// No HRI should return empty string
@@ -1967,7 +1967,7 @@ void test_api_getDLignoredQueryParams(void) {
 	char **qp;
 	char buf[256];
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// No ignored query params from non-DL URI data
@@ -2033,7 +2033,7 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	char buf[64];
 	size_t needed;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	// No data should return empty string

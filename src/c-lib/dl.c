@@ -1258,7 +1258,7 @@ static void do_test_parseDLuri(gs1_encoder* const ctx, const char* const file, c
 void test_dl_parseDLuri(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 #define test_parseDLuri(s, d, e) do {					\
@@ -1967,7 +1967,7 @@ void test_dl_testValidateDLpathAIseq(void) {
 	size_t i;
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(seq); i++) {
@@ -2027,7 +2027,7 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 void test_dl_generateDLuri(void) {
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 #define test_testGenerateDLuri(s, t, d, e) do {					\
@@ -2152,7 +2152,7 @@ void test_dl_allocFailures(void) {
 	gs1_encoder* ctx;
 	int i;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	/*

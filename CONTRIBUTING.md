@@ -420,15 +420,17 @@ Tests use the Acutest framework.
 ```c
 void test_ai_lookupAIentry(void) {
     gs1_encoder* ctx;
-    TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+    TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
     TEST_CHECK(strcmp(gs1_lookupAIentry(ctx, "01", 2)->ai, "01") == 0);
     gs1_encoder_free(ctx);
 }
 ```
 
-`GS1_ENCODER_UNIT_TEST_INIT()` (from `unittest.h`) wraps `gs1_encoder_init_ex()`
-with `iFALLBACK_ON_SYNDICT_ERROR` and a `gs1-syntax-dictionary.txt` path so CI
-exercises both the Syntax-Dictionary load path and the embedded-table fallback.
+`gs1_encoder_unit_test_init()` (from `unittest.h`) wraps `gs1_encoder_init_ex()`
+with `iFALLBACK_ON_SYNDICT_ERROR` and reads the Syntax Dictionary path from the
+`GS1_TEST_SYNDICT` env var, so CI exercises both the Syntax-Dictionary load
+path and the embedded-table fallback by running the same binary twice with
+and without the env var set.
 
 ## Build
 

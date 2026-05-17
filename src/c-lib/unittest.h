@@ -21,23 +21,29 @@
 #ifndef UNITTEST_H
 #define UNITTEST_H
 
+#include <stdlib.h>
+
 #include "gs1encoders.h"
 
 
 /*
- *  GS1_ENCODER_UNIT_TEST_INIT(): convenience initialiser that attempts
- *  to load gs1-syntax-dictionary.txt from the current working directory
- *  and falls back to the embedded AI table on any failure. Mirrors the
- *  legacy gs1_encoder_init() autoload behaviour. CI exercises both code
- *  paths by running the test suite with and without the file present.
+ *  Convenience initialiser used by the test binaries. The AI-table source
+ *  is selected by the GS1_TEST_SYNDICT env var: when set to a non-empty
+ *  path the library loads that Syntax Dictionary file (with fallback to
+ *  the embedded table on read failure); when unset or empty the library
+ *  uses the embedded table directly. CI exercises both paths by running
+ *  the same test binary twice with and without the env var set.
  *
  */
-#define GS1_ENCODER_UNIT_TEST_INIT() gs1_encoder_init_ex(NULL,			\
-	&(gs1_encoder_init_opts_t){						\
-		.struct_size      = sizeof(gs1_encoder_init_opts_t),		\
-		.flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,	\
-		.syntaxDictionary = "gs1-syntax-dictionary.txt",		\
-	})
+static inline gs1_encoder *gs1_encoder_unit_test_init(void) {
+	const char *syndict = getenv("GS1_TEST_SYNDICT");
+	gs1_encoder_init_opts_t opts = {
+		.struct_size      = sizeof(gs1_encoder_init_opts_t),
+		.flags            = gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+		.syntaxDictionary = (syndict && *syndict) ? syndict : NULL,
+	};
+	return gs1_encoder_init_ex(NULL, &opts);
+}
 
 
 #endif

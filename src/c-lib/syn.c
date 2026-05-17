@@ -829,7 +829,7 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 	size_t i;
 
 	gs1_encoder* ctx;
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	for (i = 0; i < SIZEOF_ARRAY(tests_parse_sd_entry); i++)
@@ -844,7 +844,7 @@ void test_syn_allocFailures(void) {
 
 	gs1_encoder* ctx;
 
-	TEST_ASSERT((ctx = GS1_ENCODER_UNIT_TEST_INIT()) != NULL);
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
 
 	/*
