@@ -575,8 +575,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		// Find start of AI
 		p = r - 1;
 		while (p >= pi && *p != '/') p--;
-		if (p < pi)				// At beginning of path
-			break;
+		assert(p >= pi);  // pi points at the leading '/' of the path, so the backward scan to '/' always stops at pi
 
 		DEBUG_PRINT("      %s\n", p);
 
