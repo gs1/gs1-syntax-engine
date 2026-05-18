@@ -30,15 +30,18 @@ jobs:
           # For llvm-symbolizer
           sudo apt-get -y --no-install-recommends install llvm
 
-          # Load AI table from external Syntax Dictionary
+          echo '::group::C tests with external Syntax Dictionary (clang+ASAN+LSAN+UBSAN)'
           GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
             make -C src/c-lib -j "$(nproc)" test \
               CC=clang SANITIZE=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
-          # Re-run using the embedded AI table
+          echo '::group::C tests with embedded AI table (clang+ASAN+LSAN+UBSAN)'
           make -C src/c-lib -j "$(nproc)" test \
             CC=clang SANITIZE=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
+          echo '::group::Build shared lib and apps (clang+ASAN+LSAN+UBSAN)'
           make -C src/c-lib -j "$(nproc)" lib \
             CC=clang SANITIZE=yes
 
@@ -52,10 +55,12 @@ jobs:
             CC=clang SANITIZE=yes
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
+          echo '::endgroup::'
 
-          # C++ wrapper test under ASAN+LSAN+UBSAN
+          echo '::group::C++ wrapper tests (clang+ASAN+LSAN+UBSAN)'
           make -C src/c-lib -j "$(nproc)" test-cpp \
             CC=clang SANITIZE=yes
+          echo '::endgroup::'
 
   ci-gcc:
 
@@ -69,15 +74,18 @@ jobs:
 
       - name: gcc CI
         run: |
-          # Load AI table from external Syntax Dictionary
+          echo '::group::C tests with external Syntax Dictionary (gcc+analyzer)'
           GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
             make -C src/c-lib -j "$(nproc)" test \
               CC=gcc ANALYZER=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
-          # Re-run using the embedded AI table
+          echo '::group::C tests with embedded AI table (gcc+analyzer)'
           make -C src/c-lib -j "$(nproc)" test \
             CC=gcc ANALYZER=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
+          echo '::group::Build shared lib and apps (gcc+analyzer)'
           make -C src/c-lib -j "$(nproc)" lib CC=gcc ANALYZER=yes
 
           make -C src/c-lib -j "$(nproc)" app CC=gcc ANALYZER=yes
@@ -89,6 +97,7 @@ jobs:
             CC=gcc ANALYZER=yes
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
+          echo '::endgroup::'
 
       - name: C++ wrapper tests
         run: |
@@ -116,7 +125,7 @@ jobs:
           sudo apt-get update
           sudo apt-get -y --no-install-recommends install valgrind
 
-          # Load AI table from external Syntax Dictionary
+          echo '::group::C tests under valgrind with external Syntax Dictionary'
           GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
             make -C src/c-lib -j "$(nproc)" test \
               CC=gcc SLOW_TESTS=yes
@@ -128,8 +137,9 @@ jobs:
               --error-exitcode=1 \
               --track-origins=yes \
               -s src/c-lib/build-test/gs1encoders-test.bin
+          echo '::endgroup::'
 
-          # Re-run using the embedded AI table
+          echo '::group::C tests under valgrind with embedded AI table'
           make -C src/c-lib -j "$(nproc)" test \
             CC=gcc SLOW_TESTS=yes
           valgrind --tool=memcheck \
@@ -139,8 +149,9 @@ jobs:
             --error-exitcode=1 \
             --track-origins=yes \
             -s src/c-lib/build-test/gs1encoders-test.bin
+          echo '::endgroup::'
 
-          # C++ wrapper test under memcheck
+          echo '::group::C++ wrapper tests under valgrind'
           make -C src/c-lib -j "$(nproc)" test-cpp
           LD_LIBRARY_PATH=src/c-lib/build \
             valgrind --tool=memcheck \
@@ -150,6 +161,7 @@ jobs:
               --error-exitcode=1 \
               --track-origins=yes \
               -s src/c-lib/build/gs1encoders-cpp-test.bin
+          echo '::endgroup::'
 
   ci-msan:
 
@@ -167,14 +179,16 @@ jobs:
           # For llvm-symbolizer and lld
           sudo apt-get -y --no-install-recommends install llvm lld
 
-          # Load AI table from external Syntax Dictionary
+          echo '::group::C tests with external Syntax Dictionary (clang+MSAN)'
           GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
             make -C src/c-lib -j "$(nproc)" MSAN=yes \
               SLOW_TESTS=yes test
+          echo '::endgroup::'
 
-          # Re-run using the embedded AI table
+          echo '::group::C tests with embedded AI table (clang+MSAN)'
           make -C src/c-lib -j "$(nproc)" MSAN=yes \
             SLOW_TESTS=yes test
+          echo '::endgroup::'
 
   ci-msvc:
 
@@ -191,30 +205,44 @@ jobs:
 
       - name: MSVC CI
         run: |
+          Write-Output '::group::MSBuild solution (Release|x64)'
           msbuild /t:Restore,Build `
             /p:Configuration=release `
             /p:Platform="x64" `
             /warnaserror src\gs1encoders.sln
+          Write-Output '::endgroup::'
 
-          # Load AI table from external Syntax Dictionary
+          Write-Output '::group::C tests with external Syntax Dictionary (MSVC)'
           $env:GS1_TEST_SYNDICT = "$pwd\src\c-lib\gs1-syntax-dictionary.txt"
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
-          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
+          Write-Output '::endgroup::'
 
-          # Re-run using the embedded AI table
+          Write-Output '::group::C++ wrapper tests with external Syntax Dictionary (MSVC)'
+          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
+          Write-Output '::endgroup::'
+
+          Write-Output '::group::C tests with embedded AI table (MSVC)'
           $env:GS1_TEST_SYNDICT = ""
           src\c-lib\build\test\x64\Release\gs1encoders-test.exe
-          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
+          Write-Output '::endgroup::'
 
+          Write-Output '::group::C++ wrapper tests with embedded AI table (MSVC)'
+          src\c-lib\build\test-cpp\x64\Release\gs1encoders-cpp-test.exe
+          Write-Output '::endgroup::'
+
+          Write-Output '::group::App version checks (MSVC)'
           src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
             --version
           src\c-lib\build\console-app-cpp\x64\Release\gs1encoders-cpp-app.exe `
             --version
           src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
             --version
+          Write-Output '::endgroup::'
 
+          Write-Output '::group::.NET wrapper tests (MSVC)'
           dotnet test src\dotnet-test\gs1encoders-dotnet-test.csproj `
             --no-build --configuration release
+          Write-Output '::endgroup::'
 
   ci-macos:
 
@@ -228,17 +256,20 @@ jobs:
 
       - name: clang CI
         run: |
-          # Load AI table from external Syntax Dictionary
+          echo '::group::C tests with external Syntax Dictionary (macOS clang+ASAN+UBSAN)'
           GS1_TEST_SYNDICT=$(pwd)/src/c-lib/gs1-syntax-dictionary.txt \
             make -C src/c-lib \
               -j "$(sysctl -n hw.logicalcpu)" \
               test SANITIZE=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
-          # Re-run using the embedded AI table
+          echo '::group::C tests with embedded AI table (macOS clang+ASAN+UBSAN)'
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             test SANITIZE=yes SLOW_TESTS=yes
+          echo '::endgroup::'
 
+          echo '::group::Build shared lib and apps (macOS clang+ASAN+UBSAN)'
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             lib SANITIZE=yes
@@ -255,11 +286,13 @@ jobs:
             app-static SANITIZE=yes
           ( cd src/c-lib && \
             build/gs1encoders-static.bin --version )
+          echo '::endgroup::'
 
-          # C++ wrapper test under ASAN+UBSAN (no LSAN on macOS)
+          echo '::group::C++ wrapper tests (macOS clang+ASAN+UBSAN, no LSAN)'
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             test-cpp SANITIZE=yes
+          echo '::endgroup::'
 
   ci-swift:
 
