@@ -207,20 +207,10 @@ static inline __ATTR_PURE uint8_t valLengthByPrefix(const char* const ai) {
  */
 static const struct aiEntry unknownAI =
 	AI_ENTRY( ""    , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
-static const struct aiEntry unknownAI2 =
-	AI_ENTRY( "XX"  , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI3 =
 	AI_ENTRY( "XXX" , DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI4 =
 	AI_ENTRY( "XXXX", DO_FNC1, XX_DATA_ATTR, X,1,90,MAN,_,_,_,  __, __, __, __, "", "UNKNOWN" );
-static const struct aiEntry unknownAI2fixed2 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,2,2,MAN,_,_,_,   __, __, __, __, "", "UNKNOWN" );
-static const struct aiEntry unknownAI2fixed14 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,14,14,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
-static const struct aiEntry unknownAI2fixed16 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,16,16,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
-static const struct aiEntry unknownAI2fixed18 =
-	AI_ENTRY( "XX"  , NO_FNC1, XX_DATA_ATTR, X,18,18,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI3fixed13 =
 	AI_ENTRY( "XXX" , NO_FNC1, XX_DATA_ATTR, X,13,13,MAN,_,_,_, __, __, __, __, "", "UNKNOWN" );
 static const struct aiEntry unknownAI4fixed6 =
@@ -321,15 +311,11 @@ __ATTR_PURE const struct aiEntry* gs1_lookupAIentry(const gs1_encoder* const ctx
 	if (aiLenByPrefix != 0 && !gs1_allDigits((uint8_t *)ai, aiLenByPrefix))
 		return NULL;
 
+	// 2-digit AIs equal their prefix; matching needles resolve to FOUND or INVALID at bsearch, never NOT_FOUND
+	assert(aiLenByPrefix != 2);
+
 	// Return unknownAI indicator for corresponding AI length
-	if (aiLenByPrefix == 2) {
-		uint8_t valLenByPrefix = valLengthByPrefix(ai);
-		if (valLenByPrefix == VL) return &unknownAI2;
-		if (valLenByPrefix ==  2) return &unknownAI2fixed2;
-		if (valLenByPrefix == 14) return &unknownAI2fixed14;
-		if (valLenByPrefix == 16) return &unknownAI2fixed16;
-		if (valLenByPrefix == 18) return &unknownAI2fixed18;
-	} else if (aiLenByPrefix == 3) {
+	if (aiLenByPrefix == 3) {
 		uint8_t valLenByPrefix = valLengthByPrefix(ai);
 		if (valLenByPrefix == VL) return &unknownAI3;
 		if (valLenByPrefix == 13) return &unknownAI3fixed13;
