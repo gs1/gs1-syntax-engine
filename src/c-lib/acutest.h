@@ -1663,6 +1663,10 @@ acutest_AmIBeingDebugged(void)
 }
 #endif
 
+#ifdef __cplusplus
+    }  /* extern "C" */
+#endif
+
 int
 main(int argc, char** argv)
 {
@@ -1817,6 +1821,10 @@ main(int argc, char** argv)
 
     return (acutest_stat_failed_units_ == 0) ? 0 : 1;
 }
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 
 #endif  /* #ifndef TEST_NO_MAIN */
