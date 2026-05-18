@@ -19,7 +19,7 @@
 
 .DEFAULT_GOAL := default
 
-VERSION := $(shell egrep -m1 '^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$(dollar)' ../../CHANGES)
+VERSION := $(shell egrep -m1 -o '^[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+' ../../CHANGES)
 
 MAJOR = $(word 1,$(subst ., ,$(VERSION)))
 MINOR = $(word 2,$(subst ., ,$(VERSION)))
