@@ -30,6 +30,7 @@
 #include "enc-private.h"
 #include "debug.h"
 #include "ai.h"
+#include "syn.h"
 #include "dl.h"
 #include "tr.h"
 
@@ -120,19 +121,21 @@ redo:
 	 *  Clear the current AI table
 	 *
 	 */
-	if (ctx->aiTable && ctx->aiTableIsDynamic)
+	if (ctx->aiTable && ctx->aiTableIsDynamic) {
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+		gs1_freeSyntaxDictionaryEntries(ctx, ctx->aiTable);
+#endif
 		GS1_ENCODERS_FREE(ctx->aiTable);
+	}
 
 	/*
 	 *  Set the given AI table and populate the various additional
 	 *  structures with information extracted from the AI table.
 	 *
 	 */
-	ctx->aiTableIsDynamic = true;
 	if (!aiTable) {
 #ifndef EXCLUDE_EMBEDDED_AI_TABLE
 		aiTable = embedded_ai_table;
-		ctx->aiTableIsDynamic = false;
 #else
 		strcpy(ctx->errMsg, "Embedded AI table is not available");
 		return false;
@@ -140,6 +143,11 @@ redo:
 	}
 
 	ctx->aiTable = aiTable;
+#ifndef EXCLUDE_EMBEDDED_AI_TABLE
+	ctx->aiTableIsDynamic = (aiTable != embedded_ai_table);
+#else
+	ctx->aiTableIsDynamic = true;
+#endif
 
 	ctx->aiTableEntries = 0;
 	for (e = ctx->aiTable; *e->ai; e++)
