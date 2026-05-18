@@ -216,6 +216,14 @@ APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
 
 APP_CPP_SRC = gs1encoders-cpp-app.cpp
 APP_CPP_BIN = $(BUILD_DIR)/$(NAME)-cpp-app.$(BIN_SUFFIX)
+APP_CPP_STATIC = $(BUILD_DIR)/$(NAME)-cpp-static.$(BIN_SUFFIX)
+
+# Bake libstdc++/libgcc into the standalone C++ binary so the released
+# Linux asset runs on distros whose system libstdc++ is older than the
+# build runner's.
+ifeq ($(ARCH_OS), linux)
+LDFLAGS_APP_CPP_STATIC = -static-libstdc++ -static-libgcc
+endif
 
 TEST_SRC = gs1encoders-test.c
 TEST_OBJ = $(BUILD_DIR)/$(TEST_SRC:.c=.o)
@@ -376,6 +384,9 @@ app: $(APP)
 .PHONY: app-cpp
 app-cpp: $(APP_CPP_BIN)
 
+.PHONY: app-cpp-static
+app-cpp-static: $(APP_CPP_STATIC)
+
 .PHONY: app-static
 app-static: $(APP_STATIC)
 
@@ -402,6 +413,9 @@ $(CPP_TEST_BIN): $(CPP_TEST_SRC) gs1encoders.h gs1encoders.hpp acutest.h | libsh
 
 $(APP_CPP_BIN): $(APP_CPP_SRC) gs1encoders.h gs1encoders.hpp | libshared
 	$(CXX) $(CXXFLAGS_CPP_TEST) $(APP_CPP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
+
+$(APP_CPP_STATIC): $(OBJS) $(APP_CPP_SRC) gs1encoders.h gs1encoders.hpp
+	$(CXX) $(CXXFLAGS_CPP_TEST) $(LDFLAGS) $(LDFLAGS_APP_CPP_STATIC) $(OBJS) $(APP_CPP_SRC) -o $@
 
 # Run the Swift binding test suite via Docker. The Swift Package builds the
 # C library itself, so this is end-to-end. The dictionary file is staged into
@@ -504,15 +518,15 @@ clean:
 
 .PHONY: clean-test
 clean-test:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-fuzzer
 clean-fuzzer:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-msan
 clean-msan:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-coverage
 clean-coverage:

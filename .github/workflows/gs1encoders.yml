@@ -62,6 +62,19 @@ jobs:
             CC=clang SANITIZE=yes
           echo '::endgroup::'
 
+          echo '::group::Build C++ console apps (clang+ASAN+LSAN+UBSAN)'
+          make -C src/c-lib -j "$(nproc)" app-cpp \
+            CC=clang SANITIZE=yes
+          ( cd src/c-lib && \
+            LD_LIBRARY_PATH=build \
+            build/gs1encoders-cpp-app.bin --version )
+
+          make -C src/c-lib -j "$(nproc)" app-cpp-static \
+            CC=clang SANITIZE=yes
+          ( cd src/c-lib && \
+            build/gs1encoders-cpp-static.bin --version )
+          echo '::endgroup::'
+
   ci-gcc:
 
     runs-on: ubuntu-latest
@@ -109,6 +122,10 @@ jobs:
           ( cd src/c-lib && \
             LD_LIBRARY_PATH=build \
             build/gs1encoders-cpp-app.bin --version )
+
+          make -C src/c-lib -j "$(nproc)" app-cpp-static
+          ( cd src/c-lib && \
+            build/gs1encoders-cpp-static.bin --version )
 
   ci-valgrind:
 
@@ -292,6 +309,21 @@ jobs:
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             test-cpp SANITIZE=yes
+          echo '::endgroup::'
+
+          echo '::group::Build C++ console apps (macOS clang+ASAN+UBSAN, no LSAN)'
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            app-cpp SANITIZE=yes
+          ( cd src/c-lib && \
+            DYLD_LIBRARY_PATH=build \
+            build/gs1encoders-cpp-app.bin --version )
+
+          make -C src/c-lib \
+            -j "$(sysctl -n hw.logicalcpu)" \
+            app-cpp-static SANITIZE=yes
+          ( cd src/c-lib && \
+            build/gs1encoders-cpp-static.bin --version )
           echo '::endgroup::'
 
   ci-swift:

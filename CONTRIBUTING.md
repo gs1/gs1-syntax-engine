@@ -456,8 +456,10 @@ make -j $(nproc) all
 make -j $(nproc) lib         # Both shared and static libraries
 make -j $(nproc) libshared   # Shared library only
 make -j $(nproc) libstatic   # Static library only
-make -j $(nproc) app         # Console app using shared library
-make -j $(nproc) app-static  # Standalone static console app
+make -j $(nproc) app             # C console app using shared library
+make -j $(nproc) app-static      # Standalone static C console app
+make -j $(nproc) app-cpp         # C++ console app using shared library
+make -j $(nproc) app-cpp-static  # Standalone static C++ console app
 ```
 
 Note: On macOS use `sysctl -n hw.ncpu` instead of `$(nproc)`.
