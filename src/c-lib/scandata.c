@@ -560,7 +560,7 @@ fail:
 	*ctx->dataStr = '\0';
 	ctx->sym = gs1_encoder_sNONE;
 	if (*ctx->errMsg == '\0')
-		SET_ERR(FAILED_TO_PROCESS_SCAN_DATA);
+		SET_ERR(FAILED_TO_PROCESS_SCAN_DATA);  // LCOV_EXCL_LINE: belt-and-braces; every path reaching fail: already sets a specific error
 
 	return false;
 

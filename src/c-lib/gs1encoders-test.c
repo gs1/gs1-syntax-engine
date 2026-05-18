@@ -79,6 +79,9 @@ TEST_LIST = {
     { "api_getDLignoredQueryParams", test_api_getDLignoredQueryParams },
     { "api_copyDLignoredQueryParams", test_api_copyDLignoredQueryParams },
     { "api_allocFailures", test_api_allocFailures },
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+    { "api_brokenPrefixSyndict", test_api_brokenPrefixSyndict },
+#endif
 
 
     /*
@@ -88,6 +91,9 @@ TEST_LIST = {
 #ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
     { "syn_parseSyntaxDictionaryEntry", test_syn_parseSyntaxDictionaryEntry },
     { "syn_allocFailures", test_syn_allocFailures },
+    { "syn_capacityOverflow", test_syn_capacityOverflow },
+    { "syn_strdupFailures", test_syn_strdupFailures },
+    { "syn_lineTooLong", test_syn_lineTooLong },
 #endif
 
 

@@ -428,10 +428,15 @@ test-cs: lib
 .PHONY: coverage
 coverage:
 	$(MAKE) COVERAGE=yes SLOW_TESTS=yes test
+	$(MAKE) COVERAGE=yes test-cpp
 	lcov --capture --directory build-coverage \
 		--output-file build-coverage/coverage.info
 	lcov --remove build-coverage/coverage.info \
-		'*/syntax/*' '*/gs1encoders-test.c' '*/gs1encoders-app.c' \
+		--ignore-errors unused \
+		'*/syntax/*' \
+		'*/gs1encoders-test.c' '*/gs1encoders-app.c' \
+		'*/gs1encoders-cpp-test.cpp' '*/gs1encoders-cpp-app.cpp' \
+		'*/acutest.h' '*/test-heap.h' '*/unittest.h' \
 		--output-file build-coverage/coverage.info
 	genhtml build-coverage/coverage.info \
 		--output-directory build-coverage/coverage-report

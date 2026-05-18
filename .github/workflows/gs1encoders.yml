@@ -344,6 +344,7 @@ jobs:
               -DPRNT \
               -DSYMBOLOGY=gs1_encoder_sNONE \
               -DUNIT_TESTS \
+              -DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h \
               -DGS1_LINTER_ERR_STR_EN "$1"; \
               [[ $? = 0 ]] || false' _ {} \;
 
@@ -442,6 +443,45 @@ jobs:
         with:
           name: abi-compliance-report
           path: compat_reports/
+          retention-days: 30
+
+  ci-coverage:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install lcov
+        run: |
+          sudo apt-get update
+          sudo apt-get -y --no-install-recommends install lcov
+
+      - name: Run coverage
+        run: |
+          make -C src/c-lib coverage
+          {
+            echo "## Coverage"
+            echo '```'
+            lcov --summary src/c-lib/build-coverage/coverage.info 2>&1 \
+              | grep -E '^  (lines|functions|branches)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce 100% line coverage
+        run: |
+          lcov --summary src/c-lib/build-coverage/coverage.info \
+            --fail-under-lines 100
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: src/c-lib/build-coverage/coverage-report/
           retention-days: 30
 
   ci-java-linux:

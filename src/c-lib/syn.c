@@ -470,8 +470,10 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 
 	out = GS1_ENCODERS_CALLOC(cap, sizeof(struct aiEntry));
 	if (!out) {
+		// LCOV_EXCL_START: test-harness defence — only fires if calloc itself fails inside the helper
 		TEST_ASSERT(out != NULL);
 		goto out;
+		// LCOV_EXCL_STOP
 	}
 
 	*out->ai = '\0';
@@ -489,7 +491,7 @@ static void test_parseSyntaxDictionaryEntry(gs1_encoder* const ctx, char* const 
 	TEST_CHECK(numOut >= 0);
 	TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
 	if (numOut == -1)
-		goto out;
+		goto out;  // LCOV_EXCL_LINE: defensive flow after TEST_CHECK (which reports without aborting); only fires if a test fixture mis-marks expectSuccess
 
 	while (*expectedAIentries[expectOut].ai)
 		expectOut++;
@@ -855,6 +857,113 @@ void test_syn_allocFailures(void) {
 	TEST_CHECK(gs1_loadSyntaxDictionary(ctx, "gs1-syntax-dictionary.txt") == NULL);
 	test_alloc_fail_at = 0;
 
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_syn_capacityOverflow(void) {
+
+	gs1_encoder* ctx;
+	char buf[256];
+	struct aiEntry out[10];
+	struct aiEntry *pos;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	// cap=1: primary-entry slot check fires before any AI is written
+	memset(out, 0, sizeof(out));
+	pos = out;
+	strcpy(buf, "90  X..30  # TITLE");
+	TEST_CHECK(parseSyntaxDictionaryEntry(ctx, buf, out, &pos, 1) == -1);
+
+	// cap=2 + range: primary fits at slot 0, inheritance into slot 1 trips
+	memset(out, 0, sizeof(out));
+	pos = out;
+	strcpy(buf, "91-99  X..30  # TITLE");
+	TEST_CHECK(parseSyntaxDictionaryEntry(ctx, buf, out, &pos, 2) == -1);
+	gs1_freeSyntaxDictionaryEntries(ctx, out);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_syn_strdupFailures(void) {
+
+	gs1_encoder* ctx;
+	char buf[256];
+	struct aiEntry out[10];
+	struct aiEntry *pos;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	// No-title entry, fail at title strdup: attrs(1), title(2)
+	memset(out, 0, sizeof(out));
+	pos = out;
+	strcpy(buf, "90  X..30");
+	test_alloc_fail_at = 2;
+	TEST_CHECK(parseSyntaxDictionaryEntry(ctx, buf, out, &pos, 100) == -1);
+	test_alloc_fail_at = 0;
+	gs1_freeSyntaxDictionaryEntries(ctx, out);
+
+	// Range entry, fail at first child's attrs strdup: primary attrs(1), primary title(2), child attrs(3)
+	memset(out, 0, sizeof(out));
+	pos = out;
+	strcpy(buf, "91-99  X..30  # TITLE");
+	test_alloc_fail_at = 3;
+	TEST_CHECK(parseSyntaxDictionaryEntry(ctx, buf, out, &pos, 100) == -1);
+	test_alloc_fail_at = 0;
+	gs1_freeSyntaxDictionaryEntries(ctx, out);
+
+	// Range entry, fail at first child's title strdup: alloc 4
+	memset(out, 0, sizeof(out));
+	pos = out;
+	strcpy(buf, "91-99  X..30  # TITLE");
+	test_alloc_fail_at = 4;
+	TEST_CHECK(parseSyntaxDictionaryEntry(ctx, buf, out, &pos, 100) == -1);
+	test_alloc_fail_at = 0;
+	gs1_freeSyntaxDictionaryEntries(ctx, out);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_syn_lineTooLong(void) {
+
+	const char* const path = "test-syndict-too-long.txt";
+	gs1_encoder* ctx;
+	FILE *fp;
+	struct aiEntry *sd;
+	int i;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	fp = fopen(path, "w");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	// Line overruns the fgets buffer; second line ensures !feof when fgets returns partial
+	fputs("90  X..30  # ", fp);
+	for (i = 0; i < MAX_SD_ENTRY_LEN + 50; i++)
+		fputc('a', fp);
+	fputc('\n', fp);
+	fputs("91  X..30  # OK\n", fp);
+	fclose(fp);
+
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd == NULL);
+	// LCOV_EXCL_START: cleanup only fires if the TEST_CHECK above fails
+	if (sd) {
+		gs1_freeSyntaxDictionaryEntries(ctx, sd);
+		GS1_ENCODERS_FREE(sd);
+	}
+	// LCOV_EXCL_STOP
+
+	remove(path);
 	gs1_encoder_free(ctx);
 
 }

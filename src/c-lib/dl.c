@@ -698,10 +698,15 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto fail;
 
 		// Update the AI data
+		// LCOV_EXCL_START: a DL path is constrained to one primary key plus its
+		// key qualifiers (at most a handful of segments in any real GS1 syntax
+		// dictionary), so reaching MAX_AIS via the path alone is not reachable
+		// with valid data. The check is retained as a defence in depth.
 		if (ctx->numAIs >= MAX_AIS) {
 			SET_ERR(TOO_MANY_AIS);
 			goto fail;
 		}
+		// LCOV_EXCL_STOP
 
 		ctx->aiData[ctx->numAIs++] = (struct aiValue) {
 			.kind = aiValue_aival,
@@ -946,7 +951,7 @@ out:
 fail:
 
 	if (*ctx->errMsg == '\0')
-		SET_ERR(DL_URI_PARSE_FAILED);
+		SET_ERR(DL_URI_PARSE_FAILED);  // LCOV_EXCL_LINE: belt-and-braces; every path reaching fail: already sets a specific error
 
 	DEBUG_PRINT("Parsing DL data failed: %s\n", ctx->errMsg);
 
@@ -1385,6 +1390,8 @@ void test_dl_parseDLuri(void) {
 	test_parseDLuri(true, "https://a/gtin/12312312312333", "^0112312312312333");
 	test_parseDLuri(true, "https://a/gtin/12312312312333/ser/ABC123", "^011231231231233321ABC123");
 	test_parseDLuri(true, "https://a/sscc/006141411234567890", "^00006141411234567890");
+	test_parseDLuri(false, "https://a/zzz/12312312312333", "");	// Alpha not in convenience map
+	test_parseDLuri(false, "https://a/cps/12312312312333", "");	// Partial prefix of map entry "cpsn"
 	ctx->permitConvenienceAlphas = false;			// No API so we hack this
 
 	/*
@@ -1729,6 +1736,41 @@ void test_dl_parseDLuri(void) {
 
 
 	/*
+	 *  MAX_AIS boundary in query parameters: enough (99)= query AIs to push
+	 *  total AI count past MAX_AIS during parse. The dup check is bypassed
+	 *  because TOO_MANY_AIS fails the parser before validation runs.
+	 *
+	 */
+	{
+		char dlbuf[1024] = {0};
+		char outbuf[1024];
+		char *p;
+		int j;
+
+		// Build DL URI with AI (01) in path; then MAX_AIS (99)= query AIs.
+		// The first MAX_AIS-1 query AIs are stored (numAIs becomes MAX_AIS),
+		// and the MAX_AIS-th query AI fails the >= MAX_AIS cap check at parse.
+		p = dlbuf;
+		strcpy(p, "https://a/01/12312312312333?");
+		p += strlen(p);
+		for (j = 0; j < MAX_AIS; j++) {
+			if (j > 0) *p++ = '&';
+			*p++ = '9'; *p++ = '9'; *p++ = '=';
+			*p++ = 'A' + (char)(j / 26);
+			*p++ = 'A' + (char)(j % 26);
+		}
+		*p = '\0';
+
+		ctx->numAIs = 0;
+		ctx->numSortedAIs = 0;
+		TEST_CHECK(!gs1_parseDLuri(ctx, dlbuf, outbuf));
+		TEST_MSG("Err: %s", ctx->errMsg);
+		TEST_CHECK(strstr(ctx->errMsg, "Too many AIs") != NULL);
+		TEST_MSG("Expected TOO_MANY_AIS, got: %s", ctx->errMsg);
+	}
+
+
+	/*
 	 *  Empty AI value in DL path element during forward processing
 	 *
 	 */
@@ -2016,7 +2058,7 @@ static void do_test_testGenerateDLuri(gs1_encoder* const ctx, const char* const 
 	TEST_MSG("Expected success. Got error: %s", ctx->errMsg);
 
 	if (!uri)
-		return;
+		return;  // LCOV_EXCL_LINE: only fires on the TEST_CHECK failure above
 
 	TEST_CHECK(strcmp(uri, expect) == 0);
 	TEST_MSG("Expected: '%s'. Got: '%s'", expect, uri);

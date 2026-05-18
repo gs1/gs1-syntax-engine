@@ -260,7 +260,7 @@ static inline char* gs1_buf_append(char *dst, size_t *rem, const void *src, size
 		return dst;
 	if (*rem > 1) {
 		if (len > *rem - 1)
-			len = *rem - 1;
+			len = *rem - 1;  // LCOV_EXCL_LINE: defensive truncation; current callers size the destination beyond any reachable input length
 		memcpy(dst, src, len);
 		dst += len;
 		*rem -= len;
@@ -323,6 +323,9 @@ void test_api_copyHRI(void);
 void test_api_getDLignoredQueryParams(void);
 void test_api_copyDLignoredQueryParams(void);
 void test_api_allocFailures(void);
+#ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
+void test_api_brokenPrefixSyndict(void);
+#endif
 
 #endif
 

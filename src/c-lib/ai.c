@@ -529,7 +529,7 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 			case cset_X: cset_linter = gs1_lint_cset82; break;
 			case cset_Y: cset_linter = gs1_lint_cset39; break;
 			case cset_Z: cset_linter = gs1_lint_cset64; break;
-			default: cset_linter = NULL; break;
+			default: cset_linter = NULL; break;  // LCOV_EXCL_LINE: enum is closed; default is defensive (caught by the assert below)
 		}
 		assert(cset_linter);
 		l = &cset_linter;

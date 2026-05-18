@@ -44,6 +44,9 @@ int parseSyntaxDictionaryEntry(gs1_encoder *ctx, const char* line, const struct 
 
 void test_syn_parseSyntaxDictionaryEntry(void);
 void test_syn_allocFailures(void);
+void test_syn_capacityOverflow(void);
+void test_syn_strdupFailures(void);
+void test_syn_lineTooLong(void);
 
 #endif  /* UNIT_TESTS */
 
