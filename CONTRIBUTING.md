@@ -90,6 +90,7 @@ how users must structure their applications.
 - Document assumptions about parameters (e.g., valid pointers, length constraints)
 - Assertions are for programmer errors, not user input validation
 - Assertions are extremely valuable for fuzzing - they catch invariant violations that might otherwise cause silent corruption or go unnoticed
+- Prefer `assert()` over `LCOV_EXCL_LINE` when a branch is unreachable by an invariant — the assert documents and enforces the invariant. Reserve `LCOV_EXCL_LINE` (with a one-line justification) for legitimate defensive code that is not invariant-violating: general-utility behaviour not exercised by current callers, error-classification arms only reachable under build-flag combinations, or test-helper cleanup that only fires on test failure.
 
 ### Memory Allocation
 
@@ -529,11 +530,14 @@ make -j $(nproc) test SLOW_TESTS=yes
 # Build and run specific test suite (regex match on test name)
 make test TEST="test_ai_"
 
-# Run tests without the bundled Syntax Dictionary file
-# (the optional explicit-path test case is skipped; embedded-AI-table tests still run)
-rm gs1-syntax-dictionary.txt
+# Run tests against an external Syntax Dictionary
+GS1_TEST_SYNDICT=$(pwd)/gs1-syntax-dictionary.txt make test
+
+# Run tests against the embedded AI table only (env var unset or empty)
 make test
-git checkout gs1-syntax-dictionary.txt  # Restore it
+
+# Build and run the C++17 wrapper test binary
+make -j $(nproc) test-cpp
 
 # MemorySanitizer (detects reads of uninitialised memory; requires clang)
 make -j $(nproc) test MSAN=yes
@@ -542,6 +546,7 @@ make -j $(nproc) test MSAN=yes
 make -j $(nproc) test ANALYZER=yes
 
 # Code coverage report (generates build-coverage/coverage-report/)
+# CI enforces 100% line coverage via `lcov --fail-under-lines 100`
 make coverage
 ```
 
@@ -651,13 +656,23 @@ make -C src/c-lib docs           # All documentation
 
 GitHub Actions workflow (`.github/workflows/gs1encoders.yml`) runs:
 
-- Linux CI with gcc and clang (with sanitizers)
-- Windows CI with MSVC
-- macOS CI with clang
+- Linux CI with gcc (`-fanalyzer`) and clang (ASAN+LSAN+UBSAN)
+- MemorySanitizer build (clang+MSAN) on Linux
+- Valgrind memcheck on Linux
+- Windows CI with MSVC (warnings-as-errors, x64 Release)
+- macOS CI with clang (ASAN+UBSAN; no LSAN on macOS)
+- C++17 wrapper test binary (`test-cpp`) under each of the above sanitizer/valgrind/MSVC configurations
 - Static analysis (scan-build, cppcheck, IWYU)
+- Code coverage with a hard 100%-line-coverage gate (`lcov --fail-under-lines 100`); HTML report uploaded as an artifact
+- ABI compatibility check vs the latest release tag (`abi-dumper` + `abi-compliance-checker`)
 - Java wrapper tests on Linux, macOS, Windows
-- WebAssembly build and Node.js tests
+- Swift package tests on macOS
+- WebAssembly + asm.js builds and Node.js tests
 - iOS and Android app builds
+
+Jobs that run the test suite exercise it twice — once with `GS1_TEST_SYNDICT` pointing at the external dictionary, once unset — so both the Syntax-Dictionary load path and the embedded-AI-table path are covered per platform/sanitizer.
+
+Long shell blocks in the workflow wrap related commands in `echo '::group::label'` / `echo '::endgroup::'` (PowerShell: `Write-Output`) so the log viewer renders each test configuration as a labelled, collapsible section.
 
 Releases are created automatically when version tags are pushed.
 
