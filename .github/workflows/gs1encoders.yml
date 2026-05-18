@@ -876,10 +876,10 @@ jobs:
 
       - name: ZIP console application
         working-directory: >-
-          src/c-lib/build/console-app/x64/Release
+          src/c-lib/build/console-app-cpp/x64/Release
         run: |
           7z a gs1encoders-windows-console-app.zip `
-            gs1encoders-app.exe gs1encoders.dll `
+            gs1encoders-cpp-app.exe gs1encoders.dll `
             ../../../../gs1-syntax-dictionary.txt
 
       - name: Store Windows console app
@@ -887,7 +887,7 @@ jobs:
         with:
           name: windows-console-app
           path: "\
-            src/c-lib/build/console-app/\
+            src/c-lib/build/console-app-cpp/\
             x64/Release/\
             gs1encoders-windows-console-app.zip"
           retention-days: 1
@@ -968,14 +968,14 @@ jobs:
 
       - name: Linux release build
         run: |
-          make -C src/c-lib -j "$(nproc)" CC=clang
-          src/c-lib/build/gs1encoders-static.bin \
+          make -C src/c-lib -j "$(nproc)" CC=clang app-cpp-static
+          src/c-lib/build/gs1encoders-cpp-static.bin \
             --version
           cp src/c-lib/gs1-syntax-dictionary.txt \
             src/c-lib/build/
           cd src/c-lib/build
           tar cvzf gs1encoders-linux-app.tgz \
-            gs1encoders-static.bin \
+            gs1encoders-cpp-static.bin \
             gs1-syntax-dictionary.txt
 
       - name: Store Linux build
