@@ -168,6 +168,16 @@ jobs:
             -s src/c-lib/build-test/gs1encoders-test.bin
           echo '::endgroup::'
 
+          echo '::group::Syntax Dictionary linter tests under valgrind'
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
+            --error-exitcode=1 \
+            --track-origins=yes \
+            -s src/c-lib/build-test/gs1syntaxdictionary-test.bin
+          echo '::endgroup::'
+
           echo '::group::C++ wrapper tests under valgrind'
           make -C src/c-lib -j "$(nproc)" test-cpp
           LD_LIBRARY_PATH=src/c-lib/build \
