@@ -48,7 +48,7 @@ endif
 
 ifneq ($(filter test,$(MAKECMDGOALS)),)
 BUILD_DIR = build-test
-UNIT_TEST_CFLAGS = -DUNIT_TESTS -DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h
+UNIT_TEST_CFLAGS = -DUNIT_TESTS -DGS1_ENCODERS_CUSTOM_HEAP_MANAGEMENT_H=test-heap.h -DGS1_LINTER_CUSTOM_GCP_LOOKUP_H=test-gcp-lookup.h
 endif
 
 WASM_DIR = ../js-wasm
@@ -232,6 +232,9 @@ CPP_TEST_SRC = gs1encoders-cpp-test.cpp
 CPP_TEST_BIN = $(BUILD_DIR)/$(NAME)-cpp-test.$(BIN_SUFFIX)
 
 LINTER_TEST_SRC = syntax/gs1syntaxdictionary-test.c
+LINTER_TEST_OBJ = $(BUILD_DIR)/$(LINTER_TEST_SRC:.c=.o)
+LINTER_TEST_BIN = $(BUILD_DIR)/gs1syntaxdictionary-test.$(BIN_SUFFIX)
+SYNTAX_OBJS = $(filter $(BUILD_DIR)/syntax/%,$(OBJS))
 
 FUZZER_PREFIX = $(NAME)-fuzzer-
 FUZZER_SRCS = gs1encoders-fuzzer-ais.c gs1encoders-fuzzer-data.c gs1encoders-fuzzer-dl.c gs1encoders-fuzzer-scandata.c gs1encoders-fuzzer-syn.c
@@ -317,6 +320,13 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJ)
 
 
 #
+#  Linter test binary (mirrors gs1-syntax-dictionary upstream)
+#
+$(LINTER_TEST_BIN): $(SYNTAX_OBJS) $(LINTER_TEST_OBJ)
+	$(CC) $(CFLAGS) $(SYNTAX_OBJS) $(LINTER_TEST_OBJ) -o $(LINTER_TEST_BIN)
+
+
+#
 #  WASM JS
 #
 $(WASM_JS): $(OBJS)
@@ -395,8 +405,9 @@ wasm: $(WASM_JS)
 	@cp -f $(WASM_OUT_FILES) $(WASM_DIR)/
 
 .PHONY: test
-test: $(TEST_BIN)
+test: $(TEST_BIN) $(LINTER_TEST_BIN)
 	$(SAN_ENV) ./$(TEST_BIN) $(TEST)
+	$(SAN_ENV) ./$(LINTER_TEST_BIN) $(TEST)
 
 # Build and run the C++ wrapper test suite against the in-tree shared library.
 .PHONY: test-cpp
@@ -447,9 +458,9 @@ coverage:
 		--output-file build-coverage/coverage.info
 	lcov --remove build-coverage/coverage.info \
 		--ignore-errors unused \
-		'*/syntax/*' \
 		'*/gs1encoders-test.c' '*/gs1encoders-app.c' \
 		'*/gs1encoders-cpp-test.cpp' '*/gs1encoders-cpp-app.cpp' \
+		'*/gs1syntaxdictionary-test.c' \
 		'*/acutest.h' '*/test-heap.h' '*/unittest.h' \
 		--output-file build-coverage/coverage.info
 	genhtml build-coverage/coverage.info \
@@ -518,15 +529,15 @@ clean:
 
 .PHONY: clean-test
 clean-test:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-fuzzer
 clean-fuzzer:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-msan
 clean-msan:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-coverage
 clean-coverage:
@@ -640,8 +651,10 @@ syncsyntaxdict:
 	cp ../../../gs1-syntax-dictionary/src/acutest.h syntax/
 	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary.c syntax/
 	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary.h syntax/
+	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary-test.c syntax/
 	cp ../../../gs1-syntax-dictionary/src/gs1syntaxdictionary-utils.h syntax/
 	cp ../../../gs1-syntax-dictionary/src/lint_*.c syntax/
+	cp ../../../gs1-syntax-dictionary/src/test-gcp-lookup.h syntax/
 	cp ../../../gs1-syntax-dictionary/src/unittest.h syntax/
 	mv aitable.inc aitable.$$(date +%s)
 	cat gs1-syntax-dictionary.txt | ./build-embedded-ai-table.pl > aitable.inc.new && mv aitable.inc.new aitable.inc

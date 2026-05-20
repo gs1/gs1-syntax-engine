@@ -57,6 +57,8 @@ let package = Package(
                 "c-lib/acutest.h",
                 "c-lib/syntax/acutest.h",
                 "c-lib/syntax/unittest.h",
+                "c-lib/syntax/gs1syntaxdictionary-test.c",
+                "c-lib/syntax/test-gcp-lookup.h",
                 // Exclude non-C source files
                 "c-lib/Makefile",
                 "c-lib/build-embedded-ai-table.pl",
