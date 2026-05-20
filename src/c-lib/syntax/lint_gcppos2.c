@@ -98,7 +98,7 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_gcppos2(const char* const data
 void test_lint_gcppos2(void)
 {
 
-	char data[GCP_MIN_LENGTH + 3], expect[GCP_MIN_LENGTH + 5];
+	char data[GCP_MIN_LENGTH + 3] = {0}, expect[GCP_MIN_LENGTH + 5] = {0};
 	int i;
 
 	/*
@@ -177,6 +177,14 @@ void test_lint_gcppos2(void)
 		memcpy(&expect[i], "*A*A", 4);
 		UNIT_TEST_FAIL(gs1_lint_gcppos2, data, GS1_LINTER_INVALID_GCP_PREFIX, expect);
 	}
+
+#ifdef GS1_LINTER_CUSTOM_GCP_LOOKUP
+	test_gcp_lookup_result = 1;
+	UNIT_TEST_FAIL(gs1_lint_gcppos2, "I1234567", GS1_LINTER_INVALID_GCP_PREFIX, "I*1234567*");
+	test_gcp_lookup_result = 2;
+	UNIT_TEST_FAIL(gs1_lint_gcppos2, "I1234567", GS1_LINTER_GCP_DATASOURCE_OFFLINE, "I*1234567*");
+	test_gcp_lookup_result = 0;
+#endif
 
 }
 

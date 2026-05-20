@@ -28,7 +28,6 @@
 
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
 
 #include "gs1syntaxdictionary.h"
@@ -70,7 +69,6 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 	gs1_lint_err_t ret;
 	size_t pos;
 	unsigned int csum = 0;
-	unsigned char weight;
 
 	/*
 	 * IBAN character checksum weights (0 = invalid; weight off by 1)
@@ -129,8 +127,8 @@ GS1_SYNTAX_DICTIONARY_API gs1_lint_err_t gs1_lint_iban(const char* const data, s
 	/* Process characters from position 4 to end, then positions 0-3 */
 	for (pos = 4; pos < data_len + 4; pos++) {
 		size_t actual_pos = (pos < data_len) ? pos : (pos - data_len);
-		
-		weight = iban_weights[(unsigned char)data[actual_pos]];
+		unsigned char weight = iban_weights[(unsigned char)data[actual_pos]];
+
 		if (GS1_LINTER_UNLIKELY(weight == 0))
 			GS1_LINTER_RETURN_ERROR(
 				GS1_LINTER_INVALID_IBAN_CHARACTER,

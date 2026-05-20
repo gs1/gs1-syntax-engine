@@ -54,3 +54,25 @@ GS1_LINTER_STUB(gs1_lint_yymmddhh)
 
 #undef GS1_LINTER_STUB
 
+
+#ifdef UNIT_TESTS
+
+#include "unittest.h"
+
+void test_lint__stubs(void)
+{
+DIAG_PUSH
+DIAG_DISABLE_DEPRECATED_DECLARATIONS
+#define GS1_LINTER_STUB_TEST(linter) UNIT_TEST_PASS(linter, "TEST");
+	GS1_LINTER_STUB_TEST(gs1_lint_hhmm)
+	GS1_LINTER_STUB_TEST(gs1_lint_iso3166list)
+	GS1_LINTER_STUB_TEST(gs1_lint_key)
+	GS1_LINTER_STUB_TEST(gs1_lint_keyoff1)
+	GS1_LINTER_STUB_TEST(gs1_lint_mmoptss)
+	GS1_LINTER_STUB_TEST(gs1_lint_yymmddhh)
+#undef GS1_LINTER_STUB_TEST
+DIAG_POP
+}
+
+#endif  /* UNIT_TESTS */
+
