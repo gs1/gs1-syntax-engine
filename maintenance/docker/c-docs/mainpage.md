@@ -197,15 +197,23 @@ int main() {
 \endcode
 
 To load an external GS1 Syntax Dictionary file instead of using the embedded
-AI table, supply initialisation options: in C, populate a
-@ref gs1_encoder_init_opts_t and pass it to gs1_encoder_init_ex(); in C++,
-construct the gs1encoders::GS1Encoder from a gs1encoders::InitOpts builder.
-The available options are:
+AI table, supply initialisation options.
 
-  * **Syntax Dictionary path** — @ref gs1_encoder_init_opts::syntaxDictionary (C) or gs1encoders::InitOpts::syntax_dictionary() (C++). Unset (the default) uses the embedded AI table.
-  * **Fall back to the embedded AI table** if the Syntax Dictionary cannot be loaded — @ref gs1_encoder_init_flags "gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR" (C) or gs1encoders::InitOpts::fallback_on_syndict_error() (C++).
-  * **Refuse to use the embedded AI table** (initialisation fails if no other AI table can be loaded) — @ref gs1_encoder_init_flags "gs1_encoder_iNO_EMBEDDED" (C) or gs1encoders::InitOpts::no_embedded() (C++).
-  * **Initialisation outcome and any error or warning message** — @ref gs1_encoder_init_opts::status and @ref gs1_encoder_init_opts::msgBuf (C); in C++ a failure throws gs1encoders::GS1EncoderGeneralException and any fallback warning is returned by gs1encoders::GS1Encoder::init_fallback_warning().
+In C, populate a @ref gs1_encoder_init_opts_t and pass it to
+gs1_encoder_init_ex():
+
+  * @ref gs1_encoder_init_opts::syntaxDictionary — path to a Syntax Dictionary file; unset (the default) uses the embedded AI table.
+  * @ref gs1_encoder_init_flags "gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR" — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+  * @ref gs1_encoder_init_flags "gs1_encoder_iNO_EMBEDDED" — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).
+  * @ref gs1_encoder_init_opts::status and @ref gs1_encoder_init_opts::msgBuf — receive the structured initialisation outcome and any error or warning message.
+
+In C++, construct the gs1encoders::GS1Encoder from a gs1encoders::InitOpts
+builder:
+
+  * gs1encoders::InitOpts::syntax_dictionary() — path to a Syntax Dictionary file; unset (the default) uses the embedded AI table.
+  * gs1encoders::InitOpts::fallback_on_syndict_error() — fall back to the embedded AI table if the Syntax Dictionary cannot be loaded.
+  * gs1encoders::InitOpts::no_embedded() — refuse to use the embedded AI table (initialisation fails if no other AI table can be loaded).
+  * initialisation failure throws gs1encoders::GS1EncoderGeneralException; any fallback warning is returned by gs1encoders::GS1Encoder::init_fallback_warning().
 
 The following inverse example parses a GS1 Digital Link URI and reports the
 extracted AI data, loading the Syntax Dictionary from a host filesystem path
@@ -289,11 +297,6 @@ int main() {
 }
 \endcode
 
-**Note:** Each `gs1_encoder` instance allocates native resources. The C
-caller must release them with gs1_encoder_free(); in C++ the encoder
-object's destructor handles this automatically when the holding scope
-ends or the holder is destroyed.
-
 **On Unix/macOS:**
 
 Compile and link.
@@ -332,31 +335,30 @@ Run (same for both; ensure `gs1encoders.dll` is in the same directory or on PATH
 The following are examples of how to use the library.
 
 \note
-Using the library always begins by creating an encoder instance and ends by
-releasing it. In C, initialise with @ref gs1_encoder_init_ex() and release
-with @ref gs1_encoder_free(); in C++, construct a gs1encoders::GS1Encoder,
-whose destructor releases the native resources automatically when it goes out
-of scope.
-
-\note
-In C, unless otherwise specified, the getter functions return pointers to
+**C** — Using the library begins by initialising with
+@ref gs1_encoder_init_ex() and ends by releasing with @ref gs1_encoder_free().
+Unless otherwise specified, the getter functions return pointers to
 per-instance storage managed by this library and therefore must not be freed
 by the user; if their content must persist following a subsequent call to the
-same instance then it must be copied to a user-managed buffer. The C++ wrapper
-returns owning `std::string` and `std::vector` copies instead, so this caveat
-does not apply.
+same instance then it must be copied to a user-managed buffer. Most of the
+setter and action functions return a boolean indicating whether the function
+was successful and write an error message that can be accessed with
+@ref gs1_encoder_getErrMsg() in the event of failure; production code should
+check the return value and, where relevant, do something appropriate which
+might include rendering the error message to the user.
 
 \note
-In C, most of the setter and action functions return a boolean indicating
-whether the function was successful and write an error message that can be
-accessed with @ref gs1_encoder_getErrMsg() in the event of failure; production
-code should check the return value and, where relevant, do something
-appropriate which might include rendering the error message to the user. The
-C++ wrapper instead reports failures by throwing a
-gs1encoders::GS1EncoderException (which carries the same message via its
-`what()`), so the equivalent handling is a `try`/`catch`. Error message
-strings are provided in the English language in a single file that can be
-replaced at compile time.
+**C++** — Using the library begins by constructing a gs1encoders::GS1Encoder,
+whose destructor releases the native resources automatically when it goes out
+of scope. The getter methods return owning `std::string` and `std::vector`
+copies, so there are no lifetime caveats on returned values. The setter and
+action methods report failure by throwing a gs1encoders::GS1EncoderException
+(whose `what()` carries the error message), so the equivalent handling is a
+`try`/`catch`.
+
+\note
+Error message strings are provided in the English language in a single file
+that can be replaced at compile time.
 
 Refer to the example console applications (`gs1encoders-app.c` and
 `gs1encoders-cpp-app.cpp`) for comprehensive examples of how to use this
