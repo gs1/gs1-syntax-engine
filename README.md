@@ -36,7 +36,7 @@ There is a large corpus of example code.
 
 **C:**
 
-- Console application ([source](src/c-lib/gs1encoders-app.c))
+- [Console application](https://github.com/gs1/gs1-syntax-engine/wiki/Console-Application-User-Guide) ([source](src/c-lib/gs1encoders-app.c))
 
 **C++:**
 
