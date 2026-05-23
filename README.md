@@ -36,7 +36,7 @@ There is a large corpus of example code.
 
 **C:**
 
-- [Console application](https://github.com/gs1/gs1-syntax-engine/wiki/Console-Application-User-Guide) ([source](src/c-lib/gs1encoders-app.c))
+- API usage example ([source](src/c-lib/example.c))
 
 **C++:**
 
@@ -100,7 +100,7 @@ Source code is organised in the following directories:
 
 | Directory                          | Purpose                                                                           |
 | ---------------------------------- | --------------------------------------------------------------------------------- |
-| [`src/c-lib`](src/c-lib)           | Source for the native C library, unit tests, fuzzers and demo console application |
+| [`src/c-lib`](src/c-lib)           | Native C library, unit tests, fuzzers, C example and C++ demo console application |
 | [`src/dotnet-lib`](src/dotnet-lib) | C# .NET wrapper source                                                            |
 | [`src/dotnet-app`](src/dotnet-app) | Demo C# .NET desktop application (WPF) source                                     |
 | [`src/java`](src/java)             | Java wrapper source and demo console application                                  |

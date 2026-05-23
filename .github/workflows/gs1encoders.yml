@@ -41,20 +41,17 @@ jobs:
             CC=clang SANITIZE=yes SLOW_TESTS=yes
           echo '::endgroup::'
 
-          echo '::group::Build shared lib and apps (clang+ASAN+LSAN+UBSAN)'
+          echo '::group::Build shared lib (clang+ASAN+LSAN+UBSAN)'
           make -C src/c-lib -j "$(nproc)" lib \
             CC=clang SANITIZE=yes
+          echo '::endgroup::'
 
-          make -C src/c-lib -j "$(nproc)" app \
+          echo '::group::Build and run C API example (clang+ASAN+LSAN+UBSAN)'
+          make -C src/c-lib -j "$(nproc)" example \
             CC=clang SANITIZE=yes
           ( cd src/c-lib && \
             LD_LIBRARY_PATH=build \
-            build/gs1encoders.bin --version )
-
-          make -C src/c-lib -j "$(nproc)" app-static \
-            CC=clang SANITIZE=yes
-          ( cd src/c-lib && \
-            build/gs1encoders-static.bin --version )
+            build/gs1encoders-example.bin )
           echo '::endgroup::'
 
           echo '::group::C++ wrapper tests (clang+ASAN+LSAN+UBSAN)'
@@ -98,18 +95,15 @@ jobs:
             CC=gcc ANALYZER=yes SLOW_TESTS=yes
           echo '::endgroup::'
 
-          echo '::group::Build shared lib and apps (gcc+analyzer)'
+          echo '::group::Build shared lib (gcc+analyzer)'
           make -C src/c-lib -j "$(nproc)" lib CC=gcc ANALYZER=yes
+          echo '::endgroup::'
 
-          make -C src/c-lib -j "$(nproc)" app CC=gcc ANALYZER=yes
+          echo '::group::Build and run C API example (gcc+analyzer)'
+          make -C src/c-lib -j "$(nproc)" example CC=gcc ANALYZER=yes
           ( cd src/c-lib && \
             LD_LIBRARY_PATH=build \
-            build/gs1encoders.bin --version )
-
-          make -C src/c-lib -j "$(nproc)" app-static \
-            CC=gcc ANALYZER=yes
-          ( cd src/c-lib && \
-            build/gs1encoders-static.bin --version )
+            build/gs1encoders-example.bin )
           echo '::endgroup::'
 
       - name: C++ wrapper tests
@@ -258,8 +252,6 @@ jobs:
           Write-Output '::endgroup::'
 
           Write-Output '::group::App version checks (MSVC)'
-          src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe `
-            --version
           src\c-lib\build\console-app-cpp\x64\Release\gs1encoders-cpp-app.exe `
             --version
           src\dotnet-app\bin\Release\net8.0-windows\gs1encoders-dotnet-app.exe `
@@ -296,23 +288,19 @@ jobs:
             test SANITIZE=yes SLOW_TESTS=yes
           echo '::endgroup::'
 
-          echo '::group::Build shared lib and apps (macOS clang+ASAN+UBSAN)'
+          echo '::group::Build shared lib (macOS clang+ASAN+UBSAN)'
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
             lib SANITIZE=yes
+          echo '::endgroup::'
 
+          echo '::group::Build and run C API example (macOS clang+ASAN+UBSAN)'
           make -C src/c-lib \
             -j "$(sysctl -n hw.logicalcpu)" \
-            app SANITIZE=yes
+            example SANITIZE=yes
           ( cd src/c-lib && \
             DYLD_LIBRARY_PATH=build \
-            build/gs1encoders.bin --version )
-
-          make -C src/c-lib \
-            -j "$(sysctl -n hw.logicalcpu)" \
-            app-static SANITIZE=yes
-          ( cd src/c-lib && \
-            build/gs1encoders-static.bin --version )
+            build/gs1encoders-example.bin )
           echo '::endgroup::'
 
           echo '::group::C++ wrapper tests (macOS clang+ASAN+UBSAN, no LSAN)'

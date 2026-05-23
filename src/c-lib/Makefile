@@ -195,9 +195,6 @@ endif
 
 CFLAGS = $(CFLAGS_G) $(CFLAGS_O) $(CFLAGS_FORTIFY) $(CFLAGS_V) -Wall -Wextra -Wconversion -Wformat=2 -Wshadow -Wdeclaration-after-statement -pedantic -Wundef -Wnull-dereference -Wstrict-prototypes -Werror -fstack-protector-strong -MMD -fPIC -DGS1_LINTER_ERR_STR_EN $(SAN_CFLAGS) $(COV_CFLAGS) $(ANALYZER_CFLAGS) $(UNIT_TEST_CFLAGS) $(DEBUG_CFLAGS) $(SLOW_TESTS_CFLAGS)
 
-APP = $(BUILD_DIR)/$(NAME).$(BIN_SUFFIX)
-APP_STATIC = $(BUILD_DIR)/$(NAME)-static.$(BIN_SUFFIX)
-
 TEST_BIN = $(BUILD_DIR)/$(NAME)-test.$(BIN_SUFFIX)
 
 LIB_STATIC = $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX)
@@ -211,8 +208,8 @@ endif
 PREFIX = /usr/local
 LIBDIR = $(PREFIX)/lib
 
-APP_SRC = gs1encoders-app.c
-APP_OBJ = $(BUILD_DIR)/$(APP_SRC:.c=.o)
+EXAMPLE_SRC = example.c
+EXAMPLE_BIN = $(BUILD_DIR)/$(NAME)-example.$(BIN_SUFFIX)
 
 APP_CPP_SRC = gs1encoders-cpp-app.cpp
 APP_CPP_BIN = $(BUILD_DIR)/$(NAME)-cpp-app.$(BIN_SUFFIX)
@@ -247,7 +244,7 @@ FUZZER_CORPUSES = $(addsuffix /,$(addprefix $(FUZZER_CORPUS_PREFIX),$(FUZZER_NAM
 FUZZER_SEED_SOURCES = *test*.c dl.c ai.c scandata.c syn.c
 
 ALL_SRCS = $(wildcard *.c) $(wildcard syntax/*.c)
-SRCS = $(filter-out $(APP_SRC) $(TEST_SRC) $(LINTER_TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
+SRCS = $(filter-out $(EXAMPLE_SRC) $(TEST_SRC) $(LINTER_TEST_SRC) $(FUZZER_SRCS), $(ALL_SRCS))
 OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 DEPS = $(addprefix $(BUILD_DIR)/, $(ALL_SRCS:.c=.d)) $(FUZZER_OBJS:.o=.d)
 
@@ -299,17 +296,10 @@ $(BUILD_DIR)/lib$(NAME).$(LIB_STATIC_SUFFIX): $(OBJS)
 
 
 #
-#  Application built to use shared library
+#  C API example built to use shared library
 #
-$(APP): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(APP_SRC)
-	$(CC) $(CFLAGS) $(LDFLAGS_APP_STATIC) $(APP_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
-
-
-#
-#  Standalone application
-#
-$(APP_STATIC): $(OBJS) $(APP_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(APP_OBJ) -o $(APP_STATIC)
+$(EXAMPLE_BIN): $(BUILD_DIR)/lib$(NAME).$(LIB_DYN_SUFFIX) $(EXAMPLE_SRC)
+	$(CC) $(CFLAGS) $(LDFLAGS_APP_STATIC) $(EXAMPLE_SRC) -o $@ -L$(BUILD_DIR) -l$(NAME)
 
 
 #
@@ -374,10 +364,10 @@ $(BUILD_DIR)/$(FUZZER_PREFIX)syn: $(OBJS) $(BUILD_DIR)/$(FUZZER_PREFIX)syn.o
 #  Utility targets
 #
 .PHONY: default
-default: lib app-static
+default: lib app-cpp-static
 
 .PHONY: all
-all: lib app app-static
+all: lib app-cpp app-cpp-static example
 
 .PHONY: lib
 lib: libshared libstatic
@@ -388,17 +378,14 @@ libshared: $(LIB_SHARED)
 .PHONY: libstatic
 libstatic: $(LIB_STATIC)
 
-.PHONY: app
-app: $(APP)
+.PHONY: example
+example: $(EXAMPLE_BIN)
 
 .PHONY: app-cpp
 app-cpp: $(APP_CPP_BIN)
 
 .PHONY: app-cpp-static
 app-cpp-static: $(APP_CPP_STATIC)
-
-.PHONY: app-static
-app-static: $(APP_STATIC)
 
 .PHONY: .wasm
 wasm: $(WASM_JS)
@@ -458,7 +445,7 @@ coverage:
 		--output-file build-coverage/coverage.info
 	lcov --remove build-coverage/coverage.info \
 		--ignore-errors unused \
-		'*/gs1encoders-test.c' '*/gs1encoders-app.c' \
+		'*/gs1encoders-test.c' \
 		'*/gs1encoders-cpp-test.cpp' '*/gs1encoders-cpp-app.cpp' \
 		'*/gs1syntaxdictionary-test.c' \
 		'*/acutest.h' '*/test-heap.h' '*/unittest.h' \
@@ -529,15 +516,15 @@ clean:
 
 .PHONY: clean-test
 clean-test:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(EXAMPLE_BIN) $(APP_CPP_BIN) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-fuzzer
 clean-fuzzer:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(EXAMPLE_BIN) $(APP_CPP_BIN) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-msan
 clean-msan:
-	$(RM) $(OBJS) $(APP_OBJ) $(APP) $(APP_STATIC) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
+	$(RM) $(OBJS) $(EXAMPLE_BIN) $(APP_CPP_BIN) $(APP_CPP_STATIC) $(TEST_BIN) $(TEST_OBJ) $(LINTER_TEST_BIN) $(LINTER_TEST_OBJ) $(FUZZER_BINS) $(FUZZER_OBJS) $(LIB_STATIC) $(LIB_SHARED) $(DEPS)
 
 .PHONY: clean-coverage
 clean-coverage:

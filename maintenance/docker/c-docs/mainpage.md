@@ -107,36 +107,34 @@ Build using Visual Studio or from a Developer Command Prompt:
 
 This generates the library in `src\c-lib\build\library\x64\Release\gs1encoders.dll`.
 
-#### Running the example application
+#### Running the examples
 
-After building, you can test the library by running the interactive console
-application, available in both a C and a C++ implementation:
+After building, you can exercise the library in two ways: a non-interactive
+**C** program that walks through the API (`example.c`), and an interactive
+**C++** console application (`gs1encoders-cpp-app.cpp`) that provides a menu for
+testing different input formats and features.
 
 **On Unix/macOS:**
 
-C:
+C API example:
 
-    make -C src/c-lib -j `nproc` app
-    LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin
+    make -C src/c-lib -j `nproc` example
+    LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders-example.bin
 
-C++:
+C++ console application:
 
     make -C src/c-lib -j `nproc` app-cpp
     LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders-cpp-app.bin
 
 **On Windows:**
 
-C:
-
-    msbuild src\gs1encoders.sln /t:gs1encoders-app /p:Configuration=Release /p:Platform=x64
-    src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe
-
-C++:
+The C++ console application is built as part of the solution:
 
     msbuild src\gs1encoders.sln /t:gs1encoders-cpp-app /p:Configuration=Release /p:Platform=x64
     src\c-lib\build\console-app-cpp\x64\Release\gs1encoders-cpp-app.exe
 
-Both applications provide an identical interactive menu for testing different input formats and features.
+The C example has no Visual Studio project; compile it directly against the
+library as shown in the *Using in your own C/C++ project* section below.
 
 #### Using in your own C/C++ project
 
@@ -360,9 +358,9 @@ action methods report failure by throwing a gs1encoders::GS1EncoderException
 Error message strings are provided in the English language in a single file
 that can be replaced at compile time.
 
-Refer to the example console applications (`gs1encoders-app.c` and
-`gs1encoders-cpp-app.cpp`) for comprehensive examples of how to use this
-library.
+Refer to the bundled examples — the C program `example.c` and the interactive
+C++ console application `gs1encoders-cpp-app.cpp` — for complete, working
+demonstrations of how to use this library.
 
 
 #### GS1 AI data validation and extraction (including GS1 Digital Link)

@@ -206,7 +206,7 @@ Use prefixes to avoid collisions with user code:
 | `syntax/*`                   | Vendored copy of Syntax Dictionary linter routines   |
 | `debug.h`                    | Debugging macros (`DEBUG_PRINT`)                     |
 | `tr.h`, `tr_EN.h`            | Error message translation system                     |
-| `gs1encoders-app.c`          | C console demo application source                    |
+| `example.c`                  | C API usage example (`make example`)                 |
 | `gs1encoders-cpp-app.cpp`    | C++ console demo application source (`make app-cpp`) |
 | `gs1encoders-test.c`         | C unit test harness                                  |
 | `gs1encoders-cpp-test.cpp`   | C++ wrapper unit test harness (`make test-cpp`)      |
@@ -446,18 +446,17 @@ and without the env var set.
 ```bash
 cd src/c-lib
 
-# Build library and static console app (default)
+# Build library and standalone static C++ console app (default)
 make -j $(nproc)
 
-# Build all targets including shared library app
+# Build all targets (libraries, C++ console apps and C example)
 make -j $(nproc) all
 
 # Build specific targets
 make -j $(nproc) lib         # Both shared and static libraries
 make -j $(nproc) libshared   # Shared library only
 make -j $(nproc) libstatic   # Static library only
-make -j $(nproc) app             # C console app using shared library
-make -j $(nproc) app-static      # Standalone static C console app
+make -j $(nproc) example         # C API example using shared library
 make -j $(nproc) app-cpp         # C++ console app using shared library
 make -j $(nproc) app-cpp-static  # Standalone static C++ console app
 ```

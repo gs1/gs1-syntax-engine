@@ -44,8 +44,8 @@ let package = Package(
             name: "CGS1Encoders",
             dependencies: [],
             exclude: [
-                // Exclude test, fuzzer, and utility files from the C library
-                "c-lib/gs1encoders-app.c",
+                // Exclude example, test, fuzzer, and utility files from the C library
+                "c-lib/example.c",
                 "c-lib/gs1encoders-cpp-app.cpp",
                 "c-lib/gs1encoders-test.c",
                 "c-lib/gs1encoders-cpp-test.cpp",
@@ -64,8 +64,6 @@ let package = Package(
                 "c-lib/build-embedded-ai-table.pl",
                 "c-lib/gs1encoders.vcxproj",
                 "c-lib/gs1encoders.vcxproj.filters",
-                "c-lib/gs1encoders-app.vcxproj",
-                "c-lib/gs1encoders-app.vcxproj.filters",
                 "c-lib/gs1encoders-test.vcxproj",
                 "c-lib/gs1encoders-test.vcxproj.filters",
                 "c-lib/aitable.inc",
