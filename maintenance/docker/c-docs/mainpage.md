@@ -56,7 +56,7 @@ This documentation set covers two equivalent surfaces:
     ::gs1_encoder_init_opts_t structure for explicit initialisation control.
     Suitable for C and for C++ code that prefers to talk to the C ABI directly.
 
-  * **@ref cppapi "C++ API"** — a header-only C++ wrapper (requires C++17 or
+  * **@ref cppapi "C++ API"** — a header-based C++ wrapper (requires C++17 or
     later), declared in `gs1encoders.hpp` and rooted in the @ref gs1encoders
     namespace. Provides a fluent gs1encoders::InitOpts builder, idiomatic STL
     types (`std::string`, `std::vector`, `std::optional`) and a typed exception

@@ -23,7 +23,7 @@
  *
  * @endlicenseblock
  *
- * Header-only C++ wrapper for the GS1 Barcode Syntax Engine (requires
+ * Header-based C++ wrapper for the GS1 Barcode Syntax Engine (requires
  * C++17 or later). Provides idiomatic C++ types (std::string, std::vector,
  * std::optional) and a typed exception hierarchy over the underlying
  * [C API](@ref capi); the native context is freed automatically when the
@@ -35,7 +35,7 @@
 
 /**
  * @defgroup cppapi C++ API
- * @brief Header-only C++ wrapper (requires C++17 or later) declared in
+ * @brief Header-based C++ wrapper (requires C++17 or later) declared in
  * `gs1encoders.hpp`, in the @ref gs1encoders namespace.
  *
  * Wraps the [C API](@ref capi) with a move-only context class

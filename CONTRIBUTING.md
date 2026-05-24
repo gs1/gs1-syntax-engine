@@ -194,7 +194,7 @@ Use prefixes to avoid collisions with user code:
 | File                         | Purpose                                              |
 |------------------------------|------------------------------------------------------|
 | `gs1encoders.h`              | Public C API header with all exported functions      |
-| `gs1encoders.hpp`            | Header-only C++ wrapper (requires C++17 or later)    |
+| `gs1encoders.hpp`            | Header-based C++ wrapper (requires C++17 or later)   |
 | `enc-private.h`              | Private header with internal definitions             |
 | `gs1encoders.c`              | API implementation and context management            |
 | `ai.c`                       | Application Identifier processing and validation     |
@@ -261,7 +261,7 @@ context contains all state and working memory for each instance of the library.
 | Header            | Purpose                                                |
 |-------------------|--------------------------------------------------------|
 | `gs1encoders.h`   | Public C API - included by user application code       |
-| `gs1encoders.hpp` | Header-only C++ wrapper around `gs1encoders.h`         |
+| `gs1encoders.hpp` | Header-based C++ wrapper around `gs1encoders.h`        |
 | `enc-private.h`   | Private internals - included only by this library      |
 
 The public header declares `gs1_encoder` as an opaque incomplete type. The
