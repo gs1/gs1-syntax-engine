@@ -4,7 +4,8 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Overview"/>
-    <tab type="user" url="gs1encoders_8h.html" title="API Reference"/>
+    <tab type="user" url="group__capi.html" title="C API Reference"/>
+    <tab type="user" url="group__cppapi.html" title="C++ API Reference"/>
 <!--
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="topics" visible="yes" title="" intro=""/>

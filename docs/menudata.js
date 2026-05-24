@@ -24,4 +24,5 @@
 */
 var menudata={children:[
 {text:"Overview",url:"index.html"},
-{text:"API Reference",url:"gs1encoders_8h.html"}]}
+{text:"C API Reference",url:"group__capi.html"},
+{text:"C++ API Reference",url:"group__cppapi.html"}]}

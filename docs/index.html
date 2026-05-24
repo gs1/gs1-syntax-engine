@@ -110,19 +110,17 @@ Building the C library</h3>
 <p>Build using Visual Studio or from a Developer Command Prompt: </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders /p:Configuration=Release /p:Platform=x64
 </pre><p> This generates the library in <code>src\c-lib\build\library\x64\Release\gs1encoders.dll</code>.</p>
 <h3><a class="anchor" id="autotoc_md2"></a>
-Running the example application</h3>
-<p>After building, you can test the library by running the interactive console application, available in both a C and a C++ implementation:</p>
+Running the examples</h3>
+<p>After building, you can exercise the library in two ways: a non-interactive <b>C</b> program that walks through the API (<code>example.c</code>), and an interactive <b>C++</b> console application (<code>gs1encoders-cpp-app.cpp</code>) that provides a menu for testing different input formats and features.</p>
 <p><b>On Unix/macOS:</b></p>
-<p>C: </p><pre class="fragment">make -C src/c-lib -j `nproc` app
-LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders.bin
-</pre><p> C++: </p><pre class="fragment">make -C src/c-lib -j `nproc` app-cpp
+<p>C API example: </p><pre class="fragment">make -C src/c-lib -j `nproc` example
+LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders-example.bin
+</pre><p> C++ console application: </p><pre class="fragment">make -C src/c-lib -j `nproc` app-cpp
 LD_LIBRARY_PATH=src/c-lib/build src/c-lib/build/gs1encoders-cpp-app.bin
 </pre><p> <b>On Windows:</b></p>
-<p>C: </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders-app /p:Configuration=Release /p:Platform=x64
-src\c-lib\build\console-app\x64\Release\gs1encoders-app.exe
-</pre><p> C++: </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders-cpp-app /p:Configuration=Release /p:Platform=x64
+<p>The C++ console application is built as part of the solution: </p><pre class="fragment">msbuild src\gs1encoders.sln /t:gs1encoders-cpp-app /p:Configuration=Release /p:Platform=x64
 src\c-lib\build\console-app-cpp\x64\Release\gs1encoders-cpp-app.exe
-</pre><p> Both applications provide an identical interactive menu for testing different input formats and features.</p>
+</pre><p> The C example has no Visual Studio project; compile it directly against the library as shown in the <em>Using in your own C/C++ project</em> section below.</p>
 <h3><a class="anchor" id="autotoc_md3"></a>
 Using in your own C/C++ project</h3>
 <p>To use the library in your C/C++ project you must:</p>
@@ -281,7 +279,7 @@ Example Uses</h2>
 <b>C++</b> — Using the library begins by constructing a <a class="el" href="classgs1encoders_1_1GS1Encoder.html" title="Main class for processing GS1 barcode data, including validation, format conversion,...">gs1encoders::GS1Encoder</a>, whose destructor releases the native resources automatically when it goes out of scope. The getter methods return owning <code>std::string</code> and <code>std::vector</code> copies, so there are no lifetime caveats on returned values. The setter and action methods report failure by throwing a <a class="el" href="classgs1encoders_1_1GS1EncoderException.html" title="Common base class for all exceptions thrown by this wrapper.">gs1encoders::GS1EncoderException</a> (whose <code>what()</code> carries the error message), so the equivalent handling is a <code>try</code>/<code>catch</code>.</dd>
 <dd>
 Error message strings are provided in the English language in a single file that can be replaced at compile time.</dd></dl>
-<p>Refer to the example console applications (<code>gs1encoders-app.c</code> and <code>gs1encoders-cpp-app.cpp</code>) for comprehensive examples of how to use this library.</p>
+<p>Refer to the bundled examples — the C program <code>example.c</code> and the interactive C++ console application <code>gs1encoders-cpp-app.cpp</code> — for complete, working demonstrations of how to use this library.</p>
 <h3><a class="anchor" id="autotoc_md4"></a>
 GS1 AI data validation and extraction (including GS1 Digital Link)</h3>
 <p>The following code processes AI data input, validates it (reporting any failures) and displays the extracted AIs if the validation succeeds.</p>
