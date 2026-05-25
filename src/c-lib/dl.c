@@ -973,6 +973,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	size_t key_len = 0;
 	int keyEntry = -1, bestKeyEntry;
 	char *p;
+	size_t avail;					// Bytes free at p; tracked as we emit
 	bool emitFixed;
 	ssize_t len;
 	const char *stem_to_use;
@@ -1127,15 +1128,22 @@ output:
 	 *
 	 */
 	p = ctx->outStr;
+	avail = sizeof(ctx->outStr);
 	stem_to_use = stem ? stem : CANONICAL_DL_STEM;
-	len = (ssize_t)strlen(stem_to_use);
-	assert((size_t)len < sizeof(ctx->outStr));
-	memcpy(p, stem_to_use, (size_t)len);
-	p += len;
 
-	// Trim trailing slash
-	if (*(p-1) == '/')
+	// Emit the caller stem in a single pass, leaving room for a terminating NUL
+	while (*stem_to_use && avail >= 2) {
+		*p++ = *stem_to_use++;
+		avail--;
+	}
+	if (*stem_to_use)			// Stem did not fit
+		goto too_long;
+
+	// Trim trailing slash (guarding against an empty stem)
+	if (p != ctx->outStr && *(p-1) == '/') {
 		p--;
+		avail++;
+	}
 
 	/*
 	 *  Output the path components in priority order (i.e. primary key AI,
@@ -1147,19 +1155,27 @@ output:
 
 		assert(ai);				// Should not have gaps in the path order
 
-		len = URIescape(p + 1 + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - 1 - ai->ailen - 1, ai->value, ai->vallen, false);
-		assert(len >= 0);
-		assert(1 + (size_t)ai->ailen + 1 + (size_t)len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "/AI/VALUE"
+		// Need room for "/AI/", the escaped value and a terminating NUL
+		if (avail < (size_t)ai->ailen + 4)
+			goto too_long;
+
+		len = URIescape(p + 1 + ai->ailen + 1, avail - (size_t)ai->ailen - 3, ai->value, ai->vallen, false);
+		if (len < 0)				// Escaped value did not fit
+			goto too_long;
 
 		*p++ = '/';
 		memcpy(p, ai->ai, ai->ailen);
 		p += ai->ailen;
 		*p++ = '/';
 		p += len;
+		avail -= (size_t)ai->ailen + 2 + (size_t)len;
 
 		GS1_SET_AI_OUTPUT(ai);			// Mark as processed
 	}
+
+	// Each emitted path element leaves at least one free byte, so '?' fits
 	*p++ = '?';
+	avail--;
 
 	/*
 	 *  Output the query parameter components (i.e. attribute AIs) in received order (i.e. attribute AIs), fixed-length first
@@ -1193,15 +1209,20 @@ again:
 			return NULL;
 		}
 
-		len = URIescape(p + ai->ailen + 1, sizeof(ctx->outStr) - (size_t)(p - ctx->outStr) - ai->ailen - 1, ai->value, ai->vallen, true);
-		assert(len >= 0);	// URI encoding should not overflow
-		assert((size_t)ai->ailen + 1 + (size_t)len + 1 < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));	// "AI=VALUE&"
+		// Need room for "AI=", the escaped value and a trailing '&'
+		if (avail < (size_t)ai->ailen + 3)
+			goto too_long;
+
+		len = URIescape(p + ai->ailen + 1, avail - (size_t)ai->ailen - 2, ai->value, ai->vallen, true);
+		if (len < 0)		// Escaped value did not fit
+			goto too_long;
 
 		memcpy(p, ai->ai, ai->ailen);
 		p += ai->ailen;
 		*p++ = '=';
 		p += len;
 		*p++ = '&';
+		avail -= (size_t)ai->ailen + 2 + (size_t)len;
 
 		GS1_SET_AI_OUTPUT(ai);		// Mark as processed
 
@@ -1215,6 +1236,12 @@ again:
 	*(p-1) = '\0';
 
 	return ctx->outStr;
+
+too_long:
+
+	SET_ERR(DL_URI_TOO_LONG);
+	*ctx->outStr = '\0';
+	return NULL;
 
 #undef GS1_AI_OUTPUT_VAL
 #undef GS1_SET_AI_OUTPUT
@@ -2182,6 +2209,55 @@ void test_dl_generateDLuri(void) {
 	}
 
 #undef test_testGenerateDLuri
+
+	// Sweep stem lengths across the buffer boundary to exercise every overflow guard
+	{
+		static const char *const datasets[] = {
+			"(01)12312312312326",			// Path only
+			"(01)12312312312326(99)123456",		// Path and query attribute
+		};
+		const size_t cap = sizeof(ctx->outStr);
+		char stembuf[2*MAX_DATA + 16];
+		size_t d;
+
+		for (d = 0; d < sizeof(datasets) / sizeof(datasets[0]); d++) {
+			bool saw_ok = false, saw_toolong = false;
+			size_t len;
+
+			TEST_CASE(datasets[d]);
+			TEST_CHECK(gs1_encoder_setAIdataStr(ctx, datasets[d]) == true);
+
+			for (len = cap - 40; len <= cap + 4; len++) {
+				const char *uri;
+
+				memset(stembuf, 'a', sizeof(stembuf));	// Init whole buffer for MSan
+				memcpy(stembuf, "https://", 8);
+				stembuf[len] = '\0';			// Stem of exactly len chars
+				uri = gs1_generateDLuri(ctx, stembuf);
+
+				if (uri) {
+					saw_ok = true;
+				} else {
+					saw_toolong = true;
+					TEST_CHECK(ctx->err == gs1_encoder_eDL_URI_TOO_LONG);
+					TEST_MSG("stem len %zu gave: %s", len, ctx->errMsg);
+				}
+			}
+
+			TEST_CHECK(saw_ok && saw_toolong);	// Boundary actually crossed
+		}
+	}
+
+	/* An empty stem must not read before the start of the output buffer */
+	{
+		const char *uri;
+
+		TEST_CASE("Empty stem");
+		TEST_CHECK(gs1_encoder_setAIdataStr(ctx, "(01)12312312312326") == true);
+		TEST_CHECK((uri = gs1_generateDLuri(ctx, "")) != NULL);
+		if (uri)
+			TEST_CHECK(strcmp(uri, "/01/12312312312326") == 0);
+	}
 
 	gs1_encoder_free(ctx);
 

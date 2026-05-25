@@ -67,6 +67,7 @@
 #define TR_EN_AI_SHOULD_BE_IN_PATH_INFO "AI (%s) from query params should be in the path info"
 #define TR_EN_DL_URI_PARSE_FAILED "Failed to parse DL data"
 #define TR_EN_CANNOT_CREATE_DL_URI_WITHOUT_PRIMARY_KEY_AI "Cannot create a DL URI without a primary key AI"
+#define TR_EN_DL_URI_TOO_LONG "Generated DL URI is too long"
 #define TR_EN_UNKNOWN_SYMBOLOGY "Unknown symbology"
 #define TR_EN_UNKNOWN_VALIDATION "Unknown validation"
 #define TR_EN_VALIDATION_CANNOT_BE_AMENDED "This validation cannot be amended"

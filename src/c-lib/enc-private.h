@@ -149,6 +149,7 @@ typedef enum {
 	gs1_encoder_eAI_SHOULD_BE_IN_PATH_INFO,
 	gs1_encoder_eDL_URI_PARSE_FAILED,
 	gs1_encoder_eCANNOT_CREATE_DL_URI_WITHOUT_PRIMARY_KEY_AI,
+	gs1_encoder_eDL_URI_TOO_LONG,
 	gs1_encoder_eUNKNOWN_SYMBOLOGY,
 	gs1_encoder_eUNKNOWN_VALIDATION,
 	gs1_encoder_eVALIDATION_CANNOT_BE_AMENDED,
