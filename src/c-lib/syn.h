@@ -47,6 +47,7 @@ void test_syn_allocFailures(void);
 void test_syn_capacityOverflow(void);
 void test_syn_strdupFailures(void);
 void test_syn_lineTooLong(void);
+void test_syn_nulLeadingLine(void);
 
 #endif  /* UNIT_TESTS */
 

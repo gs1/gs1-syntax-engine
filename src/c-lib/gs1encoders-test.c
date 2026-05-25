@@ -94,6 +94,7 @@ TEST_LIST = {
     { "syn_capacityOverflow", test_syn_capacityOverflow },
     { "syn_strdupFailures", test_syn_strdupFailures },
     { "syn_lineTooLong", test_syn_lineTooLong },
+    { "syn_nulLeadingLine", test_syn_nulLeadingLine },
 #endif
 
 

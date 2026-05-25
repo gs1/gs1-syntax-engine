@@ -404,7 +404,8 @@ struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* con
 	pos = sd;
 	linenum = 1;
 	while (fgets(buf, sizeof(buf), fp)) {
-		if (buf[strlen(buf)-1] != '\n' && !feof(fp))
+		const size_t buflen = strlen(buf);		// May be 0 on a NUL-led line
+		if (buflen > 0 && buf[buflen-1] != '\n' && !feof(fp))
 			error_v(SYNTAX_DICTIONARY_LINE_EXCEEDS_IMPL, (int)linenum, MAX_SD_ENTRY_LEN);
 		buf[strcspn(buf, "\r\n")] = 0;		/* Chop linefeed and newline */
 		if (parseSyntaxDictionaryEntry(ctx, buf, sd, &pos, cap) < 0) {
@@ -962,6 +963,38 @@ void test_syn_lineTooLong(void) {
 		GS1_ENCODERS_FREE(sd);
 	}
 	// LCOV_EXCL_STOP
+
+	remove(path);
+	gs1_encoder_free(ctx);
+
+}
+
+
+void test_syn_nulLeadingLine(void) {
+
+	const char* const path = "test-syndict-nul-line.txt";
+	gs1_encoder* ctx;
+	FILE *fp;
+	struct aiEntry *sd;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	// A line beginning with NUL makes strlen(buf)==0; must not read buf[-1]
+	fputc('\0', fp);
+	fputs("junk\n", fp);
+	fputs("91  X..30  # OK\n", fp);
+	fclose(fp);
+
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd != NULL);
+	if (sd) {
+		gs1_freeSyntaxDictionaryEntries(ctx, sd);
+		GS1_ENCODERS_FREE(sd);
+	}
 
 	remove(path);
 	gs1_encoder_free(ctx);
