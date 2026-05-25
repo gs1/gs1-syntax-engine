@@ -174,6 +174,7 @@ void test_ai_AItableVsPrefixLength(void);
 void test_ai_AItableVsIsFNC1required(void);
 void test_ai_parseAIdata(void);
 void test_ai_linters(void);
+void test_ai_errMarkup(void);
 void test_ai_processAIdata(void);
 void test_ai_validateAIs(void);
 void test_ai_lint_csumalpha(void);

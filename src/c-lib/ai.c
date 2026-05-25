@@ -542,20 +542,20 @@ static size_t validate_ai_val(gs1_encoder* const ctx, const char* const ai, cons
 			if (err) {
 				char *m = ctx->linterErrMarkup;
 				size_t rem = sizeof(ctx->linterErrMarkup);
+				const size_t errabs = (size_t)(p-start) + errpos;	// Error offset within the whole value
 
 				SET_ERR_V(AI_LINTER_ERROR, (int)entry->ailen, ai, gs1_lint_err_str[err]);
 				ctx->linterErr = err;
-				errpos += (size_t)(p-start);
 
-				// "(AI)before|error|after"
+				// "(AI)before|error|after"; errpos stays component-relative for the trailing length
 				m = gs1_buf_append(m, &rem, "(", 1);
 				m = gs1_buf_append(m, &rem, ai, entry->ailen);
 				m = gs1_buf_append(m, &rem, ")", 1);
-				m = gs1_buf_append(m, &rem, start, errpos);
+				m = gs1_buf_append(m, &rem, start, errabs);
 				m = gs1_buf_append(m, &rem, "|", 1);
-				m = gs1_buf_append(m, &rem, start + errpos, errlen);
+				m = gs1_buf_append(m, &rem, start + errabs, errlen);
 				m = gs1_buf_append(m, &rem, "|", 1);
-				m = gs1_buf_append(m, &rem, start + errpos + errlen, complen - errpos - errlen);
+				m = gs1_buf_append(m, &rem, start + errabs + errlen, complen - errpos - errlen);
 				*m = '\0';
 
 				return 0;
@@ -1581,6 +1581,46 @@ void test_ai_linters(void) {
 
 	for (i = 0; i < SIZEOF_ARRAY(tests); i++)
 		test_linters(ctx, tests[i].aiData, tests[i].linterErr);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+static void do_test_errMarkup(gs1_encoder* const ctx, const char* const file, const int line, const char* const aiData, const char* const expect) {
+
+	char casename[256];
+
+	snprintf(casename, sizeof(casename), "%s:%d: %s", file, line, aiData);
+	TEST_CASE(casename);
+
+	TEST_CHECK(gs1_encoder_setAIdataStr(ctx, aiData) == false);	// Linter error expected
+	TEST_CHECK(strcmp(gs1_encoder_getErrMarkup(ctx), expect) == 0);
+	TEST_MSG("Given: %s; Got: '%s'; Expected: '%s'", aiData, gs1_encoder_getErrMarkup(ctx), expect);
+
+}
+
+void test_ai_errMarkup(void) {
+
+	gs1_encoder* ctx;
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, false);
+
+#define test_errMarkup(d, e) do {					\
+	do_test_errMarkup(ctx, __FILE__, __LINE__, d, e);		\
+} while (0)
+
+	// AI 8001 = N4 N5 N3 N1 N1; 'X' is valid CSET 82 but not a digit.
+	// Error in the first component: the "after" segment is correct.
+	test_errMarkup("(8001)1X345678901234", "(8001)1|X|34");
+
+	// Error in a later component: the "after" segment must retain the
+	// trailing data of that component.
+	test_errMarkup("(8001)12341X34567890", "(8001)12341|X|345");
+
+#undef test_errMarkup
 
 	gs1_encoder_free(ctx);
 

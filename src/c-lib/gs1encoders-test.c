@@ -109,6 +109,7 @@ TEST_LIST = {
     { "ai_AItableVsIsFNC1required", test_ai_AItableVsIsFNC1required },
     { "ai_gs1_parseAIdata", test_ai_parseAIdata },
     { "ai_linters", test_ai_linters },
+    { "ai_errMarkup", test_ai_errMarkup },
     { "ai_gs1_processAIdata", test_ai_processAIdata },
     { "ai_validateAIs", test_ai_validateAIs },
 
