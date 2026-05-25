@@ -316,6 +316,10 @@ bool gs1_encoder_setValidateAIassociations(gs1_encoder* const ctx, const bool va
 bool gs1_encoder_getValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_validations_t validation) {
 	assert(ctx);
 	reset_error(ctx);
+	if ((signed int)validation < 0 || validation >= gs1_encoder_vNUMVALIDATIONS) {  // Cast satisfies "unsigned enum < 0" checks
+		SET_ERR(UNKNOWN_VALIDATION);
+		return false;
+	}
 	return ctx->validationTable[validation].enabled;
 }
 bool gs1_encoder_setValidationEnabled(gs1_encoder* const ctx, const gs1_encoder_validations_t validation, const bool enabled) {
@@ -1265,6 +1269,11 @@ void test_api_validations(void) {
 	// Locked validation (always enabled)
 	TEST_CHECK(gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vREPEATED_AIS));		// Default
 	TEST_CHECK(!gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREPEATED_AIS, false));
+
+	// Out-of-range index must be rejected by both setter and getter, not indexed
+	TEST_CHECK(!gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vNUMVALIDATIONS, true));
+	TEST_CHECK(!gs1_encoder_getValidationEnabled(ctx, gs1_encoder_vNUMVALIDATIONS));
+	TEST_CHECK(strlen(gs1_encoder_getErrMsg(ctx)) > 0);					// Error reported
 
 	gs1_encoder_free(ctx);
 
