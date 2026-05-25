@@ -497,8 +497,16 @@ jobs:
 
       - name: Compare
         run: |
+          # abi-dumper captures the full definition of the opaque gs1_encoder
+          # struct from DWARF, including its embedded private gs1_encoder_err_t
+          # enum. Adding an internal error code renumbers that enum and trips
+          # the check, although it is unreachable through the public API. Skip
+          # the private struct so changes reachable only through it are ignored;
+          # public types (declared in gs1encoders.h) remain checked.
+          printf '<skip_types>\ngs1_encoder\n</skip_types>\n' > abi-filter.xml
           abi-compliance-checker -l libgs1encoders \
-            -old baseline.dump -new current.dump
+            -old baseline.dump -new current.dump \
+            -filter abi-filter.xml
 
       - name: Upload report
         if: always()
