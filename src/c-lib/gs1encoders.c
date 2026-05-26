@@ -501,7 +501,9 @@ char* gs1_encoder_getAIdataStr(gs1_encoder* const ctx) {
 	for (i = 0; i < ctx->numAIs; i++) {
 		const struct aiValue *ai = &ctx->aiData[i];
 		if (ai->kind == aiValue_aival) {
-			len = (size_t)ai->ailen + 2;		// "(AI)"
+			// Worst case write for this AI: "(AI)" plus every value byte
+			// escaped as "\(", with the '<' leaving room for the trailing NUL
+			len = (size_t)ai->ailen + 2 + 2*(size_t)ai->vallen;
 			assert(len < sizeof(ctx->outStr) - (size_t)(p - ctx->outStr));
 			*p++ = '(';
 			memcpy(p, ai->ai, ai->ailen);
