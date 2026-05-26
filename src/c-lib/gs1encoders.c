@@ -639,6 +639,9 @@ void gs1_encoder_copyHRI(gs1_encoder* const ctx, void* const buf, const size_t m
 	assert(ctx);
 	reset_error(ctx);
 
+	if (max == 0)		// No room even for a terminating NUL
+		return;
+
 	numhri = gs1_encoder_getHRI(ctx, &hri);
 
 	p = buf;
@@ -722,6 +725,9 @@ void gs1_encoder_copyDLignoredQueryParams(gs1_encoder* const ctx, void* const bu
 
 	assert(ctx);
 	reset_error(ctx);
+
+	if (max == 0)		// No room even for a terminating NUL
+		return;
 
 	numqp = gs1_encoder_getDLignoredQueryParams(ctx, &qp);
 
@@ -1971,6 +1977,11 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	gs1_encoder_copyHRI(ctx, (void*)buf, needed - 1);
 	TEST_CHECK(buf[0] == '\0');
 
+	// max == 0 has no room even for a NUL, so nothing must be written
+	buf[0] = 'X';
+	gs1_encoder_copyHRI(ctx, (void*)buf, 0);
+	TEST_CHECK(buf[0] == 'X');
+
 	gs1_encoder_free(ctx);
 
 DIAG_POP
@@ -2065,8 +2076,13 @@ DIAG_DISABLE_DEPRECATED_DECLARATIONS
 	TEST_CHECK(strlen(buf) == needed - 1);
 
 	// Check buffer too short returns empty string
-	gs1_encoder_copyHRI(ctx, (void*)buf, needed - 1);
+	gs1_encoder_copyDLignoredQueryParams(ctx, (void*)buf, needed - 1);
 	TEST_CHECK(buf[0] == '\0');
+
+	// max == 0 has no room even for a NUL, so nothing must be written
+	buf[0] = 'X';
+	gs1_encoder_copyDLignoredQueryParams(ctx, (void*)buf, 0);
+	TEST_CHECK(buf[0] == 'X');
 
 	gs1_encoder_free(ctx);
 
