@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "gs1encoders.h"
 
@@ -33,6 +34,7 @@
 struct aiEntry;
 
 
+struct aiEntry* gs1_loadSyntaxDictionaryFromFile(gs1_encoder *ctx, FILE *const fp);
 struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder *ctx, const char *const fname);
 void gs1_freeSyntaxDictionaryEntries(const gs1_encoder *ctx, struct aiEntry *sd);
 

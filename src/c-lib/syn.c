@@ -417,10 +417,9 @@ fail:
 
 }
 
-struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* const fname) {
+struct aiEntry* gs1_loadSyntaxDictionaryFromFile(gs1_encoder* const ctx, FILE* const fp) {
 
 	const uint16_t cap = AI_TABLE_CAPACITY;
-	FILE *fp = NULL;
 	char buf[MAX_SD_ENTRY_LEN + 2];		// fgets includes "\n\0"
 	size_t linenum;
 
@@ -433,10 +432,6 @@ struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* con
 	sd[0].ai[0] = '\0';
 	sd[0].attrs = NULL;
 	sd[0].title = NULL;
-
-	fp = fopen(fname, "r");
-	if (fp == NULL)
-		error_v(CANNOT_READ_FILE, fname);
 
 	pos = sd;
 	linenum = 1;
@@ -456,15 +451,32 @@ struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* con
 		linenum++;
 	}
 
-	fclose(fp);
-
 	return sd;
 
 fail:
-	if (fp) fclose(fp);
 	if (sd) gs1_freeSyntaxDictionaryEntries(ctx, sd);
 	GS1_ENCODERS_FREE(sd);
 	return NULL;
+
+}
+
+
+struct aiEntry* gs1_loadSyntaxDictionary(gs1_encoder* const ctx, const char* const fname) {
+
+	FILE *fp;
+	struct aiEntry *sd;
+
+	fp = fopen(fname, "r");
+	if (fp == NULL) {
+		SET_ERR_V(CANNOT_READ_FILE, fname);
+		return NULL;
+	}
+
+	sd = gs1_loadSyntaxDictionaryFromFile(ctx, fp);
+
+	fclose(fp);
+
+	return sd;
 
 }
 
