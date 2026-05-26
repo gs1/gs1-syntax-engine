@@ -488,6 +488,18 @@ fuzzer-corpus-seeds-%: $(BUILD_DIR)/$(FUZZER_PREFIX)% | $(FUZZER_CORPUS_PREFIX)%
 		echo "Corpus $$corpus_dir already exists, skipping seed generation"; \
 	fi
 
+# The Syntax Dictionary itself is the natural seed for the syn fuzzer; the
+# generic quoted-string extraction would not yield a loadable dictionary.
+.PHONY: fuzzer-corpus-seeds-syn
+fuzzer-corpus-seeds-syn: $(BUILD_DIR)/$(FUZZER_PREFIX)syn | $(FUZZER_CORPUS_PREFIX)syn/
+	@corpus_dir="$(FUZZER_CORPUS_PREFIX)syn" && \
+	if [ -z "$$(ls -A $$corpus_dir 2>/dev/null)" ]; then \
+		echo "Seeding $$corpus_dir with the Syntax Dictionary" && \
+		cp gs1-syntax-dictionary.txt "$$corpus_dir/seed-syntax-dictionary"; \
+	else \
+		echo "Corpus $$corpus_dir already exists, skipping seed generation"; \
+	fi
+
 .PHONY: fuzzer-corpus-seeds
 fuzzer-corpus-seeds: $(addprefix fuzzer-corpus-seeds-,$(FUZZER_NAMES))
 

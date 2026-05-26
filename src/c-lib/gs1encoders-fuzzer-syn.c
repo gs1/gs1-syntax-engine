@@ -18,80 +18,180 @@
  *
  */
 
+/*
+ *  This harness fuzzes a complete custom Syntax Dictionary: the input is loaded
+ *  as the active AI table and the engine is then driven against it. This covers
+ *  the per-line parser, the cross-entry loader invariants (sortedness,
+ *  uniqueness), and the downstream use of a hostile table.
+ *
+ */
+
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "gs1encoders.h"
 #include "enc-private.h"
+#include "ai.h"
+#include "dl.h"
 #include "syn.h"
+
+
+// Exercise the major dictionary-dependent output paths for one AI data string
+static void drive(gs1_encoder* const ctx, const char* const aidata) {
+
+	char **hri;
+
+	if (!gs1_encoder_setAIdataStr(ctx, aidata))
+		return;
+
+	gs1_encoder_getAIdataStr(ctx);
+	gs1_encoder_getHRI(ctx, &hri);
+	gs1_encoder_getDLuri(ctx, NULL);
+
+}
+
 
 int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	static gs1_encoder *ctx = NULL;
-	char in[MAX_DATA+50];
-	struct aiEntry sd[150];
-	struct aiEntry *tmp = sd;
-	int numOut;
-	int e;
+	FILE *fp;
+	struct aiEntry *sd;
+	const struct aiEntry *e;
+	unsigned int cfg = 0;
+	size_t i;
 
 	if (!ctx) {
 		ctx = gs1_encoder_init_ex(NULL, NULL);
 		assert(ctx);
 	}
 
-	if (len > MAX_DATA+49)
+	if (len < 1 || len > 512*1024)
 		return 0;
 
-	memcpy(in, buf, len);
-	in[len] = '\0';
+	/*
+	 *  Load the fuzzed dictionary from memory and install it as the active AI
+	 *  table. A malformed dictionary is rejected at load; an inconsistent one
+	 *  causes setAItable to revert to the embedded table (freeing sd). Either
+	 *  way there is nothing further to exercise.
+	 *
+	 */
+	fp = fmemopen((void *)(uintptr_t)buf, len, "r");
+	if (!fp)
+		return 0;
+	sd = gs1_loadSyntaxDictionaryFromFile(ctx, fp);
+	fclose(fp);
+	if (!sd)
+		return 0;
 
-	numOut = parseSyntaxDictionaryEntry(ctx, in, sd, &tmp, sizeof(sd) / sizeof(sd[0]));
+	// We reuse one ctx across runs; setAItable is call-once, so release the
+	// key-qualifiers it populated on the previous load before re-invoking it
+	gs1_freeDLkeyQualifiers(ctx);
+	if (!gs1_setAItable(ctx, sd))
+		return 0;
 
-	// Structural invariants for successfully-parsed entries
-	for (e = 0; e < numOut; e++) {
+	/*
+	 *  Per-entry structural invariants: even on hostile input the parser must
+	 *  never produce entries that violate these contracts.
+	 *
+	 */
+	for (e = ctx->aiTable; *e->ai; e++) {
+
 		int p;
 
-		// AI length must be within bounds
-		if (sd[e].ailen < MIN_AI_LEN || sd[e].ailen > MAX_AI_LEN) {
-			printf("\nailen=%d out of range for entry %d\n", sd[e].ailen, e);
+		if (e->ailen < MIN_AI_LEN || e->ailen > MAX_AI_LEN) {
+			printf("\nailen=%d out of range for AI '%s'\n", e->ailen, e->ai);
 			abort();
 		}
 
-		// AI string must match stated length
-		if (strlen(sd[e].ai) != sd[e].ailen) {
-			printf("\nstrlen(ai)=%zu != ailen=%d for entry %d\n",
-				strlen(sd[e].ai), sd[e].ailen, e);
+		if (strlen(e->ai) != e->ailen) {
+			printf("\nstrlen(ai)=%zu != ailen=%d for AI '%s'\n",
+				strlen(e->ai), e->ailen, e->ai);
 			abort();
 		}
 
-		for (p = 0; sd[e].parts[p].cset != cset_none; p++) {
+		for (p = 0; p < MAX_PARTS && e->parts[p].cset != cset_none; p++) {
 
-			// Component min must not exceed max
-			if (sd[e].parts[p].min > sd[e].parts[p].max) {
-				printf("\nmin=%d > max=%d in part %d of entry %d\n",
-					sd[e].parts[p].min, sd[e].parts[p].max, p, e);
+			if (e->parts[p].min > e->parts[p].max) {
+				printf("\nmin=%d > max=%d in part %d of AI '%s'\n",
+					e->parts[p].min, e->parts[p].max, p, e->ai);
 				abort();
 			}
 
-			// Character set must be valid
-			if (sd[e].parts[p].cset > cset_Z) {
-				printf("\ncset=%d invalid in part %d of entry %d\n",
-					sd[e].parts[p].cset, p, e);
+			if (e->parts[p].cset > cset_Z) {
+				printf("\ncset=%d invalid in part %d of AI '%s'\n",
+					e->parts[p].cset, p, e->ai);
 				abort();
 			}
+
 		}
 
-		// Component count must not exceed limit
 		if (p >= MAX_PARTS) {
-			printf("\n%d parts exceeds MAX_PARTS for entry %d\n", p, e);
+			printf("\n%d parts exceeds MAX_PARTS for AI '%s'\n", p, e->ai);
 			abort();
 		}
+
 	}
 
-	gs1_freeSyntaxDictionaryEntries(ctx, sd);
+	// Derive configuration from input content without consuming any bytes
+	for (i = 0; i < len; i++)
+		cfg = cfg * 31 + buf[i];
+	gs1_encoder_setPermitUnknownAIs(ctx, cfg & 1);
+	gs1_encoder_setIncludeDataTitlesInHRI(ctx, (cfg >> 1) & 1);
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vREQUISITE_AIS, (cfg >> 2) & 1);
+	gs1_encoder_setValidationEnabled(ctx, gs1_encoder_vMUTEX_AIS, (cfg >> 3) & 1);
+
+	// Fixed, representative inputs against the fuzzed table
+	drive(ctx, "(01)12345678901231(10)ABC123(21)XYZ(8200)https://a.example/x");
+	drive(ctx, "(3100)123456(3925)12599(00)123456789012345675");
+
+	/*
+	 *  Build a data string from the table's own AIs so their lengths, linters
+	 *  and attributes are exercised. Digits satisfy every CSET structurally, so
+	 *  components are filled with their minimum length of digits.
+	 *
+	 */
+	{
+		char data[MAX_DATA+1];
+		size_t n = 0;
+		int count = 0;
+
+		for (e = ctx->aiTable; *e->ai && count < MAX_AIS; e++, count++) {
+
+			char piece[2 + MAX_AI_LEN + MAX_PARTS*40 + 1];
+			size_t pn = 0;
+			int p;
+
+			piece[pn++] = '(';
+			memcpy(piece + pn, e->ai, e->ailen);
+			pn += e->ailen;
+			piece[pn++] = ')';
+
+			for (p = 0; p < MAX_PARTS && e->parts[p].cset != cset_none; p++) {
+				int L = e->parts[p].min ? e->parts[p].min : 1;
+				if (L > 40)
+					L = 40;
+				while (L-- > 0)
+					piece[pn++] = '1';
+			}
+
+			if (n + pn >= sizeof(data))
+				break;
+			memcpy(data + n, piece, pn);
+			n += pn;
+
+		}
+		data[n] = '\0';
+
+		drive(ctx, data);
+	}
+
+	// Scan-data parsing (AI syntax and DL URI) against the fuzzed table
+	gs1_encoder_setScanData(ctx, "]d2(01)12345678901231(21)ABC");
+	gs1_encoder_setScanData(ctx, "]d1https://id.gs1.org/01/12345678901231/21/XYZ");
 
 	return 0;
 
