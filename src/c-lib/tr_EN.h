@@ -110,6 +110,7 @@
 #define TR_EN_AI_IS_MISSING_COMPONENTS "AI is missing components"
 #define TR_EN_ONLY_FINAL_COMPONENT_MAY_HAVE_VARIABLE_LENGTH "Only the final component may have variable length"
 #define TR_EN_MANDATORY_COMPONENT_CANNOT_FOLLOW_OPTIONAL_COMPONENTS "A mandatory component cannot follow optional components"
+#define TR_EN_NO_FNC1_AI_MUST_BE_PREDEFINED_LENGTH "AI marked '*' (no FNC1 separator) must have a predefined length"
 #define TR_EN_ATTRIBUTE_NAME_REQUIRED_ON_LHS_OF_ASSIGNMENT "Attribute name required on LHS of assignment"
 #define TR_EN_ATTRIBUTE_NAME_CONTAINS_ILLEGAL_CHARACTERS "Attribute name contains illegal characters"
 #define TR_EN_ATTRIBUTE_VALUE_CONTAINS_ILLEGAL_CHARACTERS "Attribute value contain illegal characters"

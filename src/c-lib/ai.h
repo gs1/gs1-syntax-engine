@@ -157,6 +157,7 @@ struct validationEntry {
 bool gs1_setAItable(gs1_encoder *ctx, struct aiEntry *table);
 void gs1_sortAIs(gs1_encoder* ctx);
 const struct aiEntry* gs1_lookupAIentry(const gs1_encoder *ctx, const char *ai, size_t ailen);
+bool gs1_aiPrefixHasDerivedLength(const char *ai);
 bool existsInAIdata(const gs1_encoder *ctx, const char *ai, size_t ailen, const char *ignoreAI, const struct aiValue **matchedAI);
 bool gs1_aiValLengthContentCheck(gs1_encoder *ctx, const char *ai, const struct aiEntry *entry, const char *aiVal, size_t vallen);
 bool gs1_parseAIdata(gs1_encoder *ctx, const char *aiData, char *dataStr);

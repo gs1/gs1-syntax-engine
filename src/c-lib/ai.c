@@ -209,6 +209,24 @@ static inline __ATTR_PURE uint8_t valLengthByPrefix(const char* const ai) {
 
 
 /*
+ * Retired AI (23) derives pre-defined length based on leading character of value
+ *
+ */
+static __ATTR_PURE size_t derived_length_ai23(const char* const value) {
+	return (value[0] >= '0' && value[0] <= '9') ? (size_t)((value[0] - '0') * 2 + 2) : 0;
+}
+
+static size_t (* const aiDerivedLengths[100])(const char* const value) = {
+	[23] = derived_length_ai23,
+};
+
+__ATTR_PURE bool gs1_aiPrefixHasDerivedLength(const char* const ai) {
+	assert(ai[0] >= '0' && ai[0] <= '9' && ai[1] >= '0' && ai[1] <= '9');
+	return aiDerivedLengths[(ai[0] - '0') * 10 + (ai[1] - '0')] != NULL;	// NULL: no derived length function
+}
+
+
+/*
  * Pseudo AI table entries allowing AIs that are not present in the above table
  * to be "vivified" if PermitUnknownAIs is enabled
  *
@@ -729,16 +747,16 @@ fail:
 }
 
 
-// Value length the parser consumes for a NO_FNC1 AI (e.g. retired AI 23: 2n+2 by first digit)
+// Value length the parser consumes for a NO_FNC1 AI: derived from the value
+// where the AI has a derived length (e.g. retired AI 23), else sum of part max.
 static __ATTR_PURE size_t aiPredefinedLength(const struct aiEntry *const entry,
 					     const char *const value) {
 
 	const struct aiComponent *part;
 	size_t total = 0;
 
-	if (entry->ailen == 2 && entry->ai[0] == '2' && entry->ai[1] == '3' &&
-	    value[0] >= '0' && value[0] <= '9')
-		return (size_t)((value[0] - '0') * 2 + 2);
+	if (entry->ailen == 2 && gs1_aiPrefixHasDerivedLength(entry->ai))
+		return aiDerivedLengths[(entry->ai[0] - '0') * 10 + (entry->ai[1] - '0')](value);
 
 	for (part = entry->parts; part->cset; part++)
 		total += part->max;

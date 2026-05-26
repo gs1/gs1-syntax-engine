@@ -294,6 +294,15 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 			error(MANDATORY_COMPONENT_CANNOT_FOLLOW_OPTIONAL_COMPONENTS);
 	}
 
+	// '*' means no FNC1 separator; predefined length must therefore be known.
+	// Exempt AIs whose value length is derived from the value (e.g. AI 23).
+	if ((*entry)->fnc1 == NO_FNC1 &&
+	    !((*entry)->ailen == 2 && gs1_aiPrefixHasDerivedLength((*entry)->ai)))
+		for (part = 0; part < numparts; part++)
+			if ((*entry)->parts[part].min != (*entry)->parts[part].max ||
+			    (*entry)->parts[part].opt == OPT)
+				error(NO_FNC1_AI_MUST_BE_PREDEFINED_LENGTH);
+
 	// Read the key/value attributes until the title delimiter
 	p = buf;
 	while (token && strcmp(token, "#") != 0) {
@@ -878,6 +887,23 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	{ false, "01  N14,csum  dlpkey=10,,21", { AI_ENTRY_TERMINATOR } },	// Empty AI
 	{ true,  "3900  ?  N4  ex=39nn", {					// Template permitted
 		AI_ENTRY("3900", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,_,_,_, __, __, __, __, "ex=39nn", ""),
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  '*' (NO_FNC1) requires a predefined length: all components fixed and
+	 *  mandatory, unless the AI's length is computed by a formula (e.g. AI 23)
+	 *
+	 */
+	{ false, "90  *  X..30",          { AI_ENTRY_TERMINATOR } },		// Variable final
+	{ false, "90  *  X5  X..30",      { AI_ENTRY_TERMINATOR } },		// Variable final
+	{ false, "90  *  [X5]",           { AI_ENTRY_TERMINATOR } },		// Optional
+	{ true,  "90  *  X5", {							// Fixed + mandatory: OK
+		AI_ENTRY("90", NO_FNC1, NO_DATA_ATTR, X,5,5,MAN,_,_,_, __, __, __, __, "", ""),
+		AI_ENTRY_TERMINATOR
+	} },
+	{ true,  "23  *  N..20", {						// Formula AI exempt
+		AI_ENTRY("23", NO_FNC1, NO_DATA_ATTR, N,1,20,MAN,_,_,_, __, __, __, __, "", ""),
 		AI_ENTRY_TERMINATOR
 	} },
 
