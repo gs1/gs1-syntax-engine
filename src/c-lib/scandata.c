@@ -913,11 +913,17 @@ void test_scandata_processScanData(void) {
 		DataBarExpanded, "^011231231231233310ABC123^99TESTING^98XYZ");
 	test_testProcessScanData(true, "]e0011231231231233310ABC123" "\x1D" "1199122598TESTING" "\x1D" "97XYZ",
 		DataBarExpanded, "^011231231231233310ABC123^1199122598TESTING^97XYZ");
+	test_testProcessScanData(true, "]e00112312312312333235XYZ" "\x1D" "10ABC",
+		DataBarExpanded, "^0112312312312333235XYZ^10ABC");	// (235) X..28 in DataBar composite
 
 	/* GS1-128 linear-only; composite is ]e0 */
 	test_testProcessScanData(false, "]C1", NONE, "");		// Empty GS1 data
 	test_testProcessScanData(true, "]C1011231231231233310ABC123" "\x1D" "99TESTING",
 		GS1_128_CCA, "^011231231231233310ABC123^99TESTING");
+	test_testProcessScanData(true, "]C10112312312312333235XYZ",
+		GS1_128_CCA, "^0112312312312333235XYZ");			// (235) X..28, no separator after last AI
+	test_testProcessScanData(true, "]C10112312312312333235XYZ" "\x1D" "10ABC",
+		GS1_128_CCA, "^0112312312312333235XYZ^10ABC");		// (235) DO_FNC1 -> GS before (10)
 
 	/* EAN/UPC, except EAN-8 */
 	test_testProcessScanData(false, "]E0", NONE, "");

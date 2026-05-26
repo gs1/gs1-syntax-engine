@@ -1355,6 +1355,13 @@ void test_ai_parseAIdata(void) {
 	test_parseAIdata(true,  "(10)12345\\(11)991225", "^1012345(11)991225");			// Escaped bracket
 	test_parseAIdata(true,  "(10)12345\\(", "^1012345(");					// At end if fine
 
+	test_parseAIdata(true,  "(235)ABC", "^235ABC");						// X..28, FNC1-required, single AI
+	test_parseAIdata(true,  "(01)12345678901231(235)XYZ", "^0112345678901231235XYZ");	// No FNC1 after (01) NO_FNC1
+	test_parseAIdata(true,  "(01)12345678901231(235)XYZ(10)BATCH",
+		"^0112345678901231235XYZ^10BATCH");						// FNC1 after (235) DO_FNC1
+	test_parseAIdata(true,  "(235)ABCDEFGHIJKLMNOPQRSTUVWXYZ12", "^235ABCDEFGHIJKLMNOPQRSTUVWXYZ12");	// X..28 at max
+	test_parseAIdata(false, "(235)ABCDEFGHIJKLMNOPQRSTUVWXYZ123", "");			// Over max
+
 	test_parseAIdata(false, "(10)(11)98765", "");						// Value must not be empty
 	test_parseAIdata(false, "(10)12345(11)", "");						// Value must not be empty
 	test_parseAIdata(false, "(1A)12345", "");						// AI must be numeric
@@ -1741,6 +1748,12 @@ void test_ai_processAIdata(void) {
 	test_processAIdata(false, "^72301212345678901234567890123456789");	// Too long
 	test_processAIdata(true,  "^7230123");					// Shortest
 	test_processAIdata(false, "^723012");					// Too short
+
+	test_processAIdata(true,  "^235ABC");					// X..28; FNC1 required
+	test_processAIdata(true,  "^235ABCDEFGHIJKLMNOPQRSTUVWXYZ12");		// X..28 at max
+	test_processAIdata(false, "^235ABCDEFGHIJKLMNOPQRSTUVWXYZ123");		// Over max
+	test_processAIdata(true,  "^0112345678901231235XYZ");			// (01) NO_FNC1 -> no ^ before 235
+	test_processAIdata(true,  "^0112345678901231235XYZ^10BATCH");		// (235) DO_FNC1 -> ^ before next AI
 
 	test_processAIdata(false, "^423");					// List of 3-digit ISO-3166 codes
 	test_processAIdata(false, "^4235");

@@ -1708,6 +1708,7 @@ void test_api_getAIdataStr(void) {
 
 	gs1_encoder* ctx;
 	char *out;
+	char buf[256];
 
 	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
 	assert(ctx);
@@ -1723,6 +1724,17 @@ void test_api_getAIdataStr(void) {
 	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
 	assert(out);
 	TEST_CHECK(strcmp(out, "(01)12312312312333(10)ABC123") == 0);
+
+	// (235) X..28 FNC1-required after a NO_FNC1 AI: no ^ before (235), ^ before (10)
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^0112312312312333235XYZ^10BATCH"));
+	TEST_ASSERT((out = gs1_encoder_getAIdataStr(ctx)) != NULL);
+	assert(out);
+	TEST_CHECK(strcmp(out, "(01)12312312312333(235)XYZ(10)BATCH") == 0);
+
+	// (235): bracketed input round-trips to the expected ^-form via getDataStr
+	strcpy(buf, "(01)12312312312333(235)XYZ(10)BATCH");
+	TEST_ASSERT(gs1_encoder_setAIdataStr(ctx, buf));
+	TEST_CHECK(strcmp(gs1_encoder_getDataStr(ctx), "^0112312312312333235XYZ^10BATCH") == 0);
 
 	// Escape data "(" characters
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC(123"));
@@ -1767,6 +1779,14 @@ void test_api_getScanData(void) {
 	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
 	assert(out);
 	TEST_CHECK(strcmp(out, "]e0011231231231233310ABC123" "\x1D" "1199122598COMPOSITE" "\x1D" "97XYZ") == 0);
+
+	// (235) X..28 emitted between a NO_FNC1 AI and a DO_FNC1 AI; GS appears
+	// only after (235), not between (01) and (235)
+	TEST_ASSERT(gs1_encoder_setSym(ctx, gs1_encoder_sGS1_128_CCA));
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^0112312312312333235XYZ^10BATCH"));
+	TEST_ASSERT((out = gs1_encoder_getScanData(ctx)) != NULL);
+	assert(out);
+	TEST_CHECK(strcmp(out, "]C10112312312312333235XYZ" "\x1D" "10BATCH") == 0);
 
 	gs1_encoder_free(ctx);
 
@@ -1842,6 +1862,15 @@ void test_api_getHRI(void) {
 	assert(hri);
 	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
 	TEST_CHECK(strcmp(hri[1], "(10) ABC123") == 0);
+
+	// HRI for (235) X..28 FNC1-required
+	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^0112312312312333235XYZ^10BATCH"));
+	TEST_ASSERT((numAIs = gs1_encoder_getHRI(ctx, &hri)) == 3);
+	TEST_ASSERT(hri != NULL);
+	assert(hri);
+	TEST_CHECK(strcmp(hri[0], "(01) 12312312312333") == 0);
+	TEST_CHECK(strcmp(hri[1], "(235) XYZ") == 0);
+	TEST_CHECK(strcmp(hri[2], "(10) BATCH") == 0);
 
 	// HRI from composite, raw AI data
 	TEST_ASSERT(gs1_encoder_setDataStr(ctx, "^011231231231233310ABC123|^99COMPOSITE"));
