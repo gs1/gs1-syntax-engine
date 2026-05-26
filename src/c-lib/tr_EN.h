@@ -103,6 +103,7 @@
 #define TR_EN_AI_RANGE_END_MUST_EXCEED_RANGE_START "AI range end must exceed range start"
 #define TR_EN_AI_HAS_WRONG_WIDTH "AI has wrong width"
 #define TR_EN_AI_MUST_BE_NUMERIC "AI must be numeric"
+#define TR_EN_AIS_MUST_BE_IN_ASCENDING_ORDER "AIs must be in strictly ascending order"
 #define TR_EN_TRUNCATED_AFTER_AI "Truncated after AI"
 #define TR_EN_TRUNCATED_AFTER_FLAGS "Truncated after flags"
 #define TR_EN_NUMBER_OF_AI_COMPONENTS_EXCEEDS_IMPL "Number of AI components exceeds implementation"

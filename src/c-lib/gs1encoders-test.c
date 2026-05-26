@@ -96,6 +96,7 @@ TEST_LIST = {
     { "syn_strdupFailures", test_syn_strdupFailures },
     { "syn_lineTooLong", test_syn_lineTooLong },
     { "syn_nulLeadingLine", test_syn_nulLeadingLine },
+    { "syn_dictionaryOrder", test_syn_dictionaryOrder },
 #endif
 
 

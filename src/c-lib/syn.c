@@ -233,6 +233,11 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 	}
 
+	// The Syntax Dictionary is sorted, so each AI must lexically exceed its
+	// predecessor; this also rejects duplicates and underpins the binary search
+	if (*entry != sd && strcmp((*entry)->ai, (*entry)[-1].ai) <= 0)
+		error(AIS_MUST_BE_IN_ASCENDING_ORDER);
+
 	token = strtok_r(NULL, " \t", &saveptr);
 	if (!token)
 		error(TRUNCATED_AFTER_AI);
@@ -1082,6 +1087,66 @@ void test_syn_nulLeadingLine(void) {
 		gs1_freeSyntaxDictionaryEntries(ctx, sd);
 		GS1_ENCODERS_FREE(sd);
 	}
+
+	remove(path);
+	gs1_encoder_free(ctx);
+
+}
+
+void test_syn_dictionaryOrder(void) {
+
+	const char* const path = "test-syndict-order.txt";
+	gs1_encoder* ctx;
+	FILE *fp;
+	struct aiEntry *sd;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	// Out-of-order AIs break the binary-search precondition and must be rejected
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	fputs("99  X..30     # INTERNAL\n", fp);
+	fputs("01  N14,csum  # GTIN\n", fp);
+	fclose(fp);
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd == NULL);
+	if (sd) { gs1_freeSyntaxDictionaryEntries(ctx, sd); GS1_ENCODERS_FREE(sd); }
+
+	// Duplicate AIs must be rejected
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	fputs("01  N14,csum  # GTIN\n", fp);
+	fputs("01  N14,csum  # GTIN duplicate\n", fp);
+	fclose(fp);
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd == NULL);
+	if (sd) { gs1_freeSyntaxDictionaryEntries(ctx, sd); GS1_ENCODERS_FREE(sd); }
+
+	// Overlapping ranges are duplicates once expanded and must be rejected
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	fputs("3100-3105  N6  # NET WEIGHT\n", fp);
+	fputs("3103-3108  N6  # NET WEIGHT overlap\n", fp);
+	fclose(fp);
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd == NULL);
+	if (sd) { gs1_freeSyntaxDictionaryEntries(ctx, sd); GS1_ENCODERS_FREE(sd); }
+
+	// Strictly-ascending AIs (including a non-overlapping range) must load
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) { gs1_encoder_free(ctx); return; }
+	fputs("01         N14,csum  # GTIN\n", fp);
+	fputs("3100-3105  N6        # NET WEIGHT\n", fp);
+	fputs("99         X..30     # INTERNAL\n", fp);
+	fclose(fp);
+	sd = gs1_loadSyntaxDictionary(ctx, path);
+	TEST_CHECK(sd != NULL);
+	if (sd) { gs1_freeSyntaxDictionaryEntries(ctx, sd); GS1_ENCODERS_FREE(sd); }
 
 	remove(path);
 	gs1_encoder_free(ctx);

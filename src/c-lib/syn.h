@@ -49,6 +49,7 @@ void test_syn_capacityOverflow(void);
 void test_syn_strdupFailures(void);
 void test_syn_lineTooLong(void);
 void test_syn_nulLeadingLine(void);
+void test_syn_dictionaryOrder(void);
 
 #endif  /* UNIT_TESTS */
 
