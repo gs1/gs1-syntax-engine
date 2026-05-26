@@ -52,6 +52,7 @@
 #define TR_EN_SERIAL_NOT_PRESENT "Serial component must be present for AI (%.*s) when used with AI (8030)"
 #define TR_EN_FAILED_TO_REALLOC_FOR_KEY_QUALIFIERS "Failed to reallocate memory for key-qualifiers"
 #define TR_EN_FAILED_TO_MALLOC_FOR_KEY_QUALIFIERS "Failed to allocate memory for key-qualifiers"
+#define TR_EN_TOO_MANY_DL_KEY_QUALIFIERS "Too many DL key qualifiers"
 #define TR_EN_URI_CONTAINS_ILLEGAL_CHARACTERS "URI contains illegal characters"
 #define TR_EN_URI_CONTAINS_ILLEGAL_SCHEME "Scheme must be http:// or HTTP:// or https:// or HTTPS://"
 #define TR_EN_URI_MISSING_DOMAIN_AND_PATH_INFO "URI must contain a domain and path info"

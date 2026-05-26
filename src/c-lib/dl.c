@@ -42,6 +42,9 @@
 #define DL_KEY_QUALIFIER_INITIAL_CAPACITY 50
 #endif
 
+// Bounds the 2^n key-qualifier combinations; real dictionary uses at most 3
+#define MAX_DL_KEY_QUALIFIERS 5
+
 
 /*
  *  Set of characters that are permissible in URIs, including percent
@@ -185,6 +188,11 @@ static bool addDLkeyQualifiers(gs1_encoder* const ctx, char*** const dlKeyQualif
 			num++;
 	if (qualifiers_len > 0)
 		num++;
+
+	if (num > MAX_DL_KEY_QUALIFIERS) {
+		SET_ERR(TOO_MANY_DL_KEY_QUALIFIERS);
+		return false;
+	}
 
 	/*
 	 *  Grow dlKeyQualifiers if necessary
@@ -2308,6 +2316,44 @@ void test_dl_allocFailures(void) {
 	TEST_CHECK(gs1_populateDLkeyQualifiers(ctx) == true);
 
 	gs1_encoder_free(ctx);
+
+}
+
+
+void test_dl_keyQualifierLimit(void) {
+
+	const char* const path = "test-syndict-dlpkey.txt";
+	FILE *fp;
+	gs1_encoder *ctx;
+
+	// A dlpkey sequence at the qualifier cap is accepted: the custom AI works
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) return;
+	fputs("8888  ?  N4  dlpkey=10,11,12,13,14  # T\n", fp);		// 5 qualifiers
+	fclose(fp);
+	{
+		gs1_encoder_init_opts_t opts = { .struct_size = sizeof(opts), .syntaxDictionary = path };
+		TEST_ASSERT((ctx = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		TEST_CHECK(gs1_encoder_setAIdataStr(ctx, "(8888)1234"));
+		gs1_encoder_free(ctx);
+	}
+
+	// One qualifier over the cap is rejected (no 2^n blow-up): load falls back
+	// to the embedded table, so the custom AI is no longer known
+	fp = fopen(path, "wb");
+	TEST_ASSERT(fp != NULL);
+	if (!fp) return;
+	fputs("8888  ?  N4  dlpkey=10,11,12,13,14,15  # T\n", fp);	// 6 qualifiers
+	fclose(fp);
+	{
+		gs1_encoder_init_opts_t opts = { .struct_size = sizeof(opts), .syntaxDictionary = path };
+		TEST_ASSERT((ctx = gs1_encoder_init_ex(NULL, &opts)) != NULL);
+		TEST_CHECK(!gs1_encoder_setAIdataStr(ctx, "(8888)1234"));
+		gs1_encoder_free(ctx);
+	}
+
+	remove(path);
 
 }
 

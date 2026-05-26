@@ -124,6 +124,7 @@ TEST_LIST = {
     { "dl_URIescape", test_dl_URIescape },
     { "dl_generateDLuri", test_dl_generateDLuri },
     { "dl_allocFailures", test_dl_allocFailures },
+    { "dl_keyQualifierLimit", test_dl_keyQualifierLimit },
 
 
     /*
