@@ -72,7 +72,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	gs1_encoder_setAddCheckDigit(ctx, (cfg >> 7) & 1);
 
 	if (len > MAX_DATA+49)
-		return 0;
+		return -1;
 
 	memcpy(in, buf, len);
 	in[len] = '\0';
@@ -86,7 +86,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	 *
 	 */
 	if (!gs1_encoder_setDataStr(ctx, in))
-		return 0;
+		return -1;
 
 	/*
 	 *  The input was accepted, so exercise the output paths.
@@ -95,8 +95,8 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 
 	// AI data must be extractable when AIs were parsed
 	if (ctx->numAIs > 0 && gs1_encoder_getAIdataStr(ctx) == NULL) {
-		printf("\ngetAIdataStr NULL with numAIs=%d after: %s\n", ctx->numAIs, in);
-		abort();
+		fprintf(stderr, "\ngetAIdataStr NULL with numAIs=%d after: %s\n", ctx->numAIs, in);
+		__builtin_trap();
 	}
 
 	gs1_encoder_getHRI(ctx, &hri);
@@ -117,25 +117,25 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	 *
 	 */
 	if ((out = gs1_encoder_getDLuri(ctx, stem)) == NULL)
-		return 0;
+		return -1;
 	if (!((cfg >> 7) & 1)) {
 		memcpy(outDL1, out, strlen(out) + 1);
 
 		if (!gs1_encoder_setDataStr(ctx, outDL1)) {
-			printf("\nFailed setting data to DL: %s\n", outDL1);
-			printf("\nError: %s\n", ctx->errMsg);
-			abort();
+			fprintf(stderr, "\nFailed setting data to DL: %s\n", outDL1);
+			fprintf(stderr, "\nError: %s\n", ctx->errMsg);
+			__builtin_trap();
 		}
 
 		if ((out = gs1_encoder_getDLuri(ctx, stem)) == NULL) {
-			printf("\nFailed reading DL after successfully setting: %s\n", outDL1);
-			abort();
+			fprintf(stderr, "\nFailed reading DL after successfully setting: %s\n", outDL1);
+			__builtin_trap();
 		}
 		memcpy(outDL2, out, strlen(out) + 1);
 
 		if (strcmp(outDL1, outDL2) != 0) {
-			printf("\nIN:  %s\nOUT: %s\n", outDL1, outDL2);
-			abort();
+			fprintf(stderr, "\nIN:  %s\nOUT: %s\n", outDL1, outDL2);
+			__builtin_trap();
 		}
 	}
 

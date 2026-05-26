@@ -70,7 +70,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	}
 
 	if (len < 1 || len > 512*1024)
-		return 0;
+		return -1;
 
 	/*
 	 *  Load the fuzzed dictionary from memory and install it as the active AI
@@ -81,17 +81,17 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 	 */
 	fp = fmemopen((void *)(uintptr_t)buf, len, "r");
 	if (!fp)
-		return 0;
+		return -1;
 	sd = gs1_loadSyntaxDictionaryFromFile(ctx, fp);
 	fclose(fp);
 	if (!sd)
-		return 0;
+		return -1;
 
 	// We reuse one ctx across runs; setAItable is call-once, so release the
 	// key-qualifiers it populated on the previous load before re-invoking it
 	gs1_freeDLkeyQualifiers(ctx);
 	if (!gs1_setAItable(ctx, sd))
-		return 0;
+		return -1;
 
 	/*
 	 *  Per-entry structural invariants: even on hostile input the parser must
@@ -103,35 +103,35 @@ int LLVMFuzzerTestOneInput(const uint8_t* const buf, size_t len) {
 		int p;
 
 		if (e->ailen < MIN_AI_LEN || e->ailen > MAX_AI_LEN) {
-			printf("\nailen=%d out of range for AI '%s'\n", e->ailen, e->ai);
-			abort();
+			fprintf(stderr, "\nailen=%d out of range for AI '%s'\n", e->ailen, e->ai);
+			__builtin_trap();
 		}
 
 		if (strlen(e->ai) != e->ailen) {
-			printf("\nstrlen(ai)=%zu != ailen=%d for AI '%s'\n",
+			fprintf(stderr, "\nstrlen(ai)=%zu != ailen=%d for AI '%s'\n",
 				strlen(e->ai), e->ailen, e->ai);
-			abort();
+			__builtin_trap();
 		}
 
 		for (p = 0; p < MAX_PARTS && e->parts[p].cset != cset_none; p++) {
 
 			if (e->parts[p].min > e->parts[p].max) {
-				printf("\nmin=%d > max=%d in part %d of AI '%s'\n",
+				fprintf(stderr, "\nmin=%d > max=%d in part %d of AI '%s'\n",
 					e->parts[p].min, e->parts[p].max, p, e->ai);
-				abort();
+				__builtin_trap();
 			}
 
 			if (e->parts[p].cset > cset_Z) {
-				printf("\ncset=%d invalid in part %d of AI '%s'\n",
+				fprintf(stderr, "\ncset=%d invalid in part %d of AI '%s'\n",
 					e->parts[p].cset, p, e->ai);
-				abort();
+				__builtin_trap();
 			}
 
 		}
 
 		if (p >= MAX_PARTS) {
-			printf("\n%d parts exceeds MAX_PARTS for AI '%s'\n", p, e->ai);
-			abort();
+			fprintf(stderr, "\n%d parts exceeds MAX_PARTS for AI '%s'\n", p, e->ai);
+			__builtin_trap();
 		}
 
 	}
