@@ -1095,7 +1095,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 		numQualifiers = 0;
 		while (gs1_tokenise(NULL, ' ', &tok2)) {
 
-			assert(tok2.len <= MAX_AI_LEN);
+			assert(tok2.len >= MIN_AI_LEN && tok2.len <= MAX_AI_LEN);
 			if (!existsInAIdata(ctx, tok2.ptr, tok2.len, NULL, NULL)) {
 				satisfied = false;
 				break;
@@ -1120,7 +1120,7 @@ char* gs1_generateDLuri(gs1_encoder* const ctx, const char* const stem) {
 	for (more = gs1_tokenise(ctx->dlKeyQualifiers[bestKeyEntry], ' ', &tok), i = 0; more; more = gs1_tokenise(NULL, ' ', &tok), i++) {
 		const struct aiValue *match = NULL;
 
-		assert(tok.len <= MAX_AI_LEN);		/* Should be validated already */
+		assert(tok.len >= MIN_AI_LEN && tok.len <= MAX_AI_LEN);		/* Validated at dictionary load */
 
 		existsInAIdata(ctx, tok.ptr, tok.len, NULL, &match);
 		assert(match);		// Should never fail since key-qualifier selection ensures all present

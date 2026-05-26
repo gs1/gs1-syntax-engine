@@ -861,7 +861,7 @@ static bool validateAImutex(gs1_encoder* const ctx) {
 
 				const struct aiValue *matchedAI;
 
-				assert(tok2.len <= MAX_AI_LEN);
+				assert(tok2.len >= MIN_AI_LEN && tok2.len <= MAX_AI_LEN);
 
 				if (!existsInAIdata(ctx, tok2.ptr, tok2.len, ai->ai, &matchedAI))
 					continue;
