@@ -113,6 +113,7 @@
 #define TR_EN_ATTRIBUTE_NAME_CONTAINS_ILLEGAL_CHARACTERS "Attribute name contains illegal characters"
 #define TR_EN_ATTRIBUTE_VALUE_CONTAINS_ILLEGAL_CHARACTERS "Attribute value contain illegal characters"
 #define TR_EN_ATTRIBUTE_VALUE_REQUIRED_ON_RHS_OF_ASSIGNMENT "Attribute value required on RHS of assignment"
+#define TR_EN_ATTRIBUTE_AI_IS_NOT_WELL_FORMED "Attribute references an AI that is not well-formed"
 #define TR_EN_SINGLETON_ATTRIBUTE_NAME_CONTAINS_ILLEGAL_CHARACTERS "Singleton attribute name contains illegal characters"
 #define TR_EN_ATTRIBUTES_TOO_LONG "Attributes too long"
 #define TR_EN_FAILED_TO_ALLOCATE_MEMORY_FOR_ATTRS "Failed to allocate memory for attrs"

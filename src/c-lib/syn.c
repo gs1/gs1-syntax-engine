@@ -139,6 +139,25 @@ fail:
 
 }
 
+// Validate that an attribute value references only well-formed AIs: 1+ leading
+// digits optionally followed by trailing 'n' wildcards (e.g. "310n"), matching
+// the form the runtime's prefix-based template matching expects
+static bool validAttrAIrefs(const char* val, const char* seps) {
+	for (;;) {
+		size_t n = strcspn(val, seps);
+		size_t leading_digits;
+		if (n < MIN_AI_LEN || n > MAX_AI_LEN)
+			return false;
+		leading_digits = strspn(val, "0123456789");
+		if (leading_digits < 1 || leading_digits + strspn(val + leading_digits, "n") != n)
+			return false;
+		val += n;
+		if (*val == '\0')
+			return true;
+		val++;					// Skip separator
+	}
+}
+
 int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, const struct aiEntry* const sd, struct aiEntry** const entry, const uint16_t cap) {
 
 	const struct aiEntry *lastEntry;
@@ -292,6 +311,19 @@ int parseSyntaxDictionaryEntry(gs1_encoder* const ctx, const char* const line, c
 
 			if (*(q+1) == '\0')
 				error(ATTRIBUTE_VALUE_REQUIRED_ON_RHS_OF_ASSIGNMENT);
+
+			// ex=, req= and dlpkey= reference AIs, which must be well-formed
+			// (separators differ: ex by ',', req by ',' and '+', dlpkey by ',' and '|')
+			if (q-token == 2 && memcmp(token, "ex", 2) == 0) {
+				if (!validAttrAIrefs(q+1, ","))
+					error(ATTRIBUTE_AI_IS_NOT_WELL_FORMED);
+			} else if (q-token == 3 && memcmp(token, "req", 3) == 0) {
+				if (!validAttrAIrefs(q+1, ",+"))
+					error(ATTRIBUTE_AI_IS_NOT_WELL_FORMED);
+			} else if (q-token == 6 && memcmp(token, "dlpkey", 6) == 0) {
+				if (!validAttrAIrefs(q+1, ",|"))
+					error(ATTRIBUTE_AI_IS_NOT_WELL_FORMED);
+			}
 
 		} else {					// e.g. dlpkey
 
@@ -814,7 +846,21 @@ struct test_parse_sd_entry_s tests_parse_sd_entry[] = {
 	 *  Attributes too long: cumulative attributes exceed MAX_AI_ATTR_LEN + 2 buffer
 	 *
 	 */
-	{ false, "90  X5  req=aaaaaaaaaa req=bbbbbbbbbb req=cccccccccc req=dddddddddd req=eeeeeeeeee", {
+	{ false, "90  X5  req=01 req=02 req=03 req=04 req=05 req=06 req=07 req=08 req=09 req=10", {
+		AI_ENTRY_TERMINATOR
+	} },
+
+	/*
+	 *  Attribute AI references must be well-formed AIs (templates permitted)
+	 *
+	 */
+	{ false, "01  N14,csum  ex=0",          { AI_ENTRY_TERMINATOR } },	// AI too short
+	{ false, "01  N14,csum  req=0",         { AI_ENTRY_TERMINATOR } },	// AI too short
+	{ false, "01  N14,csum  dlpkey=1",      { AI_ENTRY_TERMINATOR } },	// AI too short
+	{ false, "01  N14,csum  ex=12345",      { AI_ENTRY_TERMINATOR } },	// AI too long
+	{ false, "01  N14,csum  dlpkey=10,,21", { AI_ENTRY_TERMINATOR } },	// Empty AI
+	{ true,  "3900  ?  N4  ex=39nn", {					// Template permitted
+		AI_ENTRY("3900", DO_FNC1, DL_DATA_ATTR, N,4,4,MAN,_,_,_, __, __, __, __, "ex=39nn", ""),
 		AI_ENTRY_TERMINATOR
 	} },
 
@@ -837,6 +883,47 @@ void test_syn_parseSyntaxDictionaryEntry(void) {
 
 	for (i = 0; i < SIZEOF_ARRAY(tests_parse_sd_entry); i++)
 		test_parseSyntaxDictionaryEntry(ctx, tests_parse_sd_entry[i].sdEntry, tests_parse_sd_entry[i].aiEntries, tests_parse_sd_entry[i].expectSuccess);
+
+	gs1_encoder_free(ctx);
+
+}
+
+
+// Exhaustive d/n placement check for attribute AI references at lengths 2, 3
+// and 4: 1+ leading digits optionally followed by trailing 'n' wildcards
+void test_syn_attrTemplateForm(void) {
+
+	static const struct { const char* pat; bool valid; } cases[] = {
+		// Length 2 (4 placements; valid: dd, dn)
+		{ "01",   true  }, { "0n",   true  }, { "n0",   false }, { "nn",   false },
+		// Length 3 (8 placements; valid: ddd, ddn, dnn)
+		{ "012",  true  }, { "01n",  true  }, { "0n2",  false }, { "0nn",  true  },
+		{ "n01",  false }, { "n0n",  false }, { "nn0",  false }, { "nnn",  false },
+		// Length 4 (16 placements; valid: dddd, dddn, ddnn, dnnn)
+		{ "0123", true  }, { "012n", true  }, { "01n3", false }, { "01nn", true  },
+		{ "0n23", false }, { "0n2n", false }, { "0nn3", false }, { "0nnn", true  },
+		{ "n012", false }, { "n01n", false }, { "n0n2", false }, { "n0nn", false },
+		{ "nn01", false }, { "nn0n", false }, { "nnn0", false }, { "nnnn", false },
+	};
+	gs1_encoder* ctx;
+	struct aiEntry sd[2];
+	char buf[64];
+	size_t i;
+
+	TEST_ASSERT((ctx = gs1_encoder_unit_test_init()) != NULL);
+	assert(ctx);
+
+	for (i = 0; i < SIZEOF_ARRAY(cases); i++) {
+		int numOut;
+		struct aiEntry *pos = sd;
+		snprintf(buf, sizeof(buf), "01  N14,csum  ex=%s", cases[i].pat);
+		numOut = parseSyntaxDictionaryEntry(ctx, buf, sd, &pos, 2);
+		TEST_CHECK((numOut > 0) == cases[i].valid);
+		TEST_MSG("pattern '%s' expected valid=%d got numOut=%d (err: %s)",
+			 cases[i].pat, cases[i].valid, numOut, ctx->errMsg);
+		if (numOut > 0)
+			gs1_freeSyntaxDictionaryEntries(ctx, sd);
+	}
 
 	gs1_encoder_free(ctx);
 

@@ -90,6 +90,7 @@ TEST_LIST = {
      */
 #ifndef EXCLUDE_SYNTAX_DICTIONARY_LOADER
     { "syn_parseSyntaxDictionaryEntry", test_syn_parseSyntaxDictionaryEntry },
+    { "syn_attrTemplateForm", test_syn_attrTemplateForm },
     { "syn_allocFailures", test_syn_allocFailures },
     { "syn_capacityOverflow", test_syn_capacityOverflow },
     { "syn_strdupFailures", test_syn_strdupFailures },
