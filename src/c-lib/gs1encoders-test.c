@@ -113,6 +113,7 @@ TEST_LIST = {
     { "ai_linters", test_ai_linters },
     { "ai_errMarkup", test_ai_errMarkup },
     { "ai_gs1_processAIdata", test_ai_processAIdata },
+    { "ai_predefinedLength", test_ai_predefinedLength },
     { "ai_validateAIs", test_ai_validateAIs },
 
 
