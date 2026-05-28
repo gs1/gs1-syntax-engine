@@ -1,3 +1,10 @@
+1.4.1
+
+* Core: Hardened the Syntax Dictionary loader against malformed or hostile custom dictionaries.
+* Core: Fixed an overflow when processing GS1 Digital Link URIs with very long stems.
+* Core: Fixed linter error markup for non-terminal AI components.
+
+
 1.4.0
 
 * Core: The legacy `gs1_encoder_init()` entry point was deprecated. New code should use `gs1_encoder_init_ex()`.
