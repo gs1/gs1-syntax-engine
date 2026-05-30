@@ -722,7 +722,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			.ai = outai,
 			.ailen = (uint8_t)ailen,
 			.value = outval,
-			.vallen = (uint8_t)vallen,
+			.vallen = (uint16_t)vallen,
 			.dlPathOrder = (uint8_t)numPathAIs
 		};
 
@@ -755,7 +755,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if ((e = memchr(p, '=', (size_t)(r-p))) == NULL) {
 			DEBUG_PRINT("    Skipped singleton:   %.*s\n", (int)(r-p), p);
 			outval = p;
-			vallen = (uint8_t)(r-p);
+			vallen = (ssize_t)(r-p);
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
@@ -771,7 +771,7 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		if (!entry) {
 			DEBUG_PRINT("    Skipped:   %.*s\n", (int)(r-p), p);
 			outval = p;
-			vallen = (uint8_t)(r-p);
+			vallen = (ssize_t)(r-p);
 			goto add_query_param_to_ai_data;	// Undecoded, "non-AI" data value!
 		}
 
@@ -838,7 +838,7 @@ add_query_param_to_ai_data:
 			.ai = outai,
 			.ailen = (uint8_t)ailen,
 			.value = outval,
-			.vallen = (uint8_t)vallen,
+			.vallen = (uint16_t)vallen,
 			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
 		};
 

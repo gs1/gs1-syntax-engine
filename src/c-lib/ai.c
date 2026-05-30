@@ -723,7 +723,7 @@ again:
 			.ai = outai,
 			.ailen = (uint8_t)ailen,
 			.value = outval,
-			.vallen = (uint8_t)outval_len,
+			.vallen = (uint16_t)outval_len,
 			.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
 		};
 
@@ -846,7 +846,7 @@ bool gs1_processAIdata(gs1_encoder* const ctx, const char* const dataStr, const 
 				.ai = ai,
 				.ailen = entry->ailen,
 				.value = p,
-				.vallen = (uint8_t)vallen,
+				.vallen = (uint16_t)vallen,
 				.dlPathOrder = DL_PATH_ORDER_ATTRIBUTE
 			};
 		}

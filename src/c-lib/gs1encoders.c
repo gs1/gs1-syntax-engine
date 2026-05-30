@@ -2077,6 +2077,25 @@ void test_api_getDLignoredQueryParams(void) {
 	TEST_CHECK(strcmp(qp[2], "singleton2") == 0);
 	TEST_CHECK(strcmp(qp[3], "compound2=12345") == 0);
 
+	// Ignored query param longer than 255 bytes must not have its recorded
+	// length truncated modulo 256 (regression for former uint8_t vallen)
+	{
+		char longbuf[512];
+		char expect[301];
+		int n;
+
+		memset(expect, 'A', 300);
+		expect[300] = '\0';
+		n = snprintf(longbuf, sizeof(longbuf), "https://a/01/12312312312333/22/TESTING?%s", expect);
+		TEST_ASSERT(n > 0 && (size_t)n < sizeof(longbuf));
+		TEST_ASSERT(gs1_encoder_setDataStr(ctx, longbuf));
+		TEST_ASSERT((numAIs = gs1_encoder_getDLignoredQueryParams(ctx, &qp)) == 1);
+		TEST_ASSERT(qp != NULL);
+		assert(qp);
+		TEST_CHECK(strcmp(qp[0], expect) == 0);
+		TEST_MSG("Ignored query param truncated: got length %zu, expected 300", strlen(qp[0]));
+	}
+
 	gs1_encoder_free(ctx);
 
 }

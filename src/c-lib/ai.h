@@ -87,7 +87,7 @@ struct aiValue {
 	const char *ai;				// Start of the AI in the underlying buffer
 	uint8_t ailen;				// Length of the AI
 	const char *value;			// Start of the AI value in the underlying buffer
-	uint8_t vallen;				// Length of the AI value
+	uint16_t vallen;			// Length of the AI value; wider than ailen since DL "ignored" query params carry arbitrary-length non-AI data (fits in existing struct padding)
 	aiValueKind_t kind;			// Kind of AI value
 	uint8_t dlPathOrder;			// Denotes the position in a DL URI path component
 };
