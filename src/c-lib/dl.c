@@ -688,6 +688,12 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t j;
 			char *v = dataStr + dataStr_len;
+			// LCOV_EXCL_START: unreachable while MAX_AIS caps dataStr_len far below MAX_DATA; defence in depth for the unguarded 14-byte write below
+			if (dataStr_len + 14 > MAX_DATA) {
+				SET_ERR_V(DATA_TOO_LONG, MAX_DATA);
+				goto fail;
+			}
+			// LCOV_EXCL_STOP
 			for (j = 0; j <= 13; j++)
 				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
 			v[14] = '\0';
@@ -806,6 +812,12 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t j;
 			char *v = dataStr + dataStr_len;
+			// LCOV_EXCL_START: unreachable while MAX_AIS caps dataStr_len far below MAX_DATA; defence in depth for the unguarded 14-byte write below
+			if (dataStr_len + 14 > MAX_DATA) {
+				SET_ERR_V(DATA_TOO_LONG, MAX_DATA);
+				goto fail;
+			}
+			// LCOV_EXCL_STOP
 			for (j = 0; j <= 13; j++)
 				v[13-j] = vallen >= (ssize_t)(j+1) ? v[(size_t)vallen-j-1] : '0';
 			v[14] = '\0';
