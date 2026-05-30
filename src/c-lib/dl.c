@@ -807,8 +807,8 @@ bool gs1_parseDLuri(gs1_encoder* const ctx, char* const dlData, char* const data
 			goto fail;
 		}
 
-		// Special handling of AI (01) to pad up to a GTIN-14
-		if (strcmp(entry->ai, "01") == 0 &&
+		// Legacy handling of AI (01) to pad up to a GTIN-14, when feature enabled
+		if (ctx->permitZeroSuppressedGTINinDLuris && strcmp(entry->ai, "01") == 0 &&
 		    (vallen == 13 || vallen == 12 || vallen == 8)) {
 			size_t j;
 			char *v = dataStr + dataStr_len;
@@ -1475,6 +1475,35 @@ void test_dl_parseDLuri(void) {
 		"https://a/01/02345673",
 		"");
 
+	/*
+	 * Same legacy expansion when AI (01) appears as a query parameter is also
+	 * gated on the feature flag (not applied unconditionally)
+	 *
+	 */
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
+	test_parseDLuri(true,					// GTIN-13 -> GTIN-14
+		"https://a/8004/9520614141234567?01=2112345678900",
+		"^80049520614141234567^0102112345678900");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
+
+	test_parseDLuri(false,					// Not expanded without the flag: too short
+		"https://a/8004/9520614141234567?01=2112345678900",
+		"");
+
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, true);
+	test_parseDLuri(true,					// GTIN-8 -> GTIN-14
+		"https://a/8004/9520614141234567?01=02345673",
+		"^80049520614141234567^0100000002345673");
+	gs1_encoder_setPermitZeroSuppressedGTINinDLuris(ctx, false);
+
+	test_parseDLuri(false,
+		"https://a/8004/9520614141234567?01=02345673",
+		"");
+
+	test_parseDLuri(true,					// Full GTIN-14 query parameter unaffected by the flag
+		"https://a/8004/9520614141234567?01=09521234543213",
+		"^80049520614141234567^0109521234543213");
+
 
 	test_parseDLuri(true,
 		"https://a/01/12312312312333/22/TEST/10/ABC/21/XYZ",
@@ -1692,8 +1721,9 @@ void test_dl_parseDLuri(void) {
 		"https://id.gs1.org/414/9520123456788/254/32a%2Fb",
 		"^414952012345678825432a/b");
 
+	// Second primary key (GTIN) carried as a query parameter data attribute
 	test_parseDLuri(true,
-		"https://example.com/8004/9520614141234567?01=9520123456788",
+		"https://example.com/8004/9520614141234567?01=09520123456788",
 		"^80049520614141234567^0109520123456788");
 
 	// AI in query params that should be in the path info
