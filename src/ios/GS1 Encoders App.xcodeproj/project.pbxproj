@@ -14,6 +14,7 @@
 		F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9AF2909D226008E17F4 /* Assets.xcassets */; };
 		F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */; };
 		F7C8D44D2EBD928400996636 /* GS1Encoders in Frameworks */ = {isa = PBXBuildFile; productRef = F7C8D44C2EBD928400996636 /* GS1Encoders */; };
+		F7D1C7A22EBE0002008E17F4 /* gs1-syntax-dictionary.txt in Resources */ = {isa = PBXBuildFile; fileRef = F7D1C7A12EBE0001008E17F4 /* gs1-syntax-dictionary.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		F73EC9AF2909D226008E17F4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F73EC9B22909D226008E17F4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F7B29BF72941447C002AD1DC /* GS1-Encoders-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GS1-Encoders-App-Info.plist"; sourceTree = SOURCE_ROOT; };
+		F7D1C7A12EBE0001008E17F4 /* gs1-syntax-dictionary.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "gs1-syntax-dictionary.txt"; path = "../c-lib/gs1-syntax-dictionary.txt"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				F72D9195293AB3F300809E9B /* BarcodeScannerView.swift */,
 				F73EC9AF2909D226008E17F4 /* Assets.xcassets */,
 				F73EC9B12909D226008E17F4 /* Preview Content */,
+				F7D1C7A12EBE0001008E17F4 /* gs1-syntax-dictionary.txt */,
 			);
 			path = "GS1 Encoders App";
 			sourceTree = "<group>";
@@ -163,6 +166,7 @@
 			files = (
 				F73EC9B32909D226008E17F4 /* Preview Assets.xcassets in Resources */,
 				F73EC9B02909D226008E17F4 /* Assets.xcassets in Resources */,
+				F7D1C7A22EBE0002008E17F4 /* gs1-syntax-dictionary.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

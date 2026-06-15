@@ -18,8 +18,41 @@
  *
  */
 
+import Foundation
 import GS1Encoders
 import SwiftUI
+
+// Seed the GS1 Syntax Dictionary into the app's writable storage from the copy
+// bundled with the app on first launch, then load it from there. A real
+// application could replace this file with a newer revision of the Syntax
+// Dictionary without rebuilding. The AI table embedded in the library is used
+// as a fallback while no local copy is available.
+private func localSyntaxDictionaryPath() -> String? {
+    guard let seed = Bundle.main.path(forResource: "gs1-syntax-dictionary", ofType: "txt") else {
+        return nil
+    }
+    let fm = FileManager.default
+    guard let docs = try? fm.url(for: .documentDirectory,
+                                 in: .userDomainMask,
+                                 appropriateFor: nil,
+                                 create: true) else {
+        return seed  // No writable storage; load the bundled seed directly
+    }
+    let local = docs.appendingPathComponent("gs1-syntax-dictionary.txt")
+    if !fm.fileExists(atPath: local.path) {
+        try? fm.copyItem(atPath: seed, toPath: local.path)
+    }
+    return fm.fileExists(atPath: local.path) ? local.path : seed
+}
+
+private func makeEncoder() -> GS1Encoder {
+    let encoder = try! GS1Encoder(syntaxDictionary: localSyntaxDictionaryPath(),
+                                  fallbackOnSyndictError: true)
+    if let warning = encoder.initFallbackWarning {
+        NSLog("GS1 Syntax Dictionary not loaded; using embedded AI table: %@", warning)
+    }
+    return encoder
+}
 
 struct ContentView: View {
 
@@ -43,7 +76,7 @@ struct ContentView: View {
 
     @FocusState var inputIsFocused: Bool
 
-    let gs1encoder = try! GS1Encoder()
+    let gs1encoder = makeEncoder()
 
     init() {
 
