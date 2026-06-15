@@ -27,4 +27,10 @@
     <ProjectReference Include="..\dotnet-lib\gs1encoders-dotnet-lib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\c-lib\gs1-syntax-dictionary.txt"
+             CopyToOutputDirectory="PreserveNewest"
+             Link="gs1-syntax-dictionary.txt" />
+  </ItemGroup>
+
 </Project>
