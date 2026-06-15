@@ -33,12 +33,23 @@ public class Example {
 
         GS1Encoder gs1encoder = null;
 
+        // Load the GS1 Syntax Dictionary from local storage (here, the current
+        // directory), falling back to the AI table embedded in the library if
+        // the file is absent or malformed. Replacing the file with a newer
+        // revision of the Syntax Dictionary lets the application adopt it
+        // without rebuilding the library.
         try {
-            gs1encoder = new GS1Encoder();
+            GS1Encoder.InitOptions options = new GS1Encoder.InitOptions()
+                    .setSyntaxDictionary("gs1-syntax-dictionary.txt")
+                    .setFallbackOnSyndictError(true);
+            gs1encoder = new GS1Encoder(options);
         } catch (GS1EncoderGeneralException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
+
+        if (gs1encoder.getInitFallbackWarning() != null)
+            System.err.format("Warning: %s\n", gs1encoder.getInitFallbackWarning());
 
         boolean exit = false;
 
