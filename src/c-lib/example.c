@@ -27,16 +27,41 @@
 int main(void) {
 
 	gs1_encoder *gs1encoder;
+	gs1_encoder_init_status_t initStatus = GS1_ENCODERS_INIT_SUCCESS;
+	char initMsg[256] = "";
 	const char *aiData = "(01)09521234543213(10)ABC123(99)TEST";
 	const char *aiDataOut, *dlURI, *scanData;
 	char **hri, **ignored;
 	int numHRI, numIgnored, i;
 
-	gs1encoder = gs1_encoder_init_ex(NULL, NULL);
+	/*
+	 *  Load the GS1 Syntax Dictionary from local storage (here, the current
+	 *  working directory), falling back to the AI table embedded in the
+	 *  library when the file is absent or malformed. Loading the dictionary
+	 *  from a file lets an application adopt a newer revision of the Syntax
+	 *  Dictionary by replacing this file, without rebuilding the library.
+	 *
+	 */
+	gs1_encoder_init_opts_t initOpts = {
+		.struct_size		= sizeof(gs1_encoder_init_opts_t),
+		.flags			= gs1_encoder_iFALLBACK_ON_SYNDICT_ERROR,
+		.syntaxDictionary	= "gs1-syntax-dictionary.txt",
+		.status			= &initStatus,
+		.msgBuf			= initMsg,
+		.msgBufSize		= sizeof(initMsg)
+	};
+
+	gs1encoder = gs1_encoder_init_ex(NULL, &initOpts);
 	if (!gs1encoder) {
 		fprintf(stderr, "Failed to initialise the GS1 Barcode Syntax Engine\n");
+		if (*initMsg)
+			fprintf(stderr, "Error: %s\n", initMsg);
 		return 1;
 	}
+
+	// Initialisation succeeded; warn if we fell back to the embedded AI table
+	if (initStatus != GS1_ENCODERS_INIT_SUCCESS && *initMsg)
+		fprintf(stderr, "Warning: %s\n", initMsg);
 
 	printf("\nVersion: %s\n\n", gs1_encoder_getVersion());
 
