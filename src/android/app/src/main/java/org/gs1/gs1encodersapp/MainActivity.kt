@@ -25,6 +25,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +35,7 @@ import org.gs1.gs1encoders.GS1EncoderDigitalLinkException
 import org.gs1.gs1encoders.GS1EncoderParameterException
 import org.gs1.gs1encoders.GS1EncoderScanDataException
 import org.gs1.gs1encodersapp.databinding.ActivityMainBinding
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -68,8 +70,14 @@ class MainActivity : AppCompatActivity() {
             },
         )
 
-        // Load the Syntax Engine
-        gs1encoder = GS1Encoder()
+        // Load the Syntax Engine, loading the Syntax Dictionary from local
+        // storage and falling back to the embedded AI table if it is unavailable
+        val options = GS1Encoder.InitOptions().setFallbackOnSyndictError(true)
+        localSyntaxDictionaryPath()?.let { options.setSyntaxDictionary(it) }
+        gs1encoder = GS1Encoder(options)
+        gs1encoder.initFallbackWarning?.let {
+            Log.w("MainActivity", "GS1 Syntax Dictionary not loaded; using embedded AI table: $it")
+        }
 
         (this as? AppCompatActivity)?.supportActionBar?.title =
             "GS1 Encoders library: " + gs1encoder.version
@@ -83,6 +91,25 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         gs1encoder.free()
+    }
+
+    // Seed the GS1 Syntax Dictionary into the app's writable storage from the
+    // copy bundled in the APK assets on first launch, then load it from there. A
+    // real application could replace this file with a newer revision of the
+    // Syntax Dictionary without rebuilding. The AI table embedded in the library
+    // is used as a fallback while no local copy is available.
+    private fun localSyntaxDictionaryPath(): String? {
+        val local = filesDir.resolve("gs1-syntax-dictionary.txt")
+        if (!local.exists()) {
+            try {
+                assets.open("gs1-syntax-dictionary.txt").use { input ->
+                    local.outputStream().use { output -> input.copyTo(output) }
+                }
+            } catch (e: IOException) {
+                return null
+            }
+        }
+        return if (local.exists()) local.absolutePath else null
     }
 
     private fun clearRender() {

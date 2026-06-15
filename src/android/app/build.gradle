@@ -3,6 +3,14 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// Stage the canonical GS1 Syntax Dictionary into the APK assets at build time so
+// the app ships a copy without committing a second copy of the file to the repo.
+def syntaxDictionaryAssets = file('build/generated/syntaxDictionaryAssets')
+tasks.register('stageSyntaxDictionary', Copy) {
+    from rootProject.file('../c-lib/gs1-syntax-dictionary.txt')
+    into syntaxDictionaryAssets
+}
+
 android {
     namespace 'org.gs1.gs1encodersapp'
     compileSdk 34
@@ -39,6 +47,15 @@ android {
     buildFeatures {
         viewBinding true
     }
+    sourceSets {
+        main {
+            assets.srcDir(syntaxDictionaryAssets)
+        }
+    }
+}
+
+tasks.named('preBuild') {
+    dependsOn 'stageSyntaxDictionary'
 }
 
 dependencies {
