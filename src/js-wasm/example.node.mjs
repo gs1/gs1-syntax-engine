@@ -51,7 +51,19 @@ const rl = readline.createInterface({ input, output });
  */
 import { GS1encoder } from "./gs1encoder.mjs";
 
-const gs1encoder = await GS1encoder.create();
+// Load the GS1 Syntax Dictionary from local storage (here, the current
+// directory), falling back to the AI table embedded in the library if the file
+// is absent or malformed. Replacing the file with a newer revision of the
+// Syntax Dictionary lets the application adopt it without rebuilding. (In the
+// browser there is no host filesystem, so omit these options and the embedded
+// AI table is used.)
+const gs1encoder = await GS1encoder.create({
+    syntaxDictionary: "gs1-syntax-dictionary.txt",
+    fallbackOnSyndictError: true,
+});
+
+if (gs1encoder.initFallbackWarning)
+    console.error("Warning: %s", gs1encoder.initFallbackWarning);
 
 let exit = 0;
 
