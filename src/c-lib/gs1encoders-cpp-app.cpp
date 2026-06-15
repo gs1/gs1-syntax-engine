@@ -231,9 +231,12 @@ int main(int argc, char *argv[]) {
 	/*
 	 *  An explicit --syndict path is honoured strictly: init fails if
 	 *  the file cannot be loaded. Without --syndict the console app
-	 *  attempts to pick up gs1-syntax-dictionary.txt from the current
-	 *  directory, falling back to the embedded AI table if the file
-	 *  is absent or malformed.
+	 *  attempts to pick up gs1-syntax-dictionary.txt from local storage
+	 *  (here, the current directory), falling back to the embedded AI
+	 *  table if the file is absent or malformed. Loading the dictionary
+	 *  from a file lets an application adopt a newer revision of the
+	 *  Syntax Dictionary by replacing this file, without rebuilding the
+	 *  library.
 	 *
 	 */
 	enc::InitOpts opts;
