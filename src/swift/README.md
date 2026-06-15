@@ -146,6 +146,11 @@ Build and run:
 swift run
 ```
 
+By default the example loads `gs1-syntax-dictionary.txt` from the current
+directory and falls back to the embedded AI table if it is absent or malformed;
+pass `swift run Example --syndict <path>` to load a specific Syntax Dictionary
+file instead.
+
 For a comprehensive example, see [Example.swift](https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Sources/Example/Example.swift).
 
 ### iOS Mobile App Quick Start

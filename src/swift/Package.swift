@@ -69,9 +69,6 @@ let package = Package(
                 "c-lib/aitable.inc",
                 "c-lib/README.md"
             ],
-            resources: [
-                .copy("c-lib/gs1-syntax-dictionary.txt")
-            ],
             cSettings: [
                 .define("PRNT", to: "0"),
                 .define("GS1_LINTER_ERR_STR_EN"),

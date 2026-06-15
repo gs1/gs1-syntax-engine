@@ -28,9 +28,29 @@ func readLine() -> String {
     return line
 }
 
-guard let gs1encoder = try? GS1Encoder() else {
+// An explicit --syndict path is loaded strictly, while by default the example
+// loads gs1-syntax-dictionary.txt from local storage (the current directory)
+// and falls back to the AI table embedded in the library if the file is absent
+// or malformed. Replacing the file with a newer revision of the Syntax
+// Dictionary lets the application adopt it without rebuilding.
+var syntaxDictionary: String?
+var argsIterator = CommandLine.arguments.dropFirst().makeIterator()
+while let arg = argsIterator.next() {
+    if arg == "--syndict" {
+        syntaxDictionary = argsIterator.next()
+    }
+}
+let fallbackOnSyndictError = syntaxDictionary == nil
+let dictionaryPath = syntaxDictionary ?? "gs1-syntax-dictionary.txt"
+
+guard let gs1encoder = try? GS1Encoder(syntaxDictionary: dictionaryPath,
+                                       fallbackOnSyndictError: fallbackOnSyndictError) else {
     print("Failed to initialise the native library")
     Foundation.exit(1)
+}
+
+if let warning = gs1encoder.initFallbackWarning {
+    print("Warning: \(warning)")
 }
 
 defer { gs1encoder.free() }
