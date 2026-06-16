@@ -131,10 +131,6 @@
  *
  * public class MyApp {
  *
- *     static {
- *         System.loadLibrary("gs1encodersjni");
- *     }
- *
  *     public static void main(String[] args) {
  *         try (GS1Encoder gs = new GS1Encoder()) {
  *             gs.setAIdataStr("(01)09521234543213(99)TESTING123");
@@ -260,18 +256,12 @@
  * add_compile_definitions(GS1_LINTER_ERR_STR_EN)
  * add_library(gs1encoders SHARED ${LIB_SOURCE_FILES})
  *   </pre>
- * <li>Amend your Activity to import the gs1encoders package, load the native library, and then use it:
+ * <li>Amend your Activity to import the gs1encoders package and then use it:
  *   <pre>
  * ...
  * import org.gs1.gs1encoders.GS1Encoder
  *
  * class MainActivity : AppCompatActivity() {
- *
- *     companion object {
- *         init {
- *             System.loadLibrary("gs1encoders")
- *         }
- *     }
  *
  *     private lateinit var gs: GS1Encoder
  *

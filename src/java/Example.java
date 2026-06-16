@@ -25,10 +25,6 @@ import java.util.Scanner;
 
 public class Example {
 
-    static {
-        System.loadLibrary("gs1encodersjni");
-    }
-
     public static void main(final String args[]) {
 
         GS1Encoder gs1encoder = null;

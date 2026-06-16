@@ -25,10 +25,6 @@ import org.junit.jupiter.api.Test;
 
 public class GS1EncoderTest {
 
-    static {
-        System.loadLibrary("gs1encodersjni");
-    }
-
     @Test
     public void testSetDLuri() throws Exception {
         GS1Encoder gs1encoder = new GS1Encoder();
