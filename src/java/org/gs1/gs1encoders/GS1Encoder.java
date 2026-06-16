@@ -18,6 +18,12 @@ package org.gs1.gs1encoders;
  *
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * Main class for processing GS1 barcode data, including validation, format conversion, and generation of outputs such as GS1 Digital Link URIs and Human-Readable Interpretation text.
  */
@@ -54,9 +60,10 @@ public class GS1Encoder implements AutoCloseable {
     private static native String[] gs1encoderGetHRIJNI(long ctx);
     private static native String[] gs1encoderGetDLignoredQueryParamsJNI(long ctx);
 
-    // Initialisation loads the gs1encoders JNI library interface
+    // Load the gs1encoders JNI library from the system library path, or, failing
+    // that, from a per-platform copy bundled with the classes.
     static {
-        System.loadLibrary("gs1encoders");
+        NativeLibraryLoader.load("gs1encoders");
     }
 
     /**
@@ -830,6 +837,109 @@ public class GS1Encoder implements AutoCloseable {
      */
     public String[] getDLignoredQueryParams() {
         return gs1encoderGetDLignoredQueryParamsJNI(ctx);
+    }
+
+    /**
+     * Loads the native JNI library that backs the enclosing {@link GS1Encoder}.
+     *
+     * <p>The library is first sought on the system library path via {@link
+     * System#loadLibrary(String)}. This is the behaviour relied upon by the Ant build
+     * (which places the shared library alongside the classes) and by the Android AAR
+     * (whose native library is unpacked by the platform), so existing deployments are
+     * unaffected.
+     *
+     * <p>Only if that fails does it look for a copy of the library for the current
+     * platform bundled with the classes (under {@code META-INF/lib/<os>_<arch>/}); if
+     * one is present it is extracted to a temporary file and loaded. This is how the
+     * engine can be distributed as a single multi-architecture JAR that needs no
+     * separately installed native library.
+     *
+     * <p>Only {@code java.io} is used, so this class also compiles unchanged for
+     * Android, where the first step always succeeds and the fallback is never reached.
+     */
+    private static final class NativeLibraryLoader {
+
+        /** Supported operating systems: bundle directory, native library naming, and os.name marker. */
+        private enum Os {
+            LINUX  ("linux",   "lib", "so",    "linux"),
+            DARWIN ("darwin",  "lib", "dylib", "mac"),
+            WINDOWS("windows", "",    "dll",   "windows");
+
+            private final String tag, prefix, extension, marker;
+
+            Os(String tag, String prefix, String extension, String marker) {
+                this.tag = tag;
+                this.prefix = prefix;
+                this.extension = extension;
+                this.marker = marker;
+            }
+
+            String libraryFileName(String name) {
+                return prefix + name + "." + extension;
+            }
+
+            static Os current() {
+                String osName = System.getProperty("os.name", "").toLowerCase();
+                for (Os os : values())
+                    if (osName.contains(os.marker))
+                        return os;
+                throw new UnsatisfiedLinkError("Unsupported operating system: " + osName);
+            }
+        }
+
+        private NativeLibraryLoader() {
+        }
+
+        static void load(String name) {
+            try {
+                System.loadLibrary(name);
+            } catch (UnsatisfiedLinkError notOnSystemPath) {
+                loadBundled(name);
+            }
+        }
+
+        private static void loadBundled(String name) {
+            Os os = Os.current();
+            String resource = "/META-INF/lib/" + os.tag + "_" + arch() + "/" + os.libraryFileName(name);
+            try (InputStream in = NativeLibraryLoader.class.getResourceAsStream(resource)) {
+                if (in == null)
+                    throw new UnsatisfiedLinkError(
+                            "Native library '" + name + "' is neither on the library path nor bundled at " + resource);
+                System.load(extract(in, os.extension));
+            } catch (IOException e) {
+                throw new UnsatisfiedLinkError("Failed to extract bundled native library '" + name + "': " + e.getMessage());
+            }
+        }
+
+        private static String extract(InputStream in, String extension) throws IOException {
+            File tmp = File.createTempFile("gs1encoders", "." + extension);
+            tmp.deleteOnExit();
+            try (OutputStream out = new FileOutputStream(tmp)) {
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) != -1)
+                    out.write(buf, 0, n);
+            }
+            return tmp.getAbsolutePath();
+        }
+
+        private static String arch() {
+            String osArch = System.getProperty("os.arch", "").toLowerCase();
+            switch (osArch) {
+                case "amd64":
+                case "x86_64":
+                    return "x86_64";
+                case "aarch64":
+                case "arm64":
+                    return "aarch64";
+                case "x86":
+                case "i386":
+                case "i686":
+                    return "x86";
+                default:
+                    return osArch.startsWith("arm") ? "arm" : osArch;
+            }
+        }
     }
 
 }
