@@ -45,7 +45,7 @@
   <condition property="jnilib" value="libgs1encodersjni.dylib">
     <os family="mac"/>
   </condition>
-  <condition property="jnilib" value="gs1encodersjni.dll">
+  <condition property="jnilib" value="gs1encoders.dll">
     <os family="windows"/>
   </condition>
   <condition property="jnilib" value="libgs1encodersjni.so">
@@ -114,13 +114,18 @@
   </target>
 
   <target name="cc-cl" if="is.compiler.cl">
+    <mkdir dir="${build}/obj"/>
     <exec executable="cl.exe" failonerror="true">
       <arg line="/LD /MD /O2 /EHsc" />
+      <arg line="/D_CRT_SECURE_NO_WARNINGS /DGS1_LINTER_ERR_STR_EN" />
       <arg line="/I${clib}" />
       <arg line="'-I${java.home}/include'" />
       <arg line="'-I${java.home}/include/${os.family}'" />
+      <arg line="'/Fo${build}/obj/'" />
       <arg line="/Fe:${jnilib}" />
-      <arg line="${dlldir}/gs1encoders.lib ${wrapfile}" />
+      <arg line="${clib}/ai.c ${clib}/dl.c ${clib}/gs1encoders.c ${clib}/scandata.c ${clib}/syn.c" />
+      <arg line="${clib}/syntax/gs1syntaxdictionary.c ${clib}/syntax/lint_*.c" />
+      <arg line="${wrapfile}" />
     </exec>
   </target>
 
@@ -138,11 +143,7 @@
     </exec>
   </target>
 
-  <target name="copydll" unless="jnilink">
-    <copy file="${dlldir}/gs1encoders.dll" todir="${src}"/>
-  </target>
-
-  <target name="jni" depends="strip,symlink,copydll" if="jnilink"/>
+  <target name="jni" depends="strip,symlink" if="jnilink"/>
 
   <target name="compile" depends="init">
     <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
@@ -206,9 +207,8 @@
     <delete file="${jnilib}"/>
     <delete file="${jnilink}"/>
     <delete file="${src}/gs1encoders.dll"/>
-    <delete file="${src}/gs1encodersjni.exp"/>
-    <delete file="${src}/gs1encodersjni.lib"/>
-    <delete file="${src}/gs1encoders_wrap.obj"/>
+    <delete file="${src}/gs1encoders.exp"/>
+    <delete file="${src}/gs1encoders.lib"/>
     <delete file="${src}/Example.class"/>
     <delete file="${src}/GS1EncoderTest.class"/>
     <delete file="${src}/gs1-syntax-dictionary.txt"/>
