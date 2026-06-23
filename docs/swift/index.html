@@ -110,7 +110,7 @@ Digital Link URI.</li>
 
 <p>The main operations of the library involve reading and updating the state of these buffers.</p>
 <h2 id='quick-start' class='heading'>Quick start</h2>
-<h3 id='building-the-swift-package' class='heading'>Building the Swift Package</h3>
+<h3 id='build-the-library-as-a-local-package' class='heading'>Build the library as a local package</h3>
 
 <p>To build the package:</p>
 <pre class="highlight shell"><code><span class="nb">cd </span>src/swift
@@ -120,7 +120,7 @@ swift build
 <p>To build for release:</p>
 <pre class="highlight shell"><code>swift build <span class="nt">-c</span> release
 </code></pre>
-<h3 id='running-the-example-application' class='heading'>Running the Example Application</h3>
+<h3 id='build-the-example-against-the-local-package' class='heading'>Build the example against the local package</h3>
 
 <p>After building, you can test it by running the interactive example application:</p>
 <pre class="highlight shell"><code>swift run Example
@@ -131,20 +131,29 @@ swift build
 </code></pre>
 
 <p>The example application provides an interactive menu for testing different input formats and features.</p>
-<h3 id='using-in-your-own-project' class='heading'>Using in Your Own Project</h3>
+<h3 id='use-the-package-in-your-own-project' class='heading'>Use the package in your own project</h3>
 
-<p>To use the wrapper in your Swift project, add it as a dependency in your <code>Package.swift</code>:</p>
+<p>Add the published package as a dependency in your <code>Package.swift</code>:</p>
 <pre class="highlight swift"><code><span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
-    <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">path</span><span class="p">:</span> <span class="s">"&lt;path-to-gs1-syntax-engine&gt;/src/swift"</span><span class="p">)</span>
+    <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/gs1/gs1encoders-swift"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"1.4.1"</span><span class="p">)</span>
 <span class="p">]</span>
 </code></pre>
 
-<p>Then add it to your target:</p>
+<p>Then add the <code>GS1Encoders</code> product to your target:</p>
 <pre class="highlight swift"><code><span class="nv">targets</span><span class="p">:</span> <span class="p">[</span>
     <span class="o">.</span><span class="nf">target</span><span class="p">(</span>
         <span class="nv">name</span><span class="p">:</span> <span class="s">"MyApp"</span><span class="p">,</span>
-        <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span><span class="s">"GS1Encoders"</span><span class="p">]</span>
+        <span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
+            <span class="o">.</span><span class="nf">product</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"GS1Encoders"</span><span class="p">,</span> <span class="nv">package</span><span class="p">:</span> <span class="s">"gs1encoders-swift"</span><span class="p">)</span>
+        <span class="p">]</span>
     <span class="p">)</span>
+<span class="p">]</span>
+</code></pre>
+
+<p>To build against the current source of this repository instead of a release — for
+local development — use a path dependency on <code>src/swift</code>:</p>
+<pre class="highlight swift"><code><span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
+    <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">path</span><span class="p">:</span> <span class="s">"&lt;path-to-gs1-syntax-engine&gt;/src/swift"</span><span class="p">)</span>
 <span class="p">]</span>
 </code></pre>
 
@@ -192,6 +201,11 @@ own <code><a href="Classes/GS1Encoder.html">GS1Encoder</a></code> instance. Do n
 <pre class="highlight shell"><code>swift run
 </code></pre>
 
+<p>By default the example loads <code>gs1-syntax-dictionary.txt</code> from the current
+directory and falls back to the embedded AI table if it is absent or malformed;
+pass <code>swift run Example --syndict &lt;path&gt;</code> to load a specific Syntax Dictionary
+file instead.</p>
+
 <p>For a comprehensive example, see <a href="https://github.com/gs1/gs1-syntax-engine/blob/main/src/swift/Sources/Example/Example.swift">Example.swift</a>.</p>
 <h3 id='ios-mobile-app-quick-start' class='heading'>iOS Mobile App Quick Start</h3>
 
@@ -199,16 +213,21 @@ own <code><a href="Classes/GS1Encoder.html">GS1Encoder</a></code> instance. Do n
 
 <ol>
 <li><p>Create a new iOS App project in Xcode (File → New → Project → iOS → App)</p></li>
-<li><p>Add the Swift package as a local dependency:</p>
+<li><p>Add the Swift package dependency:</p>
 
 <ul>
 <li>In Xcode, select File → Add Package Dependencies&hellip;</li>
-<li>Click &ldquo;Add Local&hellip;&rdquo; button at the bottom</li>
-<li>Navigate to and select the <code>gs1-syntax-engine/src/swift</code> directory</li>
+<li>In the search field, enter the package URL: <code>https://github.com/gs1/gs1encoders-swift</code></li>
+<li>Choose the version rule (e.g. &ldquo;Up to Next Major Version&rdquo; starting from 1.4.1)</li>
 <li>Click &ldquo;Add Package&rdquo;</li>
 <li>In the dialog, ensure &ldquo;GS1Encoders&rdquo; is selected and click &ldquo;Add Package&rdquo;</li>
 </ul></li>
-<li><p>In your SwiftUI view or view controller, import and use the library:</p></li>
+</ol>
+
+<p>For local development against this repository instead, click &ldquo;Add Local&hellip;&rdquo; and select the <code>gs1-syntax-engine/src/swift</code> directory.</p>
+
+<ol>
+<li>In your SwiftUI view or view controller, import and use the library:</li>
 </ol>
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">SwiftUI</span>
 <span class="kd">import</span> <span class="kt">GS1Encoders</span>
