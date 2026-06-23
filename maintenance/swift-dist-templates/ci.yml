@@ -1,0 +1,38 @@
+name: CI
+
+# Verifies the distributed Swift package builds and tests from a clean checkout: build+test
+# on macOS and Linux, and a build for each Apple platform the package targets.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  apple:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macOS, iOS, tvOS, watchOS, visionOS]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (${{ matrix.platform }})
+        run: |
+          if [ "${{ matrix.platform }}" = "macOS" ]; then
+            swift build && swift test
+          else
+            xcodebuild -scheme GS1Encoders \
+              -destination "generic/platform=${{ matrix.platform }}" build
+          fi
+
+  linux:
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build && swift test

@@ -427,6 +427,12 @@ test-swift:
 	    -u $$(id -u):$$(id -g) swift:6.0 \
 	    swift test --build-path .build-test
 
+# Regenerate the gs1encoders-swift distribution package (see maintenance/sync-swift-package.sh).
+SWIFT_DIST ?= ../gs1encoders-swift
+.PHONY: swift-dist
+swift-dist:
+	../../maintenance/sync-swift-package.sh "$(SWIFT_DIST)"
+
 # Run the .NET binding test suite on Linux via Docker. Depends on the local
 # Linux shared library; the csproj is cross-platform aware and stages
 # libgs1encoders.so as libgs1encoders.dll in the test output dir.
