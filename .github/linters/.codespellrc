@@ -1,5 +1,5 @@
 [codespell]
-# GS1 Digital Link URI path shortname for AI 21 (Serial Number)
-ignore-words-list = ser
+# "ser": GS1 Digital Link shortname for AI 21 (Serial Number). "fo": MSVC /Fo object-dir flag.
+ignore-words-list = ser,fo
 # Skip vendored, generated, third-party, and symlinked files
 skip = src/c-lib/syntax,docs,src/c-lib/aitable.*,src/c-lib/build*,src/c-lib/corpus-*,maintenance/docker/*/build,node_modules,src/swift/.build,*/acutest.h,*/corpus-*,*.svg
