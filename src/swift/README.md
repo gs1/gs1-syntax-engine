@@ -170,12 +170,14 @@ To use the GS1 Barcode Syntax Engine in an iOS application:
 
 1. Create a new iOS App project in Xcode (File → New → Project → iOS → App)
 
-2. Add the Swift package as a local dependency:
+2. Add the Swift package dependency:
    - In Xcode, select File → Add Package Dependencies...
-   - Click "Add Local..." button at the bottom
-   - Navigate to and select the `gs1-syntax-engine/src/swift` directory
+   - In the search field, enter the package URL: `https://github.com/gs1/gs1encoders-swift`
+   - Choose the version rule (e.g. "Up to Next Major Version" starting from 1.4.1)
    - Click "Add Package"
    - In the dialog, ensure "GS1Encoders" is selected and click "Add Package"
+
+   For local development against this repository instead, click "Add Local..." and select the `gs1-syntax-engine/src/swift` directory.
 
 3. In your SwiftUI view or view controller, import and use the library:
 
