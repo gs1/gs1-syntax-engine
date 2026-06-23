@@ -14,7 +14,7 @@ and its subordinate
 ## What's included
 
 The GS1 Barcode Syntax Engine consists of a native C library, a header-based C++
-wrapper, and bindings for C# .NET, Java, Swift, and JavaScript + WebAssembly,
+wrapper, and bindings for C# .NET, Java/Kotlin, Swift, and JavaScript + WebAssembly,
 providing idiomatic interfaces to the native library from a variety of
 high-level programming languages.
 
@@ -23,7 +23,7 @@ high-level programming languages.
 | C                  | Native code         | Cross-platform, embedded | -                                                          | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/gs1encoders_8h.html)                                                                                                                     |
 | C++                | Header-based wrapper| Cross-platform, embedded | -                                                          | [Overview](https://gs1.github.io/gs1-syntax-engine/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/group__cppapi.html)                                                                                                                      |
 | C# .NET            | P/Invoke wrapper    | Windows, Linux, macOS    | -                                                          | [Overview](https://gs1.github.io/gs1-syntax-engine/cs/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/cs/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/cs/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/cs/GS1.Encoders.GS1Encoder.html)                                                                                                |
-| Java (and Android) | JNI wrapper         | Cross-platform, Android  | -                                                          | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
+| Java (and Kotlin)  | JNI wrapper         | Cross-platform, Android  | -                                                          | [Overview](https://gs1.github.io/gs1-syntax-engine/java/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/package-summary.html#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/java/org/gs1/gs1encoders/GS1Encoder.html) |
 | Swift (and iOS)    | C interoperability  | macOS, iOS               | [SPI](https://swiftpackageindex.com/gs1/gs1encoders-swift) | [Overview](https://gs1.github.io/gs1-syntax-engine/swift/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/swift/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/swift/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/swift/Classes/GS1Encoder.html)                                                                                         |
 | JavaScript         | WebAssembly         | Browser, Node.js         | [npm](https://www.npmjs.com/package/gs1encoder)            | [Overview](https://gs1.github.io/gs1-syntax-engine/js-wasm/), [Quick Start](https://gs1.github.io/gs1-syntax-engine/js-wasm/#quick-start), [Examples](https://gs1.github.io/gs1-syntax-engine/js-wasm/#example-uses), [API reference](https://gs1.github.io/gs1-syntax-engine/js-wasm/GS1encoder.html)                                                                                         |
 
@@ -46,10 +46,10 @@ There is a large corpus of example code.
 
 - [Windows WPF desktop application](https://github.com/gs1/gs1-syntax-engine/wiki/Desktop-Application-User-Guide) ([source](src/dotnet-app))
 
-**Java:**
+**Java/Kotlin:**
 
 - Console application ([source](src/java/Example.java))
-- Android mobile app (Kotlin) with ML Kit barcode scanning ([source](src/android))
+- Android mobile app with ML Kit barcode scanning ([source](src/android))
 
 **Swift:**
 
