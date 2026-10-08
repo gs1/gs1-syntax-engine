@@ -106,7 +106,7 @@ function process_clicked() {
 
 	try {
 
-		const data = document.getElementById("data").value;
+		const data = document.getElementById("data").value.trim();
 		if (data == "") return;
 
 		if (data.startsWith('(')) {
